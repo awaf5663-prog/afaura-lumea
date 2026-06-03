@@ -1,0 +1,6 @@
+{
+  "name": "Afaura LUMÉA",
+  "description": "Maison de modest fashion moderne d'exception. Foulards en coton premium, hijabs en jersey et essentiels textiles raffinés inspirés par la simplicité et la qualité.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

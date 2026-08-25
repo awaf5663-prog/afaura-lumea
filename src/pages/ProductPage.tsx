@@ -1,5 +1,6 @@
 import { ArrowLeft, Check, Loader2, ShieldCheck, Truck } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { WhatsAppLink } from '@/src/components/whatsapp/WhatsAppLink';
 import { Gallery } from '@/src/components/product/Gallery';
 import { ProductCard } from '@/src/components/product/ProductCard';
 import { VariantPicker } from '@/src/components/product/VariantPicker';
@@ -12,7 +13,6 @@ import { QuantityStepper } from '@/src/components/ui/QuantityStepper';
 import { BRAND, SITE_URL } from '@/src/config/site';
 import { useCart } from '@/src/hooks/useCart';
 import { useProducts } from '@/src/hooks/useProducts';
-import { useWhatsapp } from '@/src/hooks/useSettings';
 import { useToast } from '@/src/hooks/useToast';
 import { formatFcfa } from '@/src/lib/format';
 import { Link, useRouter } from '@/src/lib/router';
@@ -23,7 +23,6 @@ export function ProductPage({ slug }: { slug: string }) {
   const { products, loading } = useProducts();
   const { add } = useCart();
   const { notify } = useToast();
-  const whatsapp = useWhatsapp();
   const { navigate } = useRouter();
 
   const product = products.find((p) => p.slug === slug || p.id === slug);
@@ -194,19 +193,13 @@ export function ProductPage({ slug }: { slug: string }) {
                 <>Ajouter au panier · {formatFcfa(product.price * quantity)}</>
               )}
             </Button>
-            {whatsapp.available && (
-              <Button
-                size="lg"
-                variant="secondary"
-                onClick={() => {
-                  void whatsapp.open(productMessage).then((copied) => {
-                    if (copied) notify('Message copié — collez-le dans la conversation');
-                  });
-                }}
-              >
-                Commander via WhatsApp
-              </Button>
-            )}
+            <WhatsAppLink
+              message={productMessage}
+              variant="plain"
+              className="press inline-flex h-14 items-center justify-center rounded-full border border-ink/25 px-7 text-[15px] font-medium no-underline hover:border-ink"
+            >
+              Commander via WhatsApp
+            </WhatsAppLink>
           </div>
 
           <ul className="mt-8 space-y-2.5 border-t border-line pt-6 text-[13.5px] text-stone">
@@ -248,19 +241,13 @@ export function ProductPage({ slug }: { slug: string }) {
             )}
           </Button>
         </div>
-        {whatsapp.available && (
-          <button
-            type="button"
-            onClick={() => {
-              void whatsapp.open(productMessage).then((copied) => {
-                if (copied) notify('Message copié — collez-le dans la conversation');
-              });
-            }}
-            className="mt-2 block w-full text-center text-[12.5px] text-stone underline underline-offset-2"
-          >
-            Une question ? Écrire sur WhatsApp
-          </button>
-        )}
+        <WhatsAppLink
+          message={productMessage}
+          variant="plain"
+          className="mt-2 block text-center text-[12.5px] text-stone"
+        >
+          Une question ? Écrire sur WhatsApp
+        </WhatsAppLink>
       </div>
       <div className="h-28 lg:hidden" aria-hidden />
     </div>

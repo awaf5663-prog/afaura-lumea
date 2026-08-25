@@ -330,7 +330,7 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
               <label className="inline-flex items-center gap-2 text-[14px]">
                 <input
                   type="checkbox"
-                  className="size-4 accent-[#16110f]"
+                  className="size-4 accent-[#8f4b5b]"
                   checked={editing.isNew ?? false}
                   onChange={(e) => setEditing({ ...editing, isNew: e.target.checked })}
                 />
@@ -339,7 +339,7 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
               <label className="inline-flex items-center gap-2 text-[14px]">
                 <input
                   type="checkbox"
-                  className="size-4 accent-[#16110f]"
+                  className="size-4 accent-[#8f4b5b]"
                   checked={editing.isPopular ?? false}
                   onChange={(e) => setEditing({ ...editing, isPopular: e.target.checked })}
                 />

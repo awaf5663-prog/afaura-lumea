@@ -62,7 +62,7 @@ export function SheinConfirmationPage({ requestNumber }: { requestNumber: string
     <div className="container-page py-10">
       <div className="mx-auto max-w-2xl">
         <div className="animate-fade flex flex-col items-center text-center">
-          <span className="grid size-14 place-items-center rounded-full bg-ink text-ivory">
+          <span className="grid size-14 place-items-center rounded-full bg-mauve text-ivory">
             <Check className="size-7" />
           </span>
           <h1 className="mt-5 text-[34px] sm:text-[42px]">Demande envoyée</h1>

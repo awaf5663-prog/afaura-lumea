@@ -317,7 +317,7 @@ function GroupingCard({
         </div>
         <div className="mt-2 h-2 overflow-hidden rounded-full bg-sand">
           <div
-            className={cn('h-full rounded-full transition-all duration-500', rate >= 100 ? 'bg-mauve' : 'bg-ink')}
+            className={cn('h-full rounded-full transition-all duration-500', rate >= 100 ? 'bg-rosedark' : 'bg-mauve')}
             style={{ width: `${rate}%` }}
           />
         </div>

@@ -16,7 +16,7 @@ export function Hero() {
 
           <h1 className="mt-4 text-[33px] leading-[1.07] sm:text-[48px] lg:text-[58px]">
             Commande ce qui te plaît.
-            <span className="block text-stone">On s'occupe de tout le reste.</span>
+            <span className="block text-mauve">On s'occupe de tout le reste.</span>
           </h1>
 
           <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-graphite">{BRAND.pitch}</p>
@@ -45,7 +45,7 @@ export function Hero() {
 
         <div>
           <div className="relative">
-            <div className="overflow-hidden rounded-[--radius-xl] bg-cream">
+            <div className="overflow-hidden rounded-[--radius-xl] bg-blush">
               <img
                 src={heroImage}
                 alt="Hijabs en dentelle noir et blanc portés par deux modèles"

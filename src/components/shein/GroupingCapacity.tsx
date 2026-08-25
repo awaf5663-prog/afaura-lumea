@@ -61,7 +61,7 @@ export function GroupingCapacity({
               key={index}
               className={cn(
                 'h-2.5 flex-1 rounded-[2px] transition-colors duration-500',
-                index < filledSegments ? (isFull ? 'bg-mauve' : 'bg-ink') : 'bg-sand',
+                index < filledSegments ? (isFull ? 'bg-rosedark' : 'bg-mauve') : 'bg-sand',
               )}
             />
           ))}

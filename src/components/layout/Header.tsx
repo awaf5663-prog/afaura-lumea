@@ -55,7 +55,7 @@ export function Header({ onOpenCart }: { onOpenCart: () => void }) {
   return (
     <>
       {settings?.announcement ? (
-        <div className="bg-ink px-4 py-2 text-center text-[12px] tracking-wide text-ivory">
+        <div className="bg-rosedark px-4 py-2 text-center text-[12px] tracking-wide text-ivory">
           {settings.announcement}
         </div>
       ) : null}

@@ -13,7 +13,7 @@ export function TrustRow() {
   return (
     <section className="container-page mt-20">
       <Reveal>
-        <ul className="grid grid-cols-2 gap-x-4 gap-y-8 rounded-[--radius-lg] border border-line bg-white/70 p-6 lg:grid-cols-4 lg:p-8">
+        <ul className="grid grid-cols-2 gap-x-4 gap-y-8 rounded-[--radius-lg] border border-line bg-blush/45 p-6 lg:grid-cols-4 lg:p-8">
           {POINTS.map((point) => (
             <li key={point.title} className="flex gap-3">
               <point.icon className="mt-0.5 size-5 shrink-0 text-mauve" strokeWidth={1.5} />

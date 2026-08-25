@@ -195,7 +195,7 @@ export function SheinPage() {
       </section>
 
       <section className="container-page mt-20">
-        <div className="rounded-[--radius-xl] bg-ink px-6 py-12 text-center text-ivory sm:px-12">
+        <div className="rounded-[--radius-xl] bg-rosedark px-6 py-12 text-center text-ivory sm:px-12">
           <h2 className="text-[28px] text-ivory sm:text-[36px]">Prête à envoyer votre sélection ?</h2>
           <p className="mx-auto mt-3 max-w-md text-[14.5px] text-ivory/70">
             Comptez deux minutes. Vous recevez ensuite votre numéro de demande et notre réponse sur

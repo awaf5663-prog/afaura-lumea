@@ -22,7 +22,7 @@ export function GroupingSection() {
   ];
 
   return (
-    <section className="mt-24 bg-cream/70 py-16">
+    <section className="mt-24 bg-blush/40 py-16">
       <div className="container-page grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
         <Reveal>
           <p className="eyebrow">Le groupage, simplement</p>

@@ -9,7 +9,7 @@ export function SheinTeaser() {
   return (
     <section className="container-page mt-24">
       <Reveal>
-        <div className="overflow-hidden rounded-[--radius-xl] bg-ink px-6 py-12 text-ivory sm:px-12 sm:py-16">
+        <div className="overflow-hidden rounded-[--radius-xl] bg-rosedark px-6 py-12 text-ivory sm:px-12 sm:py-16">
           <p className="text-[11px] uppercase tracking-[0.2em] text-ivory/60">Service de commande groupée</p>
           <h2 className="mt-4 max-w-2xl text-[30px] text-ivory sm:text-[40px]">
             Tu as repéré des articles sur SHEIN ? Envoie-les-nous.
@@ -32,7 +32,7 @@ export function SheinTeaser() {
             <Button
               size="lg"
               variant="secondary"
-              className="border-ivory/30 text-ivory hover:border-ivory hover:bg-ivory/10"
+              className="border-ivory/35 text-ivory hover:border-ivory hover:bg-ivory/10"
               onClick={() => navigate('/comment-ca-marche')}
             >
               Comprendre le service

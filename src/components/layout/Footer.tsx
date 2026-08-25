@@ -29,7 +29,7 @@ export function Footer() {
   const contactHref = whatsapp.url('Bonjour, j’ai une question.');
 
   return (
-    <footer className="mt-20 border-t border-line bg-cream/60">
+    <footer className="mt-20 border-t border-line bg-blush/35">
       <div className="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
           <p className="font-display text-2xl">{BRAND.name}</p>

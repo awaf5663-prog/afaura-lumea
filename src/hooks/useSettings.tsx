@@ -63,9 +63,9 @@ export function useSettings(): SettingsValue {
  * Accès WhatsApp unifié : numéro (messages pré-remplis) ou lien court
  * WhatsApp Business (ouverture simple de la conversation).
  *
- * `open(message)` gère les deux cas : si le message ne peut pas être
- * pré-rempli, il est copié dans le presse-papier avant l'ouverture,
- * afin que la cliente n'ait plus qu'à le coller.
+ * `url(message)` renvoie l'adresse à mettre dans un <a href>. On ne passe
+ * jamais par window.open : les navigateurs mobiles la bloquent hors geste
+ * direct, et le bouton semble alors ne rien faire.
  */
 export function useWhatsapp() {
   const { settings } = useSettings();
@@ -81,21 +81,5 @@ export function useWhatsapp() {
     prefill,
     available: Boolean(url()),
     url,
-    /** Ouvre WhatsApp ; renvoie true si le message a dû être copié à la place. */
-    async open(message?: string): Promise<boolean> {
-      const href = url(message);
-      if (!href) return false;
-      let copied = false;
-      if (!prefill && message) {
-        try {
-          await navigator.clipboard?.writeText(message);
-          copied = true;
-        } catch {
-          copied = false;
-        }
-      }
-      window.open(href, '_blank', 'noopener');
-      return copied;
-    },
   };
 }

@@ -2,20 +2,29 @@
 
 /* ─────────────────────────────────────────────────────────────
    Identité visuelle Afaura Luméa
-   Blanc cassé · noir profond · beige · rose poudré très discret
+   Rose crème · rose clair · rose foncé · beige · noir
    ───────────────────────────────────────────────────────────── */
 @theme {
-  --color-ivory: #fbf9f6;
-  --color-cream: #f4efe8;
-  --color-sand: #e8ddd0;
-  --color-clay: #d5c3b0;
-  --color-blush: #f0e2e2;
-  --color-mauve: #8d7480;
+  /* Fonds */
+  --color-ivory: #fdf7f4; /* rose crème — fond principal */
+  --color-cream: #f8ede8; /* rose crème plus dense — surfaces */
+  --color-blush: #f6ded9; /* rose clair — badges, accents doux */
+
+  /* Beiges */
+  --color-sand: #e9d9cb;
+  --color-clay: #d9c0b0;
+  --color-line: #ecdcd4;
+
+  /* Roses foncés */
+  --color-mauve: #8f4b5b; /* rose foncé — accent, liens, chiffres clés */
+  --color-rosedark: #5c2f38; /* rose profond — grandes surfaces */
+
+  /* Noirs et gris */
+  --color-ink: #17110f;
+  --color-graphite: #40312f;
+  --color-stone: #7a665d;
+
   --color-gold: #b08d57;
-  --color-ink: #16110f;
-  --color-graphite: #3a322e;
-  --color-stone: #7d726b;
-  --color-line: #e6dfd6;
 
   --font-display: 'Fraunces', 'Times New Roman', serif;
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -70,8 +79,8 @@
   }
 
   ::selection {
-    background: var(--color-sand);
-    color: var(--color-ink);
+    background: var(--color-blush);
+    color: var(--color-rosedark);
   }
 }
 
@@ -88,7 +97,7 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
     font-weight: 500;
-    color: var(--color-stone);
+    color: var(--color-mauve);
   }
 
   .hairline {

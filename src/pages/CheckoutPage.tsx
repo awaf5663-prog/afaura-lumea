@@ -203,7 +203,7 @@ export function CheckoutPage() {
                     value={z.id}
                     checked={form.zoneId === z.id}
                     onChange={() => set('zoneId', z.id)}
-                    className="mt-1 accent-[#16110f]"
+                    className="mt-1 accent-[#8f4b5b]"
                   />
                   <span className="flex-1">
                     <span className="flex items-baseline justify-between gap-3">
@@ -274,7 +274,7 @@ export function CheckoutPage() {
                     value={m.id}
                     checked={form.paymentMethod === m.id}
                     onChange={() => set('paymentMethod', m.id)}
-                    className="mt-1 accent-[#16110f]"
+                    className="mt-1 accent-[#8f4b5b]"
                   />
                   <span>
                     <span className="block text-[15px] font-medium">{m.label}</span>

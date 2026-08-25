@@ -1,11 +1,10 @@
 import { PackageSearch, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { WhatsAppLink } from '@/src/components/whatsapp/WhatsAppLink';
 import { QuoteSummary } from '@/src/components/shein/QuoteSummary';
 import { StatusTimeline } from '@/src/components/order/StatusTimeline';
 import { Button } from '@/src/components/ui/Button';
 import { ErrorText, FormRow, Input, Label } from '@/src/components/ui/Field';
-import { useToast } from '@/src/hooks/useToast';
-import { useWhatsapp } from '@/src/hooks/useSettings';
 import { formatDateTime, formatFcfa, isValidSenegalPhone } from '@/src/lib/format';
 import {
   ORDER_STEPS,
@@ -24,8 +23,6 @@ type Result = { kind: 'order'; data: Order } | { kind: 'shein'; data: SheinReque
 
 export function TrackingPage() {
   const { search } = useRouter();
-  const whatsapp = useWhatsapp();
-  const { notify } = useToast();
 
   const [reference, setReference] = useState(search.get('numero') ?? '');
   const [phone, setPhone] = useState('');
@@ -155,21 +152,12 @@ export function TrackingPage() {
               message plutôt que sur le site, elle n'apparaît pas ici — écrivez-nous, on vous répond
               avec l'avancement.
             </p>
-            {whatsapp.available && (
-              <Button
-                className="mt-4"
-                variant="whatsapp"
-                onClick={() => {
-                  void whatsapp
-                    .open(buildTrackingMessage(reference.trim().toUpperCase()))
-                    .then((copied) => {
-                      if (copied) notify('Message copié — collez-le dans la conversation');
-                    });
-                }}
-              >
-                Demander sur WhatsApp
-              </Button>
-            )}
+            <WhatsAppLink
+              message={buildTrackingMessage(reference.trim().toUpperCase())}
+              className="mt-4 h-12 w-auto text-[14px]"
+            >
+              Demander sur WhatsApp
+            </WhatsAppLink>
           </div>
         )}
 

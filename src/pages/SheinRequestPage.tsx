@@ -409,7 +409,7 @@ export function SheinRequestPage() {
                   value={option.id}
                   checked={deliveryOptionId === option.id}
                   onChange={() => setDeliveryOptionId(option.id)}
-                  className="mt-1 accent-[#16110f]"
+                  className="mt-1 accent-[#8f4b5b]"
                 />
                 <span className="flex-1">
                   <span className="flex items-baseline justify-between gap-3">

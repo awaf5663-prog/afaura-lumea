@@ -38,15 +38,15 @@ export function StatusTimeline({
               <span
                 className={cn(
                   'grid size-8 shrink-0 place-items-center rounded-full border text-[12px] font-semibold transition-colors',
-                  done && 'border-ink bg-ink text-ivory',
-                  active && 'border-ink bg-blush text-ink',
+                  done && 'border-mauve bg-mauve text-ivory',
+                  active && 'border-mauve bg-blush text-rosedark',
                   !done && !active && 'border-line bg-white text-stone',
                 )}
               >
                 {done ? <Check className="size-4" /> : index + 1}
               </span>
               {index < steps.length - 1 && (
-                <span className={cn('w-px flex-1', done ? 'bg-ink/40' : 'bg-line')} aria-hidden />
+                <span className={cn('w-px flex-1', done ? 'bg-mauve/40' : 'bg-line')} aria-hidden />
               )}
             </div>
             <div className={cn('pb-6', index === steps.length - 1 && 'pb-0')}>

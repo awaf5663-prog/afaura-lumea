@@ -1,5 +1,6 @@
 import { Copy } from 'lucide-react';
 import { useState } from 'react';
+import { WhatsAppLink } from '@/src/components/whatsapp/WhatsAppLink';
 import { Button } from '@/src/components/ui/Button';
 import { useWhatsapp } from '@/src/hooks/useSettings';
 import { useToast } from '@/src/hooks/useToast';
@@ -40,18 +41,9 @@ export function WhatsAppHandoff({ message, hint }: { message: string; hint?: str
 
   return (
     <div className="mt-6">
-      <Button
-        full
-        size="lg"
-        variant="whatsapp"
-        onClick={() => {
-          void whatsapp.open(message).then((copied) => {
-            if (copied) notify('Message copié — collez-le dans la conversation');
-          });
-        }}
-      >
+      <WhatsAppLink message={message}>
         {whatsapp.prefill ? 'Continuer sur WhatsApp' : 'Copier et ouvrir WhatsApp'}
-      </Button>
+      </WhatsAppLink>
 
       <p className="mt-2.5 text-center text-[12.5px] text-stone">
         {whatsapp.prefill

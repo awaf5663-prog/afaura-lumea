@@ -1,4 +1,5 @@
-import type { Order, Product, SheinRequest, StoreSettings } from '@/src/types';
+import { DEFAULT_ALERT_THRESHOLDS, DEFAULT_PRICING } from '@/src/config/pricing';
+import type { Grouping, Order, Product, SheinRequest, StoreSettings } from '@/src/types';
 import type { DataSource, OrderDraft, SheinDraft } from './types';
 
 /**
@@ -147,12 +148,48 @@ const toShein = (r: Row): SheinRequest => ({
     color: i.color ?? '',
     quantity: i.quantity,
     displayedPrice: i.displayed_price ?? '',
+    priceAmount: i.price_amount ?? null,
+    priceCurrency: i.price_currency ?? 'XOF',
     screenshotName: i.image ?? undefined,
   })),
   status: r.status,
   quotedTotal: r.quoted_total,
+  groupingId: r.grouping_id ?? null,
+  quote: r.quote ?? null,
+  deliveryOptionId: r.delivery_option_id ?? '',
   createdAt: r.created_at,
   updatedAt: r.updated_at,
+});
+
+const toGrouping = (r: Row): Grouping => ({
+  id: r.id,
+  reference: r.reference,
+  destination: r.destination ?? '',
+  closingDate: r.closing_date ?? '',
+  maxOrders: r.max_orders,
+  minOrders: r.min_orders,
+  reservedCount: r.reserved_count ?? 0,
+  manualOrderCount: r.manual_order_count ?? 0,
+  logisticsCost: r.logistics_cost,
+  status: r.status,
+  note: r.note ?? undefined,
+  createdAt: r.created_at,
+  updatedAt: r.updated_at,
+});
+
+const fromGrouping = (g: Grouping): Row => ({
+  id: g.id,
+  reference: g.reference,
+  destination: g.destination,
+  closing_date: g.closingDate || null,
+  max_orders: g.maxOrders,
+  min_orders: g.minOrders,
+  reserved_count: g.reservedCount,
+  manual_order_count: g.manualOrderCount,
+  logistics_cost: g.logisticsCost,
+  status: g.status,
+  note: g.note ?? null,
+  updated_at: new Date().toISOString(),
 });
 
 const ORDER_SELECT = '*,order_items(*)';
@@ -234,6 +271,7 @@ export const supabaseAdapter: DataSource = {
         p_customer_name: draft.customerName,
         p_phone: draft.phone,
         p_note: draft.note ?? null,
+        p_delivery_option_id: draft.deliveryOptionId,
         p_items: draft.items.map((i) => ({
           product_url: i.productUrl,
           reference: i.reference,
@@ -241,6 +279,8 @@ export const supabaseAdapter: DataSource = {
           color: i.color,
           quantity: i.quantity,
           displayed_price: i.displayedPrice,
+          price_amount: i.priceAmount,
+          price_currency: i.priceCurrency,
           image: i.screenshotName ?? null,
         })),
       }),
@@ -273,6 +313,32 @@ export const supabaseAdapter: DataSource = {
     return toShein(rows[0]);
   },
 
+  async listGroupings() {
+    const rows = await rest<Row[]>('groupings?select=*&order=reference.desc');
+    return rows.map(toGrouping);
+  },
+
+  async saveGrouping(grouping) {
+    const rows = await rest<Row[]>('groupings?on_conflict=id', {
+      method: 'POST',
+      headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
+      body: JSON.stringify(fromGrouping(grouping)),
+    });
+    return toGrouping(rows[0]);
+  },
+
+  async deleteGrouping(id) {
+    await rest(`groupings?id=eq.${id}`, { method: 'DELETE' });
+  },
+
+  async transferRequests(fromGroupingId, toGroupingId) {
+    const row = await rest<number>('rpc/transfer_shein_requests', {
+      method: 'POST',
+      body: JSON.stringify({ p_from: fromGroupingId, p_to: toGroupingId }),
+    });
+    return Number(row ?? 0);
+  },
+
   async getSettings() {
     const rows = await rest<Row[]>('settings?select=*&id=eq.1');
     const r = rows[0] ?? {};
@@ -284,6 +350,8 @@ export const supabaseAdapter: DataSource = {
       orangeMoneyNumber: r.orange_money_number ?? '',
       deliveryFees: r.delivery_fees ?? {},
       announcement: r.announcement ?? '',
+      pricing: r.pricing ?? DEFAULT_PRICING,
+      alertThresholds: r.alert_thresholds ?? DEFAULT_ALERT_THRESHOLDS,
     } satisfies StoreSettings;
   },
 
@@ -300,6 +368,8 @@ export const supabaseAdapter: DataSource = {
         orange_money_number: settings.orangeMoneyNumber,
         delivery_fees: settings.deliveryFees,
         announcement: settings.announcement,
+        pricing: settings.pricing,
+        alert_thresholds: settings.alertThresholds,
       }),
     });
     return settings;

@@ -30,6 +30,7 @@ export const STORAGE_KEYS = {
   products: 'lumea.products.v1',
   orders: 'lumea.orders.v1',
   sheinRequests: 'lumea.shein.v1',
+  groupings: 'lumea.groupings.v1',
   settings: 'lumea.settings.v1',
   counters: 'lumea.counters.v1',
   adminSession: 'lumea.admin.session.v1',

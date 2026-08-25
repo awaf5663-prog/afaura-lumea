@@ -7,11 +7,13 @@ import {
   WHATSAPP_LINK,
   WHATSAPP_NUMBER,
 } from '@/src/config/site';
+import { DEFAULT_ALERT_THRESHOLDS, DEFAULT_PRICING } from '@/src/config/pricing';
 import { SEED_PRODUCTS } from '@/src/data/seed';
+import { computeQuote } from '@/src/lib/pricing';
 import { nextNumber, uid } from '@/src/lib/orderNumber';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
 import { normalizePhone } from '@/src/lib/format';
-import type { Order, Product, SheinRequest, StoreSettings } from '@/src/types';
+import type { Grouping, Order, Product, SheinRequest, StoreSettings } from '@/src/types';
 import type { DataSource, OrderDraft, SheinDraft } from './types';
 
 /**
@@ -31,7 +33,26 @@ function defaultSettings(): StoreSettings {
     orangeMoneyNumber: ORANGE_MONEY_NUMBER,
     deliveryFees: Object.fromEntries(DELIVERY_ZONES.map((z) => [z.id, z.fee])),
     announcement: '',
+    pricing: DEFAULT_PRICING,
+    alertThresholds: DEFAULT_ALERT_THRESHOLDS,
   };
+}
+
+function loadGroupings(): Grouping[] {
+  return readJson<Grouping[]>(STORAGE_KEYS.groupings, []);
+}
+
+/** Groupage qui accueille les nouvelles demandes : ouvert, non plein, clôture la plus proche. */
+export function pickOpenGrouping(groupings: Grouping[]): Grouping | null {
+  return (
+    groupings
+      .filter((g) => g.status === 'open' && g.reservedCount + g.manualOrderCount < g.maxOrders)
+      .sort((a, b) => {
+        if (!a.closingDate) return 1;
+        if (!b.closingDate) return -1;
+        return new Date(a.closingDate).getTime() - new Date(b.closingDate).getTime();
+      })[0] ?? null
+  );
 }
 
 function loadProducts(): Product[] {
@@ -168,6 +189,14 @@ export const localAdapter: DataSource = {
       }));
     if (cleanItems.length === 0) throw new Error('Ajoutez au moins un article (lien ou référence).');
 
+    // Le devis est recalculé ici, à partir des tarifs enregistrés :
+    // le navigateur n'envoie que des prix déclarés et des quantités.
+    const settings = await this.getSettings();
+    const quote = computeQuote(cleanItems, draft.deliveryOptionId, settings.pricing);
+
+    const groupings = loadGroupings();
+    const target = pickOpenGrouping(groupings);
+
     const now = new Date().toISOString();
     const request: SheinRequest = {
       id: uid(),
@@ -178,6 +207,9 @@ export const localAdapter: DataSource = {
       items: cleanItems,
       status: 'received',
       quotedTotal: null,
+      groupingId: target?.id ?? null,
+      quote,
+      deliveryOptionId: quote.deliveryOptionId,
       createdAt: now,
       updatedAt: now,
     };
@@ -185,7 +217,77 @@ export const localAdapter: DataSource = {
     const all = readJson<SheinRequest[]>(STORAGE_KEYS.sheinRequests, []);
     all.unshift(request);
     writeJson(STORAGE_KEYS.sheinRequests, all);
+
+    if (target) {
+      const reserved = target.reservedCount + 1;
+      const full = reserved + target.manualOrderCount >= target.maxOrders;
+      writeJson(
+        STORAGE_KEYS.groupings,
+        groupings.map((g) =>
+          g.id === target.id
+            ? { ...g, reservedCount: reserved, status: full ? 'full' : g.status, updatedAt: now }
+            : g,
+        ),
+      );
+    }
+
     return delay(request);
+  },
+
+  async listGroupings() {
+    return delay(
+      [...loadGroupings()].sort((a, b) => b.reference.localeCompare(a.reference)),
+    );
+  },
+
+  async saveGrouping(grouping) {
+    const groupings = loadGroupings();
+    const index = groupings.findIndex((g) => g.id === grouping.id);
+    const next = { ...grouping, updatedAt: new Date().toISOString() };
+    if (index >= 0) groupings[index] = next;
+    else groupings.unshift(next);
+    writeJson(STORAGE_KEYS.groupings, groupings);
+    return delay(next);
+  },
+
+  async deleteGrouping(id) {
+    writeJson(STORAGE_KEYS.groupings, loadGroupings().filter((g) => g.id !== id));
+    // Les demandes rattachées ne sont jamais supprimées : elles redeviennent sans groupage.
+    const requests = readJson<SheinRequest[]>(STORAGE_KEYS.sheinRequests, []);
+    writeJson(
+      STORAGE_KEYS.sheinRequests,
+      requests.map((r) => (r.groupingId === id ? { ...r, groupingId: null } : r)),
+    );
+    await delay(null);
+  },
+
+  async transferRequests(fromGroupingId, toGroupingId) {
+    const now = new Date().toISOString();
+    const requests = readJson<SheinRequest[]>(STORAGE_KEYS.sheinRequests, []);
+    const moved = requests.filter(
+      (r) => r.groupingId === fromGroupingId && r.status !== 'cancelled' && r.status !== 'delivered',
+    );
+    writeJson(
+      STORAGE_KEYS.sheinRequests,
+      requests.map((r) =>
+        moved.some((m) => m.id === r.id) ? { ...r, groupingId: toGroupingId, updatedAt: now } : r,
+      ),
+    );
+
+    const groupings = loadGroupings().map((g) => {
+      if (g.id === fromGroupingId) {
+        return { ...g, reservedCount: Math.max(0, g.reservedCount - moved.length), updatedAt: now };
+      }
+      if (toGroupingId && g.id === toGroupingId) {
+        const reserved = g.reservedCount + moved.length;
+        const full = reserved + g.manualOrderCount >= g.maxOrders;
+        return { ...g, reservedCount: reserved, status: full ? ('full' as const) : g.status, updatedAt: now };
+      }
+      return g;
+    });
+    writeJson(STORAGE_KEYS.groupings, groupings);
+
+    return delay(moved.length);
   },
 
   async listSheinRequests() {

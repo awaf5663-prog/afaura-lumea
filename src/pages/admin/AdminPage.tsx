@@ -8,8 +8,12 @@ import { formatDate, formatFcfa } from '@/src/lib/format';
 import { useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 import { db, isSupabaseConfigured } from '@/src/services';
-import type { Order, Product, SheinRequest } from '@/src/types';
+import { groupingCount, groupingFillRate } from '@/src/hooks/useGroupings';
+import { isWhatsappConfigured } from '@/src/lib/whatsapp';
+import type { Grouping, Order, Product, SheinRequest } from '@/src/types';
+import { AdminGroupings, computeGroupingStats } from './AdminGroupings';
 import { AdminLogin } from './AdminLogin';
+import { AdminPricing } from './AdminPricing';
 import { AdminOrders } from './AdminOrders';
 import { AdminProducts } from './AdminProducts';
 import { AdminSettings } from './AdminSettings';
@@ -19,6 +23,8 @@ const TABS = [
   { id: 'apercu', label: 'Aperçu' },
   { id: 'commandes', label: 'Commandes' },
   { id: 'shein', label: 'SHEIN' },
+  { id: 'groupages', label: 'Groupages' },
+  { id: 'tarification', label: 'Tarification' },
   { id: 'produits', label: 'Produits' },
   { id: 'reglages', label: 'Réglages' },
 ] as const;
@@ -34,6 +40,7 @@ export function AdminPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [requests, setRequests] = useState<SheinRequest[]>([]);
+  const [groupings, setGroupings] = useState<Grouping[]>([]);
   const [loading, setLoading] = useState(true);
 
   useSeo({ title: 'Administration', description: 'Espace administrateur.', noIndex: true });
@@ -41,10 +48,16 @@ export function AdminPage() {
   const loadAll = useCallback(async () => {
     setLoading(true);
     try {
-      const [p, o, s] = await Promise.all([db.listProducts(), db.listOrders(), db.listSheinRequests()]);
+      const [p, o, s, g] = await Promise.all([
+        db.listProducts(),
+        db.listOrders(),
+        db.listSheinRequests(),
+        db.listGroupings(),
+      ]);
       setProducts(p);
       setOrders(o);
       setRequests(s);
+      setGroupings(g);
       await refreshSettings();
     } finally {
       setLoading(false);
@@ -61,6 +74,16 @@ export function AdminPage() {
     setTab(next);
     navigate(`/admin?onglet=${next}`, { keepScroll: true });
   };
+
+  const activeGrouping =
+    groupings.find((g) => g.status === 'open') ?? groupings.find((g) => g.status === 'full') ?? null;
+  const activeStats = activeGrouping
+    ? computeGroupingStats(
+        activeGrouping,
+        requests,
+        settings?.pricing.tiers.find((t) => t.fee !== null)?.fee ?? null,
+      )
+    : null;
 
   const pendingPayments = orders.filter((o) => o.paymentStatus !== 'confirmed').length;
   const openRequests = requests.filter((r) => !['delivered', 'cancelled'].includes(r.status)).length;
@@ -137,18 +160,51 @@ export function AdminPage() {
             />
             <div className="rounded-[--radius-lg] border border-line bg-white p-5 sm:col-span-2">
               <p className="eyebrow">Prochain groupage</p>
-              <p className="mt-2 text-[18px]">
-                {settings?.nextGroupingDate
-                  ? formatDate(settings.nextGroupingDate)
-                  : 'Aucune date définie'}
-              </p>
-              <button
-                type="button"
-                onClick={() => changeTab('reglages')}
-                className="mt-2 text-[13px] text-mauve underline underline-offset-2"
-              >
-                Modifier la date
-              </button>
+              {activeGrouping ? (
+                <>
+                  <p className="mt-2 text-[18px]">
+                    {activeGrouping.reference}
+                    {activeGrouping.destination ? ` · ${activeGrouping.destination}` : ''}
+                  </p>
+                  <p className="mt-1 text-[13.5px] text-stone">
+                    {groupingCount(activeGrouping)} / {activeGrouping.maxOrders} commandes (
+                    {groupingFillRate(activeGrouping)} %)
+                    {activeGrouping.closingDate
+                      ? ` · clôture le ${formatDate(activeGrouping.closingDate)}`
+                      : ' · date non fixée'}
+                  </p>
+                  {activeStats && activeStats.margin !== null && (
+                    <p className="mt-1 text-[13px] text-stone">
+                      Marge estimée : {formatFcfa(activeStats.margin)}
+                      {activeStats.breakEven !== null &&
+                        ` · rentable à partir de ${activeStats.breakEven} commandes`}
+                    </p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => changeTab('groupages')}
+                    className="mt-2 text-[13px] text-mauve underline underline-offset-2"
+                  >
+                    Gérer les groupages
+                  </button>
+                </>
+              ) : (
+                <>
+                  <p className="mt-2 text-[18px]">Aucun groupage ouvert</p>
+                  <p className="mt-1 text-[13.5px] text-stone">
+                    {settings?.nextGroupingDate
+                      ? `Date de repli configurée : ${formatDate(settings.nextGroupingDate)}`
+                      : 'Aucune date affichée sur le site.'}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => changeTab('groupages')}
+                    className="mt-2 text-[13px] text-mauve underline underline-offset-2"
+                  >
+                    Créer un groupage
+                  </button>
+                </>
+              )}
             </div>
           </div>
         )}
@@ -156,7 +212,20 @@ export function AdminPage() {
         {tab === 'commandes' && (
           <AdminOrders orders={orders} reload={loadAll} />
         )}
-        {tab === 'shein' && <AdminShein requests={requests} reload={loadAll} />}
+        {tab === 'shein' && (
+          <AdminShein requests={requests} reload={loadAll} groupings={groupings} />
+        )}
+        {tab === 'groupages' && settings && (
+          <AdminGroupings
+            groupings={groupings}
+            requests={requests}
+            thresholds={settings.alertThresholds}
+            fallbackFee={settings.pricing.tiers.find((t) => t.fee !== null)?.fee ?? null}
+            whatsappConfigured={isWhatsappConfigured(settings.whatsappNumber)}
+            reload={loadAll}
+          />
+        )}
+        {tab === 'tarification' && <AdminPricing />}
         {tab === 'produits' && <AdminProducts products={products} reload={loadAll} />}
         {tab === 'reglages' && <AdminSettings />}
       </div>

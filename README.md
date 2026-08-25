@@ -79,8 +79,12 @@ automatiquement : plus aucun changement de code. Créez ensuite le compte admin 
 Supabase → Authentication → Users.
 
 Le schéma fournit les tables demandées (`products`, `orders`, `order_items`, `shein_requests`,
-`shein_items`, `settings`), les séquences de numérotation, les politiques RLS, et surtout les
-fonctions serveur `create_order` / `create_shein_request` / `find_order` / `find_shein_request`.
+`shein_items`, `groupings`, `settings`), les séquences de numérotation, les politiques RLS, et
+surtout les fonctions serveur `create_order` / `create_shein_request` / `find_order` /
+`find_shein_request` / `transfer_shein_requests`.
+
+La table `groupings` est en lecture publique (le compteur s'affiche sur le site) : elle ne contient
+que capacité et remplissage — jamais de donnée cliente, jamais de coût ni de marge.
 
 ---
 
@@ -98,12 +102,94 @@ Le site ne simule rien. Concrètement :
   le total indique « + livraison » au lieu d'un montant approximatif.
 - **Pas de compte à rebours fictif.** Sans `NEXT_GROUPING_DATE`, le site écrit que la date sera
   annoncée sur WhatsApp. Le compteur n'apparaît que si une vraie date est saisie.
+- **Pas de tarif présenté comme officiel.** Les frais de traitement sont nos frais de service, pas
+  des frais SHEIN, et le site le dit explicitement. Une tranche sans montant configuré affiche
+  « calcul personnalisé », une livraison sans tarif affiche « communiqué après validation ».
+- **Pas de statut de groupage inventé.** Sous le seuil minimum à la date de clôture, l'admin
+  décide ; le site n'annonce rien à sa place.
+- **Marges invisibles côté client.** Coût logistique, marge et seuil de rentabilité ne sortent
+  jamais de l'espace admin.
 - **Pas de faux avis, faux stocks ni fausses statistiques.** Les badges « Nouveau » et
   « Populaire » existent dans le modèle et se règlent dans l'admin ; ils ne sont activés sur
   aucun produit par défaut.
 - **Les montants ne sont pas calculés par le navigateur.** Le checkout n'envoie que des
   identifiants produits et des quantités : les prix sont relus dans le catalogue (mode local) ou
   recalculés par une fonction Postgres `SECURITY DEFINER` (mode Supabase).
+
+---
+
+## Tarification et groupages SHEIN
+
+Aucun montant SHEIN n'est écrit dans un composant. Tout vit dans la configuration, modifiable
+depuis l'admin sans toucher au code.
+
+### Ce que voit la cliente
+
+Le formulaire calcule l'estimation en direct et l'affiche **ligne par ligne**, jamais fondue en un
+seul « frais de livraison » :
+
+| Ligne | D'où elle vient |
+| --- | --- |
+| Articles SHEIN | Prix déclarés par la cliente, convertis en FCFA |
+| Frais de traitement | Notre service — vérification, commande, regroupement, acheminement, suivi |
+| Livraison | Option choisie (retrait, locale, domicile) |
+| **Total estimé** | Somme des lignes connues, avec « + à confirmer » si l'une manque |
+
+Suivi de la mention obligatoire : *« Le montant final peut être ajusté après vérification des
+articles et des frais logistiques. »* Le montant confirmé par l'admin (`quotedTotal`) reste seul
+faisant foi.
+
+La page SHEIN affiche aussi le compteur du groupage : `8 / 15 commandes`, barre de progression,
+places restantes. À capacité atteinte : **Groupage complet**, les nouvelles demandes ne sont plus
+rattachées et basculent sur le départ suivant.
+
+### /admin → Tarification
+
+Stratégie de calcul, tranches (min / max / frais, « vide » = devis manuel), paramètres du mode
+pourcentage, options de livraison, taux de conversion, devise par défaut, seuils d'alerte. Un
+**aperçu du calcul** en colonne de droite applique le brouillon en cours : vous testez une commande
+avant d'enregistrer les nouveaux tarifs.
+
+### /admin → Groupages
+
+Création et suivi de chaque départ : référence, destination, date de clôture, capacité maximale,
+seuil minimum, commandes hors site, coût logistique, statut. Chaque carte affiche un bloc
+**Rentabilité — usage interne** (frais encaissés, coût, marge, marge par commande, seuil de
+rentabilité, commandes non chiffrées) qui n'est jamais rendu côté client.
+
+Alertes automatiques aux seuils configurés (50 % « commence à se remplir », 80 % « presque
+complet », 100 % « complet »).
+
+Quand la date de clôture passe sous le seuil minimum, **rien n'est décidé automatiquement** :
+quatre actions vous sont proposées — reporter la date, maintenir et clôturer, transférer les
+demandes au groupage suivant, annuler. Un bouton « Prévenir les clientes » ouvre la liste des
+demandes rattachées avec un message WhatsApp par cliente, à relire avant envoi.
+
+### Changer de mode de calcul
+
+Le nombre d'articles ne mesure pas le poids : une paire de chaussures pèse plus que dix
+accessoires. La stratégie de calcul est donc un module remplaçable.
+
+```
+src/lib/pricing/
+  types.ts                    contrat ServiceFeeStrategy
+  strategies/itemTiers.ts     tranches par nombre d'articles (par défaut)
+  strategies/valuePercent.ts  pourcentage de la valeur déclarée
+  index.ts                    registre
+  quote.ts                    assemblage des trois lignes
+```
+
+`ServiceFeeInput` transporte déjà `totalWeightKg`, `totalVolumeL`, `declaredValue` et `categories`.
+Pour ajouter une tarification au poids : un fichier dans `strategies/`, une ligne dans le registre,
+un identifiant dans `ServiceFeeStrategyId`. Elle apparaît alors dans la liste des stratégies de
+l'admin — aucun composant, aucune page, aucune table à modifier.
+
+### Où le calcul se fait réellement
+
+L'estimation affichée pendant la saisie est **indicative**. À l'enregistrement, la couche de
+données la recalcule à partir des tarifs stockés : le navigateur n'envoie que des prix déclarés et
+des quantités. En mode Supabase, c'est la fonction `create_shein_request` (SECURITY DEFINER) qui
+recalcule, rattache la demande au premier groupage ouvert et incrémente son compteur.
 
 ---
 
@@ -134,6 +220,8 @@ src/
   components/  ui/ layout/ home/ product/ cart/ order/
   pages/                Une page par route, admin/ pour l'espace administrateur
   data/seed.ts          Catalogue de départ
+  config/pricing.ts     Tarifs de départ (tranches, livraison, taux, seuils)
+  lib/pricing/          Moteur de devis et stratégies remplaçables
 supabase/schema.sql     Tables, RLS, fonctions serveur
 scripts/                Génération du sitemap
 ```

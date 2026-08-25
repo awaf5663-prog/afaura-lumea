@@ -1,34 +1,63 @@
 import { AlertCircle, ImagePlus, Plus, Trash2, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { GroupingCapacity } from '@/src/components/shein/GroupingCapacity';
+import { QuoteSummary } from '@/src/components/shein/QuoteSummary';
 import { Button } from '@/src/components/ui/Button';
 import { ErrorText, FormRow, Input, Label, Textarea } from '@/src/components/ui/Field';
 import { QuantityStepper } from '@/src/components/ui/QuantityStepper';
+import { Select } from '@/src/components/ui/Field';
+import { useGroupings } from '@/src/hooks/useGroupings';
+import { useSettings } from '@/src/hooks/useSettings';
 import { useToast } from '@/src/hooks/useToast';
+import { computeQuote } from '@/src/lib/pricing';
 import { MAX_UPLOAD_BYTES, compressImage } from '@/src/lib/image';
-import { isValidSenegalPhone, normalizePhone } from '@/src/lib/format';
+import { cn } from '@/src/lib/cn';
+import { formatFcfa, isValidSenegalPhone, normalizePhone } from '@/src/lib/format';
 import { useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
 import { db } from '@/src/services';
 import type { SheinItem } from '@/src/types';
 
-const emptyItem = (): SheinItem => ({
+const emptyItem = (currency: string): SheinItem => ({
   productUrl: '',
   reference: '',
   size: '',
   color: '',
   quantity: 1,
   displayedPrice: '',
+  priceAmount: null,
+  priceCurrency: currency,
 });
+
+const CURRENCY_LABELS: Record<string, string> = {
+  XOF: 'FCFA',
+  EUR: '€',
+  USD: '$',
+};
+
+/** Texte lisible du prix, réutilisé dans le message WhatsApp. */
+function priceLabel(amount: number | null, currency: string): string {
+  if (amount === null) return '';
+  const symbol = CURRENCY_LABELS[currency] ?? currency;
+  return `${amount.toLocaleString('fr-FR')} ${symbol}`;
+}
 
 export function SheinRequestPage() {
   const { navigate } = useRouter();
   const { notify } = useToast();
+  const { settings } = useSettings();
+  const { active, displayed } = useGroupings();
+
+  const pricing = settings?.pricing;
+  const currencies = useMemo(() => Object.keys(pricing?.conversionRates ?? { XOF: 1 }), [pricing]);
+  const defaultCurrency = pricing?.defaultCurrency ?? 'XOF';
 
   const [customerName, setCustomerName] = useState('');
   const [phone, setPhone] = useState('');
   const [note, setNote] = useState('');
-  const [items, setItems] = useState<SheinItem[]>([emptyItem()]);
+  const [deliveryOptionId, setDeliveryOptionId] = useState('');
+  const [items, setItems] = useState<SheinItem[]>([emptyItem('XOF')]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -38,12 +67,31 @@ export function SheinRequestPage() {
     description: 'Envoyez-nous vos articles SHEIN : lien, taille, couleur, quantité et prix affiché.',
   });
 
+  // Les réglages arrivent de façon asynchrone : on aligne devise et livraison dessus.
+  useEffect(() => {
+    if (!pricing) return;
+    setDeliveryOptionId((current) => current || pricing.deliveryOptions[0]?.id || '');
+    setItems((prev) =>
+      prev.map((item) =>
+        item.priceAmount === null && item.priceCurrency === 'XOF'
+          ? { ...item, priceCurrency: pricing.defaultCurrency }
+          : item,
+      ),
+    );
+  }, [pricing]);
+
+  /** Estimation affichée en direct. Elle est recalculée côté données à l'envoi. */
+  const quote = useMemo(
+    () => (pricing ? computeQuote(items, deliveryOptionId, pricing) : null),
+    [items, deliveryOptionId, pricing],
+  );
+
   const updateItem = (index: number, patch: Partial<SheinItem>) => {
     setItems((prev) => prev.map((item, i) => (i === index ? { ...item, ...patch } : item)));
     setErrors((prev) => ({ ...prev, [`item-${index}`]: '' }));
   };
 
-  const addItem = () => setItems((prev) => [...prev, emptyItem()]);
+  const addItem = () => setItems((prev) => [...prev, emptyItem(defaultCurrency)]);
 
   const removeItem = (index: number) =>
     setItems((prev) => (prev.length === 1 ? prev : prev.filter((_, i) => i !== index)));
@@ -96,6 +144,7 @@ export function SheinRequestPage() {
         customerName,
         phone,
         note,
+        deliveryOptionId,
         items: items.filter((item) => item.productUrl.trim() || item.reference.trim()),
       });
 
@@ -123,6 +172,16 @@ export function SheinRequestPage() {
           Un article = un bloc. Le lien suffit dans la plupart des cas ; le reste nous aide à commander
           exactement ce que vous voulez.
         </p>
+
+        <div className="mt-6">
+          <GroupingCapacity grouping={displayed} compact />
+          {!active && displayed && (
+            <p className="mt-2.5 text-[12.5px] leading-relaxed text-stone">
+              Ce départ est complet : votre demande sera rattachée au groupage suivant dès son
+              ouverture. Vous ne payez rien avant d'avoir reçu et validé votre montant.
+            </p>
+          )}
+        </div>
 
         <section className="mt-10">
           <h2 className="text-[22px]">Vos coordonnées</h2>
@@ -216,12 +275,43 @@ export function SheinRequestPage() {
                       <Label htmlFor={`price-${index}`} hint="tel qu'affiché">
                         Prix sur SHEIN
                       </Label>
-                      <Input
-                        id={`price-${index}`}
-                        value={item.displayedPrice}
-                        onChange={(e) => updateItem(index, { displayedPrice: e.target.value })}
-                        placeholder="Ex : 12,99 €"
-                      />
+                      <div className="flex gap-2">
+                        <Input
+                          id={`price-${index}`}
+                          type="number"
+                          inputMode="decimal"
+                          min={0}
+                          step="0.01"
+                          className="flex-1"
+                          value={item.priceAmount ?? ''}
+                          onChange={(e) => {
+                            const amount = e.target.value === '' ? null : Number(e.target.value);
+                            updateItem(index, {
+                              priceAmount: amount,
+                              displayedPrice: priceLabel(amount, item.priceCurrency),
+                            });
+                          }}
+                          placeholder="12,99"
+                        />
+                        <Select
+                          aria-label="Devise"
+                          className="w-28 shrink-0"
+                          value={item.priceCurrency}
+                          onChange={(e) => {
+                            const currency = e.target.value;
+                            updateItem(index, {
+                              priceCurrency: currency,
+                              displayedPrice: priceLabel(item.priceAmount, currency),
+                            });
+                          }}
+                        >
+                          {currencies.map((code) => (
+                            <option key={code} value={code}>
+                              {CURRENCY_LABELS[code] ?? code}
+                            </option>
+                          ))}
+                        </Select>
+                      </div>
                     </FormRow>
                     <FormRow>
                       <Label htmlFor={`size-${index}`}>Taille</Label>
@@ -298,6 +388,55 @@ export function SheinRequestPage() {
             <Plus className="size-4" /> Ajouter un article
           </button>
         </section>
+
+        <section className="mt-10">
+          <h2 className="text-[22px]">Livraison</h2>
+          <p className="mt-1.5 text-[13.5px] text-stone">
+            Comment souhaitez-vous récupérer votre commande une fois le groupage arrivé ?
+          </p>
+          <div className="mt-4 space-y-3">
+            {(pricing?.deliveryOptions ?? []).map((option) => (
+              <label
+                key={option.id}
+                className={cn(
+                  'press flex cursor-pointer items-start gap-3 rounded-[--radius-md] border bg-white p-4 transition-colors',
+                  deliveryOptionId === option.id ? 'border-ink' : 'border-line',
+                )}
+              >
+                <input
+                  type="radio"
+                  name="shein-delivery"
+                  value={option.id}
+                  checked={deliveryOptionId === option.id}
+                  onChange={() => setDeliveryOptionId(option.id)}
+                  className="mt-1 accent-[#16110f]"
+                />
+                <span className="flex-1">
+                  <span className="flex items-baseline justify-between gap-3">
+                    <span className="text-[15px] font-medium">{option.label}</span>
+                    <span className="shrink-0 text-[13.5px] tabular-nums text-graphite">
+                      {option.fee === null
+                        ? 'Tarif communiqué après validation'
+                        : option.fee === 0
+                          ? 'Gratuit'
+                          : formatFcfa(option.fee)}
+                    </span>
+                  </span>
+                  {option.hint && <span className="mt-1 block text-[12.5px] text-stone">{option.hint}</span>}
+                </span>
+              </label>
+            ))}
+          </div>
+        </section>
+
+        {quote && quote.itemCount > 0 && (
+          <section className="mt-10">
+            <h2 className="text-[22px]">Ce que vous allez payer</h2>
+            <div className="mt-4">
+              <QuoteSummary quote={quote} />
+            </div>
+          </section>
+        )}
 
         <section className="mt-8">
           <FormRow>

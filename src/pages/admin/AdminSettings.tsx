@@ -116,8 +116,9 @@ export function AdminSettings() {
           />
           <p className="mt-1.5 flex gap-2 text-[12px] text-stone">
             <Info className="mt-0.5 size-3.5 shrink-0" />
-            Laissez vide tant que la date n'est pas arrêtée : le site affichera « date annoncée sur
-            WhatsApp » au lieu d'un compte à rebours fictif.
+            Date de repli, utilisée seulement quand aucun groupage n'est ouvert (voir l'onglet
+            Groupages, qui fait autorité). Laissez vide tant qu'aucune date n'est arrêtée : le site
+            affichera « date annoncée sur WhatsApp » au lieu d'un compte à rebours fictif.
           </p>
         </FormRow>
       </section>

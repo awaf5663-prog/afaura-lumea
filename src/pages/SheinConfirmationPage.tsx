@@ -1,5 +1,6 @@
 import { Check, Copy, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { QuoteSummary } from '@/src/components/shein/QuoteSummary';
 import { StatusTimeline } from '@/src/components/order/StatusTimeline';
 import { WhatsAppHandoff } from '@/src/components/order/WhatsAppHandoff';
 import { Button } from '@/src/components/ui/Button';
@@ -118,6 +119,12 @@ export function SheinConfirmationPage({ requestNumber }: { requestNumber: string
             ))}
           </ul>
         </div>
+
+        {request.quote && (
+          <div className="mt-6">
+            <QuoteSummary quote={request.quote} title="Votre estimation" />
+          </div>
+        )}
 
         <WhatsAppHandoff
           message={message}

@@ -2,6 +2,7 @@ import editorial from '@/src/assets/images/atelier-editorial.webp';
 import { Button } from '@/src/components/ui/Button';
 import { Reveal } from '@/src/components/ui/Reveal';
 import { useCountdown } from '@/src/hooks/useCountdown';
+import { useGroupings } from '@/src/hooks/useGroupings';
 import { useSettings } from '@/src/hooks/useSettings';
 import { formatDate } from '@/src/lib/format';
 import { useRouter } from '@/src/lib/router';
@@ -9,8 +10,9 @@ import { useRouter } from '@/src/lib/router';
 /** Explication du groupage, sans jargon logistique, avec compte à rebours réel. */
 export function GroupingSection() {
   const { settings } = useSettings();
+  const { displayed } = useGroupings();
   const { navigate } = useRouter();
-  const target = settings?.nextGroupingDate ?? '';
+  const target = displayed?.closingDate || settings?.nextGroupingDate || '';
   const countdown = useCountdown(target);
 
   const cells = [

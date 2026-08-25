@@ -7,14 +7,16 @@ import { formatDateTime, formatFcfa, prettyPhone } from '@/src/lib/format';
 import { SHEIN_STATUS_LABEL } from '@/src/lib/orderStatus';
 import { isWhatsappConfigured, whatsappLink } from '@/src/lib/whatsapp';
 import { db } from '@/src/services';
-import type { SheinRequest, SheinStatus } from '@/src/types';
+import type { Grouping, SheinRequest, SheinStatus } from '@/src/types';
 
 export function AdminShein({
   requests,
   reload,
+  groupings = [],
 }: {
   requests: SheinRequest[];
   reload: () => Promise<void>;
+  groupings?: Grouping[];
 }) {
   const { notify } = useToast();
   const [busy, setBusy] = useState<string | null>(null);
@@ -53,7 +55,12 @@ export function AdminShein({
                 <p className="font-display text-[20px]">{request.requestNumber}</p>
                 <p className="mt-0.5 text-[12.5px] text-stone">{formatDateTime(request.createdAt)}</p>
               </div>
-              <Badge tone="neutral">{SHEIN_STATUS_LABEL[request.status]}</Badge>
+              <div className="flex flex-wrap items-center gap-1.5">
+                <Badge tone="neutral">{SHEIN_STATUS_LABEL[request.status]}</Badge>
+                <Badge tone={request.groupingId ? 'accent' : 'neutral'}>
+                  {groupings.find((g) => g.id === request.groupingId)?.reference ?? 'Sans groupage'}
+                </Badge>
+              </div>
             </div>
 
             <div className="mt-4 border-t border-line pt-4 text-[13.5px]">
@@ -115,6 +122,15 @@ export function AdminShein({
               ))}
             </ul>
 
+            {request.quote && (
+              <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-1.5 border-t border-line pt-4 text-[12.5px] sm:grid-cols-4">
+                <QuoteStat label="Articles déclarés" value={request.quote.itemsSubtotal} />
+                <QuoteStat label="Frais de traitement" value={request.quote.serviceFee} />
+                <QuoteStat label={request.quote.deliveryLabel || 'Livraison'} value={request.quote.deliveryFee} />
+                <QuoteStat label="Total estimé" value={request.quote.total} emphasis />
+              </dl>
+            )}
+
             <div className="mt-4 grid gap-3 border-t border-line pt-4 sm:grid-cols-2">
               <label className="text-[12.5px] text-stone">
                 Étape
@@ -158,6 +174,25 @@ export function AdminShein({
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+function QuoteStat({
+  label,
+  value,
+  emphasis,
+}: {
+  label: string;
+  value: number | null;
+  emphasis?: boolean;
+}) {
+  return (
+    <div>
+      <dt className="text-[10.5px] uppercase tracking-[0.1em] text-stone">{label}</dt>
+      <dd className={emphasis ? 'mt-0.5 font-medium tabular-nums' : 'mt-0.5 tabular-nums'}>
+        {value === null ? <span className="text-stone">à confirmer</span> : formatFcfa(value)}
+      </dd>
     </div>
   );
 }

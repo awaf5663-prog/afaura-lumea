@@ -1,5 +1,6 @@
 import { PackageSearch, Search } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { QuoteSummary } from '@/src/components/shein/QuoteSummary';
 import { StatusTimeline } from '@/src/components/order/StatusTimeline';
 import { Button } from '@/src/components/ui/Button';
 import { ErrorText, FormRow, Input, Label } from '@/src/components/ui/Field';
@@ -210,6 +211,12 @@ export function TrackingPage() {
               currentId={result.data.status}
               cancelled={result.data.status === 'cancelled'}
             />
+
+            {result.data.quotedTotal === null && result.data.quote && (
+              <div className="mt-6">
+                <QuoteSummary quote={result.data.quote} title="Estimation en attente de validation" />
+              </div>
+            )}
           </ResultCard>
         )}
 

@@ -1,4 +1,5 @@
 import type {
+  Grouping,
   Order,
   OrderStatus,
   PaymentStatus,
@@ -24,6 +25,7 @@ export interface SheinDraft {
   customerName: string;
   phone: string;
   note?: string;
+  deliveryOptionId: string;
   items: SheinRequest['items'];
 }
 
@@ -56,8 +58,23 @@ export interface DataSource {
     patch: Partial<Pick<SheinRequest, 'status' | 'quotedTotal' | 'note'>>,
   ): Promise<SheinRequest>;
 
+  listGroupings(): Promise<Grouping[]>;
+  saveGrouping(grouping: Grouping): Promise<Grouping>;
+  deleteGrouping(id: string): Promise<void>;
+  /** Déplace toutes les demandes d'un groupage vers un autre (ou vers aucun). */
+  transferRequests(fromGroupingId: string, toGroupingId: string | null): Promise<number>;
+
   getSettings(): Promise<StoreSettings>;
   saveSettings(settings: StoreSettings): Promise<StoreSettings>;
 }
 
-export type { Order, OrderStatus, PaymentStatus, Product, SheinRequest, SheinStatus, StoreSettings };
+export type {
+  Grouping,
+  Order,
+  OrderStatus,
+  PaymentStatus,
+  Product,
+  SheinRequest,
+  SheinStatus,
+  StoreSettings,
+};

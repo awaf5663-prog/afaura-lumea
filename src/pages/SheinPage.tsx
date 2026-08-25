@@ -1,8 +1,11 @@
 import { ArrowRight, CircleHelp, Info } from 'lucide-react';
-import { GroupingBadge } from '@/src/components/home/GroupingBadge';
+import { GroupingCapacity } from '@/src/components/shein/GroupingCapacity';
 import { HowItWorks } from '@/src/components/home/HowItWorks';
 import { Button } from '@/src/components/ui/Button';
 import { Reveal } from '@/src/components/ui/Reveal';
+import { useGroupings } from '@/src/hooks/useGroupings';
+import { useSettings } from '@/src/hooks/useSettings';
+import { formatFcfa } from '@/src/lib/format';
 import { useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 
@@ -16,6 +19,9 @@ const WHAT_WE_NEED = [
 
 export function SheinPage() {
   const { navigate } = useRouter();
+  const { displayed } = useGroupings();
+  const { settings } = useSettings();
+  const pricing = settings?.pricing;
 
   useSeo({
     title: 'Commander sur SHEIN depuis le Sénégal',
@@ -46,8 +52,8 @@ export function SheinPage() {
           </Button>
         </div>
 
-        <div className="mt-8 max-w-sm">
-          <GroupingBadge />
+        <div className="mt-8 max-w-md">
+          <GroupingCapacity grouping={displayed} />
         </div>
 
         <p className="mt-8 flex max-w-2xl gap-2.5 rounded-[--radius-md] border border-line bg-cream/60 px-4 py-3.5 text-[13px] leading-relaxed text-graphite">
@@ -121,6 +127,71 @@ export function SheinPage() {
             </div>
           </Reveal>
         </div>
+      </section>
+
+      <section className="container-page mt-24">
+        <Reveal>
+          <h2 className="text-[28px] sm:text-[34px]">Ce que vous payez, ligne par ligne</h2>
+          <p className="mt-3 max-w-2xl text-[14.5px] leading-relaxed text-graphite">
+            Nous séparons toujours le prix de vos articles et nos frais de service. Ces frais
+            couvrent la vérification, la commande, le regroupement, l'organisation de
+            l'acheminement et le suivi — ce ne sont pas des frais facturés par SHEIN.
+          </p>
+
+          <div className="mt-7 grid gap-4 lg:grid-cols-2">
+            <div className="rounded-[--radius-lg] border border-line bg-white p-5">
+              <p className="eyebrow">Frais de traitement</p>
+              <ul className="mt-4 divide-y divide-line">
+                {(pricing?.tiers ?? []).map((tier) => (
+                  <li key={tier.id} className="flex items-baseline justify-between gap-4 py-2.5 text-[14px]">
+                    <span>
+                      {tier.maxItems === null
+                        ? `${tier.minItems} articles et plus`
+                        : `${tier.minItems} à ${tier.maxItems} articles`}
+                    </span>
+                    <span className="shrink-0 tabular-nums">
+                      {tier.fee === null ? (
+                        <span className="text-[13px] text-stone">Calcul personnalisé</span>
+                      ) : (
+                        formatFcfa(tier.fee)
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="rounded-[--radius-lg] border border-line bg-white p-5">
+              <p className="eyebrow">Livraison</p>
+              <ul className="mt-4 divide-y divide-line">
+                {(pricing?.deliveryOptions ?? []).map((option) => (
+                  <li key={option.id} className="flex items-baseline justify-between gap-4 py-2.5 text-[14px]">
+                    <span>
+                      {option.label}
+                      {option.hint && (
+                        <span className="mt-0.5 block text-[12px] leading-snug text-stone">{option.hint}</span>
+                      )}
+                    </span>
+                    <span className="shrink-0 tabular-nums">
+                      {option.fee === null ? (
+                        <span className="text-[13px] text-stone">Communiqué après validation</span>
+                      ) : option.fee === 0 ? (
+                        'Gratuit'
+                      ) : (
+                        formatFcfa(option.fee)
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <p className="mt-4 text-[12.5px] leading-relaxed text-stone">
+            Le prix des articles s'ajoute à ces frais. Le montant final vous est confirmé après
+            vérification, avant tout paiement.
+          </p>
+        </Reveal>
       </section>
 
       <section className="container-page mt-20">

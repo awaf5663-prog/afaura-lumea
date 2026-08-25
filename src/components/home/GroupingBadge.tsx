@@ -1,12 +1,15 @@
 import { CalendarClock } from 'lucide-react';
 import { useCountdown } from '@/src/hooks/useCountdown';
+import { useGroupings } from '@/src/hooks/useGroupings';
 import { useSettings } from '@/src/hooks/useSettings';
 import { formatDate } from '@/src/lib/format';
 
 /** Carte compacte « prochain groupage ». N'affiche rien tant qu'aucune date n'est configurée. */
 export function GroupingBadge() {
   const { settings } = useSettings();
-  const target = settings?.nextGroupingDate ?? '';
+  const { displayed } = useGroupings();
+  // Le groupage fait autorité ; la date des réglages sert de repli.
+  const target = displayed?.closingDate || settings?.nextGroupingDate || '';
   const countdown = useCountdown(target);
 
   if (!countdown.configured) {

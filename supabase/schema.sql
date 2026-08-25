@@ -72,6 +72,24 @@ create table if not exists order_items (
 create index if not exists order_items_order_id_idx on order_items(order_id);
 create index if not exists orders_lookup_idx on orders(order_number, phone);
 
+-- ── Groupages ──────────────────────────────────────────────────────────
+create table if not exists groupings (
+  id uuid primary key default gen_random_uuid(),
+  reference text unique not null,
+  destination text default '',
+  closing_date timestamptz,
+  max_orders integer not null check (max_orders > 0),
+  min_orders integer not null default 0 check (min_orders >= 0),
+  reserved_count integer not null default 0 check (reserved_count >= 0),
+  manual_order_count integer not null default 0 check (manual_order_count >= 0),
+  logistics_cost integer check (logistics_cost >= 0),
+  status text not null default 'open'
+    check (status in ('open','full','closed','in_transit','arrived','delivered','postponed','cancelled')),
+  note text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 -- ── Demandes SHEIN ─────────────────────────────────────────────────────
 create table if not exists shein_requests (
   id uuid primary key default gen_random_uuid(),
@@ -82,6 +100,9 @@ create table if not exists shein_requests (
   status text not null default 'received'
     check (status in ('received','quoted','payment_confirmed','grouped','in_transit','arrived','ready','delivered','cancelled')),
   quoted_total integer,                                -- null tant que non chiffré
+  grouping_id uuid references groupings(id) on delete set null,
+  delivery_option_id text default '',
+  quote jsonb,                                         -- estimation calculée côté serveur
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -95,6 +116,8 @@ create table if not exists shein_items (
   color text default '',
   quantity integer not null default 1 check (quantity > 0),
   displayed_price text default '',
+  price_amount numeric,                                 -- montant déclaré par la cliente
+  price_currency text default 'XOF',
   image text                                            -- chemin Supabase Storage
 );
 
@@ -110,7 +133,9 @@ create table if not exists settings (
   wave_number text default '',
   orange_money_number text default '',
   delivery_fees jsonb not null default '{}'::jsonb,
-  announcement text default ''
+  announcement text default '',
+  pricing jsonb not null default '{}'::jsonb,           -- tarification SHEIN pilotée par l'admin
+  alert_thresholds jsonb not null default '{}'::jsonb
 );
 
 insert into settings (id) values (1) on conflict (id) do nothing;
@@ -203,6 +228,7 @@ create or replace function create_shein_request(
   p_customer_name text,
   p_phone text,
   p_note text,
+  p_delivery_option_id text,
   p_items jsonb
 ) returns jsonb
 language plpgsql
@@ -213,20 +239,100 @@ declare
   v_id uuid;
   v_number text;
   v_item jsonb;
+  v_pricing jsonb;
+  v_item_count integer := 0;
+  v_subtotal numeric := 0;
+  v_subtotal_known boolean := true;
+  v_rate numeric;
+  v_qty integer;
+  v_tier jsonb;
+  v_service integer;
+  v_service_known boolean := false;
+  v_option jsonb;
+  v_delivery integer;
+  v_delivery_known boolean := false;
+  v_grouping groupings%rowtype;
+  v_quote jsonb;
 begin
   if jsonb_array_length(coalesce(p_items, '[]'::jsonb)) = 0 then
     raise exception 'Aucun article';
   end if;
 
+  select coalesce(pricing, '{}'::jsonb) into v_pricing from settings where id = 1;
+  -- Tant que la tarification n'a pas été enregistrée depuis l'admin, aucune ligne
+  -- n'est calculée : le devis est marqué partiel plutôt que faussement précis.
+
+  -- Prix des articles : convertis ici, jamais acceptés depuis le navigateur.
+  for v_item in select * from jsonb_array_elements(p_items) loop
+    v_qty := greatest(1, least(99, coalesce((v_item ->> 'quantity')::integer, 1)));
+    v_item_count := v_item_count + v_qty;
+
+    if v_item ->> 'price_amount' is null then
+      v_subtotal_known := false;
+    else
+      v_rate := (coalesce(v_pricing -> 'conversionRates', '{}'::jsonb) ->> coalesce(v_item ->> 'price_currency', 'XOF'))::numeric;
+      if v_rate is null then
+        v_subtotal_known := false;
+      else
+        v_subtotal := v_subtotal + (v_item ->> 'price_amount')::numeric * v_rate * v_qty;
+      end if;
+    end if;
+  end loop;
+
+  -- Frais de traitement : tranche correspondant au nombre d'articles.
+  for v_tier in select * from jsonb_array_elements(coalesce(v_pricing -> 'tiers', '[]'::jsonb)) loop
+    if v_item_count >= (v_tier ->> 'minItems')::integer
+       and (v_tier ->> 'maxItems' is null or v_item_count <= (v_tier ->> 'maxItems')::integer)
+       and v_tier ->> 'fee' is not null then
+      v_service := (v_tier ->> 'fee')::integer;
+      v_service_known := true;
+      exit;
+    end if;
+  end loop;
+
+  -- Livraison.
+  for v_option in select * from jsonb_array_elements(coalesce(v_pricing -> 'deliveryOptions', '[]'::jsonb)) loop
+    if v_option ->> 'id' = p_delivery_option_id and v_option ->> 'fee' is not null then
+      v_delivery := (v_option ->> 'fee')::integer;
+      v_delivery_known := true;
+      exit;
+    end if;
+  end loop;
+
+  v_quote := jsonb_build_object(
+    'itemCount', v_item_count,
+    'itemsSubtotal', case when v_subtotal_known then round(v_subtotal) else null end,
+    'serviceFee', case when v_service_known then v_service else null end,
+    'deliveryOptionId', p_delivery_option_id,
+    'deliveryFee', case when v_delivery_known then v_delivery else null end,
+    'total', coalesce(case when v_subtotal_known then round(v_subtotal) else 0 end, 0)
+             + coalesce(v_service, 0) + coalesce(v_delivery, 0),
+    'isPartial', not (v_subtotal_known and v_service_known and v_delivery_known),
+    'strategy', v_pricing ->> 'strategy',
+    'computedAt', now()
+  );
+
+  -- Rattachement au premier groupage ouvert qui a encore de la place.
+  select * into v_grouping
+    from groupings
+   where status = 'open'
+     and reserved_count + manual_order_count < max_orders
+   order by closing_date nulls last
+   limit 1;
+
   v_number := 'SHEIN-' || to_char(now(), 'YYYY') || '-' || lpad(nextval('shein_seq')::text, 5, '0');
 
-  insert into shein_requests (request_number, customer_name, phone, note)
-  values (v_number, p_customer_name, p_phone, p_note)
-  returning id into v_id;
+  insert into shein_requests (
+    request_number, customer_name, phone, note, grouping_id, delivery_option_id, quote
+  ) values (
+    v_number, p_customer_name, p_phone, p_note, v_grouping.id, p_delivery_option_id, v_quote
+  ) returning id into v_id;
 
   for v_item in select * from jsonb_array_elements(p_items) loop
-    insert into shein_items (request_id, product_url, reference, size, color, quantity, displayed_price, image)
-    values (
+    insert into shein_items (
+      request_id, product_url, reference, size, color, quantity,
+      displayed_price, price_amount, price_currency, image
+    ) values (
       v_id,
       coalesce(v_item ->> 'product_url', ''),
       coalesce(v_item ->> 'reference', ''),
@@ -234,9 +340,22 @@ begin
       coalesce(v_item ->> 'color', ''),
       greatest(1, least(99, coalesce((v_item ->> 'quantity')::integer, 1))),
       coalesce(v_item ->> 'displayed_price', ''),
+      (v_item ->> 'price_amount')::numeric,
+      coalesce(v_item ->> 'price_currency', 'XOF'),
       v_item ->> 'image'
     );
   end loop;
+
+  if v_grouping.id is not null then
+    update groupings
+       set reserved_count = reserved_count + 1,
+           status = case
+                      when reserved_count + 1 + manual_order_count >= max_orders then 'full'
+                      else status
+                    end,
+           updated_at = now()
+     where id = v_grouping.id;
+  end if;
 
   return (
     select to_jsonb(r) || jsonb_build_object(
@@ -244,6 +363,40 @@ begin
     )
     from shein_requests r where r.id = v_id
   );
+end;
+$$;
+
+-- Transfert des demandes d'un groupage vers un autre (ou vers aucun).
+create or replace function transfer_shein_requests(p_from uuid, p_to uuid)
+returns integer
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_moved integer;
+begin
+  update shein_requests
+     set grouping_id = p_to, updated_at = now()
+   where grouping_id = p_from
+     and status not in ('cancelled', 'delivered');
+  get diagnostics v_moved = row_count;
+
+  update groupings set reserved_count = greatest(0, reserved_count - v_moved), updated_at = now()
+   where id = p_from;
+
+  if p_to is not null then
+    update groupings
+       set reserved_count = reserved_count + v_moved,
+           status = case
+                      when reserved_count + v_moved + manual_order_count >= max_orders then 'full'
+                      else status
+                    end,
+           updated_at = now()
+     where id = p_to;
+  end if;
+
+  return v_moved;
 end;
 $$;
 
@@ -288,6 +441,7 @@ alter table order_items enable row level security;
 alter table shein_requests enable row level security;
 alter table shein_items enable row level security;
 alter table settings enable row level security;
+alter table groupings enable row level security;
 
 -- Catalogue : lecture publique des seuls articles publiés.
 drop policy if exists "produits visibles" on products;
@@ -318,6 +472,14 @@ drop policy if exists "shein lignes admin" on shein_items;
 create policy "shein lignes admin" on shein_items
   for all to authenticated using (true) with check (true);
 
+-- Groupages : lecture publique (compteur affiché sur le site), écriture admin.
+-- Aucune donnée cliente ni marge n'y figure : seulement capacité et remplissage.
+drop policy if exists "groupages publics" on groupings;
+create policy "groupages publics" on groupings for select to anon, authenticated using (true);
+
+drop policy if exists "groupages admin" on groupings;
+create policy "groupages admin" on groupings for all to authenticated using (true) with check (true);
+
 -- Réglages : lecture publique (numéro WhatsApp, date de groupage), écriture admin.
 drop policy if exists "reglages publics" on settings;
 create policy "reglages publics" on settings for select to anon, authenticated using (true);
@@ -327,6 +489,7 @@ create policy "reglages admin" on settings for all to authenticated using (true)
 
 -- Les fonctions publiques sont exposées explicitement.
 grant execute on function create_order(text, text, text, text, text, text, text, jsonb) to anon, authenticated;
-grant execute on function create_shein_request(text, text, text, jsonb) to anon, authenticated;
+grant execute on function create_shein_request(text, text, text, text, jsonb) to anon, authenticated;
+grant execute on function transfer_shein_requests(uuid, uuid) to authenticated;
 grant execute on function find_order(text, text) to anon, authenticated;
 grant execute on function find_shein_request(text, text) to anon, authenticated;

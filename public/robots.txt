@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /commander
+Disallow: /confirmation/
+Disallow: /shein/confirmation/
+
+Sitemap: /sitemap.xml

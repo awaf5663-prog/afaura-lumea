@@ -1,6 +1,5 @@
 {
-  "name": "Afaura LUMÉA",
-  "description": "Maison de modest fashion moderne d'exception. Foulards en coton premium, hijabs en jersey et essentiels textiles raffinés inspirés par la simplicité et la qualité.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "name": "Afaura Luméa",
+  "description": "Boutique mobile-first de hijabs à Dakar et service de commandes SHEIN groupées : panier, checkout, paiement mobile, suivi de commande et espace administrateur.",
+  "requestFramePermissions": []
 }

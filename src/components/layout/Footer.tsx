@@ -1,0 +1,107 @@
+import { Instagram, Mail, MapPin } from 'lucide-react';
+import { BRAND, CONTACT_EMAIL, INSTAGRAM_HANDLE } from '@/src/config/site';
+import { useSettings } from '@/src/hooks/useSettings';
+import { prettyPhone } from '@/src/lib/format';
+import { isWhatsappConfigured, whatsappLink } from '@/src/lib/whatsapp';
+import { Link } from '@/src/lib/router';
+
+const COLUMNS = [
+  {
+    title: 'Boutique',
+    links: [
+      { to: '/boutique', label: 'Toutes les pièces' },
+      { to: '/boutique?categorie=hijab', label: 'Hijabs & voiles' },
+      { to: '/boutique?categorie=accessoire', label: 'Accessoires' },
+    ],
+  },
+  {
+    title: 'Services',
+    links: [
+      { to: '/shein', label: 'Commande SHEIN' },
+      { to: '/comment-ca-marche', label: 'Comment ça marche' },
+      { to: '/suivi', label: 'Suivre ma commande' },
+      { to: '/faq', label: 'Questions fréquentes' },
+    ],
+  },
+];
+
+export function Footer() {
+  const { settings } = useSettings();
+  const number = settings?.whatsappNumber ?? '';
+
+  return (
+    <footer className="mt-20 border-t border-line bg-cream/60">
+      <div className="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
+        <div>
+          <p className="font-display text-2xl">{BRAND.name}</p>
+          <p className="mt-3 max-w-xs text-sm leading-relaxed text-stone">{BRAND.tagline}</p>
+          <p className="mt-4 flex items-center gap-2 text-sm text-stone">
+            <MapPin className="size-4" /> {BRAND.city}
+          </p>
+        </div>
+
+        {COLUMNS.map((column) => (
+          <nav key={column.title} aria-label={column.title}>
+            <p className="eyebrow mb-4">{column.title}</p>
+            <ul className="space-y-2.5">
+              {column.links.map((link) => (
+                <li key={link.to}>
+                  <Link to={link.to} className="link-underline text-sm text-graphite">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))}
+
+        <div>
+          <p className="eyebrow mb-4">Contact</p>
+          <ul className="space-y-2.5 text-sm text-graphite">
+            {isWhatsappConfigured(number) && (
+              <li>
+                <a
+                  href={whatsappLink(number, 'Bonjour, j’ai une question.')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link-underline"
+                >
+                  WhatsApp {prettyPhone(number)}
+                </a>
+              </li>
+            )}
+            {CONTACT_EMAIL && (
+              <li>
+                <a href={`mailto:${CONTACT_EMAIL}`} className="link-underline inline-flex items-center gap-2">
+                  <Mail className="size-4" /> {CONTACT_EMAIL}
+                </a>
+              </li>
+            )}
+            {INSTAGRAM_HANDLE && (
+              <li>
+                <a
+                  href={`https://instagram.com/${INSTAGRAM_HANDLE}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link-underline inline-flex items-center gap-2"
+                >
+                  <Instagram className="size-4" /> @{INSTAGRAM_HANDLE}
+                </a>
+              </li>
+            )}
+          </ul>
+        </div>
+      </div>
+
+      <div className="container-page hairline flex flex-col gap-2 py-6 text-[12px] text-stone sm:flex-row sm:items-center sm:justify-between">
+        <p>
+          © {new Date().getFullYear()} {BRAND.name}. Tous droits réservés.
+        </p>
+        <p className="max-w-lg sm:text-right">
+          {BRAND.name} est un service indépendant de commande groupée. Nous ne sommes ni SHEIN ni un
+          revendeur officiel de SHEIN.
+        </p>
+      </div>
+    </footer>
+  );
+}

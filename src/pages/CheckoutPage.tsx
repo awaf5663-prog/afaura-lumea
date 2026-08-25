@@ -1,5 +1,6 @@
 import { AlertCircle, Info, Lock } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { PaymentInstructions } from '@/src/components/order/PaymentInstructions';
 import { Button } from '@/src/components/ui/Button';
 import { ErrorText, FormRow, Input, Label, Textarea } from '@/src/components/ui/Field';
 import { PAYMENT_METHODS } from '@/src/config/site';
@@ -26,7 +27,7 @@ interface FormState {
 
 export function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
-  const { zones, settings } = useSettings();
+  const { zones } = useSettings();
   const { navigate } = useRouter();
   const { notify } = useToast();
 
@@ -283,11 +284,13 @@ export function CheckoutPage() {
               ))}
             </div>
 
-            <PaymentInstructions
-              methodId={form.paymentMethod}
-              wave={settings?.waveNumber ?? ''}
-              orange={settings?.orangeMoneyNumber ?? ''}
-            />
+            <div className="mt-4">
+              <PaymentInstructions
+                methodId={form.paymentMethod}
+                amount={total}
+                amountIsFinal={deliveryFee !== null}
+              />
+            </div>
           </section>
 
           <section className="mt-10">
@@ -373,39 +376,5 @@ export function CheckoutPage() {
         </aside>
       </div>
     </form>
-  );
-}
-
-function PaymentInstructions({
-  methodId,
-  wave,
-  orange,
-}: {
-  methodId: string;
-  wave: string;
-  orange: string;
-}) {
-  if (methodId === 'cash') return null;
-  const number = methodId === 'wave' ? wave : orange;
-  const label = methodId === 'wave' ? 'Wave' : 'Orange Money';
-
-  return (
-    <div className="mt-4 rounded-[--radius-md] border border-line bg-cream/60 p-4 text-[13px] leading-relaxed text-graphite">
-      <p className="font-medium">Comment payer en {label}</p>
-      {number ? (
-        <ol className="mt-2 list-decimal space-y-1 pl-4">
-          <li>
-            Envoyez le montant total au <span className="font-medium">{number}</span> ({label}).
-          </li>
-          <li>Faites une capture d'écran de la confirmation.</li>
-          <li>Envoyez-la dans la conversation WhatsApp ouverte à l'étape suivante.</li>
-        </ol>
-      ) : (
-        <p className="mt-2">
-          Les coordonnées {label} vous sont envoyées sur WhatsApp juste après la validation, avec le
-          montant exact à régler. Vous n'avancez rien avant cette confirmation.
-        </p>
-      )}
-    </div>
   );
 }

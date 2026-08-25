@@ -20,7 +20,7 @@ const env = import.meta.env;
  * (récapitulatif de commande, demande SHEIN). Sans elle, le site bascule sur
  * WHATSAPP_LINK ci-dessous et propose à la cliente de copier le message.
  */
-export const WHATSAPP_NUMBER: string = env.VITE_WHATSAPP_NUMBER ?? '';
+export const WHATSAPP_NUMBER: string = env.VITE_WHATSAPP_NUMBER ?? '221781071604';
 
 /**
  * Lien court WhatsApp Business (wa.me/message/XXXX) — solution de repli.
@@ -35,8 +35,8 @@ export const WHATSAPP_LINK: string =
 export const NEXT_GROUPING_DATE: string = env.VITE_NEXT_GROUPING_DATE ?? '';
 
 /** Numéros marchands pour le paiement mobile. Vides = instructions envoyées sur WhatsApp. */
-export const WAVE_NUMBER: string = env.VITE_WAVE_NUMBER ?? '';
-export const ORANGE_MONEY_NUMBER: string = env.VITE_ORANGE_MONEY_NUMBER ?? '';
+export const WAVE_NUMBER: string = env.VITE_WAVE_NUMBER ?? '221765614578';
+export const ORANGE_MONEY_NUMBER: string = env.VITE_ORANGE_MONEY_NUMBER ?? '221781071604';
 
 /** Adresse e-mail de contact (facultative). */
 export const CONTACT_EMAIL: string = env.VITE_CONTACT_EMAIL ?? '';

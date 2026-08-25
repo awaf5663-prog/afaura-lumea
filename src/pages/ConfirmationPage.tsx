@@ -1,6 +1,7 @@
 import { Check, Copy, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { StatusTimeline } from '@/src/components/order/StatusTimeline';
+import { PaymentInstructions } from '@/src/components/order/PaymentInstructions';
 import { WhatsAppHandoff } from '@/src/components/order/WhatsAppHandoff';
 import { Button } from '@/src/components/ui/Button';
 import { EmptyState } from '@/src/components/ui/EmptyState';
@@ -120,6 +121,16 @@ export function ConfirmationPage({ orderNumber }: { orderNumber: string }) {
             ))}
           </ul>
         </div>
+
+        {order.paymentStatus === 'pending' && (
+          <div className="mt-6">
+            <PaymentInstructions
+              methodId={order.paymentMethod}
+              amount={order.total}
+              amountIsFinal={order.deliveryFee !== null}
+            />
+          </div>
+        )}
 
         <WhatsAppHandoff message={message} />
 

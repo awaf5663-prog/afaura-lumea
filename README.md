@@ -30,12 +30,19 @@ Deux façons de brancher WhatsApp, et elles ne se valent pas :
 | `VITE_WHATSAPP_NUMBER` (ex. `221771234567`) | WhatsApp s'ouvre avec le **message déjà rédigé** : nom, numéro de commande, produits, quantités, total, livraison, commentaire. La cliente n'a qu'à appuyer sur Envoyer. |
 | `VITE_WHATSAPP_LINK` (ex. `https://wa.me/message/A4C6VTCHWW4QH1`) | La conversation s'ouvre, mais **vide** : le format `wa.me/message/…` ne transporte pas de texte. Le site copie donc le message dans le presse-papier et affiche « collez-le dans la conversation ». |
 
-Le lien court est configuré par défaut, le site est donc fonctionnel tout de suite. **Renseignez
-le numéro dès que possible** : c'est la différence entre une cliente qui appuie sur Envoyer et une
-cliente qui doit penser à coller. Les deux peuvent aussi se régler dans /admin → Réglages.
+Les deux sont configurés : le numéro `221 78 107 16 04` est utilisé en priorité (messages
+pré-remplis), le lien court sert de repli. Tout se règle aussi dans /admin → Réglages.
 
-Si les deux sont vides, aucun bouton WhatsApp n'est affiché — le site propose le message à copier
-plutôt qu'un lien mort.
+Si les deux étaient vides, aucun bouton WhatsApp ne s'afficherait — le site proposerait le message
+à copier plutôt qu'un lien mort.
+
+### Paiement mobile
+
+`VITE_WAVE_NUMBER` et `VITE_ORANGE_MONEY_NUMBER` alimentent les instructions de paiement (page de
+validation, page de confirmation, page « Comment ça marche ») : numéro affiché en grand, bouton
+« Copier », montant à régler rappelé. Configurés ici : Wave `76 561 45 78`, Orange Money
+`78 107 16 04`. Le statut du paiement reste « en attente de vérification » jusqu'à ce que vous le
+validiez dans l'admin — aucune confirmation automatique.
 
 ---
 

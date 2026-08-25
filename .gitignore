@@ -6,3 +6,6 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Aperçu autonome généré (npm run preview:build)
+preview/

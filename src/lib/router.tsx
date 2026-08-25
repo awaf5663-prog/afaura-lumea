@@ -22,20 +22,73 @@ interface RouterValue {
 
 const RouterContext = createContext<RouterValue | null>(null);
 
+/**
+ * Racine de l'application, déduite de l'emplacement du bundle.
+ * Vide quand le site est servi à la racine du domaine (cas normal) ; renseignée
+ * quand il vit dans un sous-dossier — un aperçu hébergé, par exemple. Les URL
+ * internes restent alors propres sans configuration supplémentaire.
+ */
+const BASE = (() => {
+  try {
+    const { pathname } = new URL(import.meta.url);
+    const index = pathname.lastIndexOf('/assets/');
+    return index > 0 ? pathname.slice(0, index) : '';
+  } catch {
+    return '';
+  }
+})();
+
+/**
+ * L'History API est indisponible dans certains contextes embarqués.
+ * On bascule alors sur le fragment (#) plutôt que de casser la navigation.
+ * Un aperçu autonome peut aussi l'imposer via <meta name="lumea-router" content="hash">.
+ */
+let useHash = (() => {
+  try {
+    return document.querySelector('meta[name="lumea-router"]')?.getAttribute('content') === 'hash';
+  } catch {
+    return false;
+  }
+})();
+
+function readLocation(): string {
+  if (useHash) return window.location.hash.slice(1) || '/';
+  const path = window.location.pathname.slice(BASE.length) || '/';
+  return path + window.location.search;
+}
+
+function writeLocation(to: string, replace: boolean): void {
+  if (!useHash) {
+    try {
+      const url = BASE + to;
+      if (replace) window.history.replaceState({}, '', url);
+      else window.history.pushState({}, '', url);
+      return;
+    } catch {
+      useHash = true;
+    }
+  }
+  const target = `${window.location.pathname}${window.location.search}#${to}`;
+  if (replace) window.location.replace(target);
+  else window.location.hash = to;
+}
+
 export function RouterProvider({ children }: { children: ReactNode }) {
-  const [location, setLocation] = useState(() => window.location.pathname + window.location.search);
+  const [location, setLocation] = useState(readLocation);
 
   useEffect(() => {
-    const onPop = () => setLocation(window.location.pathname + window.location.search);
-    window.addEventListener('popstate', onPop);
-    return () => window.removeEventListener('popstate', onPop);
+    const onChange = () => setLocation(readLocation());
+    window.addEventListener('popstate', onChange);
+    window.addEventListener('hashchange', onChange);
+    return () => {
+      window.removeEventListener('popstate', onChange);
+      window.removeEventListener('hashchange', onChange);
+    };
   }, []);
 
   const navigate = useCallback<RouterValue['navigate']>((to, options) => {
-    const current = window.location.pathname + window.location.search;
-    if (to === current) return;
-    if (options?.replace) window.history.replaceState({}, '', to);
-    else window.history.pushState({}, '', to);
+    if (to === readLocation()) return;
+    writeLocation(to, Boolean(options?.replace));
     setLocation(to);
     if (!options?.keepScroll) window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
   }, []);
@@ -77,7 +130,7 @@ export function Link({ to, children, replace, onClick, ...rest }: LinkProps) {
   const { navigate } = useRouter();
   return (
     <a
-      href={to}
+      href={BASE + to}
       onClick={(e) => {
         onClick?.(e);
         if (e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;

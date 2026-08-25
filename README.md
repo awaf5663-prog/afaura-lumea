@@ -238,7 +238,16 @@ Next.js indolore.
 
 **Déploiement** : hébergement statique classique (`npm run build` → `dist/`). Une seule règle
 requise : rediriger toutes les routes inconnues vers `index.html` (fallback SPA), sans quoi
-`/boutique` renverrait un 404 au rafraîchissement.
+`/boutique` renverrait un 404 au rafraîchissement. Vercel, Netlify et Cloudflare Pages le font
+automatiquement pour un projet Vite.
+
+Le routeur détecte tout seul le sous-dossier où le site est servi : aucun réglage à prévoir si
+l'hébergement n'est pas à la racine du domaine.
+
+**Aperçu partageable** : `npm run preview:build` produit `preview/apercu.html`, une page unique
+contenant le CSS, le JavaScript et les images en data URI (~0,9 Mo). Elle navigue au fragment (#)
+pour rester valable quel que soit l'endroit où on la dépose. Pratique pour montrer le site sans
+hébergement — le vrai déploiement reste `dist/`.
 
 ---
 

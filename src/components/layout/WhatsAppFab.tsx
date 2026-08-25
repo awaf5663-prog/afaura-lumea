@@ -1,16 +1,15 @@
-import { useSettings } from '@/src/hooks/useSettings';
-import { isWhatsappConfigured, whatsappLink } from '@/src/lib/whatsapp';
+import { useWhatsapp } from '@/src/hooks/useSettings';
 import { BRAND } from '@/src/config/site';
 
-/** Bouton WhatsApp flottant. Masqué tant qu'aucun numéro n'est configuré. */
+/** Bouton WhatsApp flottant. Masqué tant qu'aucun contact WhatsApp n'est configuré. */
 export function WhatsAppFab() {
-  const { settings } = useSettings();
-  const number = settings?.whatsappNumber ?? '';
-  if (!isWhatsappConfigured(number)) return null;
+  const whatsapp = useWhatsapp();
+  const href = whatsapp.url(`Bonjour ${BRAND.name}, j'ai une question.`);
+  if (!href) return null;
 
   return (
     <a
-      href={whatsappLink(number, `Bonjour ${BRAND.name}, j'ai une question.`)}
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Nous écrire sur WhatsApp"

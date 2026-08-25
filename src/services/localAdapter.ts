@@ -4,6 +4,7 @@ import {
   ORANGE_MONEY_NUMBER,
   PAYMENT_METHODS,
   WAVE_NUMBER,
+  WHATSAPP_LINK,
   WHATSAPP_NUMBER,
 } from '@/src/config/site';
 import { SEED_PRODUCTS } from '@/src/data/seed';
@@ -24,6 +25,7 @@ import type { DataSource, OrderDraft, SheinDraft } from './types';
 function defaultSettings(): StoreSettings {
   return {
     whatsappNumber: WHATSAPP_NUMBER,
+    whatsappLink: WHATSAPP_LINK,
     nextGroupingDate: NEXT_GROUPING_DATE,
     waveNumber: WAVE_NUMBER,
     orangeMoneyNumber: ORANGE_MONEY_NUMBER,

@@ -154,7 +154,7 @@ export function AdminPage() {
         )}
 
         {tab === 'commandes' && (
-          <AdminOrders orders={orders} reload={loadAll} whatsappNumber={settings?.whatsappNumber ?? ''} />
+          <AdminOrders orders={orders} reload={loadAll} />
         )}
         {tab === 'shein' && <AdminShein requests={requests} reload={loadAll} />}
         {tab === 'produits' && <AdminProducts products={products} reload={loadAll} />}

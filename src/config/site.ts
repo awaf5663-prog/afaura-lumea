@@ -13,8 +13,23 @@
 
 const env = import.meta.env;
 
-/** Numéro WhatsApp au format international SANS "+" ni espaces. Ex : 221771234567 */
+/**
+ * Numéro WhatsApp au format international SANS "+" ni espaces. Ex : 221771234567
+ *
+ * C'est LA valeur qui permet de pré-remplir automatiquement les messages
+ * (récapitulatif de commande, demande SHEIN). Sans elle, le site bascule sur
+ * WHATSAPP_LINK ci-dessous et propose à la cliente de copier le message.
+ */
 export const WHATSAPP_NUMBER: string = env.VITE_WHATSAPP_NUMBER ?? '';
+
+/**
+ * Lien court WhatsApp Business (wa.me/message/XXXX) — solution de repli.
+ * Il ouvre bien la conversation, mais ne peut PAS transporter de message
+ * pré-rempli : ce format ne le prévoit pas. Le site copie alors le message
+ * dans le presse-papier avant d'ouvrir WhatsApp.
+ */
+export const WHATSAPP_LINK: string =
+  env.VITE_WHATSAPP_LINK ?? 'https://wa.me/message/A4C6VTCHWW4QH1';
 
 /** Date/heure de clôture du prochain groupage (ISO 8601). Vide = aucun groupage annoncé. */
 export const NEXT_GROUPING_DATE: string = env.VITE_NEXT_GROUPING_DATE ?? '';

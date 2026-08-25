@@ -12,18 +12,18 @@ import { QuantityStepper } from '@/src/components/ui/QuantityStepper';
 import { BRAND, SITE_URL } from '@/src/config/site';
 import { useCart } from '@/src/hooks/useCart';
 import { useProducts } from '@/src/hooks/useProducts';
-import { useSettings } from '@/src/hooks/useSettings';
+import { useWhatsapp } from '@/src/hooks/useSettings';
 import { useToast } from '@/src/hooks/useToast';
 import { formatFcfa } from '@/src/lib/format';
 import { Link, useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
-import { buildProductMessage, isWhatsappConfigured, whatsappLink } from '@/src/lib/whatsapp';
+import { buildProductMessage } from '@/src/lib/whatsapp';
 
 export function ProductPage({ slug }: { slug: string }) {
   const { products, loading } = useProducts();
   const { add } = useCart();
   const { notify } = useToast();
-  const { settings } = useSettings();
+  const whatsapp = useWhatsapp();
   const { navigate } = useRouter();
 
   const product = products.find((p) => p.slug === slug || p.id === slug);
@@ -88,6 +88,12 @@ export function ProductPage({ slug }: { slug: string }) {
     );
   }
 
+  const productMessage = buildProductMessage(
+    product.name,
+    formatFcfa(product.price),
+    `${SITE_URL}/produit/${product.slug}`,
+  );
+
   const handleAdd = () => {
     if (missingOption) {
       notify(`Choisissez : ${missingOption.name}`, 'error');
@@ -101,7 +107,7 @@ export function ProductPage({ slug }: { slug: string }) {
     window.setTimeout(() => setAdded(false), 1800);
   };
 
-  const whatsappNumber = settings?.whatsappNumber ?? '';
+
 
   return (
     <div className="container-page pt-6">
@@ -188,24 +194,15 @@ export function ProductPage({ slug }: { slug: string }) {
                 <>Ajouter au panier · {formatFcfa(product.price * quantity)}</>
               )}
             </Button>
-            {isWhatsappConfigured(whatsappNumber) && (
+            {whatsapp.available && (
               <Button
                 size="lg"
                 variant="secondary"
-                onClick={() =>
-                  window.open(
-                    whatsappLink(
-                      whatsappNumber,
-                      buildProductMessage(
-                        product.name,
-                        formatFcfa(product.price),
-                        `${SITE_URL}/produit/${product.slug}`,
-                      ),
-                    ),
-                    '_blank',
-                    'noopener',
-                  )
-                }
+                onClick={() => {
+                  void whatsapp.open(productMessage).then((copied) => {
+                    if (copied) notify('Message copié — collez-le dans la conversation');
+                  });
+                }}
               >
                 Commander via WhatsApp
               </Button>
@@ -251,22 +248,18 @@ export function ProductPage({ slug }: { slug: string }) {
             )}
           </Button>
         </div>
-        {isWhatsappConfigured(whatsappNumber) && (
-          <a
-            href={whatsappLink(
-              whatsappNumber,
-              buildProductMessage(
-                product.name,
-                formatFcfa(product.price),
-                `${SITE_URL}/produit/${product.slug}`,
-              ),
-            )}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 block text-center text-[12.5px] text-stone underline underline-offset-2"
+        {whatsapp.available && (
+          <button
+            type="button"
+            onClick={() => {
+              void whatsapp.open(productMessage).then((copied) => {
+                if (copied) notify('Message copié — collez-le dans la conversation');
+              });
+            }}
+            className="mt-2 block w-full text-center text-[12.5px] text-stone underline underline-offset-2"
           >
             Une question ? Écrire sur WhatsApp
-          </a>
+          </button>
         )}
       </div>
       <div className="h-28 lg:hidden" aria-hidden />

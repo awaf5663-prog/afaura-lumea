@@ -278,6 +278,7 @@ export const supabaseAdapter: DataSource = {
     const r = rows[0] ?? {};
     return {
       whatsappNumber: r.whatsapp_number ?? '',
+      whatsappLink: r.whatsapp_link ?? '',
       nextGroupingDate: r.next_grouping_date ?? '',
       waveNumber: r.wave_number ?? '',
       orangeMoneyNumber: r.orange_money_number ?? '',
@@ -293,6 +294,7 @@ export const supabaseAdapter: DataSource = {
       body: JSON.stringify({
         id: 1,
         whatsapp_number: settings.whatsappNumber,
+        whatsapp_link: settings.whatsappLink,
         next_grouping_date: settings.nextGroupingDate || null,
         wave_number: settings.waveNumber,
         orange_money_number: settings.orangeMoneyNumber,

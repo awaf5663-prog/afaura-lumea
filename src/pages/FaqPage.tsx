@@ -1,11 +1,10 @@
 import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/src/components/ui/Button';
-import { useSettings } from '@/src/hooks/useSettings';
+import { useWhatsapp } from '@/src/hooks/useSettings';
 import { cn } from '@/src/lib/cn';
 import { useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
-import { isWhatsappConfigured, whatsappLink } from '@/src/lib/whatsapp';
 
 const FAQ = [
   {
@@ -48,9 +47,8 @@ const FAQ = [
 
 export function FaqPage() {
   const [open, setOpen] = useState<number | null>(0);
-  const { settings } = useSettings();
+  const whatsapp = useWhatsapp();
   const { navigate } = useRouter();
-  const number = settings?.whatsappNumber ?? '';
 
   useSeo({
     title: 'Questions fréquentes',
@@ -104,13 +102,8 @@ export function FaqPage() {
           <h2 className="text-[22px]">Vous ne trouvez pas votre réponse ?</h2>
           <p className="mt-2 text-[14px] text-stone">Écrivez-nous, on répond directement.</p>
           <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-            {isWhatsappConfigured(number) ? (
-              <Button
-                variant="whatsapp"
-                onClick={() =>
-                  window.open(whatsappLink(number, 'Bonjour, j’ai une question.'), '_blank', 'noopener')
-                }
-              >
+            {whatsapp.available ? (
+              <Button variant="whatsapp" onClick={() => void whatsapp.open('Bonjour, j’ai une question.')}>
                 Écrire sur WhatsApp
               </Button>
             ) : null}

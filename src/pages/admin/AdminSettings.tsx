@@ -63,6 +63,26 @@ export function AdminSettings() {
           />
           <p className="mt-1.5 text-[12px] text-stone">
             Utilisé par tous les boutons WhatsApp du site — une seule valeur, jamais recopiée ailleurs.
+            C'est ce numéro qui permet d'envoyer les récapitulatifs <strong>déjà rédigés</strong>.
+          </p>
+        </FormRow>
+
+        <FormRow>
+          <Label htmlFor="s-walink" hint="wa.me/message/…">
+            Lien court WhatsApp Business
+          </Label>
+          <Input
+            id="s-walink"
+            inputMode="url"
+            placeholder="https://wa.me/message/XXXXXXXX"
+            value={draft.whatsappLink}
+            onChange={(e) => setDraft({ ...draft, whatsappLink: e.target.value })}
+          />
+          <p className="mt-1.5 flex gap-2 text-[12px] text-stone">
+            <Info className="mt-0.5 size-3.5 shrink-0" />
+            Solution de repli si le numéro n'est pas renseigné. Ce format ouvre bien la
+            conversation mais ne peut pas transporter de texte : le site copie alors le message
+            dans le presse-papier avant d'ouvrir WhatsApp.
           </p>
         </FormRow>
 

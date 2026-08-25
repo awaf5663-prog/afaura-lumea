@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 import { StatusTimeline } from '@/src/components/order/StatusTimeline';
 import { Button } from '@/src/components/ui/Button';
 import { ErrorText, FormRow, Input, Label } from '@/src/components/ui/Field';
-import { useSettings } from '@/src/hooks/useSettings';
+import { useToast } from '@/src/hooks/useToast';
+import { useWhatsapp } from '@/src/hooks/useSettings';
 import { formatDateTime, formatFcfa, isValidSenegalPhone } from '@/src/lib/format';
 import {
   ORDER_STEPS,
@@ -14,7 +15,7 @@ import {
 import { useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 import { STORAGE_KEYS, readJson } from '@/src/lib/storage';
-import { buildTrackingMessage, isWhatsappConfigured, whatsappLink } from '@/src/lib/whatsapp';
+import { buildTrackingMessage } from '@/src/lib/whatsapp';
 import { db } from '@/src/services';
 import type { Order, SheinRequest } from '@/src/types';
 
@@ -22,7 +23,8 @@ type Result = { kind: 'order'; data: Order } | { kind: 'shein'; data: SheinReque
 
 export function TrackingPage() {
   const { search } = useRouter();
-  const { settings } = useSettings();
+  const whatsapp = useWhatsapp();
+  const { notify } = useToast();
 
   const [reference, setReference] = useState(search.get('numero') ?? '');
   const [phone, setPhone] = useState('');
@@ -78,7 +80,6 @@ export function TrackingPage() {
     }
   };
 
-  const number = settings?.whatsappNumber ?? '';
 
   return (
     <div className="container-page py-10">
@@ -153,17 +154,17 @@ export function TrackingPage() {
               message plutôt que sur le site, elle n'apparaît pas ici — écrivez-nous, on vous répond
               avec l'avancement.
             </p>
-            {isWhatsappConfigured(number) && (
+            {whatsapp.available && (
               <Button
                 className="mt-4"
                 variant="whatsapp"
-                onClick={() =>
-                  window.open(
-                    whatsappLink(number, buildTrackingMessage(reference.trim().toUpperCase())),
-                    '_blank',
-                    'noopener',
-                  )
-                }
+                onClick={() => {
+                  void whatsapp
+                    .open(buildTrackingMessage(reference.trim().toUpperCase()))
+                    .then((copied) => {
+                      if (copied) notify('Message copié — collez-le dans la conversation');
+                    });
+                }}
               >
                 Demander sur WhatsApp
               </Button>

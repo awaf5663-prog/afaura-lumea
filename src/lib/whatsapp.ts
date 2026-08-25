@@ -15,6 +15,29 @@ export function isWhatsappConfigured(number: string): boolean {
   return /^\d{8,15}$/.test(number.replace(/[^\d]/g, ''));
 }
 
+export interface WhatsappTarget {
+  /** Numéro international sans "+", seul format capable de pré-remplir un message. */
+  number: string;
+  /** Lien court WhatsApp Business (wa.me/message/…), qui ouvre la conversation sans message. */
+  link: string;
+}
+
+/** true si le message peut être pré-rempli automatiquement (numéro renseigné). */
+export function canPrefill(target: WhatsappTarget): boolean {
+  return isWhatsappConfigured(target.number);
+}
+
+/**
+ * URL d'ouverture de la conversation.
+ * Avec un numéro : le message part pré-rempli.
+ * Avec le seul lien court : la conversation s'ouvre vide — l'appelant se charge
+ * alors de copier le message dans le presse-papier (voir useWhatsapp).
+ */
+export function buildChatUrl(target: WhatsappTarget, message?: string): string | null {
+  if (canPrefill(target)) return whatsappLink(target.number, message ?? '');
+  return target.link.trim() || null;
+}
+
 export function buildOrderMessage(order: Order): string {
   const lines: string[] = [];
   lines.push(`Bonjour, je souhaite confirmer la commande ${order.orderNumber}.`);

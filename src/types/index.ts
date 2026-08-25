@@ -131,6 +131,8 @@ export interface SheinRequest {
 
 export interface StoreSettings {
   whatsappNumber: string;
+  /** Lien court WhatsApp Business, utilisé si aucun numéro n'est renseigné. */
+  whatsappLink: string;
   nextGroupingDate: string;
   waveNumber: string;
   orangeMoneyNumber: string;

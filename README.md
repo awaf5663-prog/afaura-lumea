@@ -21,9 +21,21 @@ npm run dev                  # http://localhost:3000
 Autres commandes : `npm run build` (génère aussi `sitemap.xml` / `robots.txt`),
 `npm run preview`, `npm run typecheck`.
 
-**La seule variable indispensable est `VITE_WHATSAPP_NUMBER`** (format international sans `+`,
-ex. `221771234567`). Tant qu'elle est vide, les boutons WhatsApp ne s'affichent pas et le site
-propose à la place le message à copier — plutôt qu'un lien mort.
+### WhatsApp : numéro ou lien court
+
+Deux façons de brancher WhatsApp, et elles ne se valent pas :
+
+| Réglage | Ce que ça donne |
+| --- | --- |
+| `VITE_WHATSAPP_NUMBER` (ex. `221771234567`) | WhatsApp s'ouvre avec le **message déjà rédigé** : nom, numéro de commande, produits, quantités, total, livraison, commentaire. La cliente n'a qu'à appuyer sur Envoyer. |
+| `VITE_WHATSAPP_LINK` (ex. `https://wa.me/message/A4C6VTCHWW4QH1`) | La conversation s'ouvre, mais **vide** : le format `wa.me/message/…` ne transporte pas de texte. Le site copie donc le message dans le presse-papier et affiche « collez-le dans la conversation ». |
+
+Le lien court est configuré par défaut, le site est donc fonctionnel tout de suite. **Renseignez
+le numéro dès que possible** : c'est la différence entre une cliente qui appuie sur Envoyer et une
+cliente qui doit penser à coller. Les deux peuvent aussi se régler dans /admin → Réglages.
+
+Si les deux sont vides, aucun bouton WhatsApp n'est affiché — le site propose le message à copier
+plutôt qu'un lien mort.
 
 ---
 

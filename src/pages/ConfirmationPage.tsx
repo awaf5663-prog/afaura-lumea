@@ -1,21 +1,20 @@
 import { Check, Copy, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { StatusTimeline } from '@/src/components/order/StatusTimeline';
+import { WhatsAppHandoff } from '@/src/components/order/WhatsAppHandoff';
 import { Button } from '@/src/components/ui/Button';
 import { EmptyState } from '@/src/components/ui/EmptyState';
-import { useSettings } from '@/src/hooks/useSettings';
 import { useToast } from '@/src/hooks/useToast';
 import { formatFcfa } from '@/src/lib/format';
 import { ORDER_STEPS, PAYMENT_STATUS_LABEL } from '@/src/lib/orderStatus';
 import { Link, useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 import { STORAGE_KEYS, readJson } from '@/src/lib/storage';
-import { buildOrderMessage, isWhatsappConfigured, whatsappLink } from '@/src/lib/whatsapp';
+import { buildOrderMessage } from '@/src/lib/whatsapp';
 import { db } from '@/src/services';
 import type { Order } from '@/src/types';
 
 export function ConfirmationPage({ orderNumber }: { orderNumber: string }) {
-  const { settings } = useSettings();
   const { navigate } = useRouter();
   const { notify } = useToast();
   const [order, setOrder] = useState<Order | null>(null);
@@ -56,7 +55,6 @@ export function ConfirmationPage({ orderNumber }: { orderNumber: string }) {
     );
   }
 
-  const number = settings?.whatsappNumber ?? '';
   const message = buildOrderMessage(order);
 
   return (
@@ -123,35 +121,7 @@ export function ConfirmationPage({ orderNumber }: { orderNumber: string }) {
           </ul>
         </div>
 
-        {isWhatsappConfigured(number) ? (
-          <div className="mt-6">
-            <Button
-              full
-              size="lg"
-              variant="whatsapp"
-              onClick={() => window.open(whatsappLink(number, message), '_blank', 'noopener')}
-            >
-              Continuer sur WhatsApp
-            </Button>
-            <p className="mt-2.5 text-center text-[12.5px] text-stone">
-              Le message est déjà rédigé : il ne reste qu'à l'envoyer.
-            </p>
-          </div>
-        ) : (
-          <div className="mt-6 rounded-[--radius-md] border border-line bg-cream/70 p-5 text-[13.5px] text-graphite">
-            <p className="font-medium">Message de confirmation prêt à copier</p>
-            <pre className="mt-3 whitespace-pre-wrap font-sans text-[13px] text-stone">{message}</pre>
-            <Button
-              className="mt-4"
-              variant="secondary"
-              onClick={() => {
-                void navigator.clipboard?.writeText(message).then(() => notify('Message copié'));
-              }}
-            >
-              Copier le message
-            </Button>
-          </div>
-        )}
+        <WhatsAppHandoff message={message} />
 
         <section className="mt-10">
           <h2 className="text-[22px]">Et maintenant ?</h2>

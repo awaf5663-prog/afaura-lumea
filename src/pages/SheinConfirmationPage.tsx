@@ -1,20 +1,19 @@
 import { Check, Copy, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { StatusTimeline } from '@/src/components/order/StatusTimeline';
+import { WhatsAppHandoff } from '@/src/components/order/WhatsAppHandoff';
 import { Button } from '@/src/components/ui/Button';
 import { EmptyState } from '@/src/components/ui/EmptyState';
-import { useSettings } from '@/src/hooks/useSettings';
 import { useToast } from '@/src/hooks/useToast';
 import { SHEIN_STEPS } from '@/src/lib/orderStatus';
 import { Link, useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 import { STORAGE_KEYS, readJson } from '@/src/lib/storage';
-import { buildSheinMessage, isWhatsappConfigured, whatsappLink } from '@/src/lib/whatsapp';
+import { buildSheinMessage } from '@/src/lib/whatsapp';
 import { db } from '@/src/services';
 import type { SheinRequest } from '@/src/types';
 
 export function SheinConfirmationPage({ requestNumber }: { requestNumber: string }) {
-  const { settings } = useSettings();
   const { navigate } = useRouter();
   const { notify } = useToast();
   const [request, setRequest] = useState<SheinRequest | null>(null);
@@ -55,7 +54,6 @@ export function SheinConfirmationPage({ requestNumber }: { requestNumber: string
     );
   }
 
-  const number = settings?.whatsappNumber ?? '';
   const message = buildSheinMessage(request);
   const hasScreenshots = request.items.some((item) => item.screenshotName);
 
@@ -121,35 +119,14 @@ export function SheinConfirmationPage({ requestNumber }: { requestNumber: string
           </ul>
         </div>
 
-        {isWhatsappConfigured(number) ? (
-          <div className="mt-6">
-            <Button
-              full
-              size="lg"
-              variant="whatsapp"
-              onClick={() => window.open(whatsappLink(number, message), '_blank', 'noopener')}
-            >
-              Continuer sur WhatsApp
-            </Button>
-            <p className="mt-2.5 text-center text-[12.5px] text-stone">
-              {hasScreenshots
-                ? 'Le message est prêt : envoyez-le, puis joignez vos captures dans la conversation.'
-                : 'Le message est déjà rédigé : il ne reste qu’à l’envoyer.'}
-            </p>
-          </div>
-        ) : (
-          <div className="mt-6 rounded-[--radius-md] border border-line bg-cream/70 p-5 text-[13.5px]">
-            <p className="font-medium">Message prêt à copier</p>
-            <pre className="mt-3 whitespace-pre-wrap font-sans text-[13px] text-stone">{message}</pre>
-            <Button
-              className="mt-4"
-              variant="secondary"
-              onClick={() => void navigator.clipboard?.writeText(message).then(() => notify('Message copié'))}
-            >
-              Copier le message
-            </Button>
-          </div>
-        )}
+        <WhatsAppHandoff
+          message={message}
+          hint={
+            hasScreenshots
+              ? 'Le message est prêt : envoyez-le, puis joignez vos captures dans la conversation.'
+              : undefined
+          }
+        />
 
         <section className="mt-10">
           <h2 className="text-[22px]">Les étapes à venir</h2>

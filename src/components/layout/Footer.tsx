@@ -1,8 +1,7 @@
 import { Instagram, Mail, MapPin } from 'lucide-react';
 import { BRAND, CONTACT_EMAIL, INSTAGRAM_HANDLE } from '@/src/config/site';
-import { useSettings } from '@/src/hooks/useSettings';
+import { useWhatsapp } from '@/src/hooks/useSettings';
 import { prettyPhone } from '@/src/lib/format';
-import { isWhatsappConfigured, whatsappLink } from '@/src/lib/whatsapp';
 import { Link } from '@/src/lib/router';
 
 const COLUMNS = [
@@ -26,8 +25,8 @@ const COLUMNS = [
 ];
 
 export function Footer() {
-  const { settings } = useSettings();
-  const number = settings?.whatsappNumber ?? '';
+  const whatsapp = useWhatsapp();
+  const contactHref = whatsapp.url('Bonjour, j’ai une question.');
 
   return (
     <footer className="mt-20 border-t border-line bg-cream/60">
@@ -58,15 +57,15 @@ export function Footer() {
         <div>
           <p className="eyebrow mb-4">Contact</p>
           <ul className="space-y-2.5 text-sm text-graphite">
-            {isWhatsappConfigured(number) && (
+            {contactHref && (
               <li>
                 <a
-                  href={whatsappLink(number, 'Bonjour, j’ai une question.')}
+                  href={contactHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="link-underline"
                 >
-                  WhatsApp {prettyPhone(number)}
+                  {whatsapp.prefill ? `WhatsApp ${prettyPhone(whatsapp.number)}` : 'Nous écrire sur WhatsApp'}
                 </a>
               </li>
             )}

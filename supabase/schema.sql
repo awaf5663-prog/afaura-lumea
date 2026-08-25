@@ -105,6 +105,7 @@ create index if not exists shein_lookup_idx on shein_requests(request_number, ph
 create table if not exists settings (
   id integer primary key default 1 check (id = 1),
   whatsapp_number text default '',
+  whatsapp_link text default '',
   next_grouping_date timestamptz,
   wave_number text default '',
   orange_money_number text default '',

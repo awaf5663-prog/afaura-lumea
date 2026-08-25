@@ -12,11 +12,9 @@ import type { Order, OrderStatus, PaymentStatus } from '@/src/types';
 export function AdminOrders({
   orders,
   reload,
-  whatsappNumber,
 }: {
   orders: Order[];
   reload: () => Promise<void>;
-  whatsappNumber: string;
 }) {
   const { notify } = useToast();
   const [busy, setBusy] = useState<string | null>(null);
@@ -163,7 +161,7 @@ export function AdminOrders({
               </label>
             </div>
 
-            {isWhatsappConfigured(whatsappNumber) && order.deliveryFee === null && (
+            {order.deliveryFee === null && (
               <p className="mt-3 text-[12px] text-stone">
                 Renseignez les frais pour figer le total avant d'annoncer le montant à la cliente.
               </p>

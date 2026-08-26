@@ -1,0 +1,68 @@
+# Publication du site sur GitHub Pages.
+#
+# À faire une seule fois côté GitHub : Settings → Pages → Source → GitHub
+# Actions. Ensuite, chaque envoi sur la branche republie le site.
+#
+# La clé Supabase est écrite en clair ici volontairement : c'est la clé
+# PUBLIQUE du projet. Elle part de toute façon dans le JavaScript du site, que
+# le dépôt soit public ou non — ce qui protège les données, ce sont les règles
+# RLS de supabase/schema.sql. La clé « service_role » n'a rien à faire ici.
+name: Publier le site
+
+on:
+  push:
+    branches:
+      - claude/senegal-ecommerce-shein-b1aqs2
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Une publication à la fois ; on laisse finir celle qui est en cours.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  construire:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Construire le site
+        env:
+          VITE_BASE_PATH: /afaura-lumea/
+          VITE_SITE_URL: https://awaf5663-prog.github.io/afaura-lumea
+          VITE_SUPABASE_URL: https://mhutsbfnzoiuqsoxkdji.supabase.co
+          VITE_SUPABASE_ANON_KEY: sb_publishable_lMzrL8g6JkaE0jWdabLD-Q_-8TQ5i9h
+        run: npm run build
+
+      # GitHub Pages renvoie une 404 pour toute adresse qui n'est pas un
+      # fichier. Servir index.html à sa place laisse le routeur du site faire
+      # son travail : sans ça, ouvrir /boutique directement échouerait.
+      - run: cp dist/index.html dist/404.html
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  publier:
+    needs: construire
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploiement.outputs.page_url }}
+    steps:
+      - id: deploiement
+        uses: actions/deploy-pages@v4

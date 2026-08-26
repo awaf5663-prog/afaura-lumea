@@ -7,6 +7,8 @@ import type { StoreSettings } from '@/src/types';
 interface SettingsValue {
   settings: StoreSettings | null;
   loading: boolean;
+  /** Dernière erreur de chargement. null = tout va bien. */
+  error: string | null;
   /** Zones de livraison avec les frais réellement paramétrés. */
   zones: DeliveryZone[];
   refresh: () => Promise<void>;
@@ -18,10 +20,21 @@ const SettingsContext = createContext<SettingsValue | null>(null);
 export function SettingsProvider({ children }: { children: ReactNode }) {
   const [settings, setSettings] = useState<StoreSettings | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  /*
+   * Le try/finally d'origine n'attrapait rien : une base injoignable
+   * remontait en rejet non géré et faisait apparaître une erreur dans la
+   * console de la cliente. Le site sait fonctionner sans ces réglages — il
+   * retombe sur les valeurs par défaut — mais l'erreur est conservée pour que
+   * l'espace admin puisse la montrer au lieu de la cacher.
+   */
   const refresh = useCallback(async () => {
     try {
       setSettings(await db.getSettings());
+      setError(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Réglages indisponibles.');
     } finally {
       setLoading(false);
     }
@@ -49,8 +62,8 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   );
 
   const value = useMemo(
-    () => ({ settings, loading, zones, refresh, save }),
-    [settings, loading, zones, refresh, save],
+    () => ({ settings, loading, error, zones, refresh, save }),
+    [settings, loading, error, zones, refresh, save],
   );
 
   return <SettingsContext.Provider value={value}>{children}</SettingsContext.Provider>;

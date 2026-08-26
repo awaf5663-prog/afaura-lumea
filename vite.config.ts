@@ -5,6 +5,15 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
+    /*
+     * Chemin de base du site publié.
+     *
+     * Sur GitHub Pages, le site vit dans un sous-dossier (/afaura-lumea/) et
+     * les fichiers doivent être demandés à cette adresse. Sur un hébergeur qui
+     * sert le site à la racine (Vercel, Netlify, domaine propre), la variable
+     * reste vide et tout part de « / ».
+     */
+    base: process.env.VITE_BASE_PATH || '/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {

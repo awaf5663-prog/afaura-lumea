@@ -9,7 +9,7 @@ import { useSeo } from '@/src/lib/seo';
 const FAQ = [
   {
     q: 'Êtes-vous SHEIN ?',
-    a: "Non. Nous sommes un service indépendant de commande groupée basé à Dakar. Nous achetons pour vous les articles que vous nous indiquez et organisons leur acheminement. Nous n'avons aucun lien officiel avec la marque.",
+    a: "Non. Nous sommes un service indépendant de commande groupée basé à Saint-Louis. Nous achetons pour vous les articles que vous nous indiquez et organisons leur acheminement. Nous n'avons aucun lien officiel avec la marque.",
   },
   {
     q: 'Comment se passe une commande SHEIN ?',
@@ -25,7 +25,7 @@ const FAQ = [
   },
   {
     q: 'Quels moyens de paiement acceptez-vous ?',
-    a: "Wave, Orange Money, et le paiement à la livraison pour Dakar et la banlieue. Après un paiement mobile, envoyez-nous la capture de confirmation sur WhatsApp.",
+    a: "Wave, Orange Money, et le paiement à la livraison à Saint-Louis et dans les environs. Après un paiement mobile, envoyez-nous la capture de confirmation sur WhatsApp.",
   },
   {
     q: 'Combien coûte la livraison ?',

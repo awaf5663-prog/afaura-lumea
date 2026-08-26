@@ -44,7 +44,7 @@ export function ProductCard({ product, priority }: { product: Product; priority?
       <div className="mt-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <Link to={`/produit/${product.slug}`}>
-            <h3 className="truncate font-display text-[17px] leading-tight">{product.name}</h3>
+            <h3 className="line-clamp-2 font-display text-[17px] leading-tight">{product.name}</h3>
           </Link>
           <Price amount={product.price} compareAt={product.compareAtPrice} className="mt-1 text-[14px]" />
         </div>

@@ -12,7 +12,7 @@ export function Hero() {
     <section className="container-page pt-6 lg:pt-14">
       <div className="grid items-center gap-9 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
         <div className="animate-fade">
-          <p className="eyebrow">Dakar · Hijabs & commandes SHEIN</p>
+          <p className="eyebrow">Saint-Louis · Hijabs & commandes SHEIN</p>
 
           <h1 className="mt-4 text-[33px] leading-[1.07] sm:text-[48px] lg:text-[58px]">
             Commande ce qui te plaît.
@@ -38,7 +38,7 @@ export function Hero() {
             </li>
             <li className="inline-flex items-center gap-2">
               <Truck className="size-4" strokeWidth={1.6} />
-              Livraison Dakar ou point de retrait
+              Livraison Saint-Louis ou point de retrait
             </li>
           </ul>
         </div>

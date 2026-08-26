@@ -12,9 +12,9 @@ export function HomePage() {
   const { products, loading } = useProducts();
 
   useSeo({
-    title: `${BRAND.name} — Hijabs à Dakar & commandes SHEIN groupées`,
+    title: `${BRAND.name} — Hijabs à Saint-Louis & commandes SHEIN groupées`,
     description:
-      'Foulards et hijabs disponibles à Dakar, et service de commande groupée SHEIN : vous transmettez vos articles, nous confirmons le montant en FCFA et regroupons l’acheminement.',
+      'Foulards et hijabs disponibles à Saint-Louis, et service de commande groupée SHEIN : vous transmettez vos articles, nous confirmons le montant en FCFA et regroupons l’acheminement.',
     image: products[0]?.images[0],
     jsonLd: {
       '@context': 'https://schema.org',

@@ -1,6 +1,6 @@
 # Afaura Luméa
 
-Mini-site e-commerce mobile-first pour une activité de vente de hijabs à Dakar **et** de
+Mini-site e-commerce mobile-first pour une activité de vente de hijabs à Saint-Louis **et** de
 commandes groupées SHEIN. Deux parcours dans un seul produit :
 
 | Parcours | Étapes |
@@ -195,13 +195,23 @@ recalcule, rattache la demande au premier groupage ouvert et incrémente son com
 
 ## Catalogue
 
-Les 8 articles pré-chargés (`src/data/seed.ts`) reprennent le catalogue WhatsApp existant, aux
-prix réels en FCFA : Jersey 1 500, Jersey frisé 2 000, Satin imprimé 3 500, Modal simple 4 500,
-Modal imprimé 5 500, Dentelle 5 000, Pièce unique 6 000, Hijab tape 1 000.
+Le catalogue est organisé **par lot**, comme le catalogue WhatsApp : une catégorie correspond à
+un arrivage.
 
-Les visuels sont recadrés depuis les vignettes du catalogue : ils sont donc de définition
-modeste. Remplacez-les par des photos haute définition depuis **/admin → Produits** (les images
-sont redimensionnées et compressées automatiquement à l'import). Même chose pour les variantes :
+- **Pièce unique** — 5 modèles à 6 000 FCFA, chacun en un seul exemplaire (`stock: 1`). Une fois
+  commandé, le modèle passe automatiquement en « Épuisé ». Si un modèle revient, il suffit de
+  remonter le stock dans /admin → Produits.
+- **Hijabs & voiles** — Jersey 1 500, Jersey frisé 2 000, Satin imprimé 3 500, Modal simple 4 500,
+  Modal imprimé 5 500, Dentelle 5 000.
+- **Accessoires** — Hijab tape 1 000.
+
+Pour ajouter un lot : créer la catégorie dans `CATEGORIES` (`src/data/seed.ts`), ou ajouter les
+produits un par un depuis /admin → Produits en choisissant la catégorie.
+
+Les visuels de la catégorie Pièce unique sont des photos pleine définition. Ceux des autres lots
+sont recadrés depuis les vignettes du catalogue WhatsApp, donc de définition modeste : remplacez-les
+depuis **/admin → Produits** (les images sont redimensionnées et compressées automatiquement à
+l'import). Même chose pour les variantes :
 seule « Dentelle » a des couleurs déclarées (noir / blanc, visibles sur la photo) ; pour les
 autres, la cliente indique une couleur souhaitée qui remonte dans le message WhatsApp, et vous
 pouvez déclarer de vraies variantes en une ligne dans l'admin (`Couleur: Noir, Beige`).

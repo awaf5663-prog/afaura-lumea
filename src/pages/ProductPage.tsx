@@ -11,6 +11,7 @@ import { Input, Label } from '@/src/components/ui/Field';
 import { Price } from '@/src/components/ui/Price';
 import { QuantityStepper } from '@/src/components/ui/QuantityStepper';
 import { BRAND, SITE_URL } from '@/src/config/site';
+import { CATEGORIES } from '@/src/data/seed';
 import { useCart } from '@/src/hooks/useCart';
 import { useProducts } from '@/src/hooks/useProducts';
 import { useToast } from '@/src/hooks/useToast';
@@ -122,7 +123,7 @@ export function ProductPage({ slug }: { slug: string }) {
             {product.isNew && <Badge tone="new">Nouveau</Badge>}
             {product.isPopular && <Badge tone="popular">Populaire</Badge>}
             <Badge tone="neutral">
-              {product.category === 'accessoire' ? 'Accessoire' : 'Hijab & voile'}
+              {CATEGORIES.find((c) => c.id === product.category)?.name ?? 'Boutique'}
             </Badge>
           </div>
 
@@ -205,7 +206,7 @@ export function ProductPage({ slug }: { slug: string }) {
           <ul className="mt-8 space-y-2.5 border-t border-line pt-6 text-[13.5px] text-stone">
             <li className="flex items-center gap-2.5">
               <Truck className="size-4" strokeWidth={1.6} />
-              Livraison Dakar, banlieue et régions — ou retrait sur place.
+              Livraison Saint-Louis, environs et régions — ou retrait sur place.
             </li>
             <li className="flex items-center gap-2.5">
               <ShieldCheck className="size-4" strokeWidth={1.6} />

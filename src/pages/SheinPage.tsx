@@ -26,7 +26,7 @@ export function SheinPage() {
   useSeo({
     title: 'Commander sur SHEIN depuis le Sénégal',
     description:
-      'Transmettez-nous vos articles SHEIN : nous vérifions, confirmons le montant en FCFA et intégrons votre commande au prochain groupage vers Dakar.',
+      'Transmettez-nous vos articles SHEIN : nous vérifions, confirmons le montant en FCFA et intégrons votre commande au prochain groupage vers Saint-Louis.',
   });
 
   return (
@@ -61,7 +61,7 @@ export function SheinPage() {
           <span>
             Nous sommes un service indépendant de commande groupée. Nous ne sommes ni SHEIN, ni un
             revendeur officiel, ni affiliés à la marque. Nous achetons les articles pour vous et
-            organisons leur acheminement jusqu'à Dakar.
+            organisons leur acheminement jusqu'à Saint-Louis.
           </span>
         </p>
       </section>

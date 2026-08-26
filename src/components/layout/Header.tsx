@@ -9,7 +9,7 @@ import { cn } from '@/src/lib/cn';
 const NAV = [
   { to: '/', label: 'Accueil', exact: true },
   { to: '/boutique', label: 'Boutique' },
-  { to: '/boutique?categorie=hijab', label: 'Foulards & hijabs' },
+  { to: '/boutique?categorie=piece_unique', label: 'Pièce unique' },
   { to: '/shein', label: 'Commande SHEIN' },
   { to: '/comment-ca-marche', label: 'Comment ça marche' },
   { to: '/suivi', label: 'Suivi' },

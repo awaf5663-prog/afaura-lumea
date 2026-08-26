@@ -36,7 +36,7 @@ export function ShopPage() {
   useSeo({
     title: 'Boutique — foulards, hijabs et accessoires',
     description:
-      'Toutes les pièces disponibles immédiatement : jersey, modal, satin, dentelle et accessoires. Prix en FCFA, livraison à Dakar ou retrait.',
+      'Toutes les pièces disponibles immédiatement : jersey, modal, satin, dentelle et accessoires. Prix en FCFA, livraison à Saint-Louis ou retrait.',
   });
 
   // La catégorie reste synchronisée avec l'URL (liens du menu, partage de lien).

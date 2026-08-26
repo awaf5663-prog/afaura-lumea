@@ -6,7 +6,7 @@ const STORE_STEPS = [
   { icon: ShoppingBag, title: 'Je choisis', text: 'Les pièces de la boutique sont déjà là, prêtes à partir.' },
   { icon: BadgeCheck, title: "J'ajoute au panier", text: 'Quantités et options modifiables jusqu’au dernier moment.' },
   { icon: CreditCard, title: 'Je confirme', text: 'Coordonnées, livraison, paiement : trois champs, c’est réglé.' },
-  { icon: Truck, title: 'Je reçois', text: 'Livraison à Dakar ou retrait au point convenu.' },
+  { icon: Truck, title: 'Je reçois', text: 'Livraison à Saint-Louis ou retrait au point convenu.' },
 ];
 
 const SHEIN_STEPS = [

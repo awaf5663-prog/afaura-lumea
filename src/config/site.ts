@@ -54,8 +54,8 @@ export const BRAND = {
   tagline: 'Tes envies, notre organisation.',
   /** Une phrase = tout le concept. Affichée dans le hero. */
   pitch:
-    "Des hijabs disponibles tout de suite, et tes commandes SHEIN regroupées jusqu'à Dakar. Un prix clair en FCFA, confirmé avant que tu paies.",
-  city: 'Dakar, Sénégal',
+    "Des hijabs disponibles tout de suite, et tes commandes SHEIN regroupées jusqu'à Saint-Louis. Un prix clair en FCFA, confirmé avant que tu paies.",
+  city: 'Saint-Louis, Sénégal',
   currency: 'FCFA',
 } as const;
 
@@ -85,16 +85,18 @@ export const DELIVERY_ZONES: DeliveryZone[] = [
     type: 'pickup',
   },
   {
-    id: 'dakar',
-    label: 'Livraison Dakar',
-    hint: 'Plateau, Almadies, Mermoz, Point E, Ouakam…',
+    // Les identifiants restent neutres : changer de ville ne modifie que le libellé,
+    // et les commandes déjà enregistrées gardent une zone valide.
+    id: 'city',
+    label: 'Livraison Saint-Louis',
+    hint: "Île, Sor et quartiers de la ville.",
     fee: null,
     type: 'delivery',
   },
   {
-    id: 'banlieue',
-    label: 'Livraison banlieue',
-    hint: 'Pikine, Guédiawaye, Keur Massar, Rufisque…',
+    id: 'around',
+    label: 'Environs de Saint-Louis',
+    hint: 'Communes voisines et périphérie.',
     fee: null,
     type: 'delivery',
   },
@@ -131,7 +133,7 @@ export const PAYMENT_METHODS: PaymentMethod[] = [
   {
     id: 'cash',
     label: 'Paiement à la livraison',
-    description: 'Vous réglez en espèces au moment de la remise (Dakar et banlieue).',
+    description: 'Vous réglez en espèces au moment de la remise, à Saint-Louis et ses environs.',
     requiresProof: false,
   },
 ];

@@ -5,7 +5,7 @@ import { Reveal } from '@/src/components/ui/Reveal';
 const POINTS = [
   { icon: Banknote, title: 'Prix en FCFA', text: 'Aucun taux de change à calculer soi-même.' },
   { icon: MessagesSquare, title: 'Montant confirmé avant paiement', text: 'Pour toute commande SHEIN.' },
-  { icon: Store, title: 'Livraison ou retrait', text: 'Dakar, banlieue et régions.' },
+  { icon: Store, title: 'Livraison ou retrait', text: 'Saint-Louis, environs et régions.' },
   { icon: PackageSearch, title: 'Suivi par numéro', text: 'Chaque commande a son numéro.' },
 ];
 

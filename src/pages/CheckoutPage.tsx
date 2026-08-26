@@ -36,7 +36,7 @@ export function CheckoutPage() {
     lastName: '',
     phone: '',
     address: '',
-    city: 'Dakar',
+    city: 'Saint-Louis',
     note: '',
     zoneId: zones[0]?.id ?? 'pickup',
     paymentMethod: PAYMENT_METHODS[0].id,

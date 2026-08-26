@@ -7,7 +7,7 @@ const TONES: Record<Tone, string> = {
   new: 'bg-ink text-ivory',
   popular: 'bg-blush text-mauve',
   neutral: 'bg-cream text-stone',
-  soldout: 'bg-stone/85 text-white',
+  soldout: 'bg-graphite text-white',
   accent: 'bg-sand text-graphite',
 };
 

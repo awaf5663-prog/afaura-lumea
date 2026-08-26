@@ -1,7 +1,7 @@
 # Publication du site sur GitHub Pages.
 #
-# À faire une seule fois côté GitHub : Settings → Pages → Source → GitHub
-# Actions. Ensuite, chaque envoi sur la branche republie le site.
+# Rien à activer à la main : `enablement: true` allume GitHub Pages au premier
+# passage. Ensuite, chaque envoi sur la branche republie le site.
 #
 # La clé Supabase est écrite en clair ici volontairement : c'est la clé
 # PUBLIQUE du projet. Elle part de toute façon dans le JavaScript du site, que
@@ -52,7 +52,11 @@ jobs:
       # son travail : sans ça, ouvrir /boutique directement échouerait.
       - run: cp dist/index.html dist/404.html
 
+      # `enablement` allume Pages si ce n'est pas déjà fait, au lieu d'échouer
+      # avec « Get Pages site failed » et d'obliger à cliquer dans les réglages.
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

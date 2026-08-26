@@ -122,9 +122,13 @@ export function AdminPage() {
           </span>
         ) : (
           <span>
-            <strong className="font-medium">Mode local.</strong> Produits, commandes et demandes sont
-            enregistrés dans ce navigateur uniquement — parfait pour démarrer, mais à basculer sur
-            Supabase (voir README) pour partager les données entre appareils et sécuriser cet espace.
+            <strong className="font-medium">Mode local — à lire avant d'ouvrir la boutique.</strong>{' '}
+            Tout est enregistré dans ce navigateur, sur cet appareil, et nulle part ailleurs. Une
+            commande envoyée depuis le téléphone d'une cliente reste sur son téléphone :{' '}
+            <strong className="font-medium">elle n'apparaîtra pas dans cette liste</strong>, et les
+            étapes que vous faites avancer ici ne remonteront pas sur sa page Suivi. C'est parfait
+            pour essayer le site, pas pour vendre. Branchez Supabase (voir README) avant la première
+            vraie commande.
           </span>
         )}
       </div>

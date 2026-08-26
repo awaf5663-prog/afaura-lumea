@@ -1,11 +1,14 @@
 import { useState } from 'react';
+import { ArrowRight, MessageCircle } from 'lucide-react';
+import { AmountField } from '@/src/components/admin/AmountField';
 import { Badge } from '@/src/components/ui/Badge';
 import { EmptyState } from '@/src/components/ui/EmptyState';
 import { Select } from '@/src/components/ui/Field';
 import { useToast } from '@/src/hooks/useToast';
 import { formatDateTime, formatFcfa, prettyPhone } from '@/src/lib/format';
-import { SHEIN_STATUS_LABEL } from '@/src/lib/orderStatus';
-import { isWhatsappConfigured, whatsappLink } from '@/src/lib/whatsapp';
+import { SHEIN_STATUS_LABEL, SHEIN_STEPS, nextSheinStatus } from '@/src/lib/orderStatus';
+import { SITE_URL } from '@/src/config/site';
+import { buildStatusMessage, isWhatsappConfigured, whatsappLink } from '@/src/lib/whatsapp';
 import { db } from '@/src/services';
 import type { Grouping, SheinRequest, SheinStatus } from '@/src/types';
 
@@ -131,49 +134,129 @@ export function AdminShein({
               </dl>
             )}
 
-            <div className="mt-4 grid gap-3 border-t border-line pt-4 sm:grid-cols-2">
-              <label className="text-[12.5px] text-stone">
-                Étape
-                <Select
-                  className="mt-1"
-                  disabled={busy === request.id}
-                  value={request.status}
-                  onChange={(e) => void patch(request, { status: e.target.value as SheinStatus })}
-                >
-                  {Object.entries(SHEIN_STATUS_LABEL).map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </Select>
-              </label>
-
-              <label className="text-[12.5px] text-stone">
-                Montant confirmé (FCFA)
-                <input
-                  type="number"
-                  min={0}
-                  step={500}
-                  defaultValue={request.quotedTotal ?? ''}
-                  placeholder="Non communiqué"
-                  disabled={busy === request.id}
-                  onBlur={(e) => {
-                    const next = e.target.value === '' ? null : Number(e.target.value);
-                    if (next !== request.quotedTotal) void patch(request, { quotedTotal: next });
-                  }}
-                  className="mt-1 w-full rounded-[--radius-sm] border border-line bg-white px-4 py-3 text-[15px] focus:border-ink focus:outline-none"
-                />
-              </label>
-            </div>
-
-            {request.quotedTotal !== null && (
-              <p className="mt-3 text-[12.5px] text-stone">
-                Montant communiqué à la cliente : {formatFcfa(request.quotedTotal)}
-              </p>
-            )}
+            <Workflow request={request} busy={busy === request.id} patch={patch} />
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+
+/**
+ * Le parcours d'une demande, du côté de la boutique.
+ *
+ * Le site n'avance jamais tout seul : c'est ici qu'on enregistre le montant
+ * annoncé sur WhatsApp puis qu'on fait passer la demande d'une étape à la
+ * suivante. La page de suivi de la cliente lit exactement cet état.
+ */
+function Workflow({
+  request,
+  busy,
+  patch,
+}: {
+  request: SheinRequest;
+  busy: boolean;
+  patch: (
+    request: SheinRequest,
+    changes: Parameters<typeof db.updateSheinRequest>[1],
+  ) => Promise<void>;
+}) {
+  const stepIndex = SHEIN_STEPS.findIndex((step) => step.id === request.status);
+  const step = SHEIN_STEPS[stepIndex];
+  const next = nextSheinStatus(request.status);
+  const nextStep = SHEIN_STEPS.find((s) => s.id === next);
+  const cancelled = request.status === 'cancelled';
+
+  // On ne propose « Montant confirmé » qu'une fois le montant réellement saisi :
+  // annoncer l'étape sans le chiffre ne veut rien dire pour la cliente.
+  const blockedByAmount = next === 'quoted' && request.quotedTotal === null;
+
+  const message = step
+    ? buildStatusMessage({
+        reference: request.requestNumber,
+        customerName: request.customerName,
+        stepLabel: step.label,
+        stepHint: step.hint,
+        amount: request.quotedTotal === null ? null : formatFcfa(request.quotedTotal),
+        trackingUrl: `${SITE_URL}/suivi`,
+      })
+    : '';
+
+  return (
+    <div className="mt-4 border-t border-line pt-4">
+      <div className="grid gap-3 sm:grid-cols-2">
+        <AmountField
+          label="Montant confirmé (FCFA)"
+          value={request.quotedTotal}
+          placeholder="Non communiqué"
+          disabled={busy}
+          onSave={(value) => void patch(request, { quotedTotal: value })}
+          hint={
+            request.quotedTotal === null
+              ? 'À renseigner après vérification des articles.'
+              : `Annoncé à la cliente : ${formatFcfa(request.quotedTotal)}`
+          }
+        />
+
+        <label className="text-[12.5px] text-stone">
+          Étape {stepIndex >= 0 && `(${stepIndex + 1} sur ${SHEIN_STEPS.length})`}
+          <Select
+            className="mt-1"
+            disabled={busy}
+            value={request.status}
+            onChange={(e) => void patch(request, { status: e.target.value as SheinStatus })}
+          >
+            {Object.entries(SHEIN_STATUS_LABEL).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </Select>
+        </label>
+      </div>
+
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        {next && !cancelled && (
+          <button
+            type="button"
+            disabled={busy || blockedByAmount}
+            onClick={() => void patch(request, { status: next })}
+            className="press inline-flex items-center gap-1.5 rounded-full bg-ink px-4 py-2.5 text-[12.5px] font-medium text-ivory disabled:cursor-not-allowed disabled:bg-stone"
+          >
+            Passer à « {nextStep?.label} »
+            <ArrowRight className="size-3.5" />
+          </button>
+        )}
+
+        {isWhatsappConfigured(request.phone) && step && (
+          <a
+            href={whatsappLink(request.phone, message)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="press inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-4 py-2.5 text-[12.5px] font-medium text-graphite"
+          >
+            <MessageCircle className="size-3.5" />
+            Prévenir la cliente
+          </a>
+        )}
+      </div>
+
+      {blockedByAmount && (
+        <p className="mt-2 text-[12px] text-stone">
+          Renseignez d'abord le montant : c'est lui que la cliente attend à cette étape.
+        </p>
+      )}
+
+      {!next && !cancelled && (
+        <p className="mt-2 text-[12px] text-stone">Dernière étape du parcours.</p>
+      )}
+
+      <p className="mt-3 text-[12px] leading-relaxed text-stone">
+        La cliente ne reçoit rien automatiquement : le site enregistre l'étape, et « Prévenir la
+        cliente » ouvre WhatsApp avec le message déjà écrit. Elle retrouve la même étape sur la page
+        Suivi avec son numéro et son téléphone.
+      </p>
     </div>
   );
 }

@@ -116,3 +116,34 @@ export function buildProductMessage(productName: string, price: string, url: str
 export function buildTrackingMessage(orderNumber: string): string {
   return `Bonjour, je souhaite avoir des nouvelles de ma commande ${orderNumber}.`;
 }
+
+/**
+ * Message envoyé à la cliente quand la commande change d'étape.
+ *
+ * Le site ne prévient personne tout seul : c'est ce message, envoyé depuis
+ * l'espace admin, qui fait le lien entre l'étape enregistrée et la cliente.
+ * Il rappelle le numéro et le lien de suivi pour qu'elle puisse vérifier
+ * elle-même par la suite.
+ */
+export function buildStatusMessage(options: {
+  reference: string;
+  customerName: string;
+  stepLabel: string;
+  stepHint: string;
+  amount?: string | null;
+  trackingUrl: string;
+}): string {
+  const { reference, customerName, stepLabel, stepHint, amount, trackingUrl } = options;
+  const firstName = customerName.trim().split(/\s+/)[0] || '';
+  const lines = [
+    `Bonjour ${firstName}`.trim() + ',',
+    '',
+    `Votre commande ${reference} : ${stepLabel.toUpperCase()}.`,
+    stepHint,
+  ];
+  if (amount) {
+    lines.push('', `Montant à régler : ${amount}.`);
+  }
+  lines.push('', `Suivi : ${trackingUrl}`);
+  return lines.join('\n');
+}

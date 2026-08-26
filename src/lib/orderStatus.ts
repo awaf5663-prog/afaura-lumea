@@ -51,3 +51,28 @@ export const PAYMENT_STATUS_LABEL: Record<PaymentStatus, string> = {
   confirmed: 'Paiement confirmé',
   refused: 'Paiement non validé',
 };
+
+/**
+ * Étape suivante du parcours, ou null si on est au bout.
+ *
+ * « Annulée » ne fait pas partie du parcours : elle reste un choix
+ * délibéré dans la liste déroulante, jamais une étape qu'on atteint en
+ * avançant.
+ */
+export function nextSheinStatus(current: SheinStatus): SheinStatus | null {
+  const index = SHEIN_STEPS.findIndex((step) => step.id === current);
+  if (index < 0) return null;
+  return SHEIN_STEPS[index + 1]?.id ?? null;
+}
+
+export function nextOrderStatus(current: OrderStatus): OrderStatus | null {
+  const index = ORDER_STEPS.findIndex((step) => step.id === current);
+  if (index < 0) return null;
+  return ORDER_STEPS[index + 1]?.id ?? null;
+}
+
+/** Position dans le parcours, pour « étape 3 sur 8 ». */
+export function stepPosition(steps: Array<{ id: string }>, current: string) {
+  const index = steps.findIndex((step) => step.id === current);
+  return { index, total: steps.length };
+}

@@ -198,9 +198,10 @@ recalcule, rattache la demande au premier groupage ouvert et incrémente son com
 Le catalogue est organisé **par lot**, comme le catalogue WhatsApp : une catégorie correspond à
 un arrivage.
 
-- **Pièce unique** — 5 modèles à 6 000 FCFA, chacun en un seul exemplaire (`stock: 1`). Une fois
-  commandé, le modèle passe automatiquement en « Épuisé ». Si un modèle revient, il suffit de
-  remonter le stock dans /admin → Produits.
+- **Pièce unique** — une seule fiche à 6 000 FCFA regroupant 5 modèles. La cliente fait défiler
+  les photos au doigt : chaque photo sélectionne son modèle, et choisir un modèle ramène sa photo.
+  Un modèle vendu se marque `(épuisé)` dans /admin → Produits : il reste visible, barré, et la
+  couche de données refuse la commande même si le navigateur la force.
 - **Hijabs & voiles** — Jersey 1 500, Jersey frisé 2 000, Satin imprimé 3 500, Modal simple 4 500,
   Modal imprimé 5 500, Dentelle 5 000.
 - **Accessoires** — Hijab tape 1 000.
@@ -235,6 +236,10 @@ src/
 supabase/schema.sql     Tables, RLS, fonctions serveur
 scripts/                Génération du sitemap
 ```
+
+**Galerie synchronisée** : dès qu'un groupe de variantes compte autant d'options que la fiche a
+de photos, les deux se pilotent mutuellement (`src/pages/ProductPage.tsx`). Aucun réglage : il
+suffit que le nombre corresponde, ce qui rend le procédé réutilisable pour les prochains lots.
 
 **Stack** : React 19 + TypeScript strict + Tailwind CSS v4 + Vite. Le routeur est un micro-routeur
 maison (~90 lignes, `src/lib/router.tsx`) : sur une connexion mobile sénégalaise, chaque kilo-octet

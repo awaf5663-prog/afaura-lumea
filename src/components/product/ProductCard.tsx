@@ -11,6 +11,8 @@ export function ProductCard({ product, priority }: { product: Product; priority?
   const { notify } = useToast();
   const soldOut = product.status === 'sold_out' || product.stock === 0;
   const needsChoice = product.variants.length > 0;
+  /** Nombre de modèles proposés, quand la fiche en regroupe plusieurs. */
+  const choiceCount = product.variants[0]?.options.length ?? 0;
 
   return (
     <article className="group relative">
@@ -47,6 +49,9 @@ export function ProductCard({ product, priority }: { product: Product; priority?
             <h3 className="line-clamp-2 font-display text-[17px] leading-tight">{product.name}</h3>
           </Link>
           <Price amount={product.price} compareAt={product.compareAtPrice} className="mt-1 text-[14px]" />
+          {choiceCount > 1 && (
+            <p className="mt-0.5 text-[12px] text-mauve">{choiceCount} modèles au choix</p>
+          )}
         </div>
 
         {!soldOut &&

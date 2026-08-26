@@ -117,87 +117,26 @@ export const SEED_PRODUCTS: Product[] = [
     createdAt: '2026-01-05T10:00:00.000Z',
   },
   {
-    id: 'piece-noir-fleuri',
-    slug: 'piece-noir-fleuri',
-    name: "Pièce unique · Noir fleuri",
+    id: 'piece-unique',
+    slug: 'piece-unique',
+    name: 'Pièce unique',
     description:
-      "Fond gris profond couvert d'un motif floral noir en relief. Un modèle habillé, qui se suffit à lui-même sur une tenue sobre.",
+      "Des modèles rares, reçus à l'unité. Faites défiler les photos pour les voir un par un, puis choisissez celui que vous voulez : chaque modèle n'existe qu'en un seul exemplaire.",
     price: 6000,
     compareAtPrice: null,
     category: 'piece_unique',
-    images: [pieceNoirFleuri],
-    variants: [],
-    // Chaque modèle existe en un seul exemplaire : une fois parti, il disparaît
-    // de la boutique. Ajustable depuis /admin si un modèle revient.
-    stock: 1,
-    status: 'active',
-    createdAt: '2026-01-05T10:34:00.000Z',
-  },
-  {
-    id: 'piece-creme-fleuri',
-    slug: 'piece-creme-fleuri',
-    name: "Pièce unique · Crème fleuri",
-    description:
-      "Crème à maille texturée, semé de fleurs noires. La version claire du modèle fleuri, pour les soirées et les cérémonies.",
-    price: 6000,
-    compareAtPrice: null,
-    category: 'piece_unique',
-    images: [pieceCremeFleuri],
-    variants: [],
-    // Chaque modèle existe en un seul exemplaire : une fois parti, il disparaît
-    // de la boutique. Ajustable depuis /admin si un modèle revient.
-    stock: 1,
-    status: 'active',
-    createdAt: '2026-01-05T10:33:00.000Z',
-  },
-  {
-    id: 'piece-taupe-fleuri',
-    slug: 'piece-taupe-fleuri',
-    name: "Pièce unique · Taupe fleuri",
-    description:
-      "Taupe clair à motif floral sombre, tissage gaufré. Se marie avec le noir comme avec le beige.",
-    price: 6000,
-    compareAtPrice: null,
-    category: 'piece_unique',
-    images: [pieceTaupeFleuri],
-    variants: [],
-    // Chaque modèle existe en un seul exemplaire : une fois parti, il disparaît
-    // de la boutique. Ajustable depuis /admin si un modèle revient.
-    stock: 1,
-    status: 'active',
-    createdAt: '2026-01-05T10:32:00.000Z',
-  },
-  {
-    id: 'piece-fauve',
-    slug: 'piece-fauve',
-    name: "Pièce unique · Fauve",
-    description:
-      "Imprimé animalier brun et sable, tombé fluide. Le modèle qui suffit à réveiller une tenue unie.",
-    price: 6000,
-    compareAtPrice: null,
-    category: 'piece_unique',
-    images: [pieceFauve],
-    variants: [],
-    // Chaque modèle existe en un seul exemplaire : une fois parti, il disparaît
-    // de la boutique. Ajustable depuis /admin si un modèle revient.
-    stock: 1,
-    status: 'active',
-    createdAt: '2026-01-05T10:31:00.000Z',
-  },
-  {
-    id: 'piece-ecru-or',
-    slug: 'piece-ecru-or',
-    name: "Pièce unique · Écru & or",
-    description:
-      "Écru parsemé de touches noires et dorées, matière légère. Pensé pour les journées chaudes et la lumière du dehors.",
-    price: 6000,
-    compareAtPrice: null,
-    category: 'piece_unique',
-    images: [pieceEcruOr],
-    variants: [],
-    // Chaque modèle existe en un seul exemplaire : une fois parti, il disparaît
-    // de la boutique. Ajustable depuis /admin si un modèle revient.
-    stock: 1,
+    // L'ordre des photos suit exactement l'ordre des modèles ci-dessous :
+    // faire défiler la galerie sélectionne le modèle correspondant.
+    images: [pieceNoirFleuri, pieceCremeFleuri, pieceTaupeFleuri, pieceFauve, pieceEcruOr],
+    variants: [
+      {
+        name: 'Modèle',
+        options: ['Noir fleuri', 'Crème fleuri', 'Taupe fleuri', 'Fauve', 'Écru & or'],
+        // Un modèle vendu se marque ici depuis /admin → Produits, avec « (épuisé) ».
+        soldOutOptions: [],
+      },
+    ],
+    stock: null,
     status: 'active',
     createdAt: '2026-01-05T10:30:00.000Z',
   },

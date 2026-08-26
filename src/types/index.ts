@@ -3,9 +3,11 @@
 export type ProductStatus = 'active' | 'draft' | 'sold_out';
 
 export interface ProductVariantGroup {
-  /** ex : "Couleur", "Taille" */
+  /** ex : "Modèle", "Couleur", "Taille" */
   name: string;
   options: string[];
+  /** Options momentanément indisponibles : affichées barrées, impossibles à commander. */
+  soldOutOptions?: string[];
 }
 
 export interface Product {

@@ -1,5 +1,5 @@
 import { ArrowLeft, Check, Loader2, ShieldCheck, Truck } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { WhatsAppLink } from '@/src/components/whatsapp/WhatsAppLink';
 import { Gallery } from '@/src/components/product/Gallery';
 import { ProductCard } from '@/src/components/product/ProductCard';
@@ -32,8 +32,56 @@ export function ProductPage({ slug }: { slug: string }) {
   const [colorWish, setColorWish] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const [photoIndex, setPhotoIndex] = useState(0);
 
-  const soldOut = product?.status === 'sold_out' || product?.stock === 0;
+  /**
+   * Groupe de variantes aligné sur les photos : autant d'options que d'images.
+   * C'est ce qui permet de faire défiler les modèles et de choisir dans le
+   * même geste, sur la fiche « Pièce unique » comme sur toute fiche construite
+   * de la même façon depuis l'admin.
+   */
+  const photoGroup = product?.variants.find((group) => group.options.length === product.images.length);
+
+  const isSoldOutOption = (group: { soldOutOptions?: string[] }, option: string) =>
+    (group.soldOutOptions ?? []).includes(option);
+
+  // Première option encore disponible, présélectionnée à l'ouverture.
+  useEffect(() => {
+    if (!photoGroup) return;
+    const first = photoGroup.options.findIndex((option) => !isSoldOutOption(photoGroup, option));
+    if (first < 0) return;
+    setPhotoIndex(first);
+    setOptions((current) =>
+      current[photoGroup.name] ? current : { ...current, [photoGroup.name]: photoGroup.options[first] },
+    );
+  }, [product?.id]);
+
+  /** Faire défiler la galerie choisit le modèle correspondant. */
+  const handlePhotoIndex = (index: number) => {
+    setPhotoIndex(index);
+    if (photoGroup && photoGroup.options[index]) {
+      setOptions((current) => ({ ...current, [photoGroup.name]: photoGroup.options[index] }));
+    }
+  };
+
+  /** Choisir un modèle amène sa photo. */
+  const handleOptions = (next: Record<string, string>) => {
+    setOptions(next);
+    if (photoGroup) {
+      const index = photoGroup.options.indexOf(next[photoGroup.name]);
+      if (index >= 0) setPhotoIndex(index);
+    }
+  };
+
+  /** Toutes les options d'un groupe vendues : l'article entier est épuisé. */
+  const everyOptionSoldOut = Boolean(
+    product?.variants.some(
+      (group) =>
+        group.options.length > 0 &&
+        group.options.every((option) => (group.soldOutOptions ?? []).includes(option)),
+    ),
+  );
+  const soldOut = product?.status === 'sold_out' || product?.stock === 0 || everyOptionSoldOut;
   const missingOption = product?.variants.find((group) => !options[group.name]);
 
   useSeo({
@@ -116,7 +164,13 @@ export function ProductPage({ slug }: { slug: string }) {
       </Link>
 
       <div className="mt-4 grid gap-8 lg:grid-cols-2 lg:gap-14">
-        <Gallery images={product.images} alt={product.name} />
+        <Gallery
+          images={product.images}
+          alt={product.name}
+          labels={photoGroup?.options}
+          activeIndex={photoIndex}
+          onIndexChange={handlePhotoIndex}
+        />
 
         <div>
           <div className="flex flex-wrap items-center gap-2">
@@ -153,7 +207,7 @@ export function ProductPage({ slug }: { slug: string }) {
 
           <div className="mt-7 space-y-6">
             {product.variants.length > 0 && (
-              <VariantPicker groups={product.variants} value={options} onChange={setOptions} />
+              <VariantPicker groups={product.variants} value={options} onChange={handleOptions} />
             )}
 
             {product.variants.length === 0 && (

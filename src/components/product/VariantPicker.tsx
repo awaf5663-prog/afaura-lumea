@@ -22,21 +22,26 @@ export function VariantPicker({ groups, value, onChange, size = 'md' }: Props) {
           <div className="flex flex-wrap gap-2">
             {group.options.map((option) => {
               const selected = value[group.name] === option;
+              const soldOut = (group.soldOutOptions ?? []).includes(option);
               return (
                 <button
                   key={option}
                   type="button"
                   aria-pressed={selected}
+                  disabled={soldOut}
                   onClick={() => onChange({ ...value, [group.name]: option })}
                   className={cn(
                     'press rounded-full border transition-colors',
                     size === 'sm' ? 'px-3 py-1.5 text-[12.5px]' : 'px-4 py-2.5 text-[13.5px]',
-                    selected
-                      ? 'border-ink bg-ink text-ivory'
-                      : 'border-line bg-white text-graphite hover:border-ink/40',
+                    soldOut
+                      ? 'cursor-not-allowed border-line bg-cream text-stone line-through'
+                      : selected
+                        ? 'border-ink bg-ink text-ivory'
+                        : 'border-line bg-white text-graphite hover:border-ink/40',
                   )}
                 >
                   {option}
+                  {soldOut && <span className="ml-1.5 no-underline">· parti</span>}
                 </button>
               );
             })}

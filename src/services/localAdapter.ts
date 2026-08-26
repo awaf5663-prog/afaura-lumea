@@ -98,6 +98,15 @@ export const localAdapter: DataSource = {
       const product = products.find((p) => p.id === line.productId);
       if (!product) throw new Error(`Produit introuvable : ${line.productId}`);
       if (product.status !== 'active') throw new Error(`« ${product.name} » n'est plus disponible.`);
+      // Une option retirée de la vente ne doit pas passer, même si le
+      // navigateur l'envoie : la vérification se fait ici, pas dans l'écran.
+      product.variants.forEach((group) => {
+        const chosen = line.options[group.name];
+        if (chosen && (group.soldOutOptions ?? []).includes(chosen)) {
+          throw new Error(`« ${chosen} » vient d'être vendu. Choisissez un autre modèle.`);
+        }
+      });
+
       const quantity = Math.max(1, Math.min(99, Math.trunc(line.quantity)));
       if (product.stock !== null && quantity > product.stock) {
         throw new Error(`Stock insuffisant pour « ${product.name} ».`);

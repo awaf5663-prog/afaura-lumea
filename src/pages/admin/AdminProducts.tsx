@@ -46,7 +46,14 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
   const openEditor = (product: Product) => {
     setEditing({ ...product });
     setVariantText(
-      product.variants.map((group) => `${group.name}: ${group.options.join(', ')}`).join('\n'),
+      product.variants
+        .map((group) => {
+          const options = group.options.map((option) =>
+            (group.soldOutOptions ?? []).includes(option) ? `${option} (épuisé)` : option,
+          );
+          return `${group.name}: ${options.join(', ')}`;
+        })
+        .join('\n'),
     );
   };
 
@@ -61,14 +68,17 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
       .map((line) => line.trim())
       .filter(Boolean)
       .map((line) => {
-        const [name, options = ''] = line.split(':');
-        return {
-          name: name.trim(),
-          options: options
-            .split(',')
-            .map((option) => option.trim())
-            .filter(Boolean),
-        };
+        const [name, rawOptions = ''] = line.split(':');
+        const entries = rawOptions
+          .split(',')
+          .map((option) => option.trim())
+          .filter(Boolean);
+        // « Noir fleuri (épuisé) » retire le modèle de la vente sans le supprimer.
+        const options = entries.map((entry) => entry.replace(/\s*\(épuisé\)\s*$/i, '').trim());
+        const soldOutOptions = entries
+          .filter((entry) => /\(épuisé\)\s*$/i.test(entry))
+          .map((entry) => entry.replace(/\s*\(épuisé\)\s*$/i, '').trim());
+        return { name: name.trim(), options, soldOutOptions };
       })
       .filter((group) => group.name && group.options.length > 0);
 
@@ -285,15 +295,20 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
             </div>
 
             <FormRow>
-              <Label htmlFor="p-variants" hint="une ligne par groupe : « Couleur: Noir, Blanc »">
+              <Label htmlFor="p-variants" hint="une ligne par groupe">
                 Variantes
               </Label>
               <Textarea
                 id="p-variants"
                 value={variantText}
                 onChange={(e) => setVariantText(e.target.value)}
-                placeholder={'Couleur: Noir, Blanc\nTaille: 1m80, 2m00'}
+                placeholder={'Modèle: Noir fleuri, Fauve (épuisé)\nTaille: 1m80, 2m00'}
               />
+              <p className="mt-1.5 text-[12px] leading-relaxed text-stone">
+                Ajoutez <span className="font-medium">(épuisé)</span> après un modèle vendu : il
+                reste visible, barré, mais ne peut plus être commandé. Si le groupe a autant
+                d'options que de photos, faire défiler la galerie sélectionne le modèle.
+              </p>
             </FormRow>
 
             <FormRow>

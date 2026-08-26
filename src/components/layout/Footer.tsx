@@ -96,8 +96,18 @@ export function Footer() {
       </div>
 
       <div className="container-page hairline flex flex-col gap-2 py-6 text-[12px] text-stone sm:flex-row sm:items-center sm:justify-between">
-        <p>
-          © {new Date().getFullYear()} {BRAND.name}. Tous droits réservés.
+        <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <span>
+            © {new Date().getFullYear()} {BRAND.name}. Tous droits réservés.
+          </span>
+          {/*
+            Seule porte d'entrée vers l'administration : discrète, en bas de page,
+            et protégée par un code. Sans ce lien, l'espace est inaccessible depuis
+            un téléphone, où l'on ne peut pas taper une adresse à la main.
+          */}
+          <Link to="/admin" className="link-underline text-stone">
+            Espace boutique
+          </Link>
         </p>
         <p className="max-w-lg sm:text-right">
           {BRAND.name} est un service indépendant de commande groupée. Nous ne sommes ni SHEIN ni un

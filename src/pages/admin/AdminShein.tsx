@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowRight, MessageCircle } from 'lucide-react';
 import { AmountField } from '@/src/components/admin/AmountField';
+import { ExportButton } from '@/src/components/admin/ExportButton';
 import { Badge } from '@/src/components/ui/Badge';
 import { EmptyState } from '@/src/components/ui/EmptyState';
 import { Select } from '@/src/components/ui/Field';
@@ -9,6 +10,7 @@ import { formatDateTime, formatFcfa, prettyPhone } from '@/src/lib/format';
 import { SHEIN_STATUS_LABEL, SHEIN_STEPS, nextSheinStatus } from '@/src/lib/orderStatus';
 import { SITE_URL } from '@/src/config/site';
 import { buildStatusMessage, isWhatsappConfigured, whatsappLink } from '@/src/lib/whatsapp';
+import { sheinCsv } from '@/src/lib/exportCsv';
 import { db } from '@/src/services';
 import type { Grouping, SheinRequest, SheinStatus } from '@/src/types';
 
@@ -48,7 +50,10 @@ export function AdminShein({
 
   return (
     <div>
-      <h2 className="text-[24px]">Demandes SHEIN ({requests.length})</h2>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-[24px]">Demandes SHEIN ({requests.length})</h2>
+        <ExportButton label="Exporter pour Excel" build={() => sheinCsv(requests)} />
+      </div>
 
       <ul className="mt-6 space-y-4">
         {requests.map((request) => (

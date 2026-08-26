@@ -551,7 +551,7 @@ function GroupingEditor({
                 id="g-cost"
                 type="number"
                 min={0}
-                step={500}
+                step={1}
                 placeholder="Non estimé"
                 value={draft.logisticsCost ?? ''}
                 onChange={(e) =>

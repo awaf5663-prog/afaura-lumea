@@ -232,7 +232,7 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
                   type="number"
                   inputMode="numeric"
                   min={0}
-                  step={100}
+                  step={1}
                   value={editing.price || ''}
                   onChange={(e) => setEditing({ ...editing, price: Number(e.target.value) })}
                 />
@@ -246,7 +246,7 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
                   type="number"
                   inputMode="numeric"
                   min={0}
-                  step={100}
+                  step={1}
                   value={editing.compareAtPrice ?? ''}
                   onChange={(e) =>
                     setEditing({

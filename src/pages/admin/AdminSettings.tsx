@@ -136,7 +136,7 @@ export function AdminSettings() {
                 id={`fee-${zone.id}`}
                 type="number"
                 min={0}
-                step={100}
+                step={1}
                 placeholder="À confirmer"
                 value={draft.deliveryFees[zone.id] ?? ''}
                 onChange={(e) =>

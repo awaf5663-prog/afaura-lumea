@@ -156,7 +156,7 @@ export function PromotionEditor({
                   id={`p-amount-${index}`}
                   type="number"
                   min={0}
-                  step={500}
+                  step={1}
                   value={promotion.effect.amount}
                   onChange={(e) =>
                     patch(index, {

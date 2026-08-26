@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { DELIVERY_ZONES, type DeliveryZone } from '@/src/config/site';
-import { db } from '@/src/services';
+import { db, onDataChanged } from '@/src/services';
 import { buildChatUrl, canPrefill } from '@/src/lib/whatsapp';
 import type { StoreSettings } from '@/src/types';
 
@@ -30,6 +30,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     void refresh();
   }, [refresh]);
+
+  // Un réglage enregistré — ici, dans un autre onglet, ou pendant que cet
+  // onglet était en arrière-plan — se propage sans recharger la page.
+  useEffect(() => onDataChanged(() => void refresh()), [refresh]);
 
   const save = useCallback(async (next: StoreSettings) => {
     setSettings(await db.saveSettings(next));

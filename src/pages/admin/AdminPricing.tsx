@@ -172,7 +172,7 @@ export function AdminPricing({ groupings = [] }: { groupings?: Grouping[] }) {
                     <Input
                       type="number"
                       min={0}
-                      step={500}
+                      step={1}
                       className="mt-1"
                       placeholder="Devis manuel"
                       value={tier.fee ?? ''}
@@ -213,7 +213,7 @@ export function AdminPricing({ groupings = [] }: { groupings?: Grouping[] }) {
                   id="vp-percent"
                   type="number"
                   min={0}
-                  step={0.5}
+                  step="any"
                   value={pricing.valuePercent.percent}
                   onChange={(e) =>
                     setPricing({
@@ -228,7 +228,7 @@ export function AdminPricing({ groupings = [] }: { groupings?: Grouping[] }) {
                   id="vp-min"
                   type="number"
                   min={0}
-                  step={500}
+                  step={1}
                   value={pricing.valuePercent.minFee}
                   onChange={(e) =>
                     setPricing({
@@ -245,7 +245,7 @@ export function AdminPricing({ groupings = [] }: { groupings?: Grouping[] }) {
                   id="vp-max"
                   type="number"
                   min={0}
-                  step={500}
+                  step={1}
                   value={pricing.valuePercent.maxFee ?? ''}
                   onChange={(e) =>
                     setPricing({
@@ -311,7 +311,7 @@ export function AdminPricing({ groupings = [] }: { groupings?: Grouping[] }) {
                     className="mt-1"
                     type="number"
                     min={0}
-                    step={500}
+                    step={1}
                     placeholder="À confirmer"
                     value={option.fee ?? ''}
                     onChange={(e) =>
@@ -357,7 +357,7 @@ export function AdminPricing({ groupings = [] }: { groupings?: Grouping[] }) {
                   id={`rate-${code}`}
                   type="number"
                   min={0}
-                  step="0.001"
+                  step="any"
                   placeholder="Non configuré"
                   disabled={code === 'XOF'}
                   value={rate ?? ''}
@@ -477,7 +477,7 @@ export function AdminPricing({ groupings = [] }: { groupings?: Grouping[] }) {
                 id="sim-value"
                 type="number"
                 min={0}
-                step={500}
+                step={1}
                 placeholder="Inconnue"
                 value={simValue ?? ''}
                 onChange={(e) => setSimValue(e.target.value === '' ? null : Number(e.target.value))}

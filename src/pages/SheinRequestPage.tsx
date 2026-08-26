@@ -293,24 +293,28 @@ export function SheinRequestPage() {
                           }}
                           placeholder="12,99"
                         />
-                        <Select
-                          aria-label="Devise"
-                          className="w-28 shrink-0"
-                          value={item.priceCurrency}
-                          onChange={(e) => {
-                            const currency = e.target.value;
-                            updateItem(index, {
-                              priceCurrency: currency,
-                              displayedPrice: priceLabel(item.priceAmount, currency),
-                            });
-                          }}
-                        >
-                          {currencies.map((code) => (
-                            <option key={code} value={code}>
-                              {CURRENCY_LABELS[code] ?? code}
-                            </option>
-                          ))}
-                        </Select>
+                        {/* Le champ occupe toute la largeur de son conteneur :
+                            c'est le conteneur qui porte la largeur, sinon les
+                            classes se neutralisent et la liste déborde. */}
+                        <div className="w-24 shrink-0">
+                          <Select
+                            aria-label="Devise"
+                            value={item.priceCurrency}
+                            onChange={(e) => {
+                              const currency = e.target.value;
+                              updateItem(index, {
+                                priceCurrency: currency,
+                                displayedPrice: priceLabel(item.priceAmount, currency),
+                              });
+                            }}
+                          >
+                            {currencies.map((code) => (
+                              <option key={code} value={code}>
+                                {CURRENCY_LABELS[code] ?? code}
+                              </option>
+                            ))}
+                          </Select>
+                        </div>
                       </div>
                     </FormRow>
                     <FormRow>

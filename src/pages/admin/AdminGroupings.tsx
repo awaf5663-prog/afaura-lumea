@@ -643,7 +643,7 @@ function NotifySheet({
                   href={whatsappLink(request.phone, message(request))}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="press inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#1f9c53] px-3.5 py-2 text-[12.5px] text-white"
+                  className="press inline-flex shrink-0 items-center gap-1.5 rounded-full bg-[#17803f] px-3.5 py-2 text-[12.5px] text-white"
                 >
                   <MessageCircle className="size-3.5" /> Écrire
                 </a>

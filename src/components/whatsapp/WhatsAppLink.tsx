@@ -50,7 +50,7 @@ export function WhatsAppLink({
       }}
       className={cn(
         variant === 'solid'
-          ? 'press inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#1f9c53] px-7 text-[15px] font-medium text-white hover:bg-[#188143]'
+          ? 'press inline-flex h-14 w-full items-center justify-center gap-2 rounded-full bg-[#17803f] px-7 text-[15px] font-medium text-white hover:bg-[#126632]'
           : 'underline underline-offset-2',
         className,
       )}

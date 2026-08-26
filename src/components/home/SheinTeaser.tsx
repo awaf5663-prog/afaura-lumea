@@ -22,8 +22,7 @@ export function SheinTeaser() {
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button
               size="lg"
-              variant="ghost"
-              className="bg-ivory text-ink hover:bg-cream"
+              variant="light"
               onClick={() => navigate('/shein')}
             >
               Transmettre mon panier SHEIN

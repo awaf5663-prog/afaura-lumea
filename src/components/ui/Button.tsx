@@ -1,14 +1,15 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cn } from '@/src/lib/cn';
 
-type Variant = 'primary' | 'secondary' | 'ghost' | 'whatsapp' | 'danger';
+type Variant = 'primary' | 'secondary' | 'ghost' | 'light' | 'danger';
 type Size = 'sm' | 'md' | 'lg';
 
 const VARIANTS: Record<Variant, string> = {
   primary: 'bg-ink text-ivory hover:bg-graphite disabled:bg-stone',
   secondary: 'bg-transparent text-ink border border-ink/25 hover:border-ink hover:bg-ink/[0.03]',
   ghost: 'bg-cream text-ink hover:bg-sand',
-  whatsapp: 'bg-[#1f9c53] text-white hover:bg-[#188143]',
+  /** Sur fond sombre : impossible à obtenir par surcharge, les classes se neutralisent. */
+  light: 'bg-ivory text-ink hover:bg-cream',
   danger: 'bg-[#8a2f2f] text-white hover:bg-[#742727]',
 };
 

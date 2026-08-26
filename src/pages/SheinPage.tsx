@@ -203,7 +203,8 @@ export function SheinPage() {
           </p>
           <Button
             size="lg"
-            className="mt-7 bg-ivory text-ink hover:bg-cream"
+            variant="light"
+            className="mt-7"
             onClick={() => navigate('/shein/demande')}
           >
             Transmettre mon panier SHEIN

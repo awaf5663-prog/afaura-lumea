@@ -70,7 +70,7 @@ export function AdminPricing() {
 
   return (
     <form onSubmit={submit} className="grid gap-6 lg:grid-cols-[1.35fr_1fr] lg:items-start">
-      <div>
+      <div className="min-w-0">
         <h2 className="text-[24px]">Tarification</h2>
         <p className="mt-1.5 text-[13px] text-stone">
           Ces montants sont des frais de service, distincts du prix des articles.
@@ -99,7 +99,7 @@ export function AdminPricing() {
             <Info className="mt-0.5 size-3.5 shrink-0" />
             Le nombre d'articles ne mesure pas le poids réel : une paire de chaussures pèse plus que
             dix accessoires. D'autres modes de calcul (poids, volume, catégorie) se branchent dans
-            <code className="mx-1 rounded bg-white px-1">src/lib/pricing/strategies</code> et
+            <code className="mx-1 break-all rounded bg-white px-1">src/lib/pricing/strategies</code> et
             apparaîtront dans cette liste sans autre modification.
           </p>
         </section>
@@ -128,7 +128,10 @@ export function AdminPricing() {
 
             <ul className="mt-4 space-y-3">
               {pricing.tiers.map((tier, index) => (
-                <li key={tier.id} className="grid grid-cols-[1fr_1fr_1.2fr_auto] items-end gap-2">
+                <li
+                  key={tier.id}
+                  className="grid grid-cols-2 items-end gap-2 sm:grid-cols-[1fr_1fr_1.2fr_auto]"
+                >
                   <label className="text-[11.5px] text-stone">
                     De
                     <Input
@@ -189,7 +192,7 @@ export function AdminPricing() {
                     onClick={() =>
                       setPricing({ tiers: pricing.tiers.filter((_, i) => i !== index) })
                     }
-                    className="press mb-1 grid size-10 place-items-center rounded-full bg-cream text-[#8a2f2f]"
+                    className="press mb-1 col-span-2 grid size-10 justify-self-end place-items-center rounded-full bg-cream text-[#8a2f2f] sm:col-span-1"
                   >
                     <Trash2 className="size-4" />
                   </button>
@@ -283,7 +286,10 @@ export function AdminPricing() {
 
           <ul className="mt-4 space-y-3">
             {pricing.deliveryOptions.map((option, index) => (
-              <li key={option.id} className="grid grid-cols-[1.6fr_1fr_auto] items-end gap-2">
+              <li
+                key={option.id}
+                className="grid grid-cols-2 items-end gap-2 sm:grid-cols-[1.6fr_1fr_auto]"
+              >
                 <label className="text-[11.5px] text-stone">
                   Intitulé
                   <Input
@@ -326,7 +332,7 @@ export function AdminPricing() {
                       deliveryOptions: pricing.deliveryOptions.filter((_, i) => i !== index),
                     })
                   }
-                  className="press mb-1 grid size-10 place-items-center rounded-full bg-cream text-[#8a2f2f]"
+                  className="press mb-1 col-span-2 grid size-10 justify-self-end place-items-center rounded-full bg-cream text-[#8a2f2f] sm:col-span-1"
                 >
                   <Trash2 className="size-4" />
                 </button>
@@ -427,7 +433,7 @@ export function AdminPricing() {
       </div>
 
       {/* ── Aperçu du calcul ────────────────────────────────── */}
-      <aside className="lg:sticky lg:top-6">
+      <aside className="min-w-0 lg:sticky lg:top-6">
         <div className="rounded-[--radius-lg] border border-line bg-cream/50 p-5">
           <h3 className="text-[18px]">Aperçu du calcul</h3>
           <p className="mt-1.5 text-[12px] leading-relaxed text-stone">

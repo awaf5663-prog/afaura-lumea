@@ -1,11 +1,13 @@
-import { ShieldAlert } from 'lucide-react';
+import { ArrowLeft, ShieldAlert } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/src/components/ui/Button';
 import { ErrorText, FormRow, Input, Label } from '@/src/components/ui/Field';
 import { useAdminAuth } from '@/src/hooks/useAdminAuth';
+import { useRouter } from '@/src/lib/router';
 
 export function AdminLogin() {
   const { signIn, mode } = useAdminAuth();
+  const { navigate } = useRouter();
   const [identifier, setIdentifier] = useState('');
   const [secret, setSecret] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -71,6 +73,17 @@ export function AdminLogin() {
         <Button type="submit" full className="mt-4" loading={loading}>
           Entrer
         </Button>
+
+        {/* L'administration masque l'entête du site : sans ce lien, on ne
+            peut revenir à la boutique qu'avec le bouton « retour ». */}
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          className="mt-4 flex w-full items-center justify-center gap-1.5 text-[12.5px] text-stone underline underline-offset-2"
+        >
+          <ArrowLeft className="size-3.5" />
+          Retour à la boutique
+        </button>
 
         {mode === 'local' && (
           <p className="mt-6 flex gap-2 rounded-[--radius-sm] bg-cream px-4 py-3 text-[12px] leading-relaxed text-graphite">

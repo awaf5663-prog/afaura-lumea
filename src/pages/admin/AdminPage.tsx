@@ -104,7 +104,17 @@ export function AdminPage() {
           <Button size="sm" variant="secondary" icon={<RefreshCw className="size-4" />} onClick={() => void loadAll()}>
             Actualiser
           </Button>
-          <Button size="sm" variant="ghost" icon={<LogOut className="size-4" />} onClick={signOut}>
+          <Button
+            size="sm"
+            variant="ghost"
+            icon={<LogOut className="size-4" />}
+            onClick={() => {
+              // Quitter ramène sur la boutique : rester sur l'écran de
+              // connexion donne l'impression d'être coincée dans l'admin.
+              signOut();
+              navigate('/');
+            }}
+          >
             Quitter
           </Button>
         </div>

@@ -1,8 +1,9 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { ADMIN_PASSCODE } from '@/src/config/site';
-import { STORAGE_KEYS, readJson, removeKey, writeJson } from '@/src/lib/storage';
+import { STORAGE_KEYS, removeKey } from '@/src/lib/storage';
+import { useRouter } from '@/src/lib/router';
 import { isSupabaseConfigured } from '@/src/services';
-import { hasSupabaseSession, supabaseSignIn, supabaseSignOut } from '@/src/services/supabaseAdapter';
+import { supabaseSignIn, supabaseSignOut } from '@/src/services/supabaseAdapter';
 
 interface AdminAuthValue {
   authenticated: boolean;
@@ -15,14 +16,23 @@ interface AdminAuthValue {
 const AdminAuthContext = createContext<AdminAuthValue | null>(null);
 
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
+  const { path } = useRouter();
   const mode: AdminAuthValue['mode'] = isSupabaseConfigured() ? 'supabase' : 'local';
-  const [authenticated, setAuthenticated] = useState(() => {
-    const session = Boolean(readJson<{ at: number } | null>(STORAGE_KEYS.adminSession, null));
-    // En mode Supabase, la marque locale ne suffit pas : sans jeton, la base
-    // refuse toute écriture. Mieux vaut redemander la connexion tout de suite
-    // que de laisser saisir une configuration entière qui ne partira jamais.
-    return mode === 'supabase' ? session && hasSupabaseSession() : session;
-  });
+
+  /*
+   * L'accès n'est JAMAIS conservé.
+   *
+   * Rien n'est gardé d'une visite à l'autre : entrer dans l'administration
+   * redemande l'identifiant à chaque fois. Un téléphone posé sur un comptoir,
+   * prêté, ou perdu, n'ouvre pas la boutique. Ce que ça ne coûte pas : une
+   * saisie en cours, désormais conservée à part (voir useSettingsDraft).
+   */
+  const [authenticated, setAuthenticated] = useState(false);
+
+  // Reste d'une ancienne version qui gardait la session ouverte.
+  useEffect(() => {
+    removeKey(STORAGE_KEYS.adminSession);
+  }, []);
 
   const signIn = useCallback<AdminAuthValue['signIn']>(
     async (identifier, secret) => {
@@ -31,7 +41,6 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
       } else if (secret !== ADMIN_PASSCODE) {
         throw new Error('Code incorrect.');
       }
-      writeJson(STORAGE_KEYS.adminSession, { at: Date.now() });
       setAuthenticated(true);
     },
     [mode],
@@ -42,6 +51,13 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     removeKey(STORAGE_KEYS.adminSession);
     setAuthenticated(false);
   }, [mode]);
+
+  // Quitter l'administration ferme l'accès : y revenir redemande l'identifiant,
+  // même sans avoir rechargé la page.
+  const inAdmin = path.startsWith('/admin');
+  useEffect(() => {
+    if (!inAdmin && authenticated) signOut();
+  }, [inAdmin, authenticated, signOut]);
 
   const value = useMemo(
     () => ({ authenticated, mode, signIn, signOut }),

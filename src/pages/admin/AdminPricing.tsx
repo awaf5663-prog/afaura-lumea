@@ -5,11 +5,13 @@ import { Button } from '@/src/components/ui/Button';
 import { FormRow, Input, Label, Select } from '@/src/components/ui/Field';
 import { PromotionEditor } from '@/src/components/admin/PromotionEditor';
 import { useSettings } from '@/src/hooks/useSettings';
+import { useSettingsDraft } from '@/src/hooks/useSettingsDraft';
+import { DraftStatus } from '@/src/components/admin/DraftStatus';
 import { useToast } from '@/src/hooks/useToast';
 import { formatFcfa } from '@/src/lib/format';
 import { uid } from '@/src/lib/orderNumber';
 import { SERVICE_FEE_STRATEGIES, computeQuoteFromInput, describeStrategy } from '@/src/lib/pricing';
-import type { Grouping, PricingConfig, StoreSettings } from '@/src/types';
+import type { Grouping, PricingConfig } from '@/src/types';
 
 /**
  * PARAMÈTRES → TARIFICATION
@@ -17,10 +19,12 @@ import type { Grouping, PricingConfig, StoreSettings } from '@/src/types';
  * écrit dans un composant : les pages lisent cette configuration.
  */
 export function AdminPricing({ groupings = [] }: { groupings?: Grouping[] }) {
-  const { settings, save } = useSettings();
+  const { settings } = useSettings();
   const { notify } = useToast();
-  const [draft, setDraft] = useState<StoreSettings | null>(settings);
-  const [saving, setSaving] = useState(false);
+  // La saisie survit à un échec d'enregistrement, à un changement d'onglet et
+  // même à la fermeture du navigateur. Voir useSettingsDraft.
+  const { draft, setDraft, restored, saving, error, commit, discard } =
+    useSettingsDraft('lumea.admin.draft.tarification');
 
   // Simulateur
   const [simItems, setSimItems] = useState(4);
@@ -28,8 +32,7 @@ export function AdminPricing({ groupings = [] }: { groupings?: Grouping[] }) {
   const [simDelivery, setSimDelivery] = useState('');
 
   useEffect(() => {
-    setDraft(settings);
-    setSimDelivery((current) => current || settings?.pricing.deliveryOptions[0]?.id || '');
+    setSimDelivery((current) => current || settings?.pricing?.deliveryOptions?.[0]?.id || '');
   }, [settings]);
 
   const pricing = draft?.pricing;
@@ -51,22 +54,19 @@ export function AdminPricing({ groupings = [] }: { groupings?: Grouping[] }) {
   const setPricing = (patch: Partial<PricingConfig>) =>
     setDraft({ ...draft, pricing: { ...pricing, ...patch } });
 
-  const submit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const enregistrer = async () => {
     const invalid = pricing.tiers.find((t) => t.maxItems !== null && t.maxItems < t.minItems);
     if (invalid) {
       notify('Une tranche a un maximum inférieur à son minimum.', 'error');
       return;
     }
-    setSaving(true);
-    try {
-      await save(draft);
-      notify('Tarification enregistrée');
-    } catch (error) {
-      notify(error instanceof Error ? error.message : 'Enregistrement impossible.', 'error');
-    } finally {
-      setSaving(false);
-    }
+    if (await commit()) notify('Tarification enregistrée');
+    // En cas d'échec, le détail s'affiche dans <DraftStatus> et la saisie reste.
+  };
+
+  const submit = (event: React.FormEvent) => {
+    event.preventDefault();
+    void enregistrer();
   };
 
   return (
@@ -76,6 +76,14 @@ export function AdminPricing({ groupings = [] }: { groupings?: Grouping[] }) {
         <p className="mt-1.5 text-[13px] text-stone">
           Ces montants sont des frais de service, distincts du prix des articles.
         </p>
+
+        <DraftStatus
+          restored={restored}
+          error={error}
+          saving={saving}
+          onDiscard={discard}
+          onRetry={() => void enregistrer()}
+        />
 
         {/* ── Stratégie ─────────────────────────────────────── */}
         <section className="mt-6 rounded-[--radius-lg] border border-line bg-white p-5">

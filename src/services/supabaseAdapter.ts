@@ -28,12 +28,34 @@ export function isSupabaseConfigured(): boolean {
   return Boolean(URL_BASE && ANON_KEY);
 }
 
+/**
+ * Un en-tête HTTP n'accepte que des caractères imprimables ASCII. Un jeton
+ * abîmé (retour à la ligne, accent, valeur tronquée) fait échouer la
+ * construction de la requête AVANT tout appel réseau, avec un message
+ * technique du navigateur — sur Safari « The string did not match the
+ * expected pattern. » — qui ne dit rien à personne. On préfère détecter le
+ * jeton illisible ici, l'effacer, et repartir sur une session propre.
+ */
+const HEADER_SAFE = /^[\x21-\x7e]+$/;
+
 function accessToken(): string | null {
   try {
-    return localStorage.getItem(TOKEN_KEY);
+    const raw = localStorage.getItem(TOKEN_KEY);
+    if (!raw) return null;
+    const token = raw.trim();
+    if (!token || token === 'undefined' || token === 'null' || !HEADER_SAFE.test(token)) {
+      localStorage.removeItem(TOKEN_KEY);
+      return null;
+    }
+    return token;
   } catch {
     return null;
   }
+}
+
+/** Une session Supabase est-elle réellement ouverte ? */
+export function hasSupabaseSession(): boolean {
+  return accessToken() !== null;
 }
 
 export async function supabaseSignIn(email: string, password: string): Promise<void> {
@@ -43,8 +65,14 @@ export async function supabaseSignIn(email: string, password: string): Promise<v
     body: JSON.stringify({ email, password }),
   });
   if (!res.ok) throw new Error('Identifiants refusés.');
-  const data = (await res.json()) as { access_token: string };
-  localStorage.setItem(TOKEN_KEY, data.access_token);
+  const data = (await res.json()) as { access_token?: string };
+  // Sans jeton exploitable, se déclarer connectée ne servirait qu'à faire
+  // échouer le premier enregistrement.
+  const token = (data.access_token ?? '').trim();
+  if (!token || !HEADER_SAFE.test(token)) {
+    throw new Error("La base n'a pas renvoyé de session utilisable. Réessayez.");
+  }
+  localStorage.setItem(TOKEN_KEY, token);
 }
 
 export function supabaseSignOut(): void {
@@ -57,17 +85,36 @@ export function supabaseSignOut(): void {
 
 async function rest<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = accessToken();
-  const res = await fetch(`${URL_BASE}/rest/v1/${path}`, {
-    ...init,
-    headers: {
-      apikey: ANON_KEY,
-      Authorization: `Bearer ${token ?? ANON_KEY}`,
-      'Content-Type': 'application/json',
-      Prefer: 'return=representation',
-      ...(init.headers ?? {}),
-    },
-  });
-  if (!res.ok) throw new Error(`Supabase : ${res.status} ${await res.text()}`);
+  let res: Response;
+  try {
+    res = await fetch(`${URL_BASE}/rest/v1/${path}`, {
+      ...init,
+      headers: {
+        apikey: ANON_KEY,
+        Authorization: `Bearer ${token ?? ANON_KEY}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=representation',
+        ...(init.headers ?? {}),
+      },
+    });
+  } catch (cause) {
+    // Réseau coupé, requête refusée par le navigateur : sans ce filtre, le
+    // message brut du navigateur arrivait tel quel devant la boutique.
+    const detail = cause instanceof Error ? `${cause.name} : ${cause.message}` : String(cause);
+    throw new Error(
+      `La base n'a pas pu être jointe. Vérifiez votre connexion, puis réessayez. (${detail})`,
+    );
+  }
+  if (!res.ok) {
+    const body = await res.text().catch(() => '');
+    if (res.status === 401 || res.status === 403) {
+      throw new Error(
+        "Enregistrement refusé par la base : votre session d'administration a expiré. " +
+          'Quittez puis reconnectez-vous, votre saisie est conservée.',
+      );
+    }
+    throw new Error(`Supabase : ${res.status} ${body}`);
+  }
   if (res.status === 204) return undefined as T;
   return (await res.json()) as T;
 }

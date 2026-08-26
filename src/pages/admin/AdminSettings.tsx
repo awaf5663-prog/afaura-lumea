@@ -1,12 +1,11 @@
 import { Info } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import { Button } from '@/src/components/ui/Button';
 import { FormRow, Input, Label, Textarea } from '@/src/components/ui/Field';
 import { DELIVERY_ZONES } from '@/src/config/site';
-import { useSettings } from '@/src/hooks/useSettings';
+import { useSettingsDraft } from '@/src/hooks/useSettingsDraft';
+import { DraftStatus } from '@/src/components/admin/DraftStatus';
 import { useToast } from '@/src/hooks/useToast';
 import { normalizePhone } from '@/src/lib/format';
-import type { StoreSettings } from '@/src/types';
 
 /** Convertit une date ISO en valeur pour <input type="datetime-local">. */
 const toLocalInput = (iso: string) => {
@@ -20,33 +19,35 @@ const toLocalInput = (iso: string) => {
 };
 
 export function AdminSettings() {
-  const { settings, save } = useSettings();
   const { notify } = useToast();
-  const [draft, setDraft] = useState<StoreSettings | null>(settings);
-  const [saving, setSaving] = useState(false);
-
-  useEffect(() => {
-    setDraft(settings);
-  }, [settings]);
+  const { draft, setDraft, restored, saving, error, commit, discard } =
+    useSettingsDraft('lumea.admin.draft.reglages');
 
   if (!draft) return null;
 
-  const submit = async (event: React.FormEvent) => {
+  const enregistrer = async () => {
+    // Le numéro est normalisé avant l'envoi : ce qui part et ce qui reste
+    // affiché sont ainsi la même chose.
+    const propre = { ...draft, whatsappNumber: normalizePhone(draft.whatsappNumber) };
+    if (await commit(propre)) notify('Réglages enregistrés');
+  };
+
+  const submit = (event: React.FormEvent) => {
     event.preventDefault();
-    setSaving(true);
-    try {
-      await save({ ...draft, whatsappNumber: normalizePhone(draft.whatsappNumber) });
-      notify('Réglages enregistrés');
-    } catch (error) {
-      notify(error instanceof Error ? error.message : 'Enregistrement impossible.', 'error');
-    } finally {
-      setSaving(false);
-    }
+    void enregistrer();
   };
 
   return (
     <form onSubmit={submit} className="max-w-2xl">
       <h2 className="text-[24px]">Réglages</h2>
+
+      <DraftStatus
+        restored={restored}
+        error={error}
+        saving={saving}
+        onDiscard={discard}
+        onRetry={() => void enregistrer()}
+      />
 
       <section className="mt-6 rounded-[--radius-lg] border border-line bg-white p-5">
         <h3 className="text-[18px]">Contact</h3>

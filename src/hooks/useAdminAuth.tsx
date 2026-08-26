@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 import { ADMIN_PASSCODE } from '@/src/config/site';
 import { STORAGE_KEYS, readJson, removeKey, writeJson } from '@/src/lib/storage';
 import { isSupabaseConfigured } from '@/src/services';
-import { supabaseSignIn, supabaseSignOut } from '@/src/services/supabaseAdapter';
+import { hasSupabaseSession, supabaseSignIn, supabaseSignOut } from '@/src/services/supabaseAdapter';
 
 interface AdminAuthValue {
   authenticated: boolean;
@@ -16,9 +16,13 @@ const AdminAuthContext = createContext<AdminAuthValue | null>(null);
 
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const mode: AdminAuthValue['mode'] = isSupabaseConfigured() ? 'supabase' : 'local';
-  const [authenticated, setAuthenticated] = useState(() =>
-    Boolean(readJson<{ at: number } | null>(STORAGE_KEYS.adminSession, null)),
-  );
+  const [authenticated, setAuthenticated] = useState(() => {
+    const session = Boolean(readJson<{ at: number } | null>(STORAGE_KEYS.adminSession, null));
+    // En mode Supabase, la marque locale ne suffit pas : sans jeton, la base
+    // refuse toute écriture. Mieux vaut redemander la connexion tout de suite
+    // que de laisser saisir une configuration entière qui ne partira jamais.
+    return mode === 'supabase' ? session && hasSupabaseSession() : session;
+  });
 
   const signIn = useCallback<AdminAuthValue['signIn']>(
     async (identifier, secret) => {

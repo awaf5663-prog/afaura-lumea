@@ -205,8 +205,8 @@ un arrivage.
 - **Modal imprimé** — une fiche à 5 500 FCFA regroupant 5 modèles (zébré bordeaux, pois sur brun,
   pois sur blanc, aquarelle, léopard), avec la même galerie défilante.
 - **Modal simple** — 4 500 FCFA, teinte choisie dans le nuancier numéroté.
-- **Hijabs & voiles** — Jersey 1 500 et Jersey frisé 2 000 (nuancier numéroté),
-  Satin imprimé 3 500, Dentelle 5 000.
+- **Satin imprimé** — 3 500 FCFA, 5 modèles en galerie défilante, autres coloris sur demande.
+- **Hijabs & voiles** — Jersey 1 500 et Jersey frisé 2 000 (nuancier numéroté), Dentelle 5 000.
 - **Accessoires** — Hijab tape 1 000.
 
 Pour ajouter un lot : créer la catégorie dans `CATEGORIES` (`src/data/seed.ts`), ou ajouter les

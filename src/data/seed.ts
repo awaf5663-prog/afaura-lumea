@@ -18,12 +18,17 @@ import pieceEcruOr from '@/src/assets/products/piece-ecru-or.webp';
 import pieceFauve from '@/src/assets/products/piece-fauve.webp';
 import pieceNoirFleuri from '@/src/assets/products/piece-noir-fleuri.webp';
 import pieceTaupeFleuri from '@/src/assets/products/piece-taupe-fleuri.webp';
-import satinImprime from '@/src/assets/products/satin-imprime.webp';
+import satinDegradeVertBleu from '@/src/assets/products/satin-degrade-vert-bleu.webp';
+import satinDegradeVertRouille from '@/src/assets/products/satin-degrade-vert-rouille.webp';
+import satinNoirPaillete from '@/src/assets/products/satin-noir-paillete.webp';
+import satinSablePaillete from '@/src/assets/products/satin-sable-paillete.webp';
+import satinVertEau from '@/src/assets/products/satin-vert-eau.webp';
 
 export const CATEGORIES: Category[] = [
   { id: 'piece_unique', name: 'Pièce unique' },
   { id: 'modal_imprime', name: 'Modal imprimé' },
   { id: 'modal_simple', name: 'Modal simple' },
+  { id: 'satin_imprime', name: 'Satin imprimé' },
   { id: 'hijab', name: 'Hijabs & voiles' },
   { id: 'accessoire', name: 'Accessoires' },
 ];
@@ -69,15 +74,33 @@ export const SEED_PRODUCTS: Product[] = [
   },
   {
     id: 'satin-imprime',
-    slug: 'hijab-satin-imprime',
+    slug: 'satin-imprime',
     name: 'Satin imprimé',
     description:
-      "Satin fluide aux imprimés colorés, avec ce léger reflet qui habille immédiatement une tenue simple.",
+      "Satin fluide au léger reflet, en dégradés et pailletés. Faites défiler les photos pour voir les modèles, puis choisissez le vôtre.",
     price: 3500,
     compareAtPrice: null,
-    category: 'hijab',
-    images: [satinImprime],
-    variants: [],
+    category: 'satin_imprime',
+    images: [
+      satinDegradeVertBleu,
+      satinSablePaillete,
+      satinNoirPaillete,
+      satinVertEau,
+      satinDegradeVertRouille,
+    ],
+    variants: [
+      {
+        name: 'Modèle',
+        options: [
+          'Dégradé vert & bleu',
+          'Sable pailleté',
+          'Noir pailleté',
+          "Vert d'eau",
+          'Dégradé vert & rouille',
+        ],
+        soldOutOptions: [],
+      },
+    ],
     stock: null,
     status: 'active',
     otherColorsAvailable: true,

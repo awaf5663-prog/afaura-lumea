@@ -34,9 +34,9 @@ export function ShopPage() {
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   useSeo({
-    title: 'Boutique — foulards, hijabs et accessoires',
+    title: 'Boutique — voiles, abayas et hijab tape',
     description:
-      'Toutes les pièces disponibles immédiatement : jersey, modal, satin, dentelle et accessoires. Prix en FCFA, livraison à Saint-Louis ou retrait.',
+      'Jersey, modal, satin, dentelle, viscose et abayas, sur commande. Vous choisissez, nous commandons pour vous, la pièce part avec le prochain groupage. Prix en FCFA, livraison à Saint-Louis ou retrait.',
   });
 
   // La catégorie reste synchronisée avec l'URL (liens du menu, partage de lien).
@@ -78,9 +78,11 @@ export function ShopPage() {
     <div className="container-page pt-8">
       <header>
         <p className="eyebrow">Boutique</p>
-        <h1 className="mt-3 text-[34px] sm:text-[44px]">Disponible maintenant</h1>
+        <h1 className="mt-3 text-[34px] sm:text-[44px]">Notre sélection</h1>
         <p className="mt-3 max-w-xl text-[15px] text-graphite">
-          Ces pièces sont en stock chez nous : commandez, et on vous livre sans attendre le groupage.
+          Toutes les pièces sont <strong className="font-medium text-ink">sur commande</strong> :
+          vous choisissez ici, nous commandons pour vous, et votre pièce part avec le prochain
+          groupage. Nous vous confirmons le délai sur WhatsApp avant tout paiement.
         </p>
       </header>
 

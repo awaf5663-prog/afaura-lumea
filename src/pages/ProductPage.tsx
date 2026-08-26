@@ -1,4 +1,4 @@
-import { ArrowLeft, Check, Loader2, Palette, ShieldCheck, Truck } from 'lucide-react';
+import { ArrowLeft, Check, Clock, Loader2, Palette, ShieldCheck, Truck } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { WhatsAppLink } from '@/src/components/whatsapp/WhatsAppLink';
 import { Gallery } from '@/src/components/product/Gallery';
@@ -204,15 +204,20 @@ export function ProductPage({ slug }: { slug: string }) {
             className="mt-3 text-[22px]"
           />
 
+          {/*
+            Rien n'est en stock : tout est commandé pour la cliente. Un point vert
+            « Disponible » laisserait croire que la pièce part le jour même, et la
+            déception se paierait à la livraison.
+          */}
           <p className="mt-2 inline-flex items-center gap-2 text-[13.5px]">
             {soldOut ? (
-              <span className="text-[#8a2f2f]">Épuisé pour le moment</span>
+              <span className="text-[#8a2f2f]">Momentanément indisponible</span>
             ) : (
               <>
-                <span className="size-2 rounded-full bg-[#1f9c53]" aria-hidden />
+                <Clock className="size-3.5 text-stone" aria-hidden />
                 <span className="text-graphite">
-                  Disponible
-                  {product.stock !== null ? ` — ${product.stock} en stock` : ''}
+                  Sur commande
+                  {product.stock !== null ? ` — ${product.stock} pièce(s) réservée(s)` : ''}
                 </span>
               </>
             )}
@@ -294,6 +299,11 @@ export function ProductPage({ slug }: { slug: string }) {
           </div>
 
           <ul className="mt-8 space-y-2.5 border-t border-line pt-6 text-[13.5px] text-stone">
+            <li className="flex items-start gap-2.5">
+              <Clock className="mt-0.5 size-4 shrink-0" strokeWidth={1.6} />
+              Pièce commandée pour vous : elle part avec le prochain groupage. Le délai vous est
+              confirmé sur WhatsApp avant tout paiement.
+            </li>
             <li className="flex items-center gap-2.5">
               <Truck className="size-4" strokeWidth={1.6} />
               Livraison Saint-Louis, environs et régions — ou retrait sur place.
@@ -326,7 +336,7 @@ export function ProductPage({ slug }: { slug: string }) {
                 <Check className="size-4" /> Ajouté au panier
               </>
             ) : soldOut ? (
-              'Épuisé'
+              'Indisponible'
             ) : (
               <>Ajouter · {formatFcfa(product.price * quantity)}</>
             )}

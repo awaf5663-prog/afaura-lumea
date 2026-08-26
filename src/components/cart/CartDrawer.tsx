@@ -43,7 +43,7 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
         <EmptyState
           icon={<ShoppingBag className="size-8" strokeWidth={1.2} />}
           title="Votre panier est vide"
-          description="Les foulards et hijabs disponibles sont dans la boutique, prêts à être expédiés."
+          description="Voiles, abayas et accessoires vous attendent dans la boutique, tous sur commande."
           action={<Button onClick={() => go('/boutique')}>Découvrir la boutique</Button>}
         />
       ) : (

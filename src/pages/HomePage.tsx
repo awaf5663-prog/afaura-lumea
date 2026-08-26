@@ -14,7 +14,7 @@ export function HomePage() {
   useSeo({
     title: `${BRAND.name} — Hijabs à Saint-Louis & commandes SHEIN groupées`,
     description:
-      'Foulards et hijabs disponibles à Saint-Louis, et service de commande groupée SHEIN : vous transmettez vos articles, nous confirmons le montant en FCFA et regroupons l’acheminement.',
+      'Voiles, hijabs et abayas sur commande à Saint-Louis, et service de commande groupée SHEIN : vous transmettez vos articles, nous confirmons le montant en FCFA et regroupons l’acheminement.',
     image: products[0]?.images[0],
     jsonLd: {
       '@context': 'https://schema.org',

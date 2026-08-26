@@ -1,4 +1,5 @@
-import { ArrowRight, ShieldCheck, Truck } from 'lucide-react';
+import { ArrowRight, Clock, ShieldCheck, Truck } from 'lucide-react';
+import logo from '@/src/assets/brand/logo-sombre.webp';
 import heroImage from '@/src/assets/products/dentelle-noir-blanc.webp';
 import { Button } from '@/src/components/ui/Button';
 import { BRAND } from '@/src/config/site';
@@ -12,7 +13,20 @@ export function Hero() {
     <section className="container-page pt-6 lg:pt-14">
       <div className="grid items-center gap-9 lg:grid-cols-[1.05fr_1fr] lg:gap-16">
         <div className="animate-fade">
-          <p className="eyebrow">Saint-Louis · Hijabs & commandes SHEIN</p>
+          {/*
+            Le logo de la boutique, en tête. Ombre portée douce plutôt qu'un faux
+            relief : le tracé du voile a déjà son propre modelé, l'écraser sous un
+            effet 3D lui ferait perdre sa finesse.
+          */}
+          <img
+            src={logo}
+            alt={BRAND.name}
+            width={720}
+            height={720}
+            className="h-24 w-auto object-contain drop-shadow-[0_12px_26px_rgba(23,17,15,0.20)] sm:h-32"
+          />
+
+          <p className="eyebrow mt-6">Saint-Louis · Voiles & commandes SHEIN</p>
 
           <h1 className="mt-4 text-[33px] leading-[1.07] sm:text-[48px] lg:text-[58px]">
             Commande ce qui te plaît.
@@ -35,6 +49,10 @@ export function Hero() {
             <li className="inline-flex items-center gap-2">
               <ShieldCheck className="size-4" strokeWidth={1.6} />
               Prix confirmés en FCFA avant paiement
+            </li>
+            <li className="inline-flex items-center gap-2">
+              <Clock className="size-4" strokeWidth={1.6} />
+              Tout est sur commande, délai annoncé d'avance
             </li>
             <li className="inline-flex items-center gap-2">
               <Truck className="size-4" strokeWidth={1.6} />

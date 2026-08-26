@@ -1,5 +1,7 @@
 import { Instagram, Mail, MapPin } from 'lucide-react';
-import { BRAND, CONTACT_EMAIL, INSTAGRAM_HANDLE } from '@/src/config/site';
+import logo from '@/src/assets/brand/logo-sombre.webp';
+import { TikTokIcon } from '@/src/components/ui/TikTokIcon';
+import { BRAND, CONTACT_EMAIL, INSTAGRAM_HANDLE, TIKTOK_HANDLE } from '@/src/config/site';
 import { useWhatsapp } from '@/src/hooks/useSettings';
 import { prettyPhone } from '@/src/lib/format';
 import { Link } from '@/src/lib/router';
@@ -35,7 +37,18 @@ export function Footer() {
     <footer className="mt-20 border-t border-line bg-blush/35">
       <div className="container-page grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-4">
         <div>
-          <p className="font-display text-2xl">{BRAND.name}</p>
+          {/*
+            Le logo de la boutique, dans sa version encre pour tenir sur le fond
+            clair. `drop-shadow` très légère : elle donne du relief au voile sans
+            le transformer en image brillante.
+          */}
+          <img
+            src={logo}
+            alt={BRAND.name}
+            width={720}
+            height={720}
+            className="h-28 w-auto object-contain drop-shadow-[0_6px_14px_rgba(23,17,15,0.16)]"
+          />
           <p className="mt-3 max-w-xs text-sm leading-relaxed text-stone">{BRAND.tagline}</p>
           <p className="mt-4 flex items-center gap-2 text-sm text-stone">
             <MapPin className="size-4" /> {BRAND.city}
@@ -82,7 +95,7 @@ export function Footer() {
             {INSTAGRAM_HANDLE && (
               <li>
                 <a
-                  href={`https://instagram.com/${INSTAGRAM_HANDLE}`}
+                  href={`https://www.instagram.com/${INSTAGRAM_HANDLE}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="link-underline inline-flex items-center gap-2"
@@ -91,23 +104,29 @@ export function Footer() {
                 </a>
               </li>
             )}
+            {/*
+              Le TikTok n'apparaît que le jour où le compte est renseigné dans
+              la configuration : mieux vaut pas de lien qu'un lien inventé.
+            */}
+            {TIKTOK_HANDLE && (
+              <li>
+                <a
+                  href={`https://www.tiktok.com/@${TIKTOK_HANDLE}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link-underline inline-flex items-center gap-2"
+                >
+                  <TikTokIcon className="size-4" /> @{TIKTOK_HANDLE}
+                </a>
+              </li>
+            )}
           </ul>
         </div>
       </div>
 
       <div className="container-page hairline flex flex-col gap-2 py-6 text-[12px] text-stone sm:flex-row sm:items-center sm:justify-between">
-        <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
-          <span>
-            © {new Date().getFullYear()} {BRAND.name}. Tous droits réservés.
-          </span>
-          {/*
-            Seule porte d'entrée vers l'administration : discrète, en bas de page,
-            et protégée par un code. Sans ce lien, l'espace est inaccessible depuis
-            un téléphone, où l'on ne peut pas taper une adresse à la main.
-          */}
-          <Link to="/admin" className="link-underline text-stone">
-            Espace boutique
-          </Link>
+        <p>
+          © {new Date().getFullYear()} {BRAND.name}. Tous droits réservés.
         </p>
         <p className="max-w-lg sm:text-right">
           {BRAND.name} est un service indépendant de commande groupée. Nous ne sommes ni SHEIN ni un

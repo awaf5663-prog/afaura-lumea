@@ -8,6 +8,10 @@ import { useSeo } from '@/src/lib/seo';
 
 const FAQ = [
   {
+    q: 'Les pièces de la boutique sont-elles en stock ?',
+    a: "Non, tout est sur commande. Vous choisissez sur le site, nous commandons la pièce pour vous, et elle arrive avec le prochain groupage. C'est ce qui nous permet de proposer ces prix. Le délai vous est confirmé sur WhatsApp avant tout paiement — nous préférons vous le dire d'avance plutôt que de vous faire attendre sans explication.",
+  },
+  {
     q: 'Êtes-vous SHEIN ?',
     a: "Non. Nous sommes un service indépendant de commande groupée basé à Saint-Louis. Nous achetons pour vous les articles que vous nous indiquez et organisons leur acheminement. Nous n'avons aucun lien officiel avec la marque.",
   },

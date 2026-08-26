@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import logoCarre from '@/src/assets/brand/logo-carre.webp';
 import { BRAND, SITE_URL } from '@/src/config/site';
 
 interface SeoOptions {
@@ -34,8 +35,11 @@ export function useSeo({ title, description, image, jsonLd, noIndex }: SeoOption
     upsertMeta('meta[property="og:site_name"]', 'property', 'og:site_name', BRAND.name);
     upsertMeta('meta[property="og:url"]', 'property', 'og:url', window.location.href);
     upsertMeta('meta[name="twitter:card"]', 'name', 'twitter:card', 'summary_large_image');
-    if (image) {
-      const absolute = image.startsWith('http') ? image : `${SITE_URL}${image}`;
+    // Sans visuel propre à la page, on partage le logo plutôt que rien : un
+    // lien sans image passe inaperçu sur WhatsApp.
+    {
+      const chosen = image ?? logoCarre;
+      const absolute = chosen.startsWith('http') ? chosen : `${SITE_URL}${chosen}`;
       upsertMeta('meta[property="og:image"]', 'property', 'og:image', absolute);
       upsertMeta('meta[name="twitter:image"]', 'name', 'twitter:image', absolute);
     }

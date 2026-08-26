@@ -1,5 +1,6 @@
-import { Menu, Search, ShoppingBag, X } from 'lucide-react';
+import { Lock, Menu, Search, ShoppingBag, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import symbole from '@/src/assets/brand/symbole-sombre.webp';
 import { BRAND } from '@/src/config/site';
 import { useCart } from '@/src/hooks/useCart';
 import { useSettings } from '@/src/hooks/useSettings';
@@ -77,9 +78,16 @@ export function Header({ onOpenCart }: { onOpenCart: () => void }) {
             <Menu className="size-5" />
           </button>
 
-          <Link to="/" className="flex flex-col items-center lg:items-start" aria-label={`${BRAND.name} — accueil`}>
-            <span className="font-display text-[20px] leading-none tracking-[0.02em]">{BRAND.name}</span>
-            <span className="mt-0.5 text-[9px] uppercase tracking-[0.32em] text-stone">{BRAND.city}</span>
+          <Link to="/" className="flex items-center gap-2.5" aria-label={`${BRAND.name} — accueil`}>
+            {/*
+              Le symbole du logo, pas le logo entier : à cette taille la signature
+              « MODESTE. LUMIÈRE. INTEMPORELLE. » serait un pâté illisible.
+            */}
+            <img src={symbole} alt="" className="size-8 shrink-0 object-contain" />
+            <span className="flex flex-col items-start">
+              <span className="font-display text-[20px] leading-none tracking-[0.02em]">{BRAND.name}</span>
+              <span className="mt-0.5 text-[9px] uppercase tracking-[0.32em] text-stone">{BRAND.city}</span>
+            </span>
           </Link>
 
           <nav className="hidden items-center gap-7 lg:flex" aria-label="Navigation principale">
@@ -122,7 +130,10 @@ export function Header({ onOpenCart }: { onOpenCart: () => void }) {
           <div className="animate-fade absolute inset-0 bg-ink/35" onClick={() => setMenuOpen(false)} />
           <nav className="animate-sheet absolute inset-x-0 top-0 rounded-b-[--radius-xl] bg-ivory px-6 pb-8 pt-5">
             <div className="mb-6 flex items-center justify-between">
-              <span className="font-display text-lg">{BRAND.name}</span>
+              <span className="flex items-center gap-2.5">
+                <img src={symbole} alt="" className="size-8 object-contain" />
+                <span className="font-display text-lg">{BRAND.name}</span>
+              </span>
               <button
                 type="button"
                 onClick={() => setMenuOpen(false)}
@@ -145,6 +156,21 @@ export function Header({ onOpenCart }: { onOpenCart: () => void }) {
                 </li>
               ))}
             </ul>
+
+            {/*
+              L'espace boutique vit ici, dans le menu, et nulle part ailleurs :
+              une cliente n'a rien à y faire, et il reste protégé par un code.
+              Le placer dans la barre du haut le mettrait sous les yeux de tout
+              le monde à chaque page.
+            */}
+            <Link
+              to="/admin"
+              onClick={() => setMenuOpen(false)}
+              className="hairline mt-1 flex items-center gap-2 py-3.5 text-[13.5px] text-stone"
+            >
+              <Lock className="size-3.5" />
+              Espace boutique
+            </Link>
           </nav>
         </div>
       )}

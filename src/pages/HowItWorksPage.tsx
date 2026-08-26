@@ -18,7 +18,7 @@ export function HowItWorksPage() {
   useSeo({
     title: 'Comment ça marche',
     description:
-      'Deux parcours simples : les pièces disponibles en boutique, et les commandes SHEIN groupées. Paiement, livraison et suivi expliqués.',
+      'Deux parcours simples : les pièces de la boutique, sur commande, et les commandes SHEIN groupées. Paiement, livraison et suivi expliqués.',
   });
 
   return (

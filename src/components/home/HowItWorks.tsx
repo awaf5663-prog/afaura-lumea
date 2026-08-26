@@ -3,10 +3,10 @@ import { Reveal } from '@/src/components/ui/Reveal';
 import { cn } from '@/src/lib/cn';
 
 const STORE_STEPS = [
-  { icon: ShoppingBag, title: 'Je choisis', text: 'Les pièces de la boutique sont déjà là, prêtes à partir.' },
-  { icon: BadgeCheck, title: "J'ajoute au panier", text: 'Quantités et options modifiables jusqu’au dernier moment.' },
-  { icon: CreditCard, title: 'Je confirme', text: 'Coordonnées, livraison, paiement : trois champs, c’est réglé.' },
-  { icon: Truck, title: 'Je reçois', text: 'Livraison à Saint-Louis ou retrait au point convenu.' },
+  { icon: ShoppingBag, title: 'Je choisis', text: 'Voiles, abayas, accessoires : tout est sur commande.' },
+  { icon: BadgeCheck, title: "J'ajoute au panier", text: 'Modèle, teinte, quantité — modifiables jusqu’à la validation.' },
+  { icon: CreditCard, title: 'Je confirme', text: 'Nous confirmons le montant et le délai avant tout paiement.' },
+  { icon: Truck, title: 'Je reçois', text: 'La pièce part au prochain groupage, puis livraison ou retrait.' },
 ];
 
 const SHEIN_STEPS = [
@@ -27,7 +27,7 @@ export function HowItWorks({ variant = 'both' }: { variant?: 'both' | 'store' | 
       </Reveal>
 
       <div className={cn('mt-10 grid gap-12', variant === 'both' && 'lg:grid-cols-2 lg:gap-16')}>
-        {variant !== 'shein' && <StepColumn label="Pièces disponibles" steps={STORE_STEPS} />}
+        {variant !== 'shein' && <StepColumn label="Boutique Afaura Luméa" steps={STORE_STEPS} />}
         {variant !== 'store' && <StepColumn label="Commande SHEIN" steps={SHEIN_STEPS} accent />}
       </div>
     </section>

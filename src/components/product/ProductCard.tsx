@@ -37,7 +37,7 @@ export function ProductCard({ product, priority }: { product: Product; priority?
 
           {soldOut && (
             <div className="absolute inset-0 grid place-items-center bg-ivory/70">
-              <Badge tone="soldout">Épuisé</Badge>
+              <Badge tone="soldout">Indisponible</Badge>
             </div>
           )}
         </div>

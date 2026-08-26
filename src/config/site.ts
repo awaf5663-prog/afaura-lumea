@@ -42,7 +42,13 @@ export const ORANGE_MONEY_NUMBER: string = env.VITE_ORANGE_MONEY_NUMBER ?? '2217
 export const CONTACT_EMAIL: string = env.VITE_CONTACT_EMAIL ?? '';
 
 /** Compte Instagram (sans @). Vide = le lien n'est pas affiché. */
-export const INSTAGRAM_HANDLE: string = env.VITE_INSTAGRAM_HANDLE ?? '';
+export const INSTAGRAM_HANDLE: string = env.VITE_INSTAGRAM_HANDLE ?? 'afau.ra';
+
+/**
+ * Compte TikTok (sans @). Vide tant que la boutique ne l'a pas communiqué :
+ * le lien n'apparaît pas, plutôt que de pointer vers un compte inventé.
+ */
+export const TIKTOK_HANDLE: string = env.VITE_TIKTOK_HANDLE ?? '';
 
 /** URL publique du site, utilisée pour les balises SEO / Open Graph. */
 export const SITE_URL: string =
@@ -54,7 +60,7 @@ export const BRAND = {
   tagline: 'Tes envies, notre organisation.',
   /** Une phrase = tout le concept. Affichée dans le hero. */
   pitch:
-    "Des hijabs disponibles tout de suite, et tes commandes SHEIN regroupées jusqu'à Saint-Louis. Un prix clair en FCFA, confirmé avant que tu paies.",
+    "Voiles, abayas et commandes SHEIN, commandés pour toi et regroupés jusqu'à Saint-Louis. Un prix clair en FCFA, confirmé avant que tu paies.",
   city: 'Saint-Louis, Sénégal',
   currency: 'FCFA',
 } as const;

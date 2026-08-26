@@ -204,8 +204,9 @@ un arrivage.
   couche de données refuse la commande même si le navigateur la force.
 - **Modal imprimé** — une fiche à 5 500 FCFA regroupant 5 modèles (zébré bordeaux, pois sur brun,
   pois sur blanc, aquarelle, léopard), avec la même galerie défilante.
-- **Hijabs & voiles** — Jersey 1 500, Jersey frisé 2 000, Satin imprimé 3 500, Modal simple 4 500,
-  Dentelle 5 000.
+- **Modal simple** — 4 500 FCFA, teinte choisie dans le nuancier numéroté.
+- **Hijabs & voiles** — Jersey 1 500 et Jersey frisé 2 000 (nuancier numéroté),
+  Satin imprimé 3 500, Dentelle 5 000.
 - **Accessoires** — Hijab tape 1 000.
 
 Pour ajouter un lot : créer la catégorie dans `CATEGORIES` (`src/data/seed.ts`), ou ajouter les
@@ -238,6 +239,13 @@ src/
 supabase/schema.sql     Tables, RLS, fonctions serveur
 scripts/                Génération du sitemap
 ```
+
+**Nuanciers numérotés** : `src/config/colorCharts.ts` contient les teintes relevées sur le
+nuancier du fournisseur. Un produit s'y rattache par une liste déroulante dans /admin → Produits ;
+la cliente choisit alors un numéro plutôt qu'un nom de couleur, le choix devient obligatoire, et il
+remonte dans le panier puis dans le message WhatsApp sous la forme « Couleur : n° 12 ». Les
+pastilles sont annoncées comme indicatives — un écran ne rend pas un tissu — et la disponibilité
+reste confirmée par la vendeuse. Ajouter un nuancier : une entrée de plus dans ce fichier.
 
 **Autres coloris sur demande** : la case « Autres coloris sur demande » (/admin → Produits) affiche
 sur la fiche un encadré invitant la cliente à préciser le coloris qu'elle cherche. Sa réponse

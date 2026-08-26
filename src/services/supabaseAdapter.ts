@@ -89,6 +89,7 @@ const toProduct = (r: Row): Product => ({
   isNew: r.is_new ?? false,
   isPopular: r.is_popular ?? false,
   otherColorsAvailable: r.other_colors_available ?? false,
+  colorChartId: r.color_chart_id ?? null,
   createdAt: r.created_at,
 });
 
@@ -107,6 +108,7 @@ const fromProduct = (p: Product): Row => ({
   is_new: p.isNew ?? false,
   is_popular: p.isPopular ?? false,
   other_colors_available: p.otherColorsAvailable ?? false,
+  color_chart_id: p.colorChartId ?? null,
 });
 
 const toOrder = (r: Row): Order => ({

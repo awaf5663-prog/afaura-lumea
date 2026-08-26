@@ -4,6 +4,7 @@ import { Badge } from '@/src/components/ui/Badge';
 import { Button } from '@/src/components/ui/Button';
 import { FormRow, Input, Label, Select, Textarea } from '@/src/components/ui/Field';
 import { Sheet } from '@/src/components/ui/Sheet';
+import { COLOR_CHARTS } from '@/src/config/colorCharts';
 import { CATEGORIES } from '@/src/data/seed';
 import { useToast } from '@/src/hooks/useToast';
 import { formatFcfa } from '@/src/lib/format';
@@ -35,6 +36,7 @@ const blank = (): Product => ({
   isNew: false,
   isPopular: false,
   otherColorsAvailable: false,
+  colorChartId: null,
   createdAt: new Date().toISOString(),
 });
 
@@ -281,6 +283,25 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
                     setEditing({ ...editing, stock: e.target.value === '' ? null : Number(e.target.value) })
                   }
                 />
+              </FormRow>
+              <FormRow>
+                <Label htmlFor="p-chart" hint="(numéros de teintes)">
+                  Nuancier
+                </Label>
+                <Select
+                  id="p-chart"
+                  value={editing.colorChartId ?? ''}
+                  onChange={(e) =>
+                    setEditing({ ...editing, colorChartId: e.target.value || null })
+                  }
+                >
+                  <option value="">Aucun</option>
+                  {COLOR_CHARTS.map((chart) => (
+                    <option key={chart.id} value={chart.id}>
+                      {chart.label} ({chart.swatches.length})
+                    </option>
+                  ))}
+                </Select>
               </FormRow>
               <FormRow>
                 <Label htmlFor="p-slug" hint="(URL)">

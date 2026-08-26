@@ -2,6 +2,19 @@
 
 export type ProductStatus = 'active' | 'draft' | 'sold_out';
 
+/** Une teinte du nuancier fournisseur, identifiée par son numéro. */
+export interface ColorSwatch {
+  code: string;
+  hex: string;
+  name?: string;
+}
+
+export interface ColorChart {
+  id: string;
+  label: string;
+  swatches: ColorSwatch[];
+}
+
 export interface ProductVariantGroup {
   /** ex : "Modèle", "Couleur", "Taille" */
   name: string;
@@ -32,6 +45,8 @@ export interface Product {
    * préciser celui qu'elle cherche, et nous confirmons la disponibilité.
    */
   otherColorsAvailable?: boolean;
+  /** Nuancier rattaché : la cliente choisit un numéro de teinte. */
+  colorChartId?: string | null;
   createdAt: string;
 }
 

@@ -12,6 +12,8 @@ import { Price } from '@/src/components/ui/Price';
 import { QuantityStepper } from '@/src/components/ui/QuantityStepper';
 import { BRAND, SITE_URL } from '@/src/config/site';
 import { CATEGORIES } from '@/src/data/seed';
+import { findColorChart } from '@/src/config/colorCharts';
+import { ColorChartPicker } from '@/src/components/product/ColorChartPicker';
 import { useCart } from '@/src/hooks/useCart';
 import { useProducts } from '@/src/hooks/useProducts';
 import { useToast } from '@/src/hooks/useToast';
@@ -33,6 +35,10 @@ export function ProductPage({ slug }: { slug: string }) {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [photoIndex, setPhotoIndex] = useState(0);
+  const [colorCode, setColorCode] = useState<string | undefined>(undefined);
+  const [colorError, setColorError] = useState(false);
+
+  const colorChart = findColorChart(product?.colorChartId);
 
   /**
    * Groupe de variantes aligné sur les photos : autant d'options que d'images.
@@ -147,7 +153,14 @@ export function ProductPage({ slug }: { slug: string }) {
       notify(`Choisissez : ${missingOption.name}`, 'error');
       return;
     }
+    if (colorChart && !colorCode) {
+      setColorError(true);
+      notify('Choisissez un numéro de couleur.', 'error');
+      document.getElementById('nuancier')?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      return;
+    }
     const finalOptions = { ...options };
+    if (colorChart && colorCode) finalOptions['Couleur'] = `n° ${colorCode}`;
     if (colorWish.trim()) finalOptions['Coloris souhaité'] = colorWish.trim();
     add(product, finalOptions, quantity);
     notify(`${product.name} ajouté au panier`);
@@ -208,6 +221,20 @@ export function ProductPage({ slug }: { slug: string }) {
           <div className="mt-7 space-y-6">
             {product.variants.length > 0 && (
               <VariantPicker groups={product.variants} value={options} onChange={handleOptions} />
+            )}
+
+            {colorChart && (
+              <div id="nuancier">
+                <ColorChartPicker
+                  chart={colorChart}
+                  value={colorCode}
+                  error={colorError}
+                  onChange={(code) => {
+                    setColorCode(code);
+                    setColorError(false);
+                  }}
+                />
+              </div>
             )}
 
             {product.otherColorsAvailable && (

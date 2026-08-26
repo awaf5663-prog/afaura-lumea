@@ -30,6 +30,7 @@ create table if not exists products (
   is_new boolean not null default false,
   is_popular boolean not null default false,
   other_colors_available boolean not null default false,
+  color_chart_id text,                                 -- nuancier rattaché (src/config/colorCharts.ts)
   created_at timestamptz not null default now()
 );
 

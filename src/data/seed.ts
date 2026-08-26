@@ -9,7 +9,10 @@ import modalLeopard from '@/src/assets/products/modal-leopard.webp';
 import modalPoisBlanc from '@/src/assets/products/modal-pois-blanc.webp';
 import modalPoisBrun from '@/src/assets/products/modal-pois-brun.webp';
 import modalZebreBordeaux from '@/src/assets/products/modal-zebre-bordeaux.webp';
-import modalSimple from '@/src/assets/products/modal-simple.webp';
+import modalSimpleBordeaux from '@/src/assets/products/modal-simple-bordeaux.webp';
+import modalSimpleColoris from '@/src/assets/products/modal-simple-coloris.webp';
+import modalSimpleKakiNoir from '@/src/assets/products/modal-simple-kaki-noir.webp';
+import modalSimpleNoir from '@/src/assets/products/modal-simple-noir.webp';
 import pieceCremeFleuri from '@/src/assets/products/piece-creme-fleuri.webp';
 import pieceEcruOr from '@/src/assets/products/piece-ecru-or.webp';
 import pieceFauve from '@/src/assets/products/piece-fauve.webp';
@@ -20,6 +23,7 @@ import satinImprime from '@/src/assets/products/satin-imprime.webp';
 export const CATEGORIES: Category[] = [
   { id: 'piece_unique', name: 'Pièce unique' },
   { id: 'modal_imprime', name: 'Modal imprimé' },
+  { id: 'modal_simple', name: 'Modal simple' },
   { id: 'hijab', name: 'Hijabs & voiles' },
   { id: 'accessoire', name: 'Accessoires' },
 ];
@@ -44,7 +48,7 @@ export const SEED_PRODUCTS: Product[] = [
     variants: [],
     stock: null,
     status: 'active',
-    otherColorsAvailable: true,
+    colorChartId: 'modal36',
     createdAt: '2026-01-05T10:20:00.000Z',
   },
   {
@@ -60,7 +64,7 @@ export const SEED_PRODUCTS: Product[] = [
     variants: [],
     stock: null,
     status: 'active',
-    otherColorsAvailable: true,
+    colorChartId: 'modal36',
     createdAt: '2026-01-05T10:25:00.000Z',
   },
   {
@@ -81,18 +85,18 @@ export const SEED_PRODUCTS: Product[] = [
   },
   {
     id: 'modal-simple',
-    slug: 'hijab-modal-simple',
+    slug: 'modal-simple',
     name: 'Modal simple',
     description:
-      "Modal uni, doux et respirant, très léger à porter. Un drapé souple qui reste impeccable toute la journée.",
+      "Modal uni, doux et respirant, très léger à porter. Un drapé souple qui reste impeccable toute la journée. Choisissez votre teinte dans le nuancier ci-dessous.",
     price: 4500,
     compareAtPrice: null,
-    category: 'hijab',
-    images: [modalSimple],
+    category: 'modal_simple',
+    images: [modalSimpleBordeaux, modalSimpleKakiNoir, modalSimpleNoir, modalSimpleColoris],
     variants: [],
     stock: null,
     status: 'active',
-    otherColorsAvailable: true,
+    colorChartId: 'modal36',
     createdAt: '2026-01-05T10:10:00.000Z',
   },
   {

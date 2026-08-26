@@ -155,6 +155,16 @@ insert into settings (id) values (1) on conflict (id) do nothing;
 --  Fonctions serveur : les montants sont calculés ICI, jamais dans le navigateur.
 -- ═══════════════════════════════════════════════════════════════════════
 
+-- Les signatures ont changé au fil des évolutions (code promo, étudiante).
+-- `create or replace` ne remplace que la signature IDENTIQUE : sans ces drops,
+-- réexécuter ce fichier laisserait les anciennes versions en surcharge, et
+-- PostgREST ne saurait plus laquelle appeler.
+drop function if exists create_order(text, text, text, text, text, text, text, jsonb);
+drop function if exists create_order(text, text, text, text, text, text, text, jsonb, text, boolean);
+drop function if exists create_shein_request(text, text, text, text, jsonb);
+drop function if exists create_shein_request(text, text, text, text, jsonb, boolean);
+drop function if exists create_shein_request(text, text, text, text, jsonb, boolean, text);
+
 create or replace function create_order(
   p_customer_name text,
   p_phone text,

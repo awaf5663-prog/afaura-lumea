@@ -1,4 +1,4 @@
-import { Database, LogOut, RefreshCw, ShieldAlert } from 'lucide-react';
+import { LogOut, RefreshCw, ShieldAlert } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/src/components/ui/Button';
 import { useAdminAuth } from '@/src/hooks/useAdminAuth';
@@ -13,6 +13,7 @@ import { isWhatsappConfigured } from '@/src/lib/whatsapp';
 import type { Grouping, Order, Product, SheinRequest } from '@/src/types';
 import { AdminGroupings, computeGroupingStats } from './AdminGroupings';
 import { AdminLogin } from './AdminLogin';
+import { SupabaseStatus } from '@/src/components/admin/SupabaseStatus';
 import { AdminPricing } from './AdminPricing';
 import { AdminOrders } from './AdminOrders';
 import { AdminProducts } from './AdminProducts';
@@ -108,19 +109,11 @@ export function AdminPage() {
         </div>
       </header>
 
-      <div
-        className={cn(
-          'mt-5 flex items-start gap-2.5 rounded-[--radius-md] px-4 py-3 text-[12.5px] leading-relaxed',
-          isSupabaseConfigured() ? 'bg-cream text-graphite' : 'bg-blush/60 text-graphite',
-        )}
-      >
-        {isSupabaseConfigured() ? <Database className="mt-0.5 size-4 shrink-0" /> : <ShieldAlert className="mt-0.5 size-4 shrink-0" />}
-        {isSupabaseConfigured() ? (
-          <span>
-            Connecté à Supabase : les données sont partagées entre appareils et protégées par les
-            règles RLS du projet.
-          </span>
-        ) : (
+      {isSupabaseConfigured() ? (
+        <SupabaseStatus />
+      ) : (
+        <div className="mt-5 flex items-start gap-2.5 rounded-[--radius-md] bg-blush/60 px-4 py-3 text-[12.5px] leading-relaxed text-graphite">
+          <ShieldAlert className="mt-0.5 size-4 shrink-0" />
           <span>
             <strong className="font-medium">Mode local — à lire avant d'ouvrir la boutique.</strong>{' '}
             Tout est enregistré dans ce navigateur, sur cet appareil, et nulle part ailleurs. Une
@@ -130,8 +123,8 @@ export function AdminPage() {
             pour essayer le site, pas pour vendre. Branchez Supabase (voir README) avant la première
             vraie commande.
           </span>
-        )}
-      </div>
+        </div>
+      )}
 
       <nav className="no-scrollbar mt-6 flex gap-2 overflow-x-auto border-b border-line pb-3">
         {TABS.map((item) => (

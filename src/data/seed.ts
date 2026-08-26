@@ -328,3 +328,16 @@ export const SEED_PRODUCTS: Product[] = [
     createdAt: '2026-01-05T09:50:00.000Z',
   },
 ];
+
+/**
+ * Photos livrées avec le site, par identifiant d'article.
+ *
+ * Les images sont des fichiers du build, pas des URL stables : les stocker en
+ * base n'aurait aucun sens, leur adresse change à chaque publication. Quand un
+ * article vient de Supabase sans photo, on retombe donc sur celles-ci — et dès
+ * que la boutique téléverse les siennes depuis l'admin, ce sont elles qui
+ * priment.
+ */
+export const SEED_IMAGES: Record<string, string[]> = Object.fromEntries(
+  SEED_PRODUCTS.map((product) => [product.id, product.images]),
+);

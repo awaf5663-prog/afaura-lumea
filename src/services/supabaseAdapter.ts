@@ -1,4 +1,5 @@
 import { DEFAULT_ALERT_THRESHOLDS, DEFAULT_PRICING, DEFAULT_PROMOTIONS } from '@/src/config/pricing';
+import { SEED_IMAGES } from '@/src/data/seed';
 import type { Grouping, Order, Product, SheinRequest, StoreSettings } from '@/src/types';
 import type { DataSource, OrderDraft, SheinDraft } from './types';
 
@@ -82,7 +83,9 @@ const toProduct = (r: Row): Product => ({
   price: r.price,
   compareAtPrice: r.compare_at_price,
   category: r.category,
-  images: r.images ?? [],
+  // Pas de photo en base : on reprend celles livrées avec le site plutôt que
+  // d'afficher une fiche vide. Voir SEED_IMAGES.
+  images: (r.images?.length ? r.images : SEED_IMAGES[r.id]) ?? [],
   variants: r.variants ?? [],
   stock: r.stock,
   status: r.status,

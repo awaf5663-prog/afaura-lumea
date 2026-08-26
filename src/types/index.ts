@@ -16,6 +16,8 @@ export interface ColorChart {
   id: string;
   label: string;
   swatches: ColorSwatch[];
+  /** Précision affichée sous le nuancier quand la matière demande une nuance. */
+  note?: string;
 }
 
 export interface ProductVariantGroup {

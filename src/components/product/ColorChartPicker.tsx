@@ -84,6 +84,10 @@ export function ColorChartPicker({
         Les teintes affichées sont indicatives : un écran ne rend jamais exactement la couleur du
         tissu. Nous confirmons la disponibilité de votre numéro avant l'envoi.
       </p>
+
+      {chart.note && (
+        <p className="mt-1.5 pl-[22px] text-[12px] leading-relaxed text-stone">{chart.note}</p>
+      )}
     </fieldset>
   );
 }

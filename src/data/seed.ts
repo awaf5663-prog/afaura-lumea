@@ -10,7 +10,8 @@ import jerseyNoir from '@/src/assets/products/jersey-noir.webp';
 import jerseyNoirTotal from '@/src/assets/products/jersey-noir-total.webp';
 import jerseyNude from '@/src/assets/products/jersey-nude.webp';
 import jerseyVertCanard from '@/src/assets/products/jersey-vert-canard.webp';
-import jerseyFrise from '@/src/assets/products/jersey-frise.webp';
+import jerseyFriseColoris from '@/src/assets/products/jersey-frise-coloris.webp';
+import jerseyFriseVolants from '@/src/assets/products/jersey-frise-volants.webp';
 import modalAquarelle from '@/src/assets/products/modal-aquarelle.webp';
 import modalLeopard from '@/src/assets/products/modal-leopard.webp';
 import modalPoisBlanc from '@/src/assets/products/modal-pois-blanc.webp';
@@ -38,6 +39,7 @@ export const CATEGORIES: Category[] = [
   { id: 'satin_imprime', name: 'Satin imprimé' },
   { id: 'dentelle', name: 'Dentelle' },
   { id: 'jersey', name: 'Jersey' },
+  { id: 'jersey_frise', name: 'Jersey frisé' },
   { id: 'accessoire', name: 'Accessoires' },
 ];
 
@@ -69,15 +71,15 @@ export const SEED_PRODUCTS: Product[] = [
     slug: 'jersey-frise',
     name: 'Jersey frisé',
     description:
-      "Jersey texturé, effet froissé. Il tient tout seul sur la tête et ne glisse pas, même sur une longue journée.",
+      "Jersey à bord frisé : la maille est terminée par des volants qui tiennent la forme et habillent le visage sans épingle. Faites défiler les photos pour voir le tombé et le détail du frisé, puis choisissez votre numéro de teinte dans le nuancier ci-dessous.",
     price: 2000,
     compareAtPrice: null,
-    category: 'jersey',
-    images: [jerseyFrise],
+    category: 'jersey_frise',
+    images: [jerseyFriseColoris, jerseyFriseVolants],
     variants: [],
     stock: null,
     status: 'active',
-    colorChartId: 'modal36',
+    colorChartId: 'frise36',
     createdAt: '2026-01-05T10:25:00.000Z',
   },
   {

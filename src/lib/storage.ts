@@ -27,7 +27,7 @@ export function removeKey(key: string): void {
 
 export const STORAGE_KEYS = {
   cart: 'lumea.cart.v1',
-  products: 'lumea.products.v11',
+  products: 'lumea.products.v12',
   orders: 'lumea.orders.v1',
   sheinRequests: 'lumea.shein.v1',
   groupings: 'lumea.groupings.v1',

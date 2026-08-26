@@ -1,5 +1,9 @@
 import type { Category, Product } from '@/src/types';
 
+import abayaBeigeLeopard from '@/src/assets/products/abaya-beige-leopard.webp';
+import abayaBleuZebre from '@/src/assets/products/abaya-bleu-zebre.webp';
+import abayaNoirBlanc from '@/src/assets/products/abaya-noir-blanc.webp';
+import abayaRoseCachemire from '@/src/assets/products/abaya-rose-cachemire.webp';
 import dentelleBrunRose from '@/src/assets/products/dentelle-brun-rose.webp';
 import dentelleColoris from '@/src/assets/products/dentelle-coloris.webp';
 import dentelleNoirBlanc from '@/src/assets/products/dentelle-noir-blanc.webp';
@@ -42,6 +46,7 @@ import viscoseKhaki from '@/src/assets/products/viscose-khaki.webp';
 import viscoseNoir from '@/src/assets/products/viscose-noir.webp';
 
 export const CATEGORIES: Category[] = [
+  { id: 'abaya', name: 'Abaya' },
   { id: 'piece_unique', name: 'Pièce unique' },
   { id: 'voile_viscose', name: 'Viscose premium' },
   { id: 'voile_mj', name: 'Voile MJ' },
@@ -237,6 +242,30 @@ export const SEED_PRODUCTS: Product[] = [
     status: 'active',
     colorChartId: 'modal36',
     createdAt: '2026-01-05T10:40:00.000Z',
+  },
+  {
+    id: 'abaya',
+    slug: 'abaya',
+    name: 'Abaya',
+    description:
+      "Abayas longues, coupe ample et ouverte, à porter sur une tenue. Chaque modèle a son propre tissu et son propre imprimé. Faites défiler les photos pour les voir un par un, puis choisissez le vôtre — la coupe et la longueur vous sont confirmées sur WhatsApp avant la validation de la commande.",
+    price: 15000,
+    compareAtPrice: null,
+    category: 'abaya',
+    // L'ordre des photos suit exactement l'ordre des modèles ci-dessous :
+    // faire défiler la galerie sélectionne le modèle correspondant.
+    images: [abayaNoirBlanc, abayaBleuZebre, abayaRoseCachemire, abayaBeigeLeopard],
+    variants: [
+      {
+        name: 'Modèle',
+        options: ['Noir & blanc plissé', 'Bleu zébré', 'Rose cachemire', 'Beige léopard satiné'],
+        // Un modèle épuisé se marque ici depuis /admin → Produits, avec « (épuisé) ».
+        soldOutOptions: [],
+      },
+    ],
+    stock: null,
+    status: 'active',
+    createdAt: '2026-01-05T10:45:00.000Z',
   },
   {
     id: 'hijab-tape',

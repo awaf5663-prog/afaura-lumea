@@ -9,6 +9,7 @@ const COLUMNS = [
     title: 'Boutique',
     links: [
       { to: '/boutique', label: 'Toutes les pièces' },
+      { to: '/boutique?categorie=abaya', label: 'Abaya' },
       { to: '/boutique?categorie=piece_unique', label: 'Pièce unique' },
       { to: '/boutique?categorie=jersey', label: 'Jersey' },
       { to: '/boutique?categorie=dentelle', label: 'Dentelle' },

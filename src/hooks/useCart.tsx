@@ -35,6 +35,23 @@ function makeKey(productId: string, options: Record<string, string>): string {
   return suffix ? `${productId}__${suffix}` : productId;
 }
 
+/**
+ * Photo de la ligne panier.
+ *
+ * Quand un groupe de variantes est aligné sur les photos — autant d'options
+ * que d'images, comme « Modèle » pour les pièces uniques et les abayas — on
+ * reprend la photo du modèle choisi. Sans ça, la cliente choisit le beige
+ * léopard et retrouve le noir & blanc dans son panier.
+ */
+function pickImage(product: Product, options: Record<string, string>): string {
+  const group = product.variants.find((g) => g.options.length === product.images.length);
+  if (group) {
+    const index = group.options.indexOf(options[group.name] ?? '');
+    if (index >= 0 && product.images[index]) return product.images[index];
+  }
+  return product.images[0] ?? '';
+}
+
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>(() => readJson<CartItem[]>(STORAGE_KEYS.cart, []));
   const [pulse, setPulse] = useState(0);
@@ -69,7 +86,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           productId: product.id,
           name: product.name,
           slug: product.slug,
-          image: product.images[0] ?? '',
+          image: pickImage(product, options),
           unitPrice: product.price,
           quantity,
           options,

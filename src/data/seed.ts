@@ -1,8 +1,13 @@
 import type { Category, Product } from '@/src/types';
 
 import abayaBeigeLeopard from '@/src/assets/products/abaya-beige-leopard.webp';
+import abayaBleuDelave from '@/src/assets/products/abaya-bleu-delave.webp';
 import abayaBleuZebre from '@/src/assets/products/abaya-bleu-zebre.webp';
+import abayaKakiMarbre from '@/src/assets/products/abaya-kaki-marbre.webp';
+import abayaMarbre from '@/src/assets/products/abaya-marbre.webp';
+import abayaNoir from '@/src/assets/products/abaya-noir.webp';
 import abayaNoirBlanc from '@/src/assets/products/abaya-noir-blanc.webp';
+import abayaPrunePlisse from '@/src/assets/products/abaya-prune-plisse.webp';
 import abayaRoseCachemire from '@/src/assets/products/abaya-rose-cachemire.webp';
 import dentelleBrunRose from '@/src/assets/products/dentelle-brun-rose.webp';
 import dentelleColoris from '@/src/assets/products/dentelle-coloris.webp';
@@ -254,11 +259,31 @@ export const SEED_PRODUCTS: Product[] = [
     category: 'abaya',
     // L'ordre des photos suit exactement l'ordre des modèles ci-dessous :
     // faire défiler la galerie sélectionne le modèle correspondant.
-    images: [abayaNoirBlanc, abayaBleuZebre, abayaRoseCachemire, abayaBeigeLeopard],
+    images: [
+      abayaNoirBlanc,
+      abayaBleuZebre,
+      abayaRoseCachemire,
+      abayaBeigeLeopard,
+      abayaNoir,
+      abayaMarbre,
+      abayaBleuDelave,
+      abayaPrunePlisse,
+      abayaKakiMarbre,
+    ],
     variants: [
       {
         name: 'Modèle',
-        options: ['Noir & blanc plissé', 'Bleu zébré', 'Rose cachemire', 'Beige léopard satiné'],
+        options: [
+          'Noir & blanc plissé',
+          'Bleu zébré',
+          'Rose cachemire',
+          'Beige léopard satiné',
+          'Noir uni',
+          'Marbré brun & écru',
+          'Bleu délavé',
+          'Prune plissé',
+          'Kaki marbré',
+        ],
         // Un modèle épuisé se marque ici depuis /admin → Produits, avec « (épuisé) ».
         soldOutOptions: [],
       },

@@ -29,39 +29,74 @@ export function Gallery({
 }) {
   const list = images.length > 0 ? images : [''];
   const scrollerRef = useRef<HTMLDivElement | null>(null);
-  /** Évite que le défilement programmé ne soit réinterprété comme un geste. */
-  const programmatic = useRef(false);
+  /**
+   * Position visée par un défilement programmé.
+   *
+   * Tant qu'elle n'est pas atteinte, les événements de défilement sont ignorés :
+   * l'animation traverse les photos intermédiaires, et les prendre pour un geste
+   * de la cliente ferait osciller la galerie sans fin. Un simple délai fixe ne
+   * suffit pas — un saut de la photo 1 à la photo 9 dure bien plus longtemps
+   * qu'un saut d'une photo à la suivante.
+   */
+  const pending = useRef<number | null>(null);
 
   // Le parent change de modèle : on amène la photo correspondante.
   useEffect(() => {
     const scroller = scrollerRef.current;
     if (!scroller) return;
     const target = activeIndex * scroller.clientWidth;
-    if (Math.abs(scroller.scrollLeft - target) < 8) return;
-    programmatic.current = true;
-    scroller.scrollTo({ left: target, behavior: 'smooth' });
+    const distance = Math.abs(scroller.scrollLeft - target);
+    if (distance < 8) {
+      pending.current = null;
+      return;
+    }
+    pending.current = target;
+    // Au-delà de deux photos, l'animation devient longue et donne le tournis :
+    // on saute directement.
+    const smooth = distance <= scroller.clientWidth * 2;
+    scroller.scrollTo({ left: target, behavior: smooth ? 'smooth' : 'auto' });
+    // Filet de sécurité si l'animation n'arrive jamais au bout (onglet en
+    // arrière-plan, animations désactivées) : on ne reste pas bloqué.
     const timer = window.setTimeout(() => {
-      programmatic.current = false;
-    }, 450);
+      pending.current = null;
+    }, 1500);
     return () => window.clearTimeout(timer);
   }, [activeIndex]);
 
   // La cliente fait défiler : on remonte le modèle atteint.
   const handleScroll = () => {
     const scroller = scrollerRef.current;
-    if (!scroller || programmatic.current || scroller.clientWidth === 0) return;
+    if (!scroller || scroller.clientWidth === 0) return;
+    if (pending.current !== null) {
+      if (Math.abs(scroller.scrollLeft - pending.current) < 8) pending.current = null;
+      return;
+    }
     const index = Math.round(scroller.scrollLeft / scroller.clientWidth);
     if (index !== activeIndex && index >= 0 && index < list.length) onIndexChange(index);
+  };
+
+  // La cliente pose le doigt sur la galerie : elle reprend la main, même si une
+  // animation était en cours.
+  const handlePointerDown = () => {
+    pending.current = null;
   };
 
   const single = list.length === 1;
 
   return (
-    <div>
+    /*
+     * `min-w-0` : sans lui, la galerie est un élément de grille dont la largeur
+     * minimale est calculée sur son contenu. Passé un certain nombre de photos,
+     * elle déborde de sa colonne, le téléphone dézoome pour tout faire tenir, et
+     * toute la fiche produit rétrécit. Le défilement horizontal doit rester à
+     * l'intérieur de la galerie, jamais sur la page.
+     */
+    <div className="min-w-0">
       <div className="relative overflow-hidden rounded-[--radius-lg] bg-blush">
         <div
           ref={scrollerRef}
           onScroll={handleScroll}
+          onPointerDown={handlePointerDown}
           className={cn(
             'no-scrollbar flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain',
             single && 'overflow-x-hidden',

@@ -1,5 +1,6 @@
 import { ArrowRight, CircleHelp, Info } from 'lucide-react';
 import { GroupingCapacity } from '@/src/components/shein/GroupingCapacity';
+import { PromotionNotice } from '@/src/components/shein/PromotionNotice';
 import { HowItWorks } from '@/src/components/home/HowItWorks';
 import { Button } from '@/src/components/ui/Button';
 import { Reveal } from '@/src/components/ui/Reveal';
@@ -52,7 +53,8 @@ export function SheinPage() {
           </Button>
         </div>
 
-        <div className="mt-8 max-w-md">
+        <div className="mt-8 max-w-md space-y-3">
+          <PromotionNotice kind="shein" />
           <GroupingCapacity grouping={displayed} />
         </div>
 

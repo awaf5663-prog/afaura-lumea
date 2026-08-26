@@ -229,7 +229,7 @@ export function AdminPage() {
             reload={loadAll}
           />
         )}
-        {tab === 'tarification' && <AdminPricing />}
+        {tab === 'tarification' && <AdminPricing groupings={groupings} />}
         {tab === 'produits' && <AdminProducts products={products} reload={loadAll} />}
         {tab === 'reglages' && <AdminSettings />}
       </div>

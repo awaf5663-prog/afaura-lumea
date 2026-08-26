@@ -1,6 +1,5 @@
-import { AlertCircle, Info, Lock } from 'lucide-react';
+import { AlertCircle, Info, Lock, MessageCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
-import { PaymentInstructions } from '@/src/components/order/PaymentInstructions';
 import { Button } from '@/src/components/ui/Button';
 import { ErrorText, FormRow, Input, Label, Textarea } from '@/src/components/ui/Field';
 import { PAYMENT_METHODS } from '@/src/config/site';
@@ -284,13 +283,21 @@ export function CheckoutPage() {
               ))}
             </div>
 
-            <div className="mt-4">
-              <PaymentInstructions
-                methodId={form.paymentMethod}
-                amount={total}
-                amountIsFinal={deliveryFee !== null}
-              />
-            </div>
+            {/*
+              Les instructions de paiement (numéro, montant) ne sont plus ici :
+              les afficher avant la validation laissait croire que payer
+              suffisait, alors que rien n'est vérifié automatiquement. Elles
+              apparaissent sur la page de confirmation, une fois la commande
+              enregistrée et le numéro attribué — c'est ce numéro qui permet de
+              rapprocher un paiement d'une commande.
+            */}
+            {method.requiresProof && (
+              <p className="mt-4 flex gap-2 rounded-[--radius-md] border border-line bg-cream/60 px-4 py-3.5 text-[13px] leading-relaxed text-graphite">
+                <Info className="mt-0.5 size-4 shrink-0" />
+                Après validation de votre commande, les instructions de paiement s'afficheront et
+                vous pourrez envoyer votre preuve de paiement via WhatsApp.
+              </p>
+            )}
           </section>
 
           <section className="mt-10">
@@ -362,15 +369,20 @@ export function CheckoutPage() {
             )}
 
             <Button type="submit" full size="lg" className="mt-6" loading={submitting}>
-              Confirmer la commande
+              <MessageCircle className="size-4" />
+              Envoyer ma commande sur WhatsApp
             </Button>
-            <p className="mt-3 flex items-center justify-center gap-1.5 text-[11.5px] text-stone">
-              <Lock className="size-3.5" /> Aucun paiement n'est prélevé sur ce site.
+            {/*
+              Le bouton enregistre la commande puis mène à la page de
+              confirmation, d'où part le message WhatsApp déjà écrit. On le dit,
+              plutôt que de laisser croire que WhatsApp s'ouvre tout seul.
+            */}
+            <p className="mt-3 text-center text-[11.5px] leading-relaxed text-stone">
+              Nous enregistrons votre commande et lui donnons un numéro, puis vous l'envoyez sur
+              WhatsApp en un geste.
             </p>
-            <p className="mt-2 text-center text-[11.5px] text-stone">
-              {method.requiresProof
-                ? 'Vous recevez le récapitulatif, puis vous transmettez la preuve de paiement sur WhatsApp.'
-                : 'Vous réglez au moment de la remise de votre commande.'}
+            <p className="mt-2 flex items-center justify-center gap-1.5 text-[11.5px] text-stone">
+              <Lock className="size-3.5" /> Aucun paiement n'est prélevé sur ce site.
             </p>
           </div>
         </aside>

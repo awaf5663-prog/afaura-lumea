@@ -3,19 +3,20 @@ import { useEffect, useMemo, useState } from 'react';
 import { QuoteSummary } from '@/src/components/shein/QuoteSummary';
 import { Button } from '@/src/components/ui/Button';
 import { FormRow, Input, Label, Select } from '@/src/components/ui/Field';
+import { PromotionEditor } from '@/src/components/admin/PromotionEditor';
 import { useSettings } from '@/src/hooks/useSettings';
 import { useToast } from '@/src/hooks/useToast';
 import { formatFcfa } from '@/src/lib/format';
 import { uid } from '@/src/lib/orderNumber';
 import { SERVICE_FEE_STRATEGIES, computeQuoteFromInput, describeStrategy } from '@/src/lib/pricing';
-import type { PricingConfig, StoreSettings } from '@/src/types';
+import type { Grouping, PricingConfig, StoreSettings } from '@/src/types';
 
 /**
  * PARAMÈTRES → TARIFICATION
  * Tout ce qui chiffre une demande SHEIN se règle ici. Aucun montant n'est
  * écrit dans un composant : les pages lisent cette configuration.
  */
-export function AdminPricing() {
+export function AdminPricing({ groupings = [] }: { groupings?: Grouping[] }) {
   const { settings, save } = useSettings();
   const { notify } = useToast();
   const [draft, setDraft] = useState<StoreSettings | null>(settings);
@@ -424,6 +425,23 @@ export function AdminPricing() {
                 }
               />
             </FormRow>
+          </div>
+        </section>
+
+        {/* ── Offres ────────────────────────────────────────── */}
+        <section className="mt-5 rounded-[--radius-lg] border border-line bg-white p-5">
+          <h3 className="text-[18px]">Offres</h3>
+          <p className="mt-1.5 text-[12.5px] leading-relaxed text-stone">
+            Les conditions se cumulent : une offre s'applique quand toutes celles que vous
+            renseignez sont remplies. Ce qui reste vide ne restreint rien.
+          </p>
+          <div className="mt-4">
+            <PromotionEditor
+              promotions={draft.promotions}
+              deliveryOptions={pricing.deliveryOptions}
+              groupings={groupings}
+              onChange={(promotions) => setDraft({ ...draft, promotions })}
+            />
           </div>
         </section>
 

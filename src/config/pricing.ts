@@ -1,4 +1,4 @@
-import type { AlertThresholds, PricingConfig } from '@/src/types';
+import type { AlertThresholds, PricingConfig, Promotion } from '@/src/types';
 
 /**
  * ─────────────────────────────────────────────────────────────
@@ -81,3 +81,28 @@ export const DEFAULT_ALERT_THRESHOLDS: AlertThresholds = {
   warning: 50,
   almostFull: 80,
 };
+
+/**
+ * Offres livrées avec le site.
+ *
+ * Les dates sont vides : aucune période n'est inventée ici. L'offre court
+ * jusqu'à ce que la boutique fixe une date de fin dans /admin → Tarification,
+ * ou la désactive. Les groupages concernés se cochent au même endroit, une
+ * fois qu'ils existent — vide signifie « tous les groupages ».
+ */
+export const DEFAULT_PROMOTIONS: Promotion[] = [
+  {
+    id: 'rentree-etudiantes',
+    label: 'Offre rentrée',
+    description:
+      'Commande SHEIN étudiante : la livraison à Saint-Louis est offerte pendant la durée de l’offre.',
+    active: true,
+    scope: 'shein',
+    studentOnly: true,
+    startsAt: null,
+    endsAt: null,
+    groupingIds: [],
+    deliveryOptionIds: ['local'],
+    effect: { type: 'free_delivery' },
+  },
+];

@@ -1,5 +1,27 @@
-import type { PricingConfig, Quote, SheinItem } from '@/src/types';
+import type { PricingConfig, Promotion, Quote, SheinItem } from '@/src/types';
 import { getStrategy } from './index';
+import { findPromotion, type PromotionContext } from './promotions';
+
+/**
+ * Applique la promotion éventuelle à la ligne livraison.
+ *
+ * Le tarif d'origine est conservé : la cliente voit « 2 000 FCFA → offerte »
+ * plutôt qu'un zéro sans explication, et la boutique retrouve le vrai tarif si
+ * l'offre est retirée. Une livraison dont le tarif n'est pas encore fixé n'est
+ * pas « offerte » : on ne peut pas offrir un montant qu'on ne connaît pas.
+ */
+function applyPromotion(
+  fee: number | null,
+  promotions: Promotion[],
+  context: PromotionContext | undefined,
+): { fee: number | null; before: number | null; label: string | null } {
+  if (!context || fee === null || fee === 0) return { fee, before: null, label: null };
+  const promotion = findPromotion(promotions, context);
+  if (!promotion || promotion.effect.type !== 'free_delivery') {
+    return { fee, before: null, label: null };
+  }
+  return { fee: 0, before: fee, label: promotion.label };
+}
 
 /** Convertit un montant vers le FCFA. null si le taux n'est pas configuré. */
 export function convertToFcfa(
@@ -64,6 +86,8 @@ export function computeQuote(
   items: SheinItem[],
   deliveryOptionId: string,
   config: PricingConfig,
+  promotions: Promotion[] = [],
+  context?: PromotionContext,
 ): Quote {
   const itemCount = items.reduce((sum, item) => sum + Math.max(1, item.quantity), 0);
 
@@ -93,8 +117,9 @@ export function computeQuote(
   const option =
     config.deliveryOptions.find((o) => o.id === deliveryOptionId) ?? config.deliveryOptions[0];
 
-  const total =
-    (itemsSubtotal ?? 0) + (service.fee ?? 0) + (option?.fee ?? 0);
+  const delivery = applyPromotion(option?.fee ?? null, promotions, context);
+
+  const total = (itemsSubtotal ?? 0) + (service.fee ?? 0) + (delivery.fee ?? 0);
 
   return {
     itemCount,
@@ -104,9 +129,11 @@ export function computeQuote(
     serviceFeeReason: service.reason,
     deliveryOptionId: option?.id ?? '',
     deliveryLabel: option?.label ?? '',
-    deliveryFee: option?.fee ?? null,
+    deliveryFee: delivery.fee,
+    deliveryFeeBeforePromotion: delivery.before,
+    promotionLabel: delivery.label,
     total,
-    isPartial: itemsSubtotal === null || service.fee === null || (option?.fee ?? null) === null,
+    isPartial: itemsSubtotal === null || service.fee === null || delivery.fee === null,
     strategy: config.strategy,
     computedAt: new Date().toISOString(),
   };

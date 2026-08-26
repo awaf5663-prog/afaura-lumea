@@ -1,6 +1,7 @@
 import { AlertCircle, ImagePlus, Plus, Trash2, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { GroupingCapacity } from '@/src/components/shein/GroupingCapacity';
+import { PromotionNotice } from '@/src/components/shein/PromotionNotice';
 import { QuoteSummary } from '@/src/components/shein/QuoteSummary';
 import { Button } from '@/src/components/ui/Button';
 import { ErrorText, FormRow, Input, Label, Textarea } from '@/src/components/ui/Field';
@@ -10,6 +11,7 @@ import { useGroupings } from '@/src/hooks/useGroupings';
 import { useSettings } from '@/src/hooks/useSettings';
 import { useToast } from '@/src/hooks/useToast';
 import { computeQuote } from '@/src/lib/pricing';
+import { visiblePromotions } from '@/src/lib/pricing/promotions';
 import { MAX_UPLOAD_BYTES, compressImage } from '@/src/lib/image';
 import { cn } from '@/src/lib/cn';
 import { formatFcfa, isValidSenegalPhone, normalizePhone } from '@/src/lib/format';
@@ -57,6 +59,7 @@ export function SheinRequestPage() {
   const [phone, setPhone] = useState('');
   const [note, setNote] = useState('');
   const [deliveryOptionId, setDeliveryOptionId] = useState('');
+  const [isStudent, setIsStudent] = useState(false);
   const [items, setItems] = useState<SheinItem[]>([emptyItem('XOF')]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -80,10 +83,31 @@ export function SheinRequestPage() {
     );
   }, [pricing]);
 
+  /**
+   * Offres en cours sur les demandes SHEIN. Sert à décider ce qu'on affiche —
+   * l'encadré de l'offre, la question « êtes-vous étudiante ? » — jamais à
+   * calculer un montant : le devis définitif est refait côté données.
+   */
+  const offers = useMemo(
+    () => visiblePromotions(settings?.promotions ?? [], 'shein'),
+    [settings?.promotions],
+  );
+  const asksStudent = offers.some((offer) => offer.studentOnly);
+
   /** Estimation affichée en direct. Elle est recalculée côté données à l'envoi. */
   const quote = useMemo(
-    () => (pricing ? computeQuote(items, deliveryOptionId, pricing) : null),
-    [items, deliveryOptionId, pricing],
+    () =>
+      pricing
+        ? computeQuote(items, deliveryOptionId, pricing, settings?.promotions ?? [], {
+            kind: 'shein',
+            isStudent,
+            // Le groupage n'est attribué qu'à l'enregistrement : ici on ne
+            // restreint pas, l'estimation reste une estimation.
+            groupingId: null,
+            deliveryOptionId,
+          })
+        : null,
+    [items, deliveryOptionId, pricing, settings?.promotions, isStudent],
   );
 
   const updateItem = (index: number, patch: Partial<SheinItem>) => {
@@ -145,6 +169,7 @@ export function SheinRequestPage() {
         phone,
         note,
         deliveryOptionId,
+        isStudent,
         items: items.filter((item) => item.productUrl.trim() || item.reference.trim()),
       });
 
@@ -173,8 +198,11 @@ export function SheinRequestPage() {
           exactement ce que vous voulez.
         </p>
 
-        <div className="mt-6">
+        <div className="mt-6 space-y-3">
+          <PromotionNotice kind="shein" />
+
           <GroupingCapacity grouping={displayed} compact />
+
           {!active && displayed && (
             <p className="mt-2.5 text-[12.5px] leading-relaxed text-stone">
               Ce départ est complet : votre demande sera rattachée au groupage suivant dès son
@@ -431,6 +459,26 @@ export function SheinRequestPage() {
               </label>
             ))}
           </div>
+
+          {asksStudent && (
+            <div className="mt-4 rounded-[--radius-md] border border-line bg-cream/60 p-4">
+              <label className="flex cursor-pointer items-start gap-3">
+                <input
+                  type="checkbox"
+                  checked={isStudent}
+                  onChange={(e) => setIsStudent(e.target.checked)}
+                  className="mt-1 size-4 accent-[#8f4b5b]"
+                />
+                <span className="text-[13.5px] leading-relaxed text-graphite">
+                  <span className="font-medium">Je suis étudiante</span>
+                  <span className="mt-1 block text-[12.5px] text-stone">
+                    Une offre en cours est réservée aux étudiantes. Nous vous demanderons
+                    simplement votre carte d'étudiante sur WhatsApp avant de l'appliquer.
+                  </span>
+                </span>
+              </label>
+            </div>
+          )}
         </section>
 
         {quote && quote.itemCount > 0 && (

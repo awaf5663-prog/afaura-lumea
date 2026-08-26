@@ -104,6 +104,9 @@ create table if not exists shein_requests (
   quoted_total integer,                                -- null tant que non chiffré
   grouping_id uuid references groupings(id) on delete set null,
   delivery_option_id text default '',
+  -- Déclaration de la cliente, jamais une vérification : la boutique confirme
+  -- avant d'accorder une offre réservée aux étudiantes.
+  is_student boolean not null default false,
   quote jsonb,                                         -- estimation calculée côté serveur
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -137,6 +140,7 @@ create table if not exists settings (
   delivery_fees jsonb not null default '{}'::jsonb,
   announcement text default '',
   pricing jsonb not null default '{}'::jsonb,           -- tarification SHEIN pilotée par l'admin
+  promotions jsonb not null default '[]'::jsonb,
   alert_thresholds jsonb not null default '{}'::jsonb
 );
 
@@ -231,7 +235,8 @@ create or replace function create_shein_request(
   p_phone text,
   p_note text,
   p_delivery_option_id text,
-  p_items jsonb
+  p_items jsonb,
+  p_is_student boolean default false
 ) returns jsonb
 language plpgsql
 security definer
@@ -255,12 +260,19 @@ declare
   v_delivery_known boolean := false;
   v_grouping groupings%rowtype;
   v_quote jsonb;
+  v_promotions jsonb;
+  v_promo jsonb;
+  v_promo_label text;
+  v_delivery_before integer;
+  v_today text := to_char(now(), 'YYYY-MM-DD');
 begin
   if jsonb_array_length(coalesce(p_items, '[]'::jsonb)) = 0 then
     raise exception 'Aucun article';
   end if;
 
-  select coalesce(pricing, '{}'::jsonb) into v_pricing from settings where id = 1;
+  select coalesce(pricing, '{}'::jsonb), coalesce(promotions, '[]'::jsonb)
+    into v_pricing, v_promotions
+    from settings where id = 1;
   -- Tant que la tarification n'a pas été enregistrée depuis l'admin, aucune ligne
   -- n'est calculée : le devis est marqué partiel plutôt que faussement précis.
 
@@ -301,20 +313,8 @@ begin
     end if;
   end loop;
 
-  v_quote := jsonb_build_object(
-    'itemCount', v_item_count,
-    'itemsSubtotal', case when v_subtotal_known then round(v_subtotal) else null end,
-    'serviceFee', case when v_service_known then v_service else null end,
-    'deliveryOptionId', p_delivery_option_id,
-    'deliveryFee', case when v_delivery_known then v_delivery else null end,
-    'total', coalesce(case when v_subtotal_known then round(v_subtotal) else 0 end, 0)
-             + coalesce(v_service, 0) + coalesce(v_delivery, 0),
-    'isPartial', not (v_subtotal_known and v_service_known and v_delivery_known),
-    'strategy', v_pricing ->> 'strategy',
-    'computedAt', now()
-  );
-
-  -- Rattachement au premier groupage ouvert qui a encore de la place.
+  -- Rattachement au premier groupage ouvert qui a encore de la place. Choisi
+  -- avant le devis : une promotion peut être réservée à un groupage précis.
   select * into v_grouping
     from groupings
    where status = 'open'
@@ -322,12 +322,56 @@ begin
    order by closing_date nulls last
    limit 1;
 
+  -- Promotions. Toutes les conditions renseignées doivent être remplies ; une
+  -- liste vide ne restreint rien. Vérifiées ici, jamais d'après le navigateur,
+  -- qui ne transmet que la déclaration « je suis étudiante ».
+  if v_delivery_known and v_delivery > 0 then
+    for v_promo in select * from jsonb_array_elements(v_promotions) loop
+      continue when not coalesce((v_promo ->> 'active')::boolean, false);
+      continue when coalesce(v_promo ->> 'scope', 'all') not in ('all', 'shein');
+      continue when coalesce((v_promo ->> 'studentOnly')::boolean, false)
+                    and not coalesce(p_is_student, false);
+      continue when v_promo ->> 'startsAt' is not null and v_today < (v_promo ->> 'startsAt');
+      continue when v_promo ->> 'endsAt' is not null and v_today > (v_promo ->> 'endsAt');
+      continue when jsonb_array_length(coalesce(v_promo -> 'groupingIds', '[]'::jsonb)) > 0
+                    and (v_grouping.id is null
+                         or not (coalesce(v_promo -> 'groupingIds', '[]'::jsonb)
+                                 ? v_grouping.id::text));
+      continue when jsonb_array_length(coalesce(v_promo -> 'deliveryOptionIds', '[]'::jsonb)) > 0
+                    and not (coalesce(v_promo -> 'deliveryOptionIds', '[]'::jsonb)
+                             ? p_delivery_option_id);
+      continue when coalesce(v_promo -> 'effect' ->> 'type', '') <> 'free_delivery';
+
+      v_delivery_before := v_delivery;
+      v_delivery := 0;
+      v_promo_label := v_promo ->> 'label';
+      exit;
+    end loop;
+  end if;
+
+  v_quote := jsonb_build_object(
+    'itemCount', v_item_count,
+    'itemsSubtotal', case when v_subtotal_known then round(v_subtotal) else null end,
+    'serviceFee', case when v_service_known then v_service else null end,
+    'deliveryOptionId', p_delivery_option_id,
+    'deliveryFee', case when v_delivery_known then v_delivery else null end,
+    'deliveryFeeBeforePromotion', v_delivery_before,
+    'promotionLabel', v_promo_label,
+    'total', coalesce(case when v_subtotal_known then round(v_subtotal) else 0 end, 0)
+             + coalesce(v_service, 0) + coalesce(v_delivery, 0),
+    'isPartial', not (v_subtotal_known and v_service_known and v_delivery_known),
+    'strategy', v_pricing ->> 'strategy',
+    'computedAt', now()
+  );
+
   v_number := 'SHEIN-' || to_char(now(), 'YYYY') || '-' || lpad(nextval('shein_seq')::text, 5, '0');
 
   insert into shein_requests (
-    request_number, customer_name, phone, note, grouping_id, delivery_option_id, quote
+    request_number, customer_name, phone, note, grouping_id, delivery_option_id,
+    is_student, quote
   ) values (
-    v_number, p_customer_name, p_phone, p_note, v_grouping.id, p_delivery_option_id, v_quote
+    v_number, p_customer_name, p_phone, p_note, v_grouping.id, p_delivery_option_id,
+    coalesce(p_is_student, false), v_quote
   ) returning id into v_id;
 
   for v_item in select * from jsonb_array_elements(p_items) loop
@@ -491,7 +535,7 @@ create policy "reglages admin" on settings for all to authenticated using (true)
 
 -- Les fonctions publiques sont exposées explicitement.
 grant execute on function create_order(text, text, text, text, text, text, text, jsonb) to anon, authenticated;
-grant execute on function create_shein_request(text, text, text, text, jsonb) to anon, authenticated;
+grant execute on function create_shein_request(text, text, text, text, jsonb, boolean) to anon, authenticated;
 grant execute on function transfer_shein_requests(uuid, uuid) to authenticated;
 grant execute on function find_order(text, text) to anon, authenticated;
 grant execute on function find_shein_request(text, text) to anon, authenticated;

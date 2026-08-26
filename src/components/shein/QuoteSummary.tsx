@@ -37,7 +37,28 @@ export function QuoteSummary({ quote, title = 'Estimation' }: { quote: Quote; ti
           value={quote.serviceFee}
           missing="Calcul personnalisé"
         />
-        <Line label={quote.deliveryLabel || 'Livraison'} value={quote.deliveryFee} missing="À confirmer" />
+        {/*
+          Livraison offerte : on montre le tarif barré plutôt qu'un zéro sec.
+          « Offerte » sans le prix d'origine ne dit rien de la valeur de l'offre.
+        */}
+        {quote.promotionLabel && quote.deliveryFeeBeforePromotion ? (
+          <div className="flex items-baseline justify-between gap-4">
+            <dt className="min-w-0">
+              <span className="block">{quote.deliveryLabel || 'Livraison'}</span>
+              <span className="mt-0.5 block text-[12px] leading-snug text-mauve">
+                {quote.promotionLabel}
+              </span>
+            </dt>
+            <dd className="shrink-0 text-right tabular-nums">
+              <span className="text-stone line-through">
+                {formatFcfa(quote.deliveryFeeBeforePromotion)}
+              </span>
+              <span className="ml-2 font-medium text-mauve">Offerte</span>
+            </dd>
+          </div>
+        ) : (
+          <Line label={quote.deliveryLabel || 'Livraison'} value={quote.deliveryFee} missing="À confirmer" />
+        )}
 
         <div className="flex items-baseline justify-between gap-4 border-t border-line pt-3">
           <dt className="text-[16px]">Total estimé</dt>

@@ -1,4 +1,4 @@
-import { DEFAULT_ALERT_THRESHOLDS, DEFAULT_PRICING } from '@/src/config/pricing';
+import { DEFAULT_ALERT_THRESHOLDS, DEFAULT_PRICING, DEFAULT_PROMOTIONS } from '@/src/config/pricing';
 import type { Grouping, Order, Product, SheinRequest, StoreSettings } from '@/src/types';
 import type { DataSource, OrderDraft, SheinDraft } from './types';
 
@@ -161,6 +161,7 @@ const toShein = (r: Row): SheinRequest => ({
   groupingId: r.grouping_id ?? null,
   quote: r.quote ?? null,
   deliveryOptionId: r.delivery_option_id ?? '',
+  isStudent: r.is_student ?? false,
   createdAt: r.created_at,
   updatedAt: r.updated_at,
 });
@@ -276,6 +277,7 @@ export const supabaseAdapter: DataSource = {
         p_phone: draft.phone,
         p_note: draft.note ?? null,
         p_delivery_option_id: draft.deliveryOptionId,
+        p_is_student: draft.isStudent,
         p_items: draft.items.map((i) => ({
           product_url: i.productUrl,
           reference: i.reference,
@@ -356,6 +358,7 @@ export const supabaseAdapter: DataSource = {
       announcement: r.announcement ?? '',
       pricing: r.pricing ?? DEFAULT_PRICING,
       alertThresholds: r.alert_thresholds ?? DEFAULT_ALERT_THRESHOLDS,
+      promotions: r.promotions ?? DEFAULT_PROMOTIONS,
     } satisfies StoreSettings;
   },
 
@@ -373,6 +376,7 @@ export const supabaseAdapter: DataSource = {
         delivery_fees: settings.deliveryFees,
         announcement: settings.announcement,
         pricing: settings.pricing,
+        promotions: settings.promotions,
         alert_thresholds: settings.alertThresholds,
       }),
     });

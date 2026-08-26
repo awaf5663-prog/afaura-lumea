@@ -170,6 +170,12 @@ export interface SheinRequest {
   quote: Quote | null;
   /** Option de livraison choisie par la cliente. */
   deliveryOptionId: string;
+  /**
+   * La cliente s'est déclarée étudiante. C'est une déclaration, pas une
+   * vérification : le site ne contrôle aucune carte. La boutique confirme
+   * avant d'accorder l'offre, et le site le dit à la cliente.
+   */
+  isStudent: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -236,8 +242,16 @@ export interface Quote {
   serviceFeeReason: string;
   deliveryOptionId: string;
   deliveryLabel: string;
-  /** null = tarif non configuré. */
+  /** null = tarif non configuré. Vaut 0 quand une promotion offre la livraison. */
   deliveryFee: number | null;
+  /**
+   * Frais de livraison avant promotion, quand une promotion s'applique.
+   * Permet d'afficher « 2 000 FCFA → offerte » plutôt qu'un zéro sans
+   * explication, et de retrouver le tarif normal si la promotion est retirée.
+   */
+  deliveryFeeBeforePromotion?: number | null;
+  /** Nom de la promotion appliquée, pour l'afficher à la cliente. */
+  promotionLabel?: string | null;
   /** Somme des lignes connues. */
   total: number;
   /** true si une ligne manque : le total affiché est partiel. */
@@ -298,4 +312,46 @@ export interface StoreSettings {
   pricing: PricingConfig;
   /** Seuils d'alerte de remplissage des groupages. */
   alertThresholds: AlertThresholds;
+  /** Offres en cours. Toutes les conditions sont modifiables depuis l'admin. */
+  promotions: Promotion[];
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Promotions
+   ───────────────────────────────────────────────────────────── */
+
+/** Ce qu'une promotion change. Une seule sorte pour l'instant, extensible. */
+export type PromotionEffect = { type: 'free_delivery' };
+
+/**
+ * Une offre et ses conditions.
+ *
+ * Toutes les conditions sont cumulatives : une promotion s'applique quand
+ * TOUTES celles qui sont renseignées sont remplies. Un champ laissé vide ne
+ * restreint rien — `groupingIds` vide vaut « tous les groupages ».
+ *
+ * Les conditions sont vérifiées côté données au moment d'enregistrer la
+ * commande, jamais d'après ce que le navigateur affirme avoir calculé.
+ */
+export interface Promotion {
+  id: string;
+  /** Nom court, affiché à la cliente : « Offre rentrée ». */
+  label: string;
+  /** Une phrase qui explique l'offre, affichée sur le site. */
+  description: string;
+  /** Interrupteur principal. false = invisible et sans effet. */
+  active: boolean;
+  /** À quel type de commande elle s'applique. */
+  scope: 'shein' | 'store' | 'all';
+  /** Réservée aux clientes qui se déclarent étudiantes. */
+  studentOnly: boolean;
+  /** Début de la période (ISO, date seule). null = pas de date de début. */
+  startsAt: string | null;
+  /** Fin de la période, incluse. null = pas de date de fin. */
+  endsAt: string | null;
+  /** Groupages concernés. Vide = tous. */
+  groupingIds: string[];
+  /** Options de livraison concernées. Vide = toutes. */
+  deliveryOptionIds: string[];
+  effect: PromotionEffect;
 }

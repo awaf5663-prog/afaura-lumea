@@ -7,7 +7,7 @@ import {
   WHATSAPP_LINK,
   WHATSAPP_NUMBER,
 } from '@/src/config/site';
-import { DEFAULT_ALERT_THRESHOLDS, DEFAULT_PRICING } from '@/src/config/pricing';
+import { DEFAULT_ALERT_THRESHOLDS, DEFAULT_PRICING, DEFAULT_PROMOTIONS } from '@/src/config/pricing';
 import { SEED_PRODUCTS } from '@/src/data/seed';
 import { computeQuote } from '@/src/lib/pricing';
 import { nextNumber, uid } from '@/src/lib/orderNumber';
@@ -35,6 +35,7 @@ function defaultSettings(): StoreSettings {
     announcement: '',
     pricing: DEFAULT_PRICING,
     alertThresholds: DEFAULT_ALERT_THRESHOLDS,
+    promotions: DEFAULT_PROMOTIONS,
   };
 }
 
@@ -201,10 +202,18 @@ export const localAdapter: DataSource = {
     // Le devis est recalculé ici, à partir des tarifs enregistrés :
     // le navigateur n'envoie que des prix déclarés et des quantités.
     const settings = await this.getSettings();
-    const quote = computeQuote(cleanItems, draft.deliveryOptionId, settings.pricing);
 
     const groupings = loadGroupings();
     const target = pickOpenGrouping(groupings);
+
+    // Le groupage est choisi avant le devis : une promotion peut être réservée
+    // à un groupage précis, et la cliente n'a pas son mot à dire là-dessus.
+    const quote = computeQuote(cleanItems, draft.deliveryOptionId, settings.pricing, settings.promotions, {
+      kind: 'shein',
+      isStudent: draft.isStudent,
+      groupingId: target?.id ?? null,
+      deliveryOptionId: draft.deliveryOptionId,
+    });
 
     const now = new Date().toISOString();
     const request: SheinRequest = {
@@ -219,6 +228,7 @@ export const localAdapter: DataSource = {
       groupingId: target?.id ?? null,
       quote,
       deliveryOptionId: quote.deliveryOptionId,
+      isStudent: draft.isStudent,
       createdAt: now,
       updatedAt: now,
     };

@@ -27,6 +27,8 @@ export interface SheinDraft {
   note?: string;
   deliveryOptionId: string;
   items: SheinRequest['items'];
+  /** Déclaration de la cliente, jamais une vérification. */
+  isStudent: boolean;
 }
 
 /**

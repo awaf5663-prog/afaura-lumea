@@ -1,5 +1,6 @@
 import { DEFAULT_PROMOTIONS } from '@/src/config/pricing';
 import { SEED_IMAGES } from '@/src/data/seed';
+import { normalizePhone } from '@/src/lib/format';
 import type { Grouping, Order, Product, SheinRequest, StoreSettings } from '@/src/types';
 import { normalizeAlertThresholds, normalizePricing, normalizePromotions } from './settingsShape';
 import type { DataSource, OrderDraft, SheinDraft } from './types';
@@ -283,7 +284,11 @@ export const supabaseAdapter: DataSource = {
       method: 'POST',
       body: JSON.stringify({
         p_customer_name: draft.customerName,
-        p_phone: draft.phone,
+        // Le numéro part normalisé (221…), comme il est enregistré côté
+        // navigateur pour retrouver la commande. Sans ça, « 78 107 16 04 »
+        // et « 221781071604 » désignent la même cliente sans jamais se
+        // correspondre, et le récapitulatif devient introuvable.
+        p_phone: normalizePhone(draft.phone),
         p_address: draft.address,
         p_city: draft.city,
         p_note: draft.note ?? null,
@@ -332,7 +337,7 @@ export const supabaseAdapter: DataSource = {
       method: 'POST',
       body: JSON.stringify({
         p_customer_name: draft.customerName,
-        p_phone: draft.phone,
+        p_phone: normalizePhone(draft.phone),
         p_note: draft.note ?? null,
         p_delivery_option_id: draft.deliveryOptionId,
         p_is_student: draft.isStudent,

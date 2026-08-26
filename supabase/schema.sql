@@ -514,6 +514,22 @@ begin
 end;
 $$;
 
+-- Comparaison de deux numéros sénégalais.
+--
+-- « 78 107 16 04 », « +221 78 107 16 04 » et « 221781071604 » désignent la
+-- même personne. On ne garde que les chiffres, puis les neuf derniers : le
+-- préfixe pays présent d'un côté et absent de l'autre ne doit pas empêcher
+-- une cliente de retrouver sa commande.
+create or replace function meme_numero(a text, b text)
+returns boolean
+language sql
+immutable
+as $$
+  select right(regexp_replace(coalesce(a, ''), '\D', '', 'g'), 9)
+       = right(regexp_replace(coalesce(b, ''), '\D', '', 'g'), 9)
+     and length(regexp_replace(coalesce(a, ''), '\D', '', 'g')) >= 6;
+$$;
+
 -- Suivi client : exige le numéro de commande ET le téléphone.
 create or replace function find_order(p_order_number text, p_phone text)
 returns jsonb
@@ -526,7 +542,7 @@ as $$
   )
   from orders o
   where upper(o.order_number) = upper(p_order_number)
-    and regexp_replace(o.phone, '\D', '', 'g') = regexp_replace(p_phone, '\D', '', 'g')
+    and meme_numero(o.phone, p_phone)
   limit 1;
 $$;
 
@@ -541,7 +557,7 @@ as $$
   )
   from shein_requests r
   where upper(r.request_number) = upper(p_request_number)
-    and regexp_replace(r.phone, '\D', '', 'g') = regexp_replace(p_phone, '\D', '', 'g')
+    and meme_numero(r.phone, p_phone)
   limit 1;
 $$;
 

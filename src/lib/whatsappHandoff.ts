@@ -1,33 +1,19 @@
 /**
- * Ouverture automatique de WhatsApp après un envoi.
+ * Passage automatique sur WhatsApp après un envoi.
  *
- * La commande est d'abord enregistrée — c'est elle qui donne le numéro de
- * suivi et qui apparaît dans l'administration — puis le message part sur
- * WhatsApp sans que la cliente ait un second geste à faire.
+ * Le message part depuis l'écran d'envoi lui-même, avec la commande qui
+ * vient d'être créée en main. C'est volontaire : la page de confirmation
+ * doit relire la commande dans la base pour l'afficher, et si cette
+ * relecture échoue (réseau, numéro mal formé), WhatsApp ne s'ouvrait pas.
+ * Or l'ouverture de WhatsApp est le moment le plus important du parcours —
+ * c'est par là que la boutique apprend qu'une commande existe.
  *
- * Le drapeau ne vaut que pour UN passage : la page de confirmation rouverte
- * plus tard, ou revisitée avec le bouton retour, ne renvoie pas sur WhatsApp.
- * Il vit dans sessionStorage, donc il disparaît avec l'onglet.
+ * Navigation de l'onglet, jamais window.open : les navigateurs mobiles
+ * bloquent une fenêtre qui ne suit pas immédiatement un geste, et le
+ * passage échouerait en silence. Le bouton retour ramène sur la page de
+ * confirmation, qui garde le récapitulatif.
  */
-
-const KEY = 'lumea.whatsapp.a-ouvrir';
-
-/** À appeler juste avant d'aller sur la page de confirmation. */
-export function armWhatsappHandoff(reference: string): void {
-  try {
-    sessionStorage.setItem(KEY, reference);
-  } catch {
-    // Stockage indisponible : la cliente utilisera le bouton, rien n'est cassé.
-  }
-}
-
-/** Vrai une seule fois, pour la référence qui vient d'être créée. */
-export function consumeWhatsappHandoff(reference: string): boolean {
-  try {
-    if (sessionStorage.getItem(KEY) !== reference) return false;
-    sessionStorage.removeItem(KEY);
-    return true;
-  } catch {
-    return false;
-  }
+export function openWhatsapp(url: string | null): void {
+  if (!url) return;
+  window.location.href = url;
 }

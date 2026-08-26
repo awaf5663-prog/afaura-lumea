@@ -19,7 +19,8 @@ import { formatFcfa, isValidSenegalPhone, normalizePhone } from '@/src/lib/forma
 import { useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
-import { armWhatsappHandoff } from '@/src/lib/whatsappHandoff';
+import { buildSheinMessage } from '@/src/lib/whatsapp';
+import { openWhatsapp } from '@/src/lib/whatsappHandoff';
 import { db } from '@/src/services';
 import type { SheinItem } from '@/src/types';
 
@@ -192,8 +193,10 @@ export function SheinRequestPage() {
         ...mine.filter((m) => m.requestNumber !== request.requestNumber),
       ]);
 
-      armWhatsappHandoff(request.requestNumber);
       navigate(`/shein/confirmation/${request.requestNumber}`);
+      // WhatsApp part avec la demande en main : c'est ce message qui
+      // prévient la boutique qu'une demande vient d'arriver.
+      openWhatsapp(whatsapp.url(buildSheinMessage(request)));
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Envoi impossible pour le moment.';
       setSubmitError(message);

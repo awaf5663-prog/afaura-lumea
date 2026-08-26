@@ -14,7 +14,8 @@ import { formatFcfa, isValidSenegalPhone, normalizePhone } from '@/src/lib/forma
 import { useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
-import { armWhatsappHandoff } from '@/src/lib/whatsappHandoff';
+import { buildOrderMessage } from '@/src/lib/whatsapp';
+import { openWhatsapp } from '@/src/lib/whatsappHandoff';
 import { db } from '@/src/services';
 
 interface FormState {
@@ -160,10 +161,12 @@ export function CheckoutPage() {
       ]);
 
       clear();
-      // La commande est enregistrée : WhatsApp s'ouvrira de lui-même sur la
-      // page de confirmation, message déjà rédigé.
-      armWhatsappHandoff(order.orderNumber);
+      // La confirmation est empilée d'abord : le bouton retour depuis
+      // WhatsApp ramène dessus, avec le récapitulatif.
       navigate(`/confirmation/${order.orderNumber}`);
+      // Puis WhatsApp, message déjà rédigé, à partir de la commande que
+      // l'on tient en main — sans dépendre d'une relecture en base.
+      openWhatsapp(whatsapp.url(buildOrderMessage(order)));
     } catch (error) {
       const message = error instanceof Error ? error.message : 'La commande n’a pas pu être enregistrée.';
       setSubmitError(message);

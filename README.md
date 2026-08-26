@@ -207,7 +207,7 @@ un arrivage.
 - **Modal simple** — 4 500 FCFA, teinte choisie dans le nuancier numéroté.
 - **Satin imprimé** — 3 500 FCFA, 5 modèles en galerie défilante, autres coloris sur demande.
 - **Dentelle** — 5 000 FCFA, teinte choisie dans le nuancier dentelle de 12 teintes.
-- **Hijabs & voiles** — Jersey 1 500 et Jersey frisé 2 000, avec le nuancier 36 teintes.
+- **Jersey** — Jersey 1 500 (5 photos, nuancier 36 teintes) et Jersey frisé 2 000.
 - **Accessoires** — Hijab tape 1 000.
 
 Pour ajouter un lot : créer la catégorie dans `CATEGORIES` (`src/data/seed.ts`), ou ajouter les
@@ -242,7 +242,10 @@ scripts/                Génération du sitemap
 ```
 
 **Nuanciers numérotés** : `src/config/colorCharts.ts` contient les teintes relevées sur les
-nuanciers du fournisseur — 36 teintes pour le modal et le jersey, 12 pour la dentelle. Un produit s'y rattache par une liste déroulante dans /admin → Produits ;
+nuanciers du fournisseur — 36 teintes pour le modal et le jersey, 12 pour la dentelle. Une pastille
+peut porter une photo de la matière (`image`) plutôt qu'un aplat : c'est le cas de la dentelle,
+dont chaque pastille est découpée dans le nuancier réel, masque circulaire compris, pour que le
+motif se voie. Les pastilles sans photo retombent sur leur teinte moyenne. Un produit s'y rattache par une liste déroulante dans /admin → Produits ;
 la cliente choisit alors un numéro plutôt qu'un nom de couleur, le choix devient obligatoire, et il
 remonte dans le panier puis dans le message WhatsApp sous la forme « Couleur : n° 12 ». Les
 pastilles sont annoncées comme indicatives — un écran ne rend pas un tissu — et la disponibilité

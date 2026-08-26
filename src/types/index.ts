@@ -5,7 +5,10 @@ export type ProductStatus = 'active' | 'draft' | 'sold_out';
 /** Une teinte du nuancier fournisseur, identifiée par son numéro. */
 export interface ColorSwatch {
   code: string;
+  /** Teinte moyenne, utilisée seule quand aucune photo n'accompagne la pastille. */
   hex: string;
+  /** Photo de la matière dans cette teinte : plus juste qu'un aplat pour la dentelle. */
+  image?: string;
   name?: string;
 }
 

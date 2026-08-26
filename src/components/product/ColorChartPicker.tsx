@@ -53,12 +53,23 @@ export function ColorChartPicker({
             >
               <span
                 className={cn(
-                  'grid size-9 place-items-center rounded-full ring-1 ring-inset ring-ink/15 transition-all',
+                  'relative grid size-9 place-items-center overflow-hidden rounded-full ring-1 ring-inset ring-ink/15 transition-all',
                   active && 'ring-2 ring-mauve ring-offset-2 ring-offset-white',
                 )}
                 style={{ backgroundColor: swatch.hex }}
               >
-                {active && <Check className="size-4 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,.7)]" />}
+                {swatch.image && (
+                  <img
+                    src={swatch.image}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    className="absolute inset-0 size-full object-cover"
+                  />
+                )}
+                {active && (
+                  <Check className="relative size-4 text-white drop-shadow-[0_1px_2px_rgba(0,0,0,.85)]" />
+                )}
               </span>
               <span className={cn('text-[10.5px] tabular-nums', active ? 'text-ink' : 'text-stone')}>
                 {swatch.code}

@@ -1,3 +1,15 @@
+import dentelle01 from '@/src/assets/swatches/dentelle-01.webp';
+import dentelle02 from '@/src/assets/swatches/dentelle-02.webp';
+import dentelle03 from '@/src/assets/swatches/dentelle-03.webp';
+import dentelle04 from '@/src/assets/swatches/dentelle-04.webp';
+import dentelle05 from '@/src/assets/swatches/dentelle-05.webp';
+import dentelle06 from '@/src/assets/swatches/dentelle-06.webp';
+import dentelle07 from '@/src/assets/swatches/dentelle-07.webp';
+import dentelle08 from '@/src/assets/swatches/dentelle-08.webp';
+import dentelle09 from '@/src/assets/swatches/dentelle-09.webp';
+import dentelle10 from '@/src/assets/swatches/dentelle-10.webp';
+import dentelle11 from '@/src/assets/swatches/dentelle-11.webp';
+import dentelle12 from '@/src/assets/swatches/dentelle-12.webp';
 import type { ColorChart } from '@/src/types';
 
 /**
@@ -61,18 +73,18 @@ export const COLOR_CHARTS: ColorChart[] = [
     id: 'dentelle12',
     label: 'Nuancier dentelle 12 teintes',
     swatches: [
-      { code: '01', hex: '#171717' },
-      { code: '02', hex: '#e3e1e7' },
-      { code: '03', hex: '#ddcac0' },
-      { code: '04', hex: '#dac6bd' },
-      { code: '05', hex: '#c6a39b' },
-      { code: '06', hex: '#e6becb' },
-      { code: '07', hex: '#b6b4bd' },
-      { code: '08', hex: '#172549' },
-      { code: '09', hex: '#b07289' },
-      { code: '10', hex: '#a582c7' },
-      { code: '11', hex: '#d6b8a4' },
-      { code: '12', hex: '#e0c4bd' },
+      { code: '01', hex: '#171717', image: dentelle01 },
+      { code: '02', hex: '#e3e1e7', image: dentelle02 },
+      { code: '03', hex: '#ddcac0', image: dentelle03 },
+      { code: '04', hex: '#dac6bd', image: dentelle04 },
+      { code: '05', hex: '#c6a39b', image: dentelle05 },
+      { code: '06', hex: '#e6becb', image: dentelle06 },
+      { code: '07', hex: '#b6b4bd', image: dentelle07 },
+      { code: '08', hex: '#172549', image: dentelle08 },
+      { code: '09', hex: '#b07289', image: dentelle09 },
+      { code: '10', hex: '#a582c7', image: dentelle10 },
+      { code: '11', hex: '#d6b8a4', image: dentelle11 },
+      { code: '12', hex: '#e0c4bd', image: dentelle12 },
     ],
   },
 ];

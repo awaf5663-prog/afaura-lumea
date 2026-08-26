@@ -5,7 +5,11 @@ import dentelleColoris from '@/src/assets/products/dentelle-coloris.webp';
 import dentelleNoirBlanc from '@/src/assets/products/dentelle-noir-blanc.webp';
 import dentelleNoirRose from '@/src/assets/products/dentelle-noir-rose.webp';
 import hijabTape from '@/src/assets/products/hijab-tape.webp';
-import jersey from '@/src/assets/products/jersey.webp';
+import jerseyBrun from '@/src/assets/products/jersey-brun.webp';
+import jerseyNoir from '@/src/assets/products/jersey-noir.webp';
+import jerseyNoirTotal from '@/src/assets/products/jersey-noir-total.webp';
+import jerseyNude from '@/src/assets/products/jersey-nude.webp';
+import jerseyVertCanard from '@/src/assets/products/jersey-vert-canard.webp';
 import jerseyFrise from '@/src/assets/products/jersey-frise.webp';
 import modalAquarelle from '@/src/assets/products/modal-aquarelle.webp';
 import modalLeopard from '@/src/assets/products/modal-leopard.webp';
@@ -33,7 +37,7 @@ export const CATEGORIES: Category[] = [
   { id: 'modal_simple', name: 'Modal simple' },
   { id: 'satin_imprime', name: 'Satin imprimé' },
   { id: 'dentelle', name: 'Dentelle' },
-  { id: 'hijab', name: 'Hijabs & voiles' },
+  { id: 'jersey', name: 'Jersey' },
   { id: 'accessoire', name: 'Accessoires' },
 ];
 
@@ -46,14 +50,14 @@ export const CATEGORIES: Category[] = [
 export const SEED_PRODUCTS: Product[] = [
   {
     id: 'jersey',
-    slug: 'hijab-jersey',
+    slug: 'jersey',
     name: 'Jersey',
     description:
-      "Le hijab du quotidien. Maille jersey souple, tombé net, aucune épingle nécessaire. La base à avoir en plusieurs exemplaires.",
+      "Le hijab du quotidien. Maille jersey souple, tombé net, aucune épingle nécessaire. Choisissez votre teinte dans le nuancier ci-dessous.",
     price: 1500,
     compareAtPrice: null,
-    category: 'hijab',
-    images: [jersey],
+    category: 'jersey',
+    images: [jerseyNoir, jerseyVertCanard, jerseyNude, jerseyBrun, jerseyNoirTotal],
     variants: [],
     stock: null,
     status: 'active',
@@ -62,13 +66,13 @@ export const SEED_PRODUCTS: Product[] = [
   },
   {
     id: 'jersey-frise',
-    slug: 'hijab-jersey-frise',
+    slug: 'jersey-frise',
     name: 'Jersey frisé',
     description:
       "Jersey texturé, effet froissé. Il tient tout seul sur la tête et ne glisse pas, même sur une longue journée.",
     price: 2000,
     compareAtPrice: null,
-    category: 'hijab',
+    category: 'jersey',
     images: [jerseyFrise],
     variants: [],
     stock: null,

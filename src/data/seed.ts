@@ -12,6 +12,11 @@ import jerseyNude from '@/src/assets/products/jersey-nude.webp';
 import jerseyVertCanard from '@/src/assets/products/jersey-vert-canard.webp';
 import jerseyFriseColoris from '@/src/assets/products/jersey-frise-coloris.webp';
 import jerseyFriseVolants from '@/src/assets/products/jersey-frise-volants.webp';
+import mjBlanc from '@/src/assets/products/mj-blanc.webp';
+import mjBrunCafe from '@/src/assets/products/mj-brun-cafe.webp';
+import mjDimensions from '@/src/assets/products/mj-dimensions.webp';
+import mjNoir from '@/src/assets/products/mj-noir.webp';
+import mjRosePoudre from '@/src/assets/products/mj-rose-poudre.webp';
 import modalAquarelle from '@/src/assets/products/modal-aquarelle.webp';
 import modalLeopard from '@/src/assets/products/modal-leopard.webp';
 import modalPoisBlanc from '@/src/assets/products/modal-pois-blanc.webp';
@@ -34,6 +39,7 @@ import satinVertEau from '@/src/assets/products/satin-vert-eau.webp';
 
 export const CATEGORIES: Category[] = [
   { id: 'piece_unique', name: 'Pièce unique' },
+  { id: 'voile_mj', name: 'Voile MJ' },
   { id: 'modal_imprime', name: 'Modal imprimé' },
   { id: 'modal_simple', name: 'Modal simple' },
   { id: 'satin_imprime', name: 'Satin imprimé' },
@@ -115,6 +121,22 @@ export const SEED_PRODUCTS: Product[] = [
     status: 'active',
     otherColorsAvailable: true,
     createdAt: '2026-01-05T10:05:00.000Z',
+  },
+  {
+    id: 'voile-mj',
+    slug: 'voile-mj',
+    name: 'Voile MJ',
+    description:
+      "Notre voile le plus fluide : un mélange de modal et de jersey. Il a la douceur et le tombé du modal, avec le maintien du jersey — il ne glisse pas et ne demande pas d'épingle. 170 × 60 cm. Faites défiler les photos pour voir le tombé, puis choisissez votre numéro de teinte dans le nuancier ci-dessous.",
+    price: 4500,
+    compareAtPrice: null,
+    category: 'voile_mj',
+    images: [mjNoir, mjBlanc, mjRosePoudre, mjBrunCafe, mjDimensions],
+    variants: [],
+    stock: null,
+    status: 'active',
+    colorChartId: 'modal36',
+    createdAt: '2026-01-05T10:12:00.000Z',
   },
   {
     id: 'modal-simple',

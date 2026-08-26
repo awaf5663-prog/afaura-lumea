@@ -9,7 +9,7 @@ import { ErrorText, FormRow, Input, Label, Textarea } from '@/src/components/ui/
 import { QuantityStepper } from '@/src/components/ui/QuantityStepper';
 import { Select } from '@/src/components/ui/Field';
 import { useGroupings } from '@/src/hooks/useGroupings';
-import { useSettings } from '@/src/hooks/useSettings';
+import { useSettings, useWhatsapp } from '@/src/hooks/useSettings';
 import { useToast } from '@/src/hooks/useToast';
 import { computeQuote } from '@/src/lib/pricing';
 import { visiblePromotions } from '@/src/lib/pricing/promotions';
@@ -19,6 +19,7 @@ import { formatFcfa, isValidSenegalPhone, normalizePhone } from '@/src/lib/forma
 import { useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
+import { armWhatsappHandoff } from '@/src/lib/whatsappHandoff';
 import { db } from '@/src/services';
 import type { SheinItem } from '@/src/types';
 
@@ -50,6 +51,7 @@ export function SheinRequestPage() {
   const { navigate } = useRouter();
   const { notify } = useToast();
   const { settings } = useSettings();
+  const whatsapp = useWhatsapp();
   const { active, displayed } = useGroupings();
 
   const pricing = settings?.pricing;
@@ -190,6 +192,7 @@ export function SheinRequestPage() {
         ...mine.filter((m) => m.requestNumber !== request.requestNumber),
       ]);
 
+      armWhatsappHandoff(request.requestNumber);
       navigate(`/shein/confirmation/${request.requestNumber}`);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Envoi impossible pour le moment.';
@@ -530,8 +533,10 @@ export function SheinRequestPage() {
           <Button type="submit" size="lg" full loading={submitting}>
             Envoyer ma demande
           </Button>
-          <p className="mt-3 text-center text-[12.5px] text-stone">
-            Vous recevez un numéro de demande. Aucun paiement n'est demandé à cette étape.
+          <p className="mt-3 text-center text-[12.5px] leading-relaxed text-stone">
+            Vous recevez un numéro de demande
+            {whatsapp.prefill ? ", puis WhatsApp s'ouvre avec le message déjà écrit" : ''}. Aucun
+            paiement n'est demandé à cette étape.
           </p>
         </div>
       </div>

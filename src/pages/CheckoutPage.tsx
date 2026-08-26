@@ -6,7 +6,7 @@ import { Button } from '@/src/components/ui/Button';
 import { ErrorText, FormRow, Input, Label, Textarea } from '@/src/components/ui/Field';
 import { PAYMENT_METHODS } from '@/src/config/site';
 import { useCart } from '@/src/hooks/useCart';
-import { useSettings } from '@/src/hooks/useSettings';
+import { useSettings, useWhatsapp } from '@/src/hooks/useSettings';
 import { useToast } from '@/src/hooks/useToast';
 import { findPromotion, visiblePromotions } from '@/src/lib/pricing/promotions';
 import { cn } from '@/src/lib/cn';
@@ -14,6 +14,7 @@ import { formatFcfa, isValidSenegalPhone, normalizePhone } from '@/src/lib/forma
 import { useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
+import { armWhatsappHandoff } from '@/src/lib/whatsappHandoff';
 import { db } from '@/src/services';
 
 interface FormState {
@@ -32,6 +33,7 @@ interface FormState {
 export function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
   const { zones, settings } = useSettings();
+  const whatsapp = useWhatsapp();
   const { navigate } = useRouter();
   const { notify } = useToast();
 
@@ -158,6 +160,9 @@ export function CheckoutPage() {
       ]);
 
       clear();
+      // La commande est enregistrée : WhatsApp s'ouvrira de lui-même sur la
+      // page de confirmation, message déjà rédigé.
+      armWhatsappHandoff(order.orderNumber);
       navigate(`/confirmation/${order.orderNumber}`);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'La commande n’a pas pu être enregistrée.';
@@ -458,13 +463,15 @@ export function CheckoutPage() {
               Envoyer ma commande sur WhatsApp
             </Button>
             {/*
-              Le bouton enregistre la commande puis mène à la page de
-              confirmation, d'où part le message WhatsApp déjà écrit. On le dit,
-              plutôt que de laisser croire que WhatsApp s'ouvre tout seul.
+              Le bouton enregistre la commande, puis WhatsApp s'ouvre avec le
+              message déjà rédigé. Sans numéro configuré, il n'y a rien à
+              pré-remplir : on le dit, plutôt que de promettre une ouverture
+              qui n'aura pas lieu.
             */}
             <p className="mt-3 text-center text-[11.5px] leading-relaxed text-stone">
-              Nous enregistrons votre commande et lui donnons un numéro, puis vous l'envoyez sur
-              WhatsApp en un geste.
+              {whatsapp.prefill
+                ? "Votre commande est enregistrée et reçoit un numéro, puis WhatsApp s'ouvre avec le message déjà écrit."
+                : "Nous enregistrons votre commande et lui donnons un numéro, puis vous l'envoyez sur WhatsApp en un geste."}
             </p>
             <p className="mt-2 flex items-center justify-center gap-1.5 text-[11.5px] text-stone">
               <Lock className="size-3.5" /> Aucun paiement n'est prélevé sur ce site.

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { StatusTimeline } from '@/src/components/order/StatusTimeline';
 import { PaymentInstructions } from '@/src/components/order/PaymentInstructions';
 import { WhatsAppHandoff } from '@/src/components/order/WhatsAppHandoff';
+import { WhatsappOpening } from '@/src/components/order/WhatsappOpening';
 import { Button } from '@/src/components/ui/Button';
 import { EmptyState } from '@/src/components/ui/EmptyState';
 import { useToast } from '@/src/hooks/useToast';
@@ -61,6 +62,7 @@ export function ConfirmationPage({ orderNumber }: { orderNumber: string }) {
   return (
     <div className="container-page py-10">
       <div className="mx-auto max-w-2xl">
+        <WhatsappOpening reference={orderNumber} message={message} />
         <div className="animate-fade flex flex-col items-center text-center">
           <span className="grid size-14 place-items-center rounded-full bg-mauve text-ivory">
             <Check className="size-7" />

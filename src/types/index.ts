@@ -26,6 +26,14 @@ export interface ProductVariantGroup {
   options: string[];
   /** Options momentanément indisponibles : affichées barrées, impossibles à commander. */
   soldOutOptions?: string[];
+  /**
+   * Modèle correspondant à chaque photo, dans l'ordre des photos.
+   *
+   * Sans ça, la galerie ne se synchronise avec les options que s'il y a
+   * exactement autant de photos que de modèles. Avec ça, un modèle peut avoir
+   * plusieurs photos — une vue de face et une vue de dos, par exemple.
+   */
+  photoOptions?: string[];
 }
 
 export interface Product {

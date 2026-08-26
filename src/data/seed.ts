@@ -4,6 +4,8 @@ import abayaBeigeLeopard from '@/src/assets/products/abaya-beige-leopard.webp';
 import abayaBleuDelave from '@/src/assets/products/abaya-bleu-delave.webp';
 import abayaBleuZebre from '@/src/assets/products/abaya-bleu-zebre.webp';
 import abayaKakiMarbre from '@/src/assets/products/abaya-kaki-marbre.webp';
+import abayaLeopardFauve from '@/src/assets/products/abaya-leopard-fauve.webp';
+import abayaLeopardFauveDos from '@/src/assets/products/abaya-leopard-fauve-dos.webp';
 import abayaMarbre from '@/src/assets/products/abaya-marbre.webp';
 import abayaNoir from '@/src/assets/products/abaya-noir.webp';
 import abayaNoirBlanc from '@/src/assets/products/abaya-noir-blanc.webp';
@@ -61,7 +63,7 @@ export const CATEGORIES: Category[] = [
   { id: 'dentelle', name: 'Dentelle' },
   { id: 'jersey', name: 'Jersey' },
   { id: 'jersey_frise', name: 'Jersey frisé' },
-  { id: 'accessoire', name: 'Accessoires' },
+  { id: 'hijab_tape', name: 'Hijab tape' },
 ];
 
 /**
@@ -269,6 +271,8 @@ export const SEED_PRODUCTS: Product[] = [
       abayaBleuDelave,
       abayaPrunePlisse,
       abayaKakiMarbre,
+      abayaLeopardFauve,
+      abayaLeopardFauveDos,
     ],
     variants: [
       {
@@ -283,9 +287,25 @@ export const SEED_PRODUCTS: Product[] = [
           'Bleu délavé',
           'Prune plissé',
           'Kaki marbré',
+          'Léopard fauve',
         ],
         // Un modèle épuisé se marque ici depuis /admin → Produits, avec « (épuisé) ».
         soldOutOptions: [],
+        // Modèle montré par chaque photo, dans l'ordre des photos. Le léopard
+        // fauve en a deux : une vue de face et une vue de dos.
+        photoOptions: [
+          'Noir & blanc plissé',
+          'Bleu zébré',
+          'Rose cachemire',
+          'Beige léopard satiné',
+          'Noir uni',
+          'Marbré brun & écru',
+          'Bleu délavé',
+          'Prune plissé',
+          'Kaki marbré',
+          'Léopard fauve',
+          'Léopard fauve',
+        ],
       },
     ],
     stock: null,
@@ -297,10 +317,10 @@ export const SEED_PRODUCTS: Product[] = [
     slug: 'hijab-tape',
     name: 'Hijab tape',
     description:
-      "Les bandes adhésives qui remplacent les épingles : le hijab reste en place sans marquer ni abîmer le tissu.",
+      "Les bandes adhésives double face qui remplacent les épingles : on colle, le voile reste en place toute la journée, et rien ne marque ni n'abîme le tissu. Un sachet contient plusieurs bandes.",
     price: 1000,
     compareAtPrice: null,
-    category: 'accessoire',
+    category: 'hijab_tape',
     images: [hijabTape],
     variants: [],
     stock: null,

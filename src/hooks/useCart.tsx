@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
+import { findPhotoGroup, photoOfOption } from '@/src/lib/variants';
 import type { CartItem, Product } from '@/src/types';
 
 interface CartValue {
@@ -44,9 +45,9 @@ function makeKey(productId: string, options: Record<string, string>): string {
  * léopard et retrouve le noir & blanc dans son panier.
  */
 function pickImage(product: Product, options: Record<string, string>): string {
-  const group = product.variants.find((g) => g.options.length === product.images.length);
+  const group = findPhotoGroup(product);
   if (group) {
-    const index = group.options.indexOf(options[group.name] ?? '');
+    const index = photoOfOption(group, options[group.name] ?? '');
     if (index >= 0 && product.images[index]) return product.images[index];
   }
   return product.images[0] ?? '';

@@ -20,6 +20,7 @@ import { useToast } from '@/src/hooks/useToast';
 import { formatFcfa } from '@/src/lib/format';
 import { Link, useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
+import { findPhotoGroup, photoOfOption, photoOptionsOf } from '@/src/lib/variants';
 import { buildProductMessage } from '@/src/lib/whatsapp';
 
 export function ProductPage({ slug }: { slug: string }) {
@@ -40,13 +41,12 @@ export function ProductPage({ slug }: { slug: string }) {
 
   const colorChart = findColorChart(product?.colorChartId);
 
-  /**
-   * Groupe de variantes aligné sur les photos : autant d'options que d'images.
-   * C'est ce qui permet de faire défiler les modèles et de choisir dans le
-   * même geste, sur la fiche « Pièce unique » comme sur toute fiche construite
-   * de la même façon depuis l'admin.
-   */
-  const photoGroup = product?.variants.find((group) => group.options.length === product.images.length);
+  const photoGroup = product ? findPhotoGroup(product) : undefined;
+  /** Modèle montré par la photo n° index. */
+  const optionAtPhoto = (index: number) =>
+    photoGroup ? photoOptionsOf(photoGroup)[index] : undefined;
+  /** Première photo qui montre ce modèle. */
+  const photoAtOption = (option: string) => (photoGroup ? photoOfOption(photoGroup, option) : -1);
 
   const isSoldOutOption = (group: { soldOutOptions?: string[] }, option: string) =>
     (group.soldOutOptions ?? []).includes(option);
@@ -54,19 +54,20 @@ export function ProductPage({ slug }: { slug: string }) {
   // Première option encore disponible, présélectionnée à l'ouverture.
   useEffect(() => {
     if (!photoGroup) return;
-    const first = photoGroup.options.findIndex((option) => !isSoldOutOption(photoGroup, option));
-    if (first < 0) return;
-    setPhotoIndex(first);
+    const first = photoGroup.options.find((option) => !isSoldOutOption(photoGroup, option));
+    if (first === undefined) return;
+    setPhotoIndex(Math.max(0, photoAtOption(first)));
     setOptions((current) =>
-      current[photoGroup.name] ? current : { ...current, [photoGroup.name]: photoGroup.options[first] },
+      current[photoGroup.name] ? current : { ...current, [photoGroup.name]: first },
     );
   }, [product?.id]);
 
   /** Faire défiler la galerie choisit le modèle correspondant. */
   const handlePhotoIndex = (index: number) => {
     setPhotoIndex(index);
-    if (photoGroup && photoGroup.options[index]) {
-      setOptions((current) => ({ ...current, [photoGroup.name]: photoGroup.options[index] }));
+    const option = optionAtPhoto(index);
+    if (photoGroup && option) {
+      setOptions((current) => ({ ...current, [photoGroup.name]: option }));
     }
   };
 
@@ -74,8 +75,9 @@ export function ProductPage({ slug }: { slug: string }) {
   const handleOptions = (next: Record<string, string>) => {
     setOptions(next);
     if (photoGroup) {
-      const index = photoGroup.options.indexOf(next[photoGroup.name]);
-      if (index >= 0) setPhotoIndex(index);
+      const index = photoAtOption(next[photoGroup.name]);
+      // Une photo déjà en train de montrer ce modèle : on ne bouge pas.
+      if (index >= 0 && optionAtPhoto(photoIndex) !== next[photoGroup.name]) setPhotoIndex(index);
     }
   };
 
@@ -180,7 +182,7 @@ export function ProductPage({ slug }: { slug: string }) {
         <Gallery
           images={product.images}
           alt={product.name}
-          labels={photoGroup?.options}
+          labels={photoGroup && photoOptionsOf(photoGroup)}
           activeIndex={photoIndex}
           onIndexChange={handlePhotoIndex}
         />

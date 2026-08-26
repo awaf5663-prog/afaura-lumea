@@ -13,7 +13,7 @@ const COLUMNS = [
       { to: '/boutique?categorie=piece_unique', label: 'Pièce unique' },
       { to: '/boutique?categorie=jersey', label: 'Jersey' },
       { to: '/boutique?categorie=dentelle', label: 'Dentelle' },
-      { to: '/boutique?categorie=accessoire', label: 'Accessoires' },
+      { to: '/boutique?categorie=hijab_tape', label: 'Hijab tape' },
     ],
   },
   {

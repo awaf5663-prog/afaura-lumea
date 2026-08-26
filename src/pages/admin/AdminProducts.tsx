@@ -83,7 +83,22 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
           .map((entry) => entry.replace(/\s*\(épuisé\)\s*$/i, '').trim());
         return { name: name.trim(), options, soldOutOptions };
       })
-      .filter((group) => group.name && group.options.length > 0);
+      .filter((group) => group.name && group.options.length > 0)
+      .map((group) => {
+        /*
+         * `photoOptions` (quelle photo montre quel modèle) ne s'édite pas dans
+         * ce champ texte : on le reprend tel quel sur le groupe existant, sinon
+         * modifier un simple libellé casserait la synchronisation galerie ↔
+         * modèle. On l'abandonne s'il ne colle plus — nombre de photos changé,
+         * ou modèle renommé ou supprimé.
+         */
+        const previous = editing.variants.find((g) => g.name === group.name)?.photoOptions;
+        const valid =
+          previous &&
+          previous.length === editing.images.length &&
+          previous.every((option) => group.options.includes(option));
+        return valid ? { ...group, photoOptions: previous } : group;
+      });
 
     setSaving(true);
     try {

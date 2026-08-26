@@ -8,6 +8,7 @@ import {
   WHATSAPP_NUMBER,
 } from '@/src/config/site';
 import { DEFAULT_ALERT_THRESHOLDS, DEFAULT_PRICING, DEFAULT_PROMOTIONS } from '@/src/config/pricing';
+import { normalizeSettings } from './settingsShape';
 import { SEED_PRODUCTS } from '@/src/data/seed';
 import { computeQuote } from '@/src/lib/pricing';
 import { findPromotion } from '@/src/lib/pricing/promotions';
@@ -366,7 +367,9 @@ export const localAdapter: DataSource = {
 
   async getSettings() {
     const stored = readJson<Partial<StoreSettings>>(STORAGE_KEYS.settings, {});
-    return delay({ ...defaultSettings(), ...stored });
+    // Un navigateur peut garder des réglages enregistrés avant l'ajout d'un
+    // champ : on les complète au lieu de les prendre tels quels.
+    return delay(normalizeSettings(stored, defaultSettings()));
   },
 
   async saveSettings(settings) {

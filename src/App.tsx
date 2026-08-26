@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { CartDrawer } from '@/src/components/cart/CartDrawer';
+import { ErrorBoundary } from '@/src/components/ErrorBoundary';
 import { BottomNav } from '@/src/components/layout/BottomNav';
 import { Footer } from '@/src/components/layout/Footer';
 import { Header } from '@/src/components/layout/Header';
@@ -80,7 +81,11 @@ function Shell() {
       {!isAdmin && <Header onOpenCart={() => setCartOpen(true)} />}
 
       <main id="contenu" className={isAdmin ? 'flex-1' : 'flex-1 pb-safe-nav lg:pb-0'}>
-        <Routes />
+        {/* Le reste de la page (entête, menu, panier) survit à une erreur de
+            rendu : la cliente garde de quoi naviguer au lieu d'une page vide. */}
+        <ErrorBoundary key={path} label="cette page" className="container-page my-10">
+          <Routes />
+        </ErrorBoundary>
       </main>
 
       {!isAdmin && (

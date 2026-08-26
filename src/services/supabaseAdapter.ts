@@ -1,6 +1,7 @@
-import { DEFAULT_ALERT_THRESHOLDS, DEFAULT_PRICING, DEFAULT_PROMOTIONS } from '@/src/config/pricing';
+import { DEFAULT_PROMOTIONS } from '@/src/config/pricing';
 import { SEED_IMAGES } from '@/src/data/seed';
 import type { Grouping, Order, Product, SheinRequest, StoreSettings } from '@/src/types';
+import { normalizeAlertThresholds, normalizePricing, normalizePromotions } from './settingsShape';
 import type { DataSource, OrderDraft, SheinDraft } from './types';
 
 /**
@@ -359,6 +360,8 @@ export const supabaseAdapter: DataSource = {
   async getSettings() {
     const rows = await rest<Row[]>('settings?select=*&id=eq.1');
     const r = rows[0] ?? {};
+    /** La ligne a-t-elle déjà été enregistrée depuis l'admin ? */
+    const configured = Boolean(r.pricing && Object.keys(r.pricing).length);
     return {
       whatsappNumber: r.whatsapp_number ?? '',
       whatsappLink: r.whatsapp_link ?? '',
@@ -367,9 +370,18 @@ export const supabaseAdapter: DataSource = {
       orangeMoneyNumber: r.orange_money_number ?? '',
       deliveryFees: r.delivery_fees ?? {},
       announcement: r.announcement ?? '',
-      pricing: r.pricing ?? DEFAULT_PRICING,
-      alertThresholds: r.alert_thresholds ?? DEFAULT_ALERT_THRESHOLDS,
-      promotions: r.promotions ?? DEFAULT_PROMOTIONS,
+      // La ligne créée par schema.sql arrive avec `{}` dans ces colonnes :
+      // on les complète champ par champ, sinon l'admin plante à l'affichage.
+      pricing: normalizePricing(r.pricing),
+      alertThresholds: normalizeAlertThresholds(r.alert_thresholds),
+      // Tableau vide : sur une ligne jamais enregistrée depuis l'admin, cela
+      // veut dire « pas encore configuré » → on installe les offres livrées
+      // avec le site. Une fois un enregistrement fait, un tableau vide
+      // signifie vraiment « aucune offre » et on le respecte.
+      promotions:
+        Array.isArray(r.promotions) && (r.promotions.length || configured)
+          ? normalizePromotions(r.promotions)
+          : DEFAULT_PROMOTIONS,
     } satisfies StoreSettings;
   },
 

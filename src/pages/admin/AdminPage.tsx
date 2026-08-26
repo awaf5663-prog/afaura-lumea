@@ -1,6 +1,7 @@
 import { LogOut, RefreshCw, ShieldAlert } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/src/components/ui/Button';
+import { ErrorBoundary } from '@/src/components/ErrorBoundary';
 import { useAdminAuth } from '@/src/hooks/useAdminAuth';
 import { useSettings } from '@/src/hooks/useSettings';
 import { cn } from '@/src/lib/cn';
@@ -82,7 +83,7 @@ export function AdminPage() {
     ? computeGroupingStats(
         activeGrouping,
         requests,
-        settings?.pricing.tiers.find((t) => t.fee !== null)?.fee ?? null,
+        settings?.pricing?.tiers?.find((t) => t.fee !== null)?.fee ?? null,
       )
     : null;
 
@@ -145,6 +146,10 @@ export function AdminPage() {
       <div className="mt-8">
         {loading && <p className="text-[13px] text-stone">Chargement…</p>}
 
+        {/* Une erreur dans un onglet ne doit jamais vider toute la page :
+            elle reste ici, et les autres onglets restent utilisables.
+            La `key` remonte le filet à chaque changement d'onglet. */}
+        <ErrorBoundary key={tab} label={`l'onglet ${TABS.find((t) => t.id === tab)?.label ?? tab}`}>
         {tab === 'apercu' && (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <Stat label="Commandes" value={String(orders.length)} hint={`${pendingPayments} paiement(s) à vérifier`} />
@@ -217,7 +222,7 @@ export function AdminPage() {
             groupings={groupings}
             requests={requests}
             thresholds={settings.alertThresholds}
-            fallbackFee={settings.pricing.tiers.find((t) => t.fee !== null)?.fee ?? null}
+            fallbackFee={settings.pricing?.tiers?.find((t) => t.fee !== null)?.fee ?? null}
             whatsappConfigured={isWhatsappConfigured(settings.whatsappNumber)}
             reload={loadAll}
           />
@@ -225,6 +230,7 @@ export function AdminPage() {
         {tab === 'tarification' && <AdminPricing groupings={groupings} />}
         {tab === 'produits' && <AdminProducts products={products} reload={loadAll} />}
         {tab === 'reglages' && <AdminSettings />}
+        </ErrorBoundary>
       </div>
 
       {mode === 'local' && tab === 'reglages' && (

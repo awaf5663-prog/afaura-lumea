@@ -36,9 +36,14 @@ import satinDegradeVertRouille from '@/src/assets/products/satin-degrade-vert-ro
 import satinNoirPaillete from '@/src/assets/products/satin-noir-paillete.webp';
 import satinSablePaillete from '@/src/assets/products/satin-sable-paillete.webp';
 import satinVertEau from '@/src/assets/products/satin-vert-eau.webp';
+import viscoseBordeaux from '@/src/assets/products/viscose-bordeaux.webp';
+import viscoseEcru from '@/src/assets/products/viscose-ecru.webp';
+import viscoseKhaki from '@/src/assets/products/viscose-khaki.webp';
+import viscoseNoir from '@/src/assets/products/viscose-noir.webp';
 
 export const CATEGORIES: Category[] = [
   { id: 'piece_unique', name: 'Pièce unique' },
+  { id: 'voile_viscose', name: 'Viscose premium' },
   { id: 'voile_mj', name: 'Voile MJ' },
   { id: 'modal_imprime', name: 'Modal imprimé' },
   { id: 'modal_simple', name: 'Modal simple' },
@@ -70,7 +75,7 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     colorChartId: 'modal36',
-    createdAt: '2026-01-05T10:20:00.000Z',
+    createdAt: '2026-01-05T10:25:00.000Z',
   },
   {
     id: 'jersey-frise',
@@ -86,7 +91,7 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     colorChartId: 'frise36',
-    createdAt: '2026-01-05T10:25:00.000Z',
+    createdAt: '2026-01-05T10:30:00.000Z',
   },
   {
     id: 'satin-imprime',
@@ -120,7 +125,7 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     otherColorsAvailable: true,
-    createdAt: '2026-01-05T10:05:00.000Z',
+    createdAt: '2026-01-05T10:15:00.000Z',
   },
   {
     id: 'voile-mj',
@@ -136,7 +141,7 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     colorChartId: 'modal36',
-    createdAt: '2026-01-05T10:12:00.000Z',
+    createdAt: '2026-01-05T10:35:00.000Z',
   },
   {
     id: 'modal-simple',
@@ -175,7 +180,7 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     otherColorsAvailable: true,
-    createdAt: '2026-01-05T10:15:00.000Z',
+    createdAt: '2026-01-05T10:05:00.000Z',
   },
   {
     id: 'dentelle',
@@ -191,7 +196,7 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     colorChartId: 'dentelle12',
-    createdAt: '2026-01-05T10:00:00.000Z',
+    createdAt: '2026-01-05T10:20:00.000Z',
   },
   {
     id: 'piece-unique',
@@ -215,7 +220,23 @@ export const SEED_PRODUCTS: Product[] = [
     ],
     stock: null,
     status: 'active',
-    createdAt: '2026-01-05T10:30:00.000Z',
+    createdAt: '2026-01-05T10:00:00.000Z',
+  },
+  {
+    id: 'voile-viscose',
+    slug: 'voile-viscose',
+    name: 'Voile viscose premium',
+    description:
+      "Ce n'est pas du modal : la viscose est une autre matière, nettement plus légère et plus aérienne. Le voile se pose presque sans poids, avec un tombé long et un léger effet froissé — parfait pour les journées chaudes. Faites défiler les photos pour voir le rendu, puis choisissez votre numéro de teinte dans le nuancier ci-dessous.",
+    price: 6500,
+    compareAtPrice: null,
+    category: 'voile_viscose',
+    images: [viscoseKhaki, viscoseBordeaux, viscoseEcru, viscoseNoir],
+    variants: [],
+    stock: null,
+    status: 'active',
+    colorChartId: 'modal36',
+    createdAt: '2026-01-05T10:40:00.000Z',
   },
   {
     id: 'hijab-tape',
@@ -230,6 +251,6 @@ export const SEED_PRODUCTS: Product[] = [
     variants: [],
     stock: null,
     status: 'active',
-    createdAt: '2026-01-05T10:35:00.000Z',
+    createdAt: '2026-01-05T09:50:00.000Z',
   },
 ];

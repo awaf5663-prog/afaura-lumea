@@ -1,6 +1,9 @@
 import type { Category, Product } from '@/src/types';
 
-import dentelle from '@/src/assets/products/dentelle.webp';
+import dentelleBrunRose from '@/src/assets/products/dentelle-brun-rose.webp';
+import dentelleColoris from '@/src/assets/products/dentelle-coloris.webp';
+import dentelleNoirBlanc from '@/src/assets/products/dentelle-noir-blanc.webp';
+import dentelleNoirRose from '@/src/assets/products/dentelle-noir-rose.webp';
 import hijabTape from '@/src/assets/products/hijab-tape.webp';
 import jersey from '@/src/assets/products/jersey.webp';
 import jerseyFrise from '@/src/assets/products/jersey-frise.webp';
@@ -29,6 +32,7 @@ export const CATEGORIES: Category[] = [
   { id: 'modal_imprime', name: 'Modal imprimé' },
   { id: 'modal_simple', name: 'Modal simple' },
   { id: 'satin_imprime', name: 'Satin imprimé' },
+  { id: 'dentelle', name: 'Dentelle' },
   { id: 'hijab', name: 'Hijabs & voiles' },
   { id: 'accessoire', name: 'Accessoires' },
 ];
@@ -147,18 +151,18 @@ export const SEED_PRODUCTS: Product[] = [
   },
   {
     id: 'dentelle',
-    slug: 'hijab-dentelle',
+    slug: 'dentelle',
     name: 'Dentelle',
     description:
-      "Hijab bordé de dentelle, pour les occasions : cérémonies, fêtes, invitations. Disponible en noir et en blanc.",
+      "Hijab bordé de dentelle, pour les occasions : cérémonies, fêtes, invitations. Choisissez votre teinte dans le nuancier ci-dessous.",
     price: 5000,
     compareAtPrice: null,
-    category: 'hijab',
-    images: [dentelle],
-    variants: [{ name: 'Couleur', options: ['Noir', 'Blanc'] }],
+    category: 'dentelle',
+    images: [dentelleNoirBlanc, dentelleNoirRose, dentelleBrunRose, dentelleColoris],
+    variants: [],
     stock: null,
     status: 'active',
-    otherColorsAvailable: true,
+    colorChartId: 'dentelle12',
     createdAt: '2026-01-05T10:00:00.000Z',
   },
   {

@@ -1,5 +1,5 @@
 import { ArrowRight, ShieldCheck, Truck } from 'lucide-react';
-import heroImage from '@/src/assets/products/dentelle.webp';
+import heroImage from '@/src/assets/products/dentelle-noir-blanc.webp';
 import { Button } from '@/src/components/ui/Button';
 import { BRAND } from '@/src/config/site';
 import { Link, useRouter } from '@/src/lib/router';

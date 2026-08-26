@@ -206,7 +206,8 @@ un arrivage.
   pois sur blanc, aquarelle, léopard), avec la même galerie défilante.
 - **Modal simple** — 4 500 FCFA, teinte choisie dans le nuancier numéroté.
 - **Satin imprimé** — 3 500 FCFA, 5 modèles en galerie défilante, autres coloris sur demande.
-- **Hijabs & voiles** — Jersey 1 500 et Jersey frisé 2 000 (nuancier numéroté), Dentelle 5 000.
+- **Dentelle** — 5 000 FCFA, teinte choisie dans le nuancier dentelle de 12 teintes.
+- **Hijabs & voiles** — Jersey 1 500 et Jersey frisé 2 000, avec le nuancier 36 teintes.
 - **Accessoires** — Hijab tape 1 000.
 
 Pour ajouter un lot : créer la catégorie dans `CATEGORIES` (`src/data/seed.ts`), ou ajouter les
@@ -240,8 +241,8 @@ supabase/schema.sql     Tables, RLS, fonctions serveur
 scripts/                Génération du sitemap
 ```
 
-**Nuanciers numérotés** : `src/config/colorCharts.ts` contient les teintes relevées sur le
-nuancier du fournisseur. Un produit s'y rattache par une liste déroulante dans /admin → Produits ;
+**Nuanciers numérotés** : `src/config/colorCharts.ts` contient les teintes relevées sur les
+nuanciers du fournisseur — 36 teintes pour le modal et le jersey, 12 pour la dentelle. Un produit s'y rattache par une liste déroulante dans /admin → Produits ;
 la cliente choisit alors un numéro plutôt qu'un nom de couleur, le choix devient obligatoire, et il
 remonte dans le panier puis dans le message WhatsApp sous la forme « Couleur : n° 12 ». Les
 pastilles sont annoncées comme indicatives — un écran ne rend pas un tissu — et la disponibilité

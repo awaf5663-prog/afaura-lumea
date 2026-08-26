@@ -57,6 +57,24 @@ export const COLOR_CHARTS: ColorChart[] = [
       { code: '36', hex: '#50161c' },
     ],
   },
+  {
+    id: 'dentelle12',
+    label: 'Nuancier dentelle 12 teintes',
+    swatches: [
+      { code: '01', hex: '#171717' },
+      { code: '02', hex: '#e3e1e7' },
+      { code: '03', hex: '#ddcac0' },
+      { code: '04', hex: '#dac6bd' },
+      { code: '05', hex: '#c6a39b' },
+      { code: '06', hex: '#e6becb' },
+      { code: '07', hex: '#b6b4bd' },
+      { code: '08', hex: '#172549' },
+      { code: '09', hex: '#b07289' },
+      { code: '10', hex: '#a582c7' },
+      { code: '11', hex: '#d6b8a4' },
+      { code: '12', hex: '#e0c4bd' },
+    ],
+  },
 ];
 
 export function findColorChart(id: string | undefined | null): ColorChart | null {

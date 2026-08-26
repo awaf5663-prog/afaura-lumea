@@ -96,7 +96,20 @@ export function ConfirmationPage({ orderNumber }: { orderNumber: string }) {
               {formatFcfa(order.total)}
               {order.deliveryFee === null && <span className="text-[12.5px] text-stone"> + livraison</span>}
             </Row>
-            <Row label="Livraison">{order.deliveryLabel}</Row>
+            <Row label="Livraison">
+              {order.deliveryLabel}
+              {order.deliveryFeeBeforePromotion ? (
+                <span className="ml-2 text-mauve">— offerte</span>
+              ) : null}
+            </Row>
+            {order.promotionLabel && (
+              <Row label="Offre appliquée">
+                <span className="text-mauve">{order.promotionLabel}</span>
+                {order.discount > 0 && (
+                  <span className="ml-1 text-mauve">(− {formatFcfa(order.discount)})</span>
+                )}
+              </Row>
+            )}
             <Row label="Paiement">{order.paymentMethodLabel}</Row>
             <Row label="Statut du paiement">{PAYMENT_STATUS_LABEL[order.paymentStatus]}</Row>
           </dl>

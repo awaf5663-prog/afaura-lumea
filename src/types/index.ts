@@ -114,7 +114,15 @@ export interface Order {
   /** null = frais non encore paramétrés, à confirmer avec la cliente. */
   deliveryFee: number | null;
   subtotal: number;
-  /** subtotal + deliveryFee (deliveryFee null compté comme 0, l'UI le signale). */
+  /** Frais de livraison avant promotion, quand une offre les a annulés. */
+  deliveryFeeBeforePromotion?: number | null;
+  /** Remise appliquée, en FCFA. 0 = aucune. */
+  discount: number;
+  /** Nom de l'offre appliquée, pour l'afficher à la cliente. */
+  promotionLabel: string | null;
+  /** Code saisi par la cliente, tel quel. Vide = aucun. */
+  promoCode: string;
+  /** subtotal + deliveryFee − discount (deliveryFee null compté comme 0, l'UI le signale). */
   total: number;
   paymentMethod: string;
   paymentMethodLabel: string;
@@ -176,6 +184,8 @@ export interface SheinRequest {
    * avant d'accorder l'offre, et le site le dit à la cliente.
    */
   isStudent: boolean;
+  /** Code promo saisi par la cliente, tel quel. Vide = aucun. */
+  promoCode: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -250,6 +260,8 @@ export interface Quote {
    * explication, et de retrouver le tarif normal si la promotion est retirée.
    */
   deliveryFeeBeforePromotion?: number | null;
+  /** Remise appliquée sur le total, en FCFA. 0 = aucune. */
+  discount?: number;
   /** Nom de la promotion appliquée, pour l'afficher à la cliente. */
   promotionLabel?: string | null;
   /** Somme des lignes connues. */
@@ -320,8 +332,20 @@ export interface StoreSettings {
    Promotions
    ───────────────────────────────────────────────────────────── */
 
-/** Ce qu'une promotion change. Une seule sorte pour l'instant, extensible. */
-export type PromotionEffect = { type: 'free_delivery' };
+/**
+ * Ce qu'une promotion change.
+ *
+ * Un seul effet par offre : deux réductions qui se cumulent sur une même
+ * commande donnent des totaux que personne n'arrive à expliquer à une cliente.
+ * Pour cumuler, il faut créer une offre qui le dise.
+ */
+export type PromotionEffect =
+  /** La livraison passe à 0. Sans effet si son tarif n'est pas encore fixé. */
+  | { type: 'free_delivery' }
+  /** Les frais de traitement du service SHEIN passent à 0. */
+  | { type: 'free_service_fee' }
+  /** Remise en FCFA sur le total, plafonnée au total pour ne jamais passer sous zéro. */
+  | { type: 'discount_amount'; amount: number };
 
 /**
  * Une offre et ses conditions.
@@ -343,6 +367,15 @@ export interface Promotion {
   active: boolean;
   /** À quel type de commande elle s'applique. */
   scope: 'shein' | 'store' | 'all';
+  /**
+   * Code à saisir par la cliente. Vide = l'offre s'applique d'elle-même dès
+   * que les autres conditions sont remplies.
+   *
+   * Un code promo n'est pas un secret : il circule sur Instagram et WhatsApp,
+   * et une personne curieuse peut le retrouver dans la page. Il sert à mener
+   * une campagne, pas à protéger quelque chose de précieux.
+   */
+  code: string;
   /** Réservée aux clientes qui se déclarent étudiantes. */
   studentOnly: boolean;
   /** Début de la période (ISO, date seule). null = pas de date de début. */

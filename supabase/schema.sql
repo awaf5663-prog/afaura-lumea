@@ -49,7 +49,11 @@ create table if not exists orders (
   delivery_zone_id text not null,
   delivery_label text not null,
   delivery_fee integer,                                -- null = à confirmer
+  delivery_fee_before_promotion integer,               -- tarif avant offre, si offerte
   subtotal integer not null,
+  discount integer not null default 0,
+  promotion_label text,
+  promo_code text not null default '',
   total integer not null,
   payment_method text not null,
   payment_method_label text not null,
@@ -107,6 +111,7 @@ create table if not exists shein_requests (
   -- Déclaration de la cliente, jamais une vérification : la boutique confirme
   -- avant d'accorder une offre réservée aux étudiantes.
   is_student boolean not null default false,
+  promo_code text not null default '',
   quote jsonb,                                         -- estimation calculée côté serveur
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -158,7 +163,9 @@ create or replace function create_order(
   p_note text,
   p_delivery_zone_id text,
   p_payment_method text,
-  p_items jsonb
+  p_items jsonb,
+  p_promo_code text default '',
+  p_is_student boolean default false
 ) returns jsonb
 language plpgsql
 security definer
@@ -173,23 +180,32 @@ declare
   v_product products%rowtype;
   v_quantity integer;
   v_label text;
+  v_promotions jsonb;
+  v_promo jsonb;
+  v_promo_label text;
+  v_fee_before integer;
+  v_discount integer := 0;
+  v_today text := to_char(now(), 'YYYY-MM-DD');
+  v_code text := upper(btrim(coalesce(p_promo_code, '')));
 begin
   if jsonb_array_length(coalesce(p_items, '[]'::jsonb)) = 0 then
     raise exception 'Panier vide';
   end if;
 
-  select (delivery_fees ->> p_delivery_zone_id)::integer into v_fee from settings where id = 1;
+  select (delivery_fees ->> p_delivery_zone_id)::integer, coalesce(promotions, '[]'::jsonb)
+    into v_fee, v_promotions
+    from settings where id = 1;
   v_label := p_delivery_zone_id;
   v_number := 'CMD-' || to_char(now(), 'YYYY') || '-' || lpad(nextval('order_seq')::text, 5, '0');
 
   insert into orders (
     order_number, customer_name, phone, address, city, note,
     delivery_zone_id, delivery_label, delivery_fee, subtotal, total,
-    payment_method, payment_method_label
+    payment_method, payment_method_label, promo_code
   ) values (
     v_number, p_customer_name, p_phone, p_address, p_city, p_note,
     p_delivery_zone_id, v_label, v_fee, 0, 0,
-    p_payment_method, p_payment_method
+    p_payment_method, p_payment_method, v_code
   ) returning id into v_order_id;
 
   for v_item in select * from jsonb_array_elements(p_items) loop
@@ -216,9 +232,48 @@ begin
     end if;
   end loop;
 
+  -- Offres. Toutes les conditions renseignées doivent être remplies ; une liste
+  -- vide ne restreint rien. Vérifiées ici, jamais d'après le navigateur, qui ne
+  -- transmet qu'un code et une déclaration.
+  for v_promo in select * from jsonb_array_elements(v_promotions) loop
+    continue when not coalesce((v_promo ->> 'active')::boolean, false);
+    continue when coalesce(v_promo ->> 'scope', 'all') not in ('all', 'store');
+    continue when coalesce((v_promo ->> 'studentOnly')::boolean, false)
+                  and not coalesce(p_is_student, false);
+    continue when v_promo ->> 'startsAt' is not null and v_today < (v_promo ->> 'startsAt');
+    continue when v_promo ->> 'endsAt' is not null and v_today > (v_promo ->> 'endsAt');
+    continue when jsonb_array_length(coalesce(v_promo -> 'deliveryOptionIds', '[]'::jsonb)) > 0
+                  and not (coalesce(v_promo -> 'deliveryOptionIds', '[]'::jsonb)
+                           ? p_delivery_zone_id);
+    -- Une offre à code ne s'applique jamais toute seule.
+    continue when upper(btrim(coalesce(v_promo ->> 'code', ''))) <> v_code;
+
+    if coalesce(v_promo -> 'effect' ->> 'type', '') = 'free_delivery'
+       and v_fee is not null and v_fee > 0 then
+      v_fee_before := v_fee;
+      v_fee := 0;
+      v_promo_label := v_promo ->> 'label';
+      exit;
+    elsif coalesce(v_promo -> 'effect' ->> 'type', '') = 'discount_amount' then
+      -- Plafonnée au montant connu : une remise ne rend jamais d'argent.
+      v_discount := least(
+        greatest(0, coalesce((v_promo -> 'effect' ->> 'amount')::integer, 0)),
+        v_subtotal + coalesce(v_fee, 0)
+      );
+      if v_discount > 0 then
+        v_promo_label := v_promo ->> 'label';
+        exit;
+      end if;
+    end if;
+  end loop;
+
   update orders
      set subtotal = v_subtotal,
-         total = v_subtotal + coalesce(v_fee, 0)
+         delivery_fee = v_fee,
+         delivery_fee_before_promotion = v_fee_before,
+         discount = v_discount,
+         promotion_label = v_promo_label,
+         total = v_subtotal + coalesce(v_fee, 0) - v_discount
    where id = v_order_id;
 
   return (
@@ -236,7 +291,8 @@ create or replace function create_shein_request(
   p_note text,
   p_delivery_option_id text,
   p_items jsonb,
-  p_is_student boolean default false
+  p_is_student boolean default false,
+  p_promo_code text default ''
 ) returns jsonb
 language plpgsql
 security definer
@@ -265,6 +321,7 @@ declare
   v_promo_label text;
   v_delivery_before integer;
   v_today text := to_char(now(), 'YYYY-MM-DD');
+  v_code text := upper(btrim(coalesce(p_promo_code, '')));
 begin
   if jsonb_array_length(coalesce(p_items, '[]'::jsonb)) = 0 then
     raise exception 'Aucun article';
@@ -340,6 +397,7 @@ begin
       continue when jsonb_array_length(coalesce(v_promo -> 'deliveryOptionIds', '[]'::jsonb)) > 0
                     and not (coalesce(v_promo -> 'deliveryOptionIds', '[]'::jsonb)
                              ? p_delivery_option_id);
+      continue when upper(btrim(coalesce(v_promo ->> 'code', ''))) <> v_code;
       continue when coalesce(v_promo -> 'effect' ->> 'type', '') <> 'free_delivery';
 
       v_delivery_before := v_delivery;
@@ -368,10 +426,10 @@ begin
 
   insert into shein_requests (
     request_number, customer_name, phone, note, grouping_id, delivery_option_id,
-    is_student, quote
+    is_student, promo_code, quote
   ) values (
     v_number, p_customer_name, p_phone, p_note, v_grouping.id, p_delivery_option_id,
-    coalesce(p_is_student, false), v_quote
+    coalesce(p_is_student, false), v_code, v_quote
   ) returning id into v_id;
 
   for v_item in select * from jsonb_array_elements(p_items) loop
@@ -534,8 +592,8 @@ drop policy if exists "reglages admin" on settings;
 create policy "reglages admin" on settings for all to authenticated using (true) with check (true);
 
 -- Les fonctions publiques sont exposées explicitement.
-grant execute on function create_order(text, text, text, text, text, text, text, jsonb) to anon, authenticated;
-grant execute on function create_shein_request(text, text, text, text, jsonb, boolean) to anon, authenticated;
+grant execute on function create_order(text, text, text, text, text, text, text, jsonb, text, boolean) to anon, authenticated;
+grant execute on function create_shein_request(text, text, text, text, jsonb, boolean, text) to anon, authenticated;
 grant execute on function transfer_shein_requests(uuid, uuid) to authenticated;
 grant execute on function find_order(text, text) to anon, authenticated;
 grant execute on function find_shein_request(text, text) to anon, authenticated;

@@ -18,6 +18,10 @@ export interface OrderDraft {
   note?: string;
   deliveryZoneId: string;
   paymentMethod: string;
+  /** Code promo saisi par la cliente. Vide = aucun. */
+  promoCode: string;
+  /** Déclaration de la cliente, jamais une vérification. */
+  isStudent: boolean;
   items: Array<{ productId: string; quantity: number; options: Record<string, string> }>;
 }
 
@@ -29,6 +33,8 @@ export interface SheinDraft {
   items: SheinRequest['items'];
   /** Déclaration de la cliente, jamais une vérification. */
   isStudent: boolean;
+  /** Code promo saisi par la cliente. Vide = aucun. */
+  promoCode: string;
 }
 
 /**

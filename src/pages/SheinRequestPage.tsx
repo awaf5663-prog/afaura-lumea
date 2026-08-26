@@ -1,6 +1,7 @@
 import { AlertCircle, ImagePlus, Plus, Trash2, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { GroupingCapacity } from '@/src/components/shein/GroupingCapacity';
+import { PromoCodeField } from '@/src/components/order/PromoCodeField';
 import { PromotionNotice } from '@/src/components/shein/PromotionNotice';
 import { QuoteSummary } from '@/src/components/shein/QuoteSummary';
 import { Button } from '@/src/components/ui/Button';
@@ -60,6 +61,7 @@ export function SheinRequestPage() {
   const [note, setNote] = useState('');
   const [deliveryOptionId, setDeliveryOptionId] = useState('');
   const [isStudent, setIsStudent] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
   const [items, setItems] = useState<SheinItem[]>([emptyItem('XOF')]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -95,19 +97,27 @@ export function SheinRequestPage() {
   const asksStudent = offers.some((offer) => offer.studentOnly);
 
   /** Estimation affichée en direct. Elle est recalculée côté données à l'envoi. */
+  const promoContext = useMemo(
+    () => ({
+      kind: 'shein' as const,
+      isStudent,
+      // Le groupage n'est attribué qu'à l'enregistrement : ici on ne restreint
+      // pas, l'estimation reste une estimation.
+      groupingId: null,
+      deliveryOptionId,
+    }),
+    [isStudent, deliveryOptionId],
+  );
+
   const quote = useMemo(
     () =>
       pricing
         ? computeQuote(items, deliveryOptionId, pricing, settings?.promotions ?? [], {
-            kind: 'shein',
-            isStudent,
-            // Le groupage n'est attribué qu'à l'enregistrement : ici on ne
-            // restreint pas, l'estimation reste une estimation.
-            groupingId: null,
-            deliveryOptionId,
+            ...promoContext,
+            code: promoCode,
           })
         : null,
-    [items, deliveryOptionId, pricing, settings?.promotions, isStudent],
+    [items, deliveryOptionId, pricing, settings?.promotions, promoContext, promoCode],
   );
 
   const updateItem = (index: number, patch: Partial<SheinItem>) => {
@@ -170,6 +180,7 @@ export function SheinRequestPage() {
         note,
         deliveryOptionId,
         isStudent,
+        promoCode,
         items: items.filter((item) => item.productUrl.trim() || item.reference.trim()),
       });
 
@@ -479,6 +490,10 @@ export function SheinRequestPage() {
               </label>
             </div>
           )}
+
+          <div className="mt-4">
+            <PromoCodeField value={promoCode} onChange={setPromoCode} context={promoContext} />
+          </div>
         </section>
 
         {quote && quote.itemCount > 0 && (

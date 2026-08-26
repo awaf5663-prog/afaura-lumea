@@ -11,8 +11,15 @@ export interface PromotionContext {
   isStudent: boolean;
   groupingId: string | null;
   deliveryOptionId: string;
+  /** Code saisi par la cliente. Vide = aucun. */
+  code?: string;
   /** Date de la commande. Injectée pour rester testable. */
   now?: Date;
+}
+
+/** Les codes se comparent sans casse ni espaces : « rentree25 » = « RENTREE25 ». */
+export function normalizeCode(code: string | undefined | null): string {
+  return (code ?? '').trim().toUpperCase();
 }
 
 /** Une date de fin est incluse : l'offre court jusqu'au bout de la journée. */
@@ -41,7 +48,64 @@ export function promotionApplies(promotion: Promotion, context: PromotionContext
   if (promotion.deliveryOptionIds.length > 0) {
     if (!promotion.deliveryOptionIds.includes(context.deliveryOptionId)) return false;
   }
+  // Une offre à code ne s'applique jamais toute seule, même si tout le reste
+  // est rempli : c'est la cliente qui la déclenche.
+  if (normalizeCode(promotion.code) !== normalizeCode(context.code)) return false;
   return true;
+}
+
+/** Décrit l'effet en une ligne, pour l'admin comme pour la cliente. */
+export function describeEffect(effect: Promotion['effect']): string {
+  switch (effect.type) {
+    case 'free_delivery':
+      return 'Livraison offerte';
+    case 'free_service_fee':
+      return 'Frais de traitement offerts';
+    case 'discount_amount':
+      return `Remise de ${effect.amount.toLocaleString('fr-FR')} FCFA`;
+  }
+}
+
+/**
+ * Pourquoi un code ne passe pas.
+ *
+ * Renvoie null quand tout va bien. Sert à répondre à la cliente autre chose
+ * que « code invalide » quand le code existe mais que la commande ne remplit
+ * pas les conditions — c'est la différence entre une cliente qui corrige et
+ * une cliente qui abandonne.
+ */
+export function explainCode(
+  promotions: Promotion[],
+  context: PromotionContext,
+): { promotion: Promotion } | { reason: string } | null {
+  const typed = normalizeCode(context.code);
+  if (!typed) return null;
+
+  const match = promotions.find((p) => normalizeCode(p.code) === typed);
+  if (!match) return { reason: "Ce code n'existe pas." };
+  if (promotionApplies(match, context)) return { promotion: match };
+
+  const now = context.now ?? new Date();
+  if (!match.active) return { reason: "Cette offre n'est plus active." };
+  if (!withinPeriod(match, now)) return { reason: "Cette offre n'est pas en cours." };
+  if (match.scope !== 'all' && match.scope !== context.kind) {
+    return {
+      reason:
+        match.scope === 'shein'
+          ? 'Ce code est réservé aux commandes SHEIN.'
+          : 'Ce code est réservé aux commandes de la boutique.',
+    };
+  }
+  if (match.studentOnly && !context.isStudent) {
+    return { reason: 'Ce code est réservé aux étudiantes : cochez la case ci-dessus.' };
+  }
+  if (
+    match.deliveryOptionIds.length > 0 &&
+    !match.deliveryOptionIds.includes(context.deliveryOptionId)
+  ) {
+    return { reason: "Ce code ne s'applique pas au mode de livraison choisi." };
+  }
+  return { reason: "Ce code ne s'applique pas à cette commande." };
 }
 
 /** Première promotion applicable, ou null. */

@@ -60,9 +60,20 @@ export function buildOrderMessage(order: Order): string {
   lines.push(`Sous-total : ${formatFcfa(order.subtotal)}`);
   lines.push(
     `Livraison : ${order.deliveryLabel}${
-      order.deliveryFee === null ? ' (frais à confirmer)' : ` — ${formatFcfa(order.deliveryFee)}`
+      order.deliveryFeeBeforePromotion
+        ? ` — offerte (${formatFcfa(order.deliveryFeeBeforePromotion)})`
+        : order.deliveryFee === null
+          ? ' (frais à confirmer)'
+          : ` — ${formatFcfa(order.deliveryFee)}`
     }`,
   );
+  if (order.promotionLabel) {
+    lines.push(
+      `Offre : ${order.promotionLabel}${
+        order.discount > 0 ? ` — remise ${formatFcfa(order.discount)}` : ''
+      }${order.promoCode ? ` (code ${order.promoCode})` : ''}`,
+    );
+  }
   if (order.address) lines.push(`Adresse : ${order.address}, ${order.city}`);
   lines.push(
     `Total : ${formatFcfa(order.total)}${order.deliveryFee === null ? ' + livraison' : ''}`,

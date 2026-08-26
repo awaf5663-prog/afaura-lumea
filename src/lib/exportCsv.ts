@@ -34,7 +34,8 @@ export function ordersCsv(orders: Order[]): { filename: string; content: string 
     [
       'Numéro', 'Date', 'Cliente', 'Téléphone', 'Ville', 'Adresse',
       'Articles', 'Sous-total FCFA', 'Livraison', 'Frais livraison FCFA',
-      'Total FCFA', 'Paiement', 'État paiement', 'Étape', 'Commentaire',
+      'Total FCFA', 'Code promo', 'Offre', 'Remise FCFA',
+      'Paiement', 'État paiement', 'Étape', 'Commentaire',
     ],
     orders.map((order) => [
       order.orderNumber,
@@ -55,6 +56,9 @@ export function ordersCsv(orders: Order[]): { filename: string; content: string 
       order.deliveryLabel,
       order.deliveryFee ?? 'à confirmer',
       order.total,
+      order.promoCode,
+      order.promotionLabel ?? '',
+      order.discount,
       order.paymentMethodLabel,
       PAYMENT_STATUS_LABEL[order.paymentStatus],
       ORDER_STATUS_LABEL[order.orderStatus],
@@ -88,6 +92,9 @@ export function sheinCsv(requests: SheinRequest[]): { filename: string; content:
         request.quote?.deliveryFee ?? 'à confirmer',
         request.quote?.total ?? '',
         request.quotedTotal ?? 'non communiqué',
+        request.isStudent ? 'oui' : 'non',
+        request.promoCode ?? '',
+        request.quote?.promotionLabel ?? '',
         SHEIN_STATUS_LABEL[request.status],
         request.note ?? '',
       ]);
@@ -98,7 +105,7 @@ export function sheinCsv(requests: SheinRequest[]): { filename: string; content:
       'Demande', 'Date', 'Cliente', 'Téléphone', 'N° article', 'Référence', 'Lien',
       'Taille', 'Couleur', 'Qté', 'Prix affiché', 'Devise',
       'Articles FCFA (est.)', 'Frais de traitement', 'Livraison', 'Total estimé',
-      'Montant confirmé', 'Étape', 'Commentaire',
+      'Montant confirmé', 'Étudiante', 'Code promo', 'Offre', 'Étape', 'Commentaire',
     ],
     rows,
   );

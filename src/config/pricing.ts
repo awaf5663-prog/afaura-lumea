@@ -98,6 +98,8 @@ export const DEFAULT_PROMOTIONS: Promotion[] = [
       'Commande SHEIN étudiante : la livraison à Saint-Louis est offerte pendant la durée de l’offre.',
     active: true,
     scope: 'shein',
+    // Code à communiquer sur Instagram et WhatsApp. Vide = offre automatique.
+    code: 'RENTREE',
     studentOnly: true,
     startsAt: null,
     endsAt: null,

@@ -122,7 +122,11 @@ const toOrder = (r: Row): Order => ({
   deliveryZoneId: r.delivery_zone_id,
   deliveryLabel: r.delivery_label,
   deliveryFee: r.delivery_fee,
+  deliveryFeeBeforePromotion: r.delivery_fee_before_promotion ?? null,
   subtotal: r.subtotal,
+  discount: r.discount ?? 0,
+  promotionLabel: r.promotion_label ?? null,
+  promoCode: r.promo_code ?? '',
   total: r.total,
   paymentMethod: r.payment_method,
   paymentMethodLabel: r.payment_method_label,
@@ -162,6 +166,7 @@ const toShein = (r: Row): SheinRequest => ({
   quote: r.quote ?? null,
   deliveryOptionId: r.delivery_option_id ?? '',
   isStudent: r.is_student ?? false,
+  promoCode: r.promo_code ?? '',
   createdAt: r.created_at,
   updatedAt: r.updated_at,
 });
@@ -233,6 +238,8 @@ export const supabaseAdapter: DataSource = {
         p_note: draft.note ?? null,
         p_delivery_zone_id: draft.deliveryZoneId,
         p_payment_method: draft.paymentMethod,
+        p_promo_code: draft.promoCode,
+        p_is_student: draft.isStudent,
         p_items: draft.items.map((i) => ({
           product_id: i.productId,
           quantity: i.quantity,
@@ -278,6 +285,7 @@ export const supabaseAdapter: DataSource = {
         p_note: draft.note ?? null,
         p_delivery_option_id: draft.deliveryOptionId,
         p_is_student: draft.isStudent,
+        p_promo_code: draft.promoCode,
         p_items: draft.items.map((i) => ({
           product_url: i.productUrl,
           reference: i.reference,

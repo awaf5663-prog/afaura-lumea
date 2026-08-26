@@ -1,11 +1,14 @@
 import { AlertCircle, Info, Lock, MessageCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { PromoCodeField } from '@/src/components/order/PromoCodeField';
+import { PromotionNotice } from '@/src/components/shein/PromotionNotice';
 import { Button } from '@/src/components/ui/Button';
 import { ErrorText, FormRow, Input, Label, Textarea } from '@/src/components/ui/Field';
 import { PAYMENT_METHODS } from '@/src/config/site';
 import { useCart } from '@/src/hooks/useCart';
 import { useSettings } from '@/src/hooks/useSettings';
 import { useToast } from '@/src/hooks/useToast';
+import { findPromotion, visiblePromotions } from '@/src/lib/pricing/promotions';
 import { cn } from '@/src/lib/cn';
 import { formatFcfa, isValidSenegalPhone, normalizePhone } from '@/src/lib/format';
 import { useRouter } from '@/src/lib/router';
@@ -22,11 +25,13 @@ interface FormState {
   note: string;
   zoneId: string;
   paymentMethod: string;
+  promoCode: string;
+  isStudent: boolean;
 }
 
 export function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
-  const { zones } = useSettings();
+  const { zones, settings } = useSettings();
   const { navigate } = useRouter();
   const { notify } = useToast();
 
@@ -39,6 +44,8 @@ export function CheckoutPage() {
     note: '',
     zoneId: zones[0]?.id ?? 'pickup',
     paymentMethod: PAYMENT_METHODS[0].id,
+    promoCode: '',
+    isStudent: false,
   });
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitting, setSubmitting] = useState(false);
@@ -52,8 +59,37 @@ export function CheckoutPage() {
 
   const zone = useMemo(() => zones.find((z) => z.id === form.zoneId) ?? zones[0], [zones, form.zoneId]);
   const method = PAYMENT_METHODS.find((m) => m.id === form.paymentMethod) ?? PAYMENT_METHODS[0];
-  const deliveryFee = zone?.fee ?? null;
-  const total = subtotal + (deliveryFee ?? 0);
+  const rawDeliveryFee = zone?.fee ?? null;
+
+  /**
+   * Aperçu de l'offre. Recalculé à l'identique côté données à l'enregistrement :
+   * ce que la cliente voit ici ne décide de rien.
+   */
+  const promoContext = useMemo(
+    () => ({
+      kind: 'store' as const,
+      isStudent: form.isStudent,
+      groupingId: null,
+      deliveryOptionId: form.zoneId,
+    }),
+    [form.isStudent, form.zoneId],
+  );
+  const promotion = findPromotion(settings?.promotions ?? [], {
+    ...promoContext,
+    code: form.promoCode,
+  });
+  const freeDelivery =
+    promotion?.effect.type === 'free_delivery' && rawDeliveryFee !== null && rawDeliveryFee > 0;
+  const deliveryFee = freeDelivery ? 0 : rawDeliveryFee;
+  const discount =
+    promotion?.effect.type === 'discount_amount'
+      ? Math.min(Math.max(0, promotion.effect.amount), subtotal + (rawDeliveryFee ?? 0))
+      : 0;
+  const total = subtotal + (deliveryFee ?? 0) - discount;
+
+  const asksStudent = visiblePromotions(settings?.promotions ?? [], 'store').some(
+    (offer) => offer.studentOnly,
+  );
 
   if (items.length === 0 && !submitting) {
     return (
@@ -67,7 +103,7 @@ export function CheckoutPage() {
     );
   }
 
-  const set = (key: keyof FormState, value: string) => {
+  const set = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [key]: value }));
     setErrors((prev) => ({ ...prev, [key]: undefined }));
   };
@@ -106,6 +142,8 @@ export function CheckoutPage() {
         note: form.note,
         deliveryZoneId: form.zoneId,
         paymentMethod: form.paymentMethod,
+        promoCode: form.promoCode,
+        isStudent: form.isStudent,
         items: items.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
@@ -257,6 +295,36 @@ export function CheckoutPage() {
           </section>
 
           <section className="mt-10">
+            <PromotionNotice kind="store" />
+
+            {asksStudent && (
+              <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-[--radius-md] border border-line bg-cream/60 p-4">
+                <input
+                  type="checkbox"
+                  checked={form.isStudent}
+                  onChange={(e) => set('isStudent', e.target.checked)}
+                  className="mt-1 size-4 accent-[#8f4b5b]"
+                />
+                <span className="text-[13.5px] leading-relaxed text-graphite">
+                  <span className="font-medium">Je suis étudiante</span>
+                  <span className="mt-1 block text-[12.5px] text-stone">
+                    Une offre en cours est réservée aux étudiantes. Nous vous demanderons votre
+                    carte sur WhatsApp avant de l'appliquer.
+                  </span>
+                </span>
+              </label>
+            )}
+
+            <div className="mt-4">
+              <PromoCodeField
+                value={form.promoCode}
+                onChange={(next) => set('promoCode', next)}
+                context={promoContext}
+              />
+            </div>
+          </section>
+
+          <section className="mt-10">
             <h2 className="text-[22px]">3. Paiement</h2>
             <div className="mt-5 space-y-3">
               {PAYMENT_METHODS.map((m) => (
@@ -349,9 +417,26 @@ export function CheckoutPage() {
               <div className="flex justify-between">
                 <dt className="text-stone">{zone?.label}</dt>
                 <dd className="tabular-nums">
-                  {deliveryFee === null ? 'À confirmer' : deliveryFee === 0 ? 'Gratuit' : formatFcfa(deliveryFee)}
+                  {freeDelivery ? (
+                    <>
+                      <span className="text-stone line-through">{formatFcfa(rawDeliveryFee ?? 0)}</span>
+                      <span className="ml-2 font-medium text-mauve">Offerte</span>
+                    </>
+                  ) : deliveryFee === null ? (
+                    'À confirmer'
+                  ) : deliveryFee === 0 ? (
+                    'Gratuit'
+                  ) : (
+                    formatFcfa(deliveryFee)
+                  )}
                 </dd>
               </div>
+              {discount > 0 && (
+                <div className="flex justify-between">
+                  <dt className="text-mauve">{promotion?.label ?? 'Remise'}</dt>
+                  <dd className="tabular-nums text-mauve">− {formatFcfa(discount)}</dd>
+                </div>
+              )}
               <div className="flex justify-between border-t border-line pt-3 text-[18px]">
                 <dt>Total</dt>
                 <dd className="font-medium tabular-nums">

@@ -31,12 +31,24 @@ export function QuoteSummary({ quote, title = 'Estimation' }: { quote: Quote; ti
               : 'À confirmer'
           }
         />
-        <Line
-          label="Frais de traitement"
-          hint={quote.serviceFeeReason}
-          value={quote.serviceFee}
-          missing="Calcul personnalisé"
-        />
+        {quote.promotionLabel && quote.serviceFee === 0 ? (
+          <div className="flex items-baseline justify-between gap-4">
+            <dt className="min-w-0">
+              <span className="block">Frais de traitement</span>
+              <span className="mt-0.5 block text-[12px] leading-snug text-mauve">
+                {quote.promotionLabel}
+              </span>
+            </dt>
+            <dd className="shrink-0 font-medium text-mauve">Offerts</dd>
+          </div>
+        ) : (
+          <Line
+            label="Frais de traitement"
+            hint={quote.serviceFeeReason}
+            value={quote.serviceFee}
+            missing="Calcul personnalisé"
+          />
+        )}
         {/*
           Livraison offerte : on montre le tarif barré plutôt qu'un zéro sec.
           « Offerte » sans le prix d'origine ne dit rien de la valeur de l'offre.
@@ -58,6 +70,13 @@ export function QuoteSummary({ quote, title = 'Estimation' }: { quote: Quote; ti
           </div>
         ) : (
           <Line label={quote.deliveryLabel || 'Livraison'} value={quote.deliveryFee} missing="À confirmer" />
+        )}
+
+        {(quote.discount ?? 0) > 0 && (
+          <div className="flex items-baseline justify-between gap-4">
+            <dt className="text-mauve">{quote.promotionLabel ?? 'Remise'}</dt>
+            <dd className="shrink-0 tabular-nums text-mauve">− {formatFcfa(quote.discount ?? 0)}</dd>
+          </div>
         )}
 
         <div className="flex items-baseline justify-between gap-4 border-t border-line pt-3">

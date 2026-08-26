@@ -1,5 +1,6 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { ErrorText, FormRow, Input, Label, Select, Textarea } from '@/src/components/ui/Field';
+import { describeEffect } from '@/src/lib/pricing/promotions';
 import { cn } from '@/src/lib/cn';
 import type { Grouping, Promotion, SheinDeliveryOption } from '@/src/types';
 
@@ -39,6 +40,7 @@ export function PromotionEditor({
         description: '',
         active: false,
         scope: 'shein',
+        code: '',
         studentOnly: false,
         startsAt: null,
         endsAt: null,
@@ -110,6 +112,60 @@ export function PromotionEditor({
                 </Select>
               </FormRow>
             </div>
+
+            <div className="grid gap-x-4 sm:grid-cols-2">
+              <FormRow>
+                <Label htmlFor={`p-code-${index}`} hint="vide = offre automatique">
+                  Code promo
+                </Label>
+                <Input
+                  id={`p-code-${index}`}
+                  value={promotion.code}
+                  placeholder="Ex. RENTREE"
+                  autoCapitalize="characters"
+                  spellCheck={false}
+                  onChange={(e) => patch(index, { code: e.target.value.toUpperCase() })}
+                />
+              </FormRow>
+              <FormRow>
+                <Label htmlFor={`p-effect-${index}`}>Ce que l'offre change</Label>
+                <Select
+                  id={`p-effect-${index}`}
+                  value={promotion.effect.type}
+                  onChange={(e) => {
+                    const type = e.target.value as Promotion['effect']['type'];
+                    patch(index, {
+                      effect:
+                        type === 'discount_amount'
+                          ? { type, amount: 1000 }
+                          : { type },
+                    });
+                  }}
+                >
+                  <option value="free_delivery">Livraison offerte</option>
+                  <option value="free_service_fee">Frais de traitement offerts</option>
+                  <option value="discount_amount">Remise en FCFA</option>
+                </Select>
+              </FormRow>
+            </div>
+
+            {promotion.effect.type === 'discount_amount' && (
+              <FormRow>
+                <Label htmlFor={`p-amount-${index}`}>Montant de la remise (FCFA)</Label>
+                <Input
+                  id={`p-amount-${index}`}
+                  type="number"
+                  min={0}
+                  step={500}
+                  value={promotion.effect.amount}
+                  onChange={(e) =>
+                    patch(index, {
+                      effect: { type: 'discount_amount', amount: Math.max(0, Number(e.target.value)) },
+                    })
+                  }
+                />
+              </FormRow>
+            )}
 
             <FormRow>
               <Label htmlFor={`p-desc-${index}`} hint="visible par la cliente">
@@ -214,9 +270,14 @@ export function PromotionEditor({
             </div>
 
             <p className="mt-4 rounded-[--radius-sm] bg-cream/70 px-3.5 py-2.5 text-[12px] leading-relaxed text-graphite">
-              Effet : <strong className="font-medium">livraison offerte</strong> sur les options
-              cochées. Une livraison dont le tarif n'est pas encore fixé n'est pas offerte — on ne
-              peut pas offrir un montant qu'on ne connaît pas.
+              Effet : <strong className="font-medium">{describeEffect(promotion.effect)}</strong>
+              {promotion.code.trim() === ''
+                ? ", appliqué dès que les conditions sont remplies, sans que la cliente ait rien à saisir."
+                : ` — la cliente doit saisir « ${promotion.code.trim()} ».`}{' '}
+              Une ligne dont le montant n'est pas encore fixé n'est jamais offerte : on ne peut pas
+              offrir un montant qu'on ne connaît pas.
+              {promotion.effect.type === 'free_service_fee' &&
+                ' Les frais de traitement n’existent que sur les commandes SHEIN.'}
             </p>
           </fieldset>
         );

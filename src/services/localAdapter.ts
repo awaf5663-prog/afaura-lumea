@@ -10,6 +10,7 @@ import {
 import { DEFAULT_ALERT_THRESHOLDS, DEFAULT_PRICING, DEFAULT_PROMOTIONS } from '@/src/config/pricing';
 import { SEED_PRODUCTS } from '@/src/data/seed';
 import { computeQuote } from '@/src/lib/pricing';
+import { findPromotion } from '@/src/lib/pricing/promotions';
 import { nextNumber, uid } from '@/src/lib/orderNumber';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
 import { normalizePhone } from '@/src/lib/format';
@@ -125,8 +126,33 @@ export const localAdapter: DataSource = {
 
     const zone = DELIVERY_ZONES.find((z) => z.id === draft.deliveryZoneId) ?? DELIVERY_ZONES[0];
     const method = PAYMENT_METHODS.find((m) => m.id === draft.paymentMethod) ?? PAYMENT_METHODS[0];
-    const deliveryFee = settings.deliveryFees[zone.id] ?? zone.fee;
+    const rawDeliveryFee = settings.deliveryFees[zone.id] ?? zone.fee;
     const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+
+    // Les offres sont appliquées ici, à partir des règles enregistrées : le
+    // navigateur ne transmet qu'un code et une déclaration, jamais un montant.
+    const promotion = findPromotion(settings.promotions, {
+      kind: 'store',
+      isStudent: draft.isStudent,
+      groupingId: null,
+      deliveryOptionId: zone.id,
+      code: draft.promoCode,
+    });
+    let deliveryFee = rawDeliveryFee;
+    let deliveryFeeBeforePromotion: number | null = null;
+    let discount = 0;
+    if (promotion) {
+      if (promotion.effect.type === 'free_delivery' && rawDeliveryFee !== null && rawDeliveryFee > 0) {
+        deliveryFee = 0;
+        deliveryFeeBeforePromotion = rawDeliveryFee;
+      } else if (promotion.effect.type === 'discount_amount') {
+        // Plafonnée au montant connu : une remise ne rend jamais d'argent.
+        discount = Math.min(Math.max(0, promotion.effect.amount), subtotal + (rawDeliveryFee ?? 0));
+      }
+      // « Frais de traitement offerts » ne concerne que le service SHEIN :
+      // une commande de la boutique n'en a pas.
+    }
+    const applied = promotion && (deliveryFeeBeforePromotion !== null || discount > 0);
 
     const now = new Date().toISOString();
     const order: Order = {
@@ -140,8 +166,12 @@ export const localAdapter: DataSource = {
       deliveryZoneId: zone.id,
       deliveryLabel: zone.label,
       deliveryFee,
+      deliveryFeeBeforePromotion,
       subtotal,
-      total: subtotal + (deliveryFee ?? 0),
+      discount,
+      promotionLabel: applied ? promotion.label : null,
+      promoCode: draft.promoCode.trim(),
+      total: subtotal + (deliveryFee ?? 0) - discount,
       paymentMethod: method.id,
       paymentMethodLabel: method.label,
       paymentStatus: 'pending',
@@ -213,6 +243,7 @@ export const localAdapter: DataSource = {
       isStudent: draft.isStudent,
       groupingId: target?.id ?? null,
       deliveryOptionId: draft.deliveryOptionId,
+      code: draft.promoCode,
     });
 
     const now = new Date().toISOString();
@@ -229,6 +260,7 @@ export const localAdapter: DataSource = {
       quote,
       deliveryOptionId: quote.deliveryOptionId,
       isStudent: draft.isStudent,
+      promoCode: draft.promoCode.trim().toUpperCase(),
       createdAt: now,
       updatedAt: now,
     };

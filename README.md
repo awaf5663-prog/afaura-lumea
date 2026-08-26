@@ -202,8 +202,10 @@ un arrivage.
   les photos au doigt : chaque photo sélectionne son modèle, et choisir un modèle ramène sa photo.
   Un modèle vendu se marque `(épuisé)` dans /admin → Produits : il reste visible, barré, et la
   couche de données refuse la commande même si le navigateur la force.
+- **Modal imprimé** — une fiche à 5 500 FCFA regroupant 5 modèles (zébré bordeaux, pois sur brun,
+  pois sur blanc, aquarelle, léopard), avec la même galerie défilante.
 - **Hijabs & voiles** — Jersey 1 500, Jersey frisé 2 000, Satin imprimé 3 500, Modal simple 4 500,
-  Modal imprimé 5 500, Dentelle 5 000.
+  Dentelle 5 000.
 - **Accessoires** — Hijab tape 1 000.
 
 Pour ajouter un lot : créer la catégorie dans `CATEGORIES` (`src/data/seed.ts`), ou ajouter les
@@ -236,6 +238,11 @@ src/
 supabase/schema.sql     Tables, RLS, fonctions serveur
 scripts/                Génération du sitemap
 ```
+
+**Autres coloris sur demande** : la case « Autres coloris sur demande » (/admin → Produits) affiche
+sur la fiche un encadré invitant la cliente à préciser le coloris qu'elle cherche. Sa réponse
+remonte dans le panier et dans le message WhatsApp, et la disponibilité reste confirmée par vous —
+le site ne promet aucun stock qu'il ne connaît pas.
 
 **Galerie synchronisée** : dès qu'un groupe de variantes compte autant d'options que la fiche a
 de photos, les deux se pilotent mutuellement (`src/pages/ProductPage.tsx`). Aucun réglage : il

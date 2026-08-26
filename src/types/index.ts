@@ -27,6 +27,11 @@ export interface Product {
   status: ProductStatus;
   isNew?: boolean;
   isPopular?: boolean;
+  /**
+   * D'autres coloris existent hors des photos publiées : la cliente peut
+   * préciser celui qu'elle cherche, et nous confirmons la disponibilité.
+   */
+  otherColorsAvailable?: boolean;
   createdAt: string;
 }
 

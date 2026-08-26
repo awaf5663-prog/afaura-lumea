@@ -29,6 +29,7 @@ create table if not exists products (
   status text not null default 'active' check (status in ('active', 'draft', 'sold_out')),
   is_new boolean not null default false,
   is_popular boolean not null default false,
+  other_colors_available boolean not null default false,
   created_at timestamptz not null default now()
 );
 

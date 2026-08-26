@@ -88,6 +88,7 @@ const toProduct = (r: Row): Product => ({
   status: r.status,
   isNew: r.is_new ?? false,
   isPopular: r.is_popular ?? false,
+  otherColorsAvailable: r.other_colors_available ?? false,
   createdAt: r.created_at,
 });
 
@@ -105,6 +106,7 @@ const fromProduct = (p: Product): Row => ({
   status: p.status,
   is_new: p.isNew ?? false,
   is_popular: p.isPopular ?? false,
+  other_colors_available: p.otherColorsAvailable ?? false,
 });
 
 const toOrder = (r: Row): Order => ({

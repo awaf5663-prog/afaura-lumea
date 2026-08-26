@@ -34,6 +34,7 @@ const blank = (): Product => ({
   status: 'active',
   isNew: false,
   isPopular: false,
+  otherColorsAvailable: false,
   createdAt: new Date().toISOString(),
 });
 
@@ -359,6 +360,22 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
                   onChange={(e) => setEditing({ ...editing, isPopular: e.target.checked })}
                 />
                 Badge « Populaire »
+              </label>
+              <label className="inline-flex items-start gap-2 text-[14px]">
+                <input
+                  type="checkbox"
+                  className="mt-1 size-4 accent-[#8f4b5b]"
+                  checked={editing.otherColorsAvailable ?? false}
+                  onChange={(e) =>
+                    setEditing({ ...editing, otherColorsAvailable: e.target.checked })
+                  }
+                />
+                <span>
+                  Autres coloris sur demande
+                  <span className="mt-0.5 block text-[12px] leading-snug text-stone">
+                    La fiche invite la cliente à préciser le coloris qu'elle cherche.
+                  </span>
+                </span>
               </label>
             </div>
           </div>

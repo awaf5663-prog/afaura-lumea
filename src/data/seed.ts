@@ -4,7 +4,11 @@ import dentelle from '@/src/assets/products/dentelle.webp';
 import hijabTape from '@/src/assets/products/hijab-tape.webp';
 import jersey from '@/src/assets/products/jersey.webp';
 import jerseyFrise from '@/src/assets/products/jersey-frise.webp';
-import modalImprime from '@/src/assets/products/modal-imprime.webp';
+import modalAquarelle from '@/src/assets/products/modal-aquarelle.webp';
+import modalLeopard from '@/src/assets/products/modal-leopard.webp';
+import modalPoisBlanc from '@/src/assets/products/modal-pois-blanc.webp';
+import modalPoisBrun from '@/src/assets/products/modal-pois-brun.webp';
+import modalZebreBordeaux from '@/src/assets/products/modal-zebre-bordeaux.webp';
 import modalSimple from '@/src/assets/products/modal-simple.webp';
 import pieceCremeFleuri from '@/src/assets/products/piece-creme-fleuri.webp';
 import pieceEcruOr from '@/src/assets/products/piece-ecru-or.webp';
@@ -15,6 +19,7 @@ import satinImprime from '@/src/assets/products/satin-imprime.webp';
 
 export const CATEGORIES: Category[] = [
   { id: 'piece_unique', name: 'Pièce unique' },
+  { id: 'modal_imprime', name: 'Modal imprimé' },
   { id: 'hijab', name: 'Hijabs & voiles' },
   { id: 'accessoire', name: 'Accessoires' },
 ];
@@ -39,6 +44,7 @@ export const SEED_PRODUCTS: Product[] = [
     variants: [],
     stock: null,
     status: 'active',
+    otherColorsAvailable: true,
     createdAt: '2026-01-05T10:20:00.000Z',
   },
   {
@@ -54,6 +60,7 @@ export const SEED_PRODUCTS: Product[] = [
     variants: [],
     stock: null,
     status: 'active',
+    otherColorsAvailable: true,
     createdAt: '2026-01-05T10:25:00.000Z',
   },
   {
@@ -69,6 +76,7 @@ export const SEED_PRODUCTS: Product[] = [
     variants: [],
     stock: null,
     status: 'active',
+    otherColorsAvailable: true,
     createdAt: '2026-01-05T10:05:00.000Z',
   },
   {
@@ -84,21 +92,30 @@ export const SEED_PRODUCTS: Product[] = [
     variants: [],
     stock: null,
     status: 'active',
+    otherColorsAvailable: true,
     createdAt: '2026-01-05T10:10:00.000Z',
   },
   {
     id: 'modal-imprime',
-    slug: 'hijab-modal-imprime',
+    slug: 'modal-imprime',
     name: 'Modal imprimé',
     description:
-      "Le confort du modal avec un imprimé travaillé. Vendu à l'unité.",
+      "Le confort du modal avec un imprimé travaillé. Faites défiler les photos pour voir les modèles, puis choisissez celui qui vous plaît. Vendu à l'unité.",
     price: 5500,
     compareAtPrice: null,
-    category: 'hijab',
-    images: [modalImprime],
-    variants: [],
+    category: 'modal_imprime',
+    // L'ordre des photos suit l'ordre des modèles : faire défiler sélectionne.
+    images: [modalZebreBordeaux, modalPoisBrun, modalPoisBlanc, modalAquarelle, modalLeopard],
+    variants: [
+      {
+        name: 'Modèle',
+        options: ['Zébré bordeaux', 'Pois sur brun', 'Pois sur blanc', 'Aquarelle', 'Léopard'],
+        soldOutOptions: [],
+      },
+    ],
     stock: null,
     status: 'active',
+    otherColorsAvailable: true,
     createdAt: '2026-01-05T10:15:00.000Z',
   },
   {
@@ -114,6 +131,7 @@ export const SEED_PRODUCTS: Product[] = [
     variants: [{ name: 'Couleur', options: ['Noir', 'Blanc'] }],
     stock: null,
     status: 'active',
+    otherColorsAvailable: true,
     createdAt: '2026-01-05T10:00:00.000Z',
   },
   {

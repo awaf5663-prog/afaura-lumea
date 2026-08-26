@@ -1,4 +1,4 @@
-import { ArrowLeft, Check, Loader2, ShieldCheck, Truck } from 'lucide-react';
+import { ArrowLeft, Check, Loader2, Palette, ShieldCheck, Truck } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { WhatsAppLink } from '@/src/components/whatsapp/WhatsAppLink';
 import { Gallery } from '@/src/components/product/Gallery';
@@ -148,7 +148,7 @@ export function ProductPage({ slug }: { slug: string }) {
       return;
     }
     const finalOptions = { ...options };
-    if (colorWish.trim()) finalOptions['Couleur souhaitée'] = colorWish.trim();
+    if (colorWish.trim()) finalOptions['Coloris souhaité'] = colorWish.trim();
     add(product, finalOptions, quantity);
     notify(`${product.name} ajouté au panier`);
     setAdded(true);
@@ -210,20 +210,27 @@ export function ProductPage({ slug }: { slug: string }) {
               <VariantPicker groups={product.variants} value={options} onChange={handleOptions} />
             )}
 
-            {product.variants.length === 0 && (
-              <div className="max-w-xs">
-                <Label htmlFor="couleur" hint="(facultatif)">
-                  Couleur souhaitée
-                </Label>
-                <Input
-                  id="couleur"
-                  value={colorWish}
-                  onChange={(e) => setColorWish(e.target.value)}
-                  placeholder="Ex : noir, beige…"
-                />
-                <p className="mt-1.5 text-[12px] text-stone">
-                  Nous confirmons la disponibilité de la couleur sur WhatsApp avant l'envoi.
+            {product.otherColorsAvailable && (
+              <div className="rounded-[--radius-md] border border-line bg-blush/40 p-4">
+                <p className="flex gap-2 text-[13.5px] leading-relaxed text-graphite">
+                  <Palette className="mt-0.5 size-4 shrink-0 text-mauve" strokeWidth={1.6} />
+                  <span>
+                    <span className="font-medium">D'autres coloris existent</span>
+                    {product.variants.length > 0 ? ' en dehors des photos ci-dessus.' : '.'} Dites-nous
+                    lequel vous cherchez : nous confirmons la disponibilité avant l'envoi.
+                  </span>
                 </p>
+                <div className="mt-3 max-w-xs">
+                  <Label htmlFor="couleur" hint="(facultatif)">
+                    Coloris souhaité
+                  </Label>
+                  <Input
+                    id="couleur"
+                    value={colorWish}
+                    onChange={(e) => setColorWish(e.target.value)}
+                    placeholder="Ex : noir, beige, bordeaux…"
+                  />
+                </div>
               </div>
             )}
 

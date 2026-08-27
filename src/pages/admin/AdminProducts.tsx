@@ -7,16 +7,19 @@ import { Sheet } from '@/src/components/ui/Sheet';
 import { COLOR_CHARTS } from '@/src/config/colorCharts';
 
 /**
- * Lignes à remplir pour une abaya. Uniquement des intitulés : les valeurs
- * viennent du mètre ruban de la boutique, jamais d'une estimation.
+ * Lignes à remplir pour une abaya.
+ *
+ * Les intitulés reprennent exactement ceux du tableau « Product Chart » de
+ * SHEIN (Shoulder, Bust, Length, Sleeve Length) : les chiffres se recopient
+ * un pour un, sans conversion ni interprétation. Seuls les intitulés sont
+ * fournis — les valeurs viennent de la fiche de l'article ou du mètre ruban
+ * de la boutique, jamais d'une estimation.
  */
 const MESURES_ABAYA = [
-  'Longueur totale (épaule → bas)',
-  'Tour de poitrine (à plat × 2)',
-  'Largeur d\'épaules',
+  'Épaules',
+  'Poitrine',
+  'Longueur',
   'Longueur de manche',
-  'Tour de manche',
-  'Taille portée',
 ];
 import { CATEGORIES } from '@/src/data/seed';
 import { useToast } from '@/src/hooks/useToast';

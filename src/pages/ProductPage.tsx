@@ -325,7 +325,7 @@ export function ProductPage({ slug }: { slug: string }) {
                 ))}
               </dl>
               <p className="mt-3 text-[12px] leading-relaxed text-stone">
-                Mesures de l'article à plat, pas du corps.{' '}
+                Mesures du vêtement, pas du corps.{' '}
                 <Link to="/guide-des-tailles" className="underline underline-offset-2">
                   Trouver ma taille
                 </Link>

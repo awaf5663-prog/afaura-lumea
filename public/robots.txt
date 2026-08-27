@@ -5,4 +5,4 @@ Disallow: /commander
 Disallow: /confirmation/
 Disallow: /shein/confirmation/
 
-Sitemap: /sitemap.xml
+Sitemap: https://afauralumea.shop/sitemap.xml

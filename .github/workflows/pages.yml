@@ -39,10 +39,14 @@ jobs:
 
       - run: npm ci
 
+      # Le site vit désormais à la racine du domaine afauralumea.shop, et non
+      # plus dans le sous-dossier /afaura-lumea/. Le chemin de base doit suivre :
+      # sinon la page demande ses fichiers à une adresse qui n'existe pas, et
+      # s'affiche entièrement vide.
       - name: Construire le site
         env:
-          VITE_BASE_PATH: /afaura-lumea/
-          VITE_SITE_URL: https://awaf5663-prog.github.io/afaura-lumea
+          VITE_BASE_PATH: /
+          VITE_SITE_URL: https://afauralumea.shop
           VITE_SUPABASE_URL: https://mhutsbfnzoiuqsoxkdji.supabase.co
           VITE_SUPABASE_ANON_KEY: sb_publishable_lMzrL8g6JkaE0jWdabLD-Q_-8TQ5i9h
         run: npm run build

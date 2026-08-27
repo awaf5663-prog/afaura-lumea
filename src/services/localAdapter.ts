@@ -9,12 +9,13 @@ import {
 } from '@/src/config/site';
 import { DEFAULT_ALERT_THRESHOLDS, DEFAULT_PRICING, DEFAULT_PROMOTIONS } from '@/src/config/pricing';
 import { normalizeSettings } from './settingsShape';
-import { SEED_PRODUCTS } from '@/src/data/seed';
+import { SEED_IMAGES, SEED_PRODUCTS } from '@/src/data/seed';
 import { computeQuote } from '@/src/lib/pricing';
 import { findPromotion } from '@/src/lib/pricing/promotions';
 import { nextNumber, uid } from '@/src/lib/orderNumber';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
 import { normalizePhone } from '@/src/lib/format';
+import { fromStoredImages, toStoredImages } from '@/src/lib/image';
 import type { Grouping, Order, Product, SheinRequest, StoreSettings } from '@/src/types';
 import type { DataSource, OrderDraft, SheinDraft } from './types';
 
@@ -74,14 +75,27 @@ export const localAdapter: DataSource = {
   mode: 'local',
 
   async listProducts() {
-    return delay(loadProducts());
+    // Même règle qu'en base : les repères sont retraduits et les adresses
+    // d'anciennes publications écartées. Voir lib/image.
+    return delay(
+      loadProducts().map((p) => ({
+        ...p,
+        images: fromStoredImages(p.images, p.id, SEED_IMAGES[p.id]),
+      })),
+    );
   },
 
   async saveProduct(product) {
     const products = loadProducts();
+    // L'adresse d'une photo livrée avec le site change à chaque publication :
+    // on garde un repère à la place.
+    const aEnregistrer: Product = {
+      ...product,
+      images: toStoredImages(product.images, product.id, SEED_IMAGES[product.id]),
+    };
     const index = products.findIndex((p) => p.id === product.id);
-    if (index >= 0) products[index] = product;
-    else products.unshift(product);
+    if (index >= 0) products[index] = aEnregistrer;
+    else products.unshift(aEnregistrer);
     writeJson(STORAGE_KEYS.products, products);
     return delay(product);
   },

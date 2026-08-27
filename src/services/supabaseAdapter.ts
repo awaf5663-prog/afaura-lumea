@@ -9,6 +9,7 @@ import {
 import { DEFAULT_PROMOTIONS } from '@/src/config/pricing';
 import { SEED_IMAGES } from '@/src/data/seed';
 import { normalizePhone } from '@/src/lib/format';
+import { fromStoredImages, toStoredImages } from '@/src/lib/image';
 import type { Grouping, Order, Product, SheinRequest, StoreSettings } from '@/src/types';
 import { normalizeAlertThresholds, normalizePricing, normalizePromotions } from './settingsShape';
 import type { DataSource, OrderDraft, SheinDraft } from './types';
@@ -140,9 +141,9 @@ const toProduct = (r: Row): Product => ({
   price: r.price,
   compareAtPrice: r.compare_at_price,
   category: r.category,
-  // Pas de photo en base : on reprend celles livrées avec le site plutôt que
-  // d'afficher une fiche vide. Voir SEED_IMAGES.
-  images: (r.images?.length ? r.images : SEED_IMAGES[r.id]) ?? [],
+  // Les repères « seed:… » sont retraduits, les photos de la boutique gardées,
+  // et les adresses d'anciennes publications écartées. Voir lib/image.
+  images: fromStoredImages(r.images, r.id, SEED_IMAGES[r.id]),
   variants: r.variants ?? [],
   stock: r.stock,
   status: r.status,
@@ -162,7 +163,9 @@ const fromProduct = (p: Product): Row => ({
   price: p.price,
   compare_at_price: p.compareAtPrice ?? null,
   category: p.category,
-  images: p.images,
+  // On n'enregistre jamais l'adresse d'une photo livrée avec le site : elle
+  // change à chaque publication, et les fiches se retrouveraient sans photo.
+  images: toStoredImages(p.images, p.id, SEED_IMAGES[p.id]),
   variants: p.variants,
   stock: p.stock,
   status: p.status,

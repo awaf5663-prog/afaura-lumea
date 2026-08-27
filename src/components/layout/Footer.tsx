@@ -1,7 +1,14 @@
 import { Instagram, Mail, MapPin } from 'lucide-react';
 import logo from '@/src/assets/brand/logo-sombre.webp';
+import { PinterestIcon } from '@/src/components/ui/PinterestIcon';
 import { TikTokIcon } from '@/src/components/ui/TikTokIcon';
-import { BRAND, CONTACT_EMAIL, INSTAGRAM_HANDLE, TIKTOK_HANDLE } from '@/src/config/site';
+import {
+  BRAND,
+  CONTACT_EMAIL,
+  INSTAGRAM_HANDLE,
+  PINTEREST_URL,
+  TIKTOK_HANDLE,
+} from '@/src/config/site';
 import { useWhatsapp } from '@/src/hooks/useSettings';
 import { prettyPhone } from '@/src/lib/format';
 import { Link } from '@/src/lib/router';
@@ -118,6 +125,18 @@ export function Footer() {
                   className="link-underline inline-flex items-center gap-2"
                 >
                   <TikTokIcon className="size-4" /> @{TIKTOK_HANDLE}
+                </a>
+              </li>
+            )}
+            {PINTEREST_URL && (
+              <li>
+                <a
+                  href={PINTEREST_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link-underline inline-flex items-center gap-2"
+                >
+                  <PinterestIcon className="size-4" /> Pinterest
                 </a>
               </li>
             )}

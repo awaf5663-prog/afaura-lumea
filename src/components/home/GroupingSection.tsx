@@ -1,4 +1,4 @@
-import editorial from '@/src/assets/images/atelier-editorial.webp';
+import { GroupingIllustration } from '@/src/components/home/GroupingIllustration';
 import { Button } from '@/src/components/ui/Button';
 import { Reveal } from '@/src/components/ui/Reveal';
 import { useCountdown } from '@/src/hooks/useCountdown';
@@ -72,13 +72,9 @@ export function GroupingSection() {
         </Reveal>
 
         <Reveal delay={100}>
-          <img
-            src={editorial}
-            alt="Textiles pliés dans un intérieur clair"
-            loading="lazy"
-            decoding="async"
-            className="aspect-[4/3] w-full rounded-[--radius-xl] object-cover"
-          />
+          {/* Un dessin qui dit ce que dit le texte, plutôt qu'une photo
+              d'ambiance qui ne montre pas le groupage. */}
+          <GroupingIllustration className="aspect-[4/3] w-full rounded-[--radius-xl]" />
         </Reveal>
       </div>
     </section>

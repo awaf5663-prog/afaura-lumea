@@ -48,7 +48,13 @@ export const INSTAGRAM_HANDLE: string = env.VITE_INSTAGRAM_HANDLE ?? 'afau.ra';
  * Compte TikTok (sans @). Vide tant que la boutique ne l'a pas communiqué :
  * le lien n'apparaît pas, plutôt que de pointer vers un compte inventé.
  */
-export const TIKTOK_HANDLE: string = env.VITE_TIKTOK_HANDLE ?? '';
+export const TIKTOK_HANDLE: string = env.VITE_TIKTOK_HANDLE ?? 'mrs_shiinee';
+
+/**
+ * Tableau Pinterest de la boutique. Adresse complète : Pinterest ne se déduit
+ * pas d'un identifiant comme Instagram ou TikTok.
+ */
+export const PINTEREST_URL: string = env.VITE_PINTEREST_URL ?? 'https://pin.it/1PkUIqPuv';
 
 /** URL publique du site, utilisée pour les balises SEO / Open Graph. */
 export const SITE_URL: string =

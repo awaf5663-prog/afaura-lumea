@@ -194,6 +194,71 @@ const zoneLabel = (id: string, stocke?: string): string =>
 const paiementLabel = (id: string, stocke?: string): string =>
   PAYMENT_METHODS.find((m) => m.id === id)?.label ?? stocke ?? id;
 
+/*
+ * Colonnes arrivées APRÈS la première mise en place de la base.
+ *
+ * Tant que supabase/mise-a-jour.sql n'a pas été passé, elles n'existent pas et
+ * PostgREST refuse l'enregistrement entier. On réessaie donc sans elles, pour
+ * que le reste passe — mais JAMAIS en silence : si la boutique avait saisi
+ * quelque chose dedans, sa saisie n'est pas enregistrée, et le lui cacher
+ * derrière un « c'est enregistré » lui ferait retaper la même chose sans
+ * jamais comprendre pourquoi elle disparaît.
+ */
+interface ColonneRecente {
+  colonne: string;
+  etiquette: string;
+}
+
+const aDuContenu = (valeur: unknown): boolean =>
+  Array.isArray(valeur) ? valeur.length > 0 : valeur !== null && valeur !== undefined && valeur !== '';
+
+/**
+ * Enregistre `colonnes`, en retirant une à une les colonnes récentes que la
+ * base ne connaît pas encore. Lève si une colonne retirée portait une valeur.
+ */
+async function enregistrerSansColonnesAbsentes<T>(
+  envoyer: (corps: Row) => Promise<T>,
+  colonnes: Row,
+  recentes: readonly ColonneRecente[],
+): Promise<T> {
+  let corps: Row = { ...colonnes };
+  const retirees: ColonneRecente[] = [];
+  let resultat: T | undefined;
+
+  // PostgREST ne signale qu'une colonne manquante à la fois : on boucle.
+  for (let essai = 0; essai <= recentes.length; essai += 1) {
+    try {
+      resultat = await envoyer(corps);
+      break;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : '';
+      const manquante = recentes.find(
+        (c) => !retirees.includes(c) && message.toLowerCase().includes(c.colonne),
+      );
+      if (!manquante) throw error;
+      retirees.push(manquante);
+      const { [manquante.colonne]: _absente, ...reste } = corps;
+      corps = reste;
+    }
+  }
+
+  const perdues = retirees.filter((c) => aDuContenu(colonnes[c.colonne]));
+  if (perdues.length) {
+    /*
+     * Formulation volontairement neutre : le panneau qui affiche ce message
+     * est titré « Enregistrement impossible », et écrire « le reste a bien
+     * été enregistré » juste en dessous se contredirait. On nomme ce qui
+     * n'est pas passé, puis on rassure sur le reste.
+     */
+    throw new Error(
+      `Non enregistré : ${perdues.map((c) => c.etiquette).join(', ')}. ` +
+        "Votre base n'a pas encore reçu la mise à jour — le reste, lui, est bien passé. " +
+        'Ouvrez Supabase → SQL Editor, exécutez supabase/mise-a-jour.sql, puis réessayez.',
+    );
+  }
+  return resultat as T;
+}
+
 /**
  * Mise à la corbeille ou restauration, en une seule requête.
  *
@@ -480,18 +545,10 @@ export const supabaseAdapter: DataSource = {
         body: JSON.stringify(corps),
       });
 
-    const colonnes = fromGrouping(grouping);
-    try {
-      return toGrouping((await envoyer(colonnes))[0]);
-    } catch (error) {
-      // `opening_date` est arrivée après la première mise en place de la base.
-      // Tant que la mise à jour SQL n'est pas passée, on réenregistre sans
-      // elle : le reste du groupage ne doit pas être bloqué par une date.
-      const message = error instanceof Error ? error.message : '';
-      if (!/opening_date/i.test(message)) throw error;
-      const { opening_date: _ouverture, ...sansOuverture } = colonnes;
-      return toGrouping((await envoyer(sansOuverture))[0]);
-    }
+    const rows = await enregistrerSansColonnesAbsentes(envoyer, fromGrouping(grouping), [
+      { colonne: 'opening_date', etiquette: "la date d'ouverture des inscriptions" },
+    ]);
+    return toGrouping(rows[0]);
   },
 
   async deleteGrouping(id) {
@@ -581,17 +638,10 @@ export const supabaseAdapter: DataSource = {
         body: JSON.stringify(corps),
       });
 
-    try {
-      await envoyer(colonnes);
-    } catch (error) {
-      // La colonne `reviews` est arrivée après la première mise en place de
-      // la base. Tant que la mise à jour SQL n'est pas passée, on réenregistre
-      // sans elle : le reste des réglages ne doit pas être bloqué par les avis.
-      const message = error instanceof Error ? error.message : '';
-      if (!/reviews|next_grouping_opening/i.test(message)) throw error;
-      const { reviews: _avis, next_grouping_opening: _ouverture, ...sansNouveautes } = colonnes;
-      await envoyer(sansNouveautes);
-    }
+    await enregistrerSansColonnesAbsentes(envoyer, colonnes, [
+      { colonne: 'reviews', etiquette: 'les avis clientes' },
+      { colonne: 'next_grouping_opening', etiquette: "la date d'ouverture des inscriptions" },
+    ]);
     return settings;
   },
 

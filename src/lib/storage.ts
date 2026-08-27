@@ -36,4 +36,5 @@ export const STORAGE_KEYS = {
   adminSession: 'lumea.admin.session.v1',
   myOrders: 'lumea.myorders.v1',
   myShein: 'lumea.myshein.v1',
+  visits: 'lumea.visits.v1',
 } as const;

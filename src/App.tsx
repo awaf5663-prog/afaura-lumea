@@ -11,6 +11,7 @@ import { SettingsProvider } from '@/src/hooks/useSettings';
 import { ToastProvider } from '@/src/hooks/useToast';
 import { RouterProvider, matchPath, useRouter } from '@/src/lib/router';
 import { useVersionCheck } from '@/src/hooks/useVersionCheck';
+import { useVisitTracking } from '@/src/hooks/useVisitTracking';
 import { CartPage } from '@/src/pages/CartPage';
 import { CheckoutPage } from '@/src/pages/CheckoutPage';
 import { ConfirmationPage } from '@/src/pages/ConfirmationPage';
@@ -75,6 +76,8 @@ function Shell() {
   // Une version plus récente est en ligne : on recharge sur les pages
   // tranquilles, on propose sur celles où quelqu'un est en train de saisir.
   const { nouvelleVersion, recharger } = useVersionCheck(path);
+  // Comptage de la fréquentation (hors administration).
+  useVisitTracking(path);
 
   return (
     <div className="flex min-h-dvh flex-col">

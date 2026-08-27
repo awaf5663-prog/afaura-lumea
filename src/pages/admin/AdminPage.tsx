@@ -21,6 +21,7 @@ import { AdminOrders } from './AdminOrders';
 import { AdminProducts } from './AdminProducts';
 import { AdminSettings } from './AdminSettings';
 import { AdminShein } from './AdminShein';
+import { AdminVisits } from './AdminVisits';
 
 const TABS = [
   { id: 'apercu', label: 'Aperçu' },
@@ -29,6 +30,7 @@ const TABS = [
   { id: 'groupages', label: 'Groupages' },
   { id: 'tarification', label: 'Tarification' },
   { id: 'produits', label: 'Produits' },
+  { id: 'visites', label: 'Visites' },
   { id: 'reglages', label: 'Réglages' },
 ] as const;
 
@@ -48,6 +50,9 @@ export function AdminPage() {
   const [requests, setRequests] = useState<SheinRequest[]>([]);
   const [groupings, setGroupings] = useState<Grouping[]>([]);
   const [loading, setLoading] = useState(true);
+  // Compteur d'actualisations : l'onglet Visites recharge ses chiffres quand
+  // la boutique appuie sur « Actualiser », sans second bouton à elle.
+  const [refreshToken, setRefreshToken] = useState(0);
 
   useSeo({ title: 'Administration', description: 'Espace administrateur.', noIndex: true });
 
@@ -65,6 +70,7 @@ export function AdminPage() {
       setRequests(s);
       setGroupings(g);
       await refreshSettings();
+      setRefreshToken((n) => n + 1);
     } finally {
       setLoading(false);
     }
@@ -289,6 +295,7 @@ export function AdminPage() {
         )}
         {tab === 'tarification' && <AdminPricing groupings={groupings} />}
         {tab === 'produits' && <AdminProducts products={products} reload={loadAll} />}
+        {tab === 'visites' && <AdminVisits refreshToken={refreshToken} />}
         {tab === 'reglages' && <AdminSettings />}
         </ErrorBoundary>
       </div>

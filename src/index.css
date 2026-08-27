@@ -17,6 +17,7 @@
 
   /* Roses foncés */
   --color-mauve: #8f4b5b; /* rose foncé — accent, liens, chiffres clés */
+  --color-chart: #96455c; /* même rose, un cran plus vif : barres des graphiques */
   --color-rosedark: #5c2f38; /* rose profond — grandes surfaces */
 
   /* Noirs et gris */

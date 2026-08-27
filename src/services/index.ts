@@ -37,4 +37,4 @@ export const db: DataSource = new Proxy(source, {
 
 export { isSupabaseConfigured };
 export { onDataChanged } from './changes';
-export type { DataSource, OrderDraft, SheinDraft } from './types';
+export type { DataSource, OrderDraft, SheinDraft, VisitPeriod, VisitStats } from './types';

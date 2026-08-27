@@ -12,7 +12,7 @@ import { normalizePhone } from '@/src/lib/format';
 import { fromStoredImages, toStoredImages } from '@/src/lib/image';
 import type { Grouping, Order, Product, SheinRequest, StoreSettings } from '@/src/types';
 import { normalizeAlertThresholds, normalizePricing, normalizePromotions } from './settingsShape';
-import type { DataSource, OrderDraft, SheinDraft } from './types';
+import type { DataSource, OrderDraft, SheinDraft, VisitStats } from './types';
 
 /**
  * Adaptateur Supabase (PostgREST + Auth) — sans SDK, uniquement `fetch`,
@@ -126,7 +126,11 @@ async function rest<T>(path: string, init: RequestInit = {}): Promise<T> {
     throw new Error(`Supabase : ${res.status} ${body}`);
   }
   if (res.status === 204) return undefined as T;
-  return (await res.json()) as T;
+  // « return=minimal » répond 201 sans contenu : demander du JSON à un corps
+  // vide lèverait une erreur alors que l'écriture a réussi.
+  const texte = await res.text();
+  if (!texte) return undefined as T;
+  return JSON.parse(texte) as T;
 }
 
 /* ── Correspondance colonnes Postgres ⇄ types TypeScript ─────────────── */
@@ -570,5 +574,46 @@ export const supabaseAdapter: DataSource = {
       await envoyer(sansAvis);
     }
     return settings;
+  },
+
+  /*
+   * Fréquentation. La table `visits` n'accepte que l'insertion côté public :
+   * personne ne peut lire les visites depuis le site, et la ligne écrite ne
+   * contient ni adresse IP, ni nom, ni cookie de pistage — un identifiant de
+   * navigateur tiré au hasard, la page, l'heure.
+   */
+  async recordVisit(path, visitor) {
+    try {
+      await rest('visits', {
+        method: 'POST',
+        headers: { Prefer: 'return=minimal' },
+        body: JSON.stringify({ visitor, path: path.slice(0, 120) }),
+      });
+    } catch {
+      // Une visite non comptée n'est pas un incident : la cliente ne doit
+      // rien en voir, et surtout pas un message d'erreur.
+    }
+  },
+
+  async getVisitStats() {
+    try {
+      const stats = await rest<VisitStats>('rpc/stats_visites', {
+        method: 'POST',
+        body: JSON.stringify({}),
+      });
+      return stats;
+    } catch (error) {
+      // Tant que la mise à jour SQL n'est pas passée, la fonction n'existe
+      // pas encore : on le dit en clair plutôt que d'afficher des zéros qui
+      // laisseraient croire que personne n'est venu.
+      const message = error instanceof Error ? error.message : '';
+      if (/stats_visites|PGRST202|404/i.test(message)) {
+        throw new Error(
+          "La fréquentation n'est pas encore installée dans votre base. " +
+            'Exécutez supabase/mise-a-jour.sql dans Supabase, puis revenez ici.',
+        );
+      }
+      throw error;
+    }
   },
 };

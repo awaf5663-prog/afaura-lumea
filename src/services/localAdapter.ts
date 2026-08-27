@@ -14,6 +14,7 @@ import { computeQuote } from '@/src/lib/pricing';
 import { findPromotion } from '@/src/lib/pricing/promotions';
 import { nextNumber, uid } from '@/src/lib/orderNumber';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
+import { aggregateVisits, type VisitEntry } from './visitStats';
 import { normalizePhone } from '@/src/lib/format';
 import { fromStoredImages, toStoredImages } from '@/src/lib/image';
 import type { Grouping, Order, Product, SheinRequest, StoreSettings } from '@/src/types';
@@ -428,5 +429,22 @@ export const localAdapter: DataSource = {
   async saveSettings(settings) {
     writeJson(STORAGE_KEYS.settings, settings);
     return delay(settings);
+  },
+
+  /*
+   * Fréquentation. En mode local, elle ne compte que ce navigateur-ci : la
+   * boutique verra ses propres passages, pas ceux de ses clientes. Le compte
+   * qui a du sens est celui du mode connecté (Supabase).
+   */
+  async recordVisit(path, visitor) {
+    const entries = readJson<VisitEntry[]>(STORAGE_KEYS.visits, []);
+    entries.push({ visitor, path, at: new Date().toISOString() });
+    // Plafond : un an de fréquentation tient largement là-dedans, et le
+    // stockage du navigateur ne se remplit pas indéfiniment.
+    writeJson(STORAGE_KEYS.visits, entries.slice(-4000));
+  },
+
+  async getVisitStats() {
+    return delay(aggregateVisits(readJson<VisitEntry[]>(STORAGE_KEYS.visits, [])));
   },
 };

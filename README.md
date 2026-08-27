@@ -79,9 +79,14 @@ automatiquement : plus aucun changement de code. Créez ensuite le compte admin 
 Supabase → Authentication → Users.
 
 Le schéma fournit les tables demandées (`products`, `orders`, `order_items`, `shein_requests`,
-`shein_items`, `groupings`, `settings`), les séquences de numérotation, les politiques RLS, et
-surtout les fonctions serveur `create_order` / `create_shein_request` / `find_order` /
-`find_shein_request` / `transfer_shein_requests`.
+`shein_items`, `groupings`, `settings`, `visits`), les séquences de numérotation, les politiques
+RLS, et surtout les fonctions serveur `create_order` / `create_shein_request` / `find_order` /
+`find_shein_request` / `transfer_shein_requests` / `stats_visites`.
+
+**Base déjà en place ?** Passez [`supabase/mise-a-jour.sql`](supabase/mise-a-jour.sql) : il ajoute
+ce qui est arrivé après la première installation (avis, mesures, corbeille, recherche par
+téléphone, comptage des visites) et referme le droit d'exécution que PostgreSQL laisse ouvert à
+tout le monde sur les fonctions d'administration. Il peut être passé plusieurs fois sans risque.
 
 La table `groupings` est en lecture publique (le compteur s'affiche sur le site) : elle ne contient
 que capacité et remplissage — jamais de donnée cliente, jamais de coût ni de marge.
@@ -238,6 +243,7 @@ src/
   config/pricing.ts     Tarifs de départ (tranches, livraison, taux, seuils)
   lib/pricing/          Moteur de devis et stratégies remplaçables
 supabase/schema.sql     Tables, RLS, fonctions serveur
+supabase/mise-a-jour.sql  Ajouts pour une base déjà installée (rejouable)
 scripts/                Génération du sitemap
 ```
 

@@ -37,6 +37,28 @@ export interface SheinDraft {
   promoCode: string;
 }
 
+/** Un total de pages vues et le nombre de navigateurs distincts derrière. */
+export interface VisitPeriod {
+  visites: number;
+  visiteurs: number;
+}
+
+/**
+ * Fréquentation du site, agrégée côté serveur.
+ * L'administration reçoit ces quelques chiffres, jamais la liste des visites.
+ */
+export interface VisitStats {
+  jour: VisitPeriod;
+  semaine: VisitPeriod;
+  mois: VisitPeriod;
+  annee: VisitPeriod;
+  total: VisitPeriod;
+  /** 30 derniers jours, du plus ancien au plus récent, jours creux compris. */
+  parJour: Array<{ date: string; visites: number; visiteurs: number }>;
+  /** Pages les plus consultées sur 30 jours, de la plus vue à la moins vue. */
+  pages: Array<{ path: string; visites: number }>;
+}
+
 /**
  * Contrat commun aux différentes sources de données.
  * Deux implémentations : `localAdapter` (navigateur, zéro configuration)
@@ -80,6 +102,17 @@ export interface DataSource {
 
   getSettings(): Promise<StoreSettings>;
   saveSettings(settings: StoreSettings): Promise<StoreSettings>;
+
+  /*
+   * Fréquentation. Volontairement hors de la convention create/update/save :
+   * signaler une page vue n'est pas une modification de la boutique, et cela
+   * ne doit pas déclencher le rafraîchissement des écrans ouverts (voir le
+   * relais d'écritures dans services/index.ts).
+   */
+
+  /** Signale une page vue. N'échoue jamais bruyamment : ce n'est pas vital. */
+  recordVisit(path: string, visitor: string): Promise<void>;
+  getVisitStats(): Promise<VisitStats>;
 }
 
 export type {

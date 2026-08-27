@@ -87,7 +87,7 @@ export function ShopPage() {
       </header>
 
       <div className="sticky top-16 z-30 -mx-5 mt-6 bg-ivory/95 px-5 py-3 backdrop-blur-md">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 lg:max-w-xl">
           <div className="relative flex-1">
             <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-stone" />
             <input
@@ -126,7 +126,7 @@ export function ShopPage() {
           </button>
         </div>
 
-        <div className="no-scrollbar -mx-5 mt-3 flex gap-2 overflow-x-auto px-5">
+        <div className="no-scrollbar -mx-5 mt-3 flex gap-2 overflow-x-auto px-5 lg:mx-0 lg:flex-wrap lg:gap-y-2.5 lg:overflow-x-visible lg:px-0">
           <Chip active={category === 'all'} onClick={() => updateCategory('all')}>
             Tout
           </Chip>
@@ -135,7 +135,8 @@ export function ShopPage() {
               {c.name}
             </Chip>
           ))}
-          <span className="w-px shrink-0 self-stretch bg-line" aria-hidden />
+          <span className="w-px shrink-0 self-stretch bg-line lg:hidden" aria-hidden />
+          <span className="hidden w-full lg:block" aria-hidden />
           {SORTS.map((s) => (
             <Chip key={s.id} active={sort === s.id} onClick={() => setSort(s.id)}>
               {s.label}

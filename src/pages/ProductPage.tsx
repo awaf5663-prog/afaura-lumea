@@ -219,7 +219,10 @@ export function ProductPage({ slug }: { slug: string }) {
             « Disponible » laisserait croire que la pièce part le jour même, et la
             déception se paierait à la livraison.
           */}
-          <p className="mt-2 inline-flex items-center gap-2 text-[13.5px]">
+          {/* `flex` et non `inline-flex` : le prix juste au-dessus est un
+              élément en ligne, et les deux se retrouvaient collés bout à bout
+              sur la même ligne — « 4 500 FCFASur commande ». */}
+          <p className="mt-2 flex w-fit items-center gap-2 text-[13.5px]">
             {soldOut ? (
               <span className="text-[#8a2f2f]">Momentanément indisponible</span>
             ) : (

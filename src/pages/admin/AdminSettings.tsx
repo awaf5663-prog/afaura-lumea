@@ -41,7 +41,7 @@ export function AdminSettings() {
   };
 
   return (
-    <form onSubmit={submit} className="max-w-2xl">
+    <form onSubmit={submit} className="max-w-2xl xl:max-w-none">
       <h2 className="text-[24px]">Réglages</h2>
 
       <DraftStatus
@@ -52,7 +52,8 @@ export function AdminSettings() {
         onRetry={() => void enregistrer()}
       />
 
-      <section className="mt-6 rounded-[--radius-lg] border border-line bg-white p-5">
+      <div className="mt-6 grid gap-5 xl:grid-cols-2 xl:items-start">
+      <section className="rounded-[--radius-lg] border border-line bg-white p-5">
         <h3 className="text-[18px]">Contact</h3>
         <FormRow className="mt-4">
           <Label htmlFor="s-wa" hint="format international, sans +">
@@ -107,7 +108,7 @@ export function AdminSettings() {
         </FormRow>
       </section>
 
-      <section className="mt-5 rounded-[--radius-lg] border border-line bg-white p-5">
+      <section className="rounded-[--radius-lg] border border-line bg-white p-5">
         <h3 className="text-[18px]">Groupage</h3>
         <FormRow className="mt-4">
           <Label htmlFor="s-group">Clôture du prochain groupage</Label>
@@ -131,7 +132,7 @@ export function AdminSettings() {
         </FormRow>
       </section>
 
-      <section className="mt-5 rounded-[--radius-lg] border border-line bg-white p-5">
+      <section className="rounded-[--radius-lg] border border-line bg-white p-5">
         <h3 className="text-[18px]">Frais de livraison</h3>
         <p className="mt-1 text-[12.5px] text-stone">
           Laissez vide pour afficher « à confirmer » plutôt qu'un montant approximatif.
@@ -162,7 +163,7 @@ export function AdminSettings() {
         </div>
       </section>
 
-      <section className="mt-5 rounded-[--radius-lg] border border-line bg-white p-5">
+      <section className="rounded-[--radius-lg] border border-line bg-white p-5">
         <h3 className="text-[18px]">Paiement mobile</h3>
         <p className="mt-1 text-[12.5px] text-stone">
           Ces numéros s'affichent dans les instructions de paiement. Laissez vide et le site indiquera
@@ -190,7 +191,7 @@ export function AdminSettings() {
         </div>
       </section>
 
-      <section className="mt-5 rounded-[--radius-lg] border border-line bg-white p-5">
+      <section className="rounded-[--radius-lg] border border-line bg-white p-5">
         <h3 className="text-[18px]">Avis clientes</h3>
         <div className="mt-4">
           <ReviewEditor
@@ -200,6 +201,8 @@ export function AdminSettings() {
           />
         </div>
       </section>
+
+      </div>
 
       <Button type="submit" size="lg" className="mt-6" loading={saving}>
         Enregistrer les réglages

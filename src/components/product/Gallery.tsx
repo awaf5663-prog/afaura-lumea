@@ -103,7 +103,16 @@ export function Gallery({
           )}
         >
           {list.map((image, index) => (
-            <div key={`${image}-${index}`} className="aspect-[4/5] max-h-[56vh] w-full shrink-0 snap-center sm:max-h-none">
+            <div
+            key={`${image}-${index}`}
+            /*
+              Le format 4/5 est celui des photos. Sans plafond, il donne une
+              image de 720 px de haut sur un ordinateur portable : la photo
+              remplit l'écran, et les vignettes comme le bouton « Ajouter au
+              panier » passent sous la ligne de flottaison.
+            */
+            className="aspect-[4/5] max-h-[56vh] w-full shrink-0 snap-center sm:max-h-none lg:max-h-[min(68vh,600px)]"
+          >
               {image ? (
                 <img
                   src={image}

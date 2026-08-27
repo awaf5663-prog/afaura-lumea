@@ -142,6 +142,7 @@ const toProduct = (r: Row): Product => ({
   isPopular: r.is_popular ?? false,
   otherColorsAvailable: r.other_colors_available ?? false,
   colorChartId: r.color_chart_id ?? null,
+  measurements: Array.isArray(r.measurements) ? r.measurements : [],
   createdAt: r.created_at,
 });
 
@@ -161,6 +162,7 @@ const fromProduct = (p: Product): Row => ({
   is_popular: p.isPopular ?? false,
   other_colors_available: p.otherColorsAvailable ?? false,
   color_chart_id: p.colorChartId ?? null,
+  measurements: p.measurements ?? [],
 });
 
 const toOrder = (r: Row): Order => ({
@@ -266,12 +268,26 @@ export const supabaseAdapter: DataSource = {
   },
 
   async saveProduct(product) {
-    const rows = await rest<Row[]>('products?on_conflict=id', {
-      method: 'POST',
-      headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
-      body: JSON.stringify(fromProduct(product)),
-    });
-    return toProduct(rows[0]);
+    const corps = fromProduct(product);
+    const envoyer = (r: Row) =>
+      rest<Row[]>('products?on_conflict=id', {
+        method: 'POST',
+        headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
+        body: JSON.stringify(r),
+      });
+    try {
+      const rows = await envoyer(corps);
+      return toProduct(rows[0]);
+    } catch (error) {
+      // La colonne `measurements` est arrivée après la première mise en place
+      // de la base : sans la mise à jour SQL, on enregistre le reste de la
+      // fiche plutôt que de refuser la modification entière.
+      const message = error instanceof Error ? error.message : '';
+      if (!/measurements/i.test(message)) throw error;
+      const { measurements: _m, ...sansMesures } = corps;
+      const rows = await envoyer(sansMesures);
+      return toProduct(rows[0]);
+    }
   },
 
   async deleteProduct(id) {
@@ -434,27 +450,46 @@ export const supabaseAdapter: DataSource = {
         Array.isArray(r.promotions) && (r.promotions.length || configured)
           ? normalizePromotions(r.promotions)
           : DEFAULT_PROMOTIONS,
+      // Colonne absente tant que la mise à jour SQL n'est pas passée : la
+      // boutique fonctionne sans, simplement sans avis publiés.
+      reviews: Array.isArray(r.reviews) ? (r.reviews as StoreSettings['reviews']) : [],
     } satisfies StoreSettings;
   },
 
   async saveSettings(settings) {
-    await rest('settings?on_conflict=id', {
-      method: 'POST',
-      headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
-      body: JSON.stringify({
-        id: 1,
-        whatsapp_number: settings.whatsappNumber,
-        whatsapp_link: settings.whatsappLink,
-        next_grouping_date: settings.nextGroupingDate || null,
-        wave_number: settings.waveNumber,
-        orange_money_number: settings.orangeMoneyNumber,
-        delivery_fees: settings.deliveryFees,
-        announcement: settings.announcement,
-        pricing: settings.pricing,
-        promotions: settings.promotions,
-        alert_thresholds: settings.alertThresholds,
-      }),
-    });
+    const colonnes: Row = {
+      id: 1,
+      whatsapp_number: settings.whatsappNumber,
+      whatsapp_link: settings.whatsappLink,
+      next_grouping_date: settings.nextGroupingDate || null,
+      wave_number: settings.waveNumber,
+      orange_money_number: settings.orangeMoneyNumber,
+      delivery_fees: settings.deliveryFees,
+      announcement: settings.announcement,
+      pricing: settings.pricing,
+      promotions: settings.promotions,
+      alert_thresholds: settings.alertThresholds,
+      reviews: settings.reviews,
+    };
+
+    const envoyer = (corps: Row) =>
+      rest('settings?on_conflict=id', {
+        method: 'POST',
+        headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify(corps),
+      });
+
+    try {
+      await envoyer(colonnes);
+    } catch (error) {
+      // La colonne `reviews` est arrivée après la première mise en place de
+      // la base. Tant que la mise à jour SQL n'est pas passée, on réenregistre
+      // sans elle : le reste des réglages ne doit pas être bloqué par les avis.
+      const message = error instanceof Error ? error.message : '';
+      if (!/reviews/i.test(message)) throw error;
+      const { reviews: _avis, ...sansAvis } = colonnes;
+      await envoyer(sansAvis);
+    }
     return settings;
   },
 };

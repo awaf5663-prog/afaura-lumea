@@ -11,6 +11,7 @@ import { useSeo } from '@/src/lib/seo';
 import { db, isSupabaseConfigured } from '@/src/services';
 import { groupingCount, groupingFillRate } from '@/src/hooks/useGroupings';
 import { isWhatsappConfigured } from '@/src/lib/whatsapp';
+import { countSince, lastSeen, markSeen } from '@/src/lib/adminSeen';
 import type { Grouping, Order, Product, SheinRequest } from '@/src/types';
 import { AdminGroupings, computeGroupingStats } from './AdminGroupings';
 import { AdminLogin } from './AdminLogin';
@@ -39,6 +40,9 @@ export function AdminPage() {
   const { search, navigate } = useRouter();
 
   const [tab, setTab] = useState<TabId>((search.get('onglet') as TabId) ?? 'apercu');
+  // Référence figée à l'ouverture de l'écran : ce qui est arrivé depuis.
+  const [depuis] = useState(() => ({ commandes: lastSeen('commandes'), shein: lastSeen('shein') }));
+  const [vu, setVu] = useState(depuis);
   const [products, setProducts] = useState<Product[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [requests, setRequests] = useState<SheinRequest[]>([]);
@@ -70,11 +74,31 @@ export function AdminPage() {
     if (authenticated) void loadAll();
   }, [authenticated, loadAll]);
 
+  // Ouvrir l'onglet fait retomber son compteur ; `depuis` garde la référence
+  // pour continuer à signaler les lignes concernées.
+  useEffect(() => {
+    if (tab !== 'commandes' && tab !== 'shein') return;
+    markSeen(tab);
+    setVu((current) => ({ ...current, [tab]: new Date().toISOString() }));
+  }, [tab, orders.length, requests.length]);
+
   if (!authenticated) return <AdminLogin />;
 
   const changeTab = (next: TabId) => {
     setTab(next);
     navigate(`/admin?onglet=${next}`, { keepScroll: true });
+  };
+
+  /*
+   * Repère « nouveau depuis ma dernière visite ».
+   *
+   * `depuis` sert à marquer les lignes et reste figé pendant la visite : une
+   * commande consultée ne doit pas cesser d'être signalée sous les yeux de la
+   * boutique. Le compteur de l'onglet, lui, retombe dès qu'elle l'ouvre.
+   */
+  const nouveautes = {
+    commandes: countSince(orders, vu.commandes),
+    shein: countSince(requests, vu.shein),
   };
 
   const activeGrouping =
@@ -149,6 +173,16 @@ export function AdminPage() {
             )}
           >
             {item.label}
+            {nouveautes[item.id as 'commandes' | 'shein'] > 0 && (
+              <span
+                className={cn(
+                  'ml-1.5 inline-grid min-w-5 place-items-center rounded-full px-1.5 py-0.5 text-[11px] font-medium',
+                  tab === item.id ? 'bg-ivory text-ink' : 'bg-mauve text-ivory',
+                )}
+              >
+                {nouveautes[item.id as 'commandes' | 'shein']}
+              </span>
+            )}
           </button>
         ))}
       </nav>
@@ -222,10 +256,15 @@ export function AdminPage() {
         )}
 
         {tab === 'commandes' && (
-          <AdminOrders orders={orders} reload={loadAll} />
+          <AdminOrders orders={orders} reload={loadAll} newSince={depuis.commandes} />
         )}
         {tab === 'shein' && (
-          <AdminShein requests={requests} reload={loadAll} groupings={groupings} />
+          <AdminShein
+            requests={requests}
+            reload={loadAll}
+            groupings={groupings}
+            newSince={depuis.shein}
+          />
         )}
         {tab === 'groupages' && settings && (
           <AdminGroupings

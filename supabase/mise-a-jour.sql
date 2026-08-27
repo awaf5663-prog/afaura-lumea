@@ -1,19 +1,20 @@
 -- ═══════════════════════════════════════════════════════════════════════
---  Correctif à passer UNE fois dans le SQL editor de Supabase
---  (Supabase → SQL Editor → New query → coller → Run)
+--  Afaura Luméa — mise à jour de la base
 --
---  À quoi il sert : les commandes déjà enregistrées ont pu garder le
---  numéro tel qu'il a été tapé (« 78 107 16 04 ») alors que le site le
---  cherche au format international (« 221781071604 »). Résultat : la page
---  de suivi répondait « introuvable » sur une commande pourtant bien
---  présente. Ce fichier fait deux choses :
---    1. il apprend à la recherche à comparer les numéros intelligemment ;
---    2. il remet les numéros déjà enregistrés au même format.
+--  À passer UNE fois : Supabase → SQL Editor → New query → coller → Run.
+--  Sans risque, et sans effet s'il a déjà été passé : rien n'est supprimé,
+--  chaque instruction vérifie d'abord ce qui existe déjà.
 --
---  Sans risque : rien n'est supprimé, seuls les numéros sont réécrits.
+--  Ce qu'il fait :
+--    1. répare la recherche par numéro de téléphone (page de suivi et
+--       récapitulatif qui répondaient « introuvable ») ;
+--    2. remet au bon format les numéros déjà enregistrés ;
+--    3. ajoute la place des avis clientes et des mesures des articles.
 -- ═══════════════════════════════════════════════════════════════════════
 
--- 1. Comparaison tolérante au préfixe pays.
+-- ── 1. Recherche tolérante au préfixe pays ────────────────────────────
+-- « 78 107 16 04 », « +221 78 107 16 04 » et « 221781071604 » désignent la
+-- même personne : on compare les neuf derniers chiffres.
 create or replace function meme_numero(a text, b text)
 returns boolean
 language sql
@@ -54,7 +55,7 @@ as $$
   limit 1;
 $$;
 
--- 2. Numéros déjà enregistrés remis au format international.
+-- ── 2. Numéros déjà enregistrés remis au format international ─────────
 update orders
    set phone = '221' || right(regexp_replace(phone, '\D', '', 'g'), 9)
  where length(regexp_replace(phone, '\D', '', 'g')) = 9;
@@ -62,3 +63,7 @@ update orders
 update shein_requests
    set phone = '221' || right(regexp_replace(phone, '\D', '', 'g'), 9)
  where length(regexp_replace(phone, '\D', '', 'g')) = 9;
+
+-- ── 3. Avis clientes et mesures des articles ──────────────────────────
+alter table settings add column if not exists reviews jsonb not null default '[]'::jsonb;
+alter table products add column if not exists measurements jsonb not null default '[]'::jsonb;

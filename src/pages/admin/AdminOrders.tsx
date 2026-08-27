@@ -6,6 +6,7 @@ import { Badge } from '@/src/components/ui/Badge';
 import { Select } from '@/src/components/ui/Field';
 import { EmptyState } from '@/src/components/ui/EmptyState';
 import { useToast } from '@/src/hooks/useToast';
+import { cn } from '@/src/lib/cn';
 import { formatDateTime, formatFcfa, prettyPhone } from '@/src/lib/format';
 import { ORDER_STATUS_LABEL, ORDER_STEPS, PAYMENT_STATUS_LABEL, nextOrderStatus } from '@/src/lib/orderStatus';
 import { SITE_URL } from '@/src/config/site';
@@ -17,9 +18,12 @@ import type { Order, OrderStatus, PaymentStatus } from '@/src/types';
 export function AdminOrders({
   orders,
   reload,
+  newSince = '',
 }: {
   orders: Order[];
   reload: () => Promise<void>;
+  /** Date de la dernière visite : les commandes arrivées après sont signalées. */
+  newSince?: string;
 }) {
   const { notify } = useToast();
   const [busy, setBusy] = useState<string | null>(null);
@@ -55,10 +59,23 @@ export function AdminOrders({
 
       <ul className="mt-6 space-y-4">
         {orders.map((order) => (
-          <li key={order.id} className="rounded-[--radius-lg] border border-line bg-white p-5">
+          <li
+            key={order.id}
+            className={cn(
+              'rounded-[--radius-lg] border bg-white p-5',
+              newSince && order.createdAt > newSince ? 'border-mauve' : 'border-line',
+            )}
+          >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="font-display text-[20px]">{order.orderNumber}</p>
+                <p className="font-display text-[20px]">
+                  {order.orderNumber}
+                  {newSince && order.createdAt > newSince && (
+                    <span className="ml-2 align-middle rounded-full bg-mauve px-2 py-0.5 text-[11px] font-medium tracking-wide text-ivory">
+                      NOUVEAU
+                    </span>
+                  )}
+                </p>
                 <p className="mt-0.5 text-[12.5px] text-stone">{formatDateTime(order.createdAt)}</p>
               </div>
               <div className="text-right">

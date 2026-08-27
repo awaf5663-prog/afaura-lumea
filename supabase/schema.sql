@@ -31,6 +31,7 @@ create table if not exists products (
   is_popular boolean not null default false,
   other_colors_available boolean not null default false,
   color_chart_id text,                                 -- nuancier rattaché (src/config/colorCharts.ts)
+  measurements jsonb not null default '[]'::jsonb,     -- mesures réelles de la pièce, saisies par la boutique
   created_at timestamptz not null default now()
 );
 
@@ -146,8 +147,14 @@ create table if not exists settings (
   announcement text default '',
   pricing jsonb not null default '{}'::jsonb,           -- tarification SHEIN pilotée par l'admin
   promotions jsonb not null default '[]'::jsonb,
-  alert_thresholds jsonb not null default '{}'::jsonb
+  alert_thresholds jsonb not null default '{}'::jsonb,
+  reviews jsonb not null default '[]'::jsonb            -- avis recueillis et publiés par la boutique
 );
+
+-- Colonnes arrivées après la première mise en place : `create table if not
+-- exists` ne les ajoute pas sur une base déjà créée.
+alter table settings add column if not exists reviews jsonb not null default '[]'::jsonb;
+alter table products add column if not exists measurements jsonb not null default '[]'::jsonb;
 
 insert into settings (id) values (1) on conflict (id) do nothing;
 

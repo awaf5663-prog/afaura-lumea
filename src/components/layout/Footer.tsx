@@ -23,6 +23,7 @@ const COLUMNS = [
     links: [
       { to: '/shein', label: 'Commande SHEIN' },
       { to: '/comment-ca-marche', label: 'Comment ça marche' },
+      { to: '/guide-des-tailles', label: 'Guide des tailles' },
       { to: '/suivi', label: 'Suivre ma commande' },
       { to: '/faq', label: 'Questions fréquentes' },
     ],

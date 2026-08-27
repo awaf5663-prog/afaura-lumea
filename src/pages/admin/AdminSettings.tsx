@@ -4,7 +4,9 @@ import { FormRow, Input, Label, Textarea } from '@/src/components/ui/Field';
 import { DELIVERY_ZONES } from '@/src/config/site';
 import { useSettingsDraft } from '@/src/hooks/useSettingsDraft';
 import { DraftStatus } from '@/src/components/admin/DraftStatus';
+import { useProducts } from '@/src/hooks/useProducts';
 import { useToast } from '@/src/hooks/useToast';
+import { ReviewEditor } from '@/src/components/admin/ReviewEditor';
 import { normalizePhone } from '@/src/lib/format';
 
 /** Convertit une date ISO en valeur pour <input type="datetime-local">. */
@@ -20,6 +22,7 @@ const toLocalInput = (iso: string) => {
 
 export function AdminSettings() {
   const { notify } = useToast();
+  const { products } = useProducts(true);
   const { draft, setDraft, restored, saving, error, commit, discard } =
     useSettingsDraft('lumea.admin.draft.reglages');
 
@@ -180,6 +183,17 @@ export function AdminSettings() {
               onChange={(e) => setDraft({ ...draft, orangeMoneyNumber: e.target.value })}
             />
           </FormRow>
+        </div>
+      </section>
+
+      <section className="mt-5 rounded-[--radius-lg] border border-line bg-white p-5">
+        <h3 className="text-[18px]">Avis clientes</h3>
+        <div className="mt-4">
+          <ReviewEditor
+            reviews={draft.reviews}
+            products={products}
+            onChange={(reviews) => setDraft({ ...draft, reviews })}
+          />
         </div>
       </section>
 

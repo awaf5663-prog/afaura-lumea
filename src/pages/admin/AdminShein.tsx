@@ -6,6 +6,7 @@ import { Badge } from '@/src/components/ui/Badge';
 import { EmptyState } from '@/src/components/ui/EmptyState';
 import { Select } from '@/src/components/ui/Field';
 import { useToast } from '@/src/hooks/useToast';
+import { cn } from '@/src/lib/cn';
 import { formatDateTime, formatFcfa, prettyPhone } from '@/src/lib/format';
 import { SHEIN_STATUS_LABEL, SHEIN_STEPS, nextSheinStatus } from '@/src/lib/orderStatus';
 import { SITE_URL } from '@/src/config/site';
@@ -18,10 +19,13 @@ export function AdminShein({
   requests,
   reload,
   groupings = [],
+  newSince = '',
 }: {
   requests: SheinRequest[];
   reload: () => Promise<void>;
   groupings?: Grouping[];
+  /** Date de la dernière visite : les demandes arrivées après sont signalées. */
+  newSince?: string;
 }) {
   const { notify } = useToast();
   const [busy, setBusy] = useState<string | null>(null);
@@ -57,10 +61,23 @@ export function AdminShein({
 
       <ul className="mt-6 space-y-4">
         {requests.map((request) => (
-          <li key={request.id} className="rounded-[--radius-lg] border border-line bg-white p-5">
+          <li
+            key={request.id}
+            className={cn(
+              'rounded-[--radius-lg] border bg-white p-5',
+              newSince && request.createdAt > newSince ? 'border-mauve' : 'border-line',
+            )}
+          >
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <p className="font-display text-[20px]">{request.requestNumber}</p>
+                <p className="font-display text-[20px]">
+                  {request.requestNumber}
+                  {newSince && request.createdAt > newSince && (
+                    <span className="ml-2 align-middle rounded-full bg-mauve px-2 py-0.5 text-[11px] font-medium tracking-wide text-ivory">
+                      NOUVEAU
+                    </span>
+                  )}
+                </p>
                 <p className="mt-0.5 text-[12.5px] text-stone">{formatDateTime(request.createdAt)}</p>
               </div>
               <div className="flex flex-wrap items-center gap-1.5">

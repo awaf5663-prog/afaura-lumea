@@ -16,7 +16,7 @@ import { visiblePromotions } from '@/src/lib/pricing/promotions';
 import { MAX_UPLOAD_BYTES, compressImage } from '@/src/lib/image';
 import { cn } from '@/src/lib/cn';
 import { formatFcfa, isValidSenegalPhone, normalizePhone } from '@/src/lib/format';
-import { useRouter } from '@/src/lib/router';
+import { Link, useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
 import { buildSheinMessage } from '@/src/lib/whatsapp';
@@ -537,6 +537,12 @@ export function SheinRequestPage() {
             Envoyer ma demande
           </Button>
           <p className="mt-3 text-center text-[12.5px] leading-relaxed text-stone">
+            Un doute sur une taille ?{' '}
+            <Link to="/guide-des-tailles" className="underline underline-offset-2">
+              Guide des tailles
+            </Link>
+          </p>
+          <p className="mt-2 text-center text-[12.5px] leading-relaxed text-stone">
             Vous recevez un numéro de demande
             {whatsapp.prefill ? ", puis WhatsApp s'ouvre avec le message déjà écrit" : ''}. Aucun
             paiement n'est demandé à cette étape.

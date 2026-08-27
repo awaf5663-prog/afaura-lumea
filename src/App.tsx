@@ -19,6 +19,7 @@ import { HowItWorksPage } from '@/src/pages/HowItWorksPage';
 import { NotFoundPage } from '@/src/pages/NotFoundPage';
 import { ProductPage } from '@/src/pages/ProductPage';
 import { ShopPage } from '@/src/pages/ShopPage';
+import { SizeGuidePage } from '@/src/pages/SizeGuidePage';
 import { SheinConfirmationPage } from '@/src/pages/SheinConfirmationPage';
 import { SheinPage } from '@/src/pages/SheinPage';
 import { SheinRequestPage } from '@/src/pages/SheinRequestPage';
@@ -57,6 +58,8 @@ function Routes() {
       return <TrackingPage />;
     case '/faq':
       return <FaqPage />;
+    case '/guide-des-tailles':
+      return <SizeGuidePage />;
     case '/admin':
       return <AdminPage />;
     default:

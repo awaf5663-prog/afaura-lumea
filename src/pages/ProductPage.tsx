@@ -1,4 +1,4 @@
-import { ArrowLeft, Check, Clock, Loader2, Palette, ShieldCheck, Truck } from 'lucide-react';
+import { ArrowLeft, Check, Clock, Loader2, Palette, Ruler, ShieldCheck, Truck } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { WhatsAppLink } from '@/src/components/whatsapp/WhatsAppLink';
 import { Gallery } from '@/src/components/product/Gallery';
@@ -14,6 +14,7 @@ import { BRAND, SITE_URL } from '@/src/config/site';
 import { CATEGORIES } from '@/src/data/seed';
 import { findColorChart } from '@/src/config/colorCharts';
 import { ColorChartPicker } from '@/src/components/product/ColorChartPicker';
+import { ReviewCard, usePublishedReviews } from '@/src/components/home/Reviews';
 import { useCart } from '@/src/hooks/useCart';
 import { useProducts } from '@/src/hooks/useProducts';
 import { useToast } from '@/src/hooks/useToast';
@@ -122,6 +123,15 @@ export function ProductPage({ slug }: { slug: string }) {
         .filter((p) => p.id !== product?.id && p.category === product?.category && p.status === 'active')
         .slice(0, 4),
     [products, product],
+  );
+
+  // Avis recueillis auprès des clientes sur cette pièce précise.
+  const avis = usePublishedReviews(product?.id);
+
+  // Une ligne dont la valeur n'est pas encore mesurée n'a rien à faire sur la
+  // fiche : elle se lirait comme une mesure manquante plutôt qu'à venir.
+  const mesures = (product?.measurements ?? []).filter(
+    (m) => m.label.trim() && m.value.trim(),
   );
 
   if (loading) {
@@ -298,6 +308,31 @@ export function ProductPage({ slug }: { slug: string }) {
             </WhatsAppLink>
           </div>
 
+          {/* Mesures réelles de la pièce. Rien ne s'affiche tant que la
+              boutique ne les a pas saisies : une cliente ne doit pas choisir
+              sa taille sur un chiffre approximatif. */}
+          {mesures.length > 0 && (
+            <div className="mt-8 rounded-[--radius-md] border border-line bg-cream/40 p-5">
+              <h2 className="flex items-center gap-2 text-[16px]">
+                <Ruler className="size-4 text-mauve" strokeWidth={1.6} /> Mesures de la pièce
+              </h2>
+              <dl className="mt-3 grid gap-x-6 gap-y-2 sm:grid-cols-2">
+                {mesures.map((m) => (
+                  <div key={m.label} className="flex justify-between gap-4 text-[13.5px]">
+                    <dt className="text-stone">{m.label}</dt>
+                    <dd className="font-medium">{m.value}</dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="mt-3 text-[12px] leading-relaxed text-stone">
+                Mesures de l'article à plat, pas du corps.{' '}
+                <Link to="/guide-des-tailles" className="underline underline-offset-2">
+                  Trouver ma taille
+                </Link>
+              </p>
+            </div>
+          )}
+
           <ul className="mt-8 space-y-2.5 border-t border-line pt-6 text-[13.5px] text-stone">
             <li className="flex items-start gap-2.5">
               <Clock className="mt-0.5 size-4 shrink-0" strokeWidth={1.6} />
@@ -315,6 +350,17 @@ export function ProductPage({ slug }: { slug: string }) {
           </ul>
         </div>
       </div>
+
+      {avis.length > 0 && (
+        <section className="mt-20">
+          <h2 className="text-[26px]">Avis sur cette pièce</h2>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {avis.map((review) => (
+              <ReviewCard key={review.id} review={review} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {related.length > 0 && (
         <section className="mt-20">

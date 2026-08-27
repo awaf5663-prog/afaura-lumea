@@ -5,6 +5,19 @@ import { Button } from '@/src/components/ui/Button';
 import { FormRow, Input, Label, Select, Textarea } from '@/src/components/ui/Field';
 import { Sheet } from '@/src/components/ui/Sheet';
 import { COLOR_CHARTS } from '@/src/config/colorCharts';
+
+/**
+ * Lignes à remplir pour une abaya. Uniquement des intitulés : les valeurs
+ * viennent du mètre ruban de la boutique, jamais d'une estimation.
+ */
+const MESURES_ABAYA = [
+  'Longueur totale (épaule → bas)',
+  'Tour de poitrine (à plat × 2)',
+  'Largeur d\'épaules',
+  'Longueur de manche',
+  'Tour de manche',
+  'Taille portée',
+];
 import { CATEGORIES } from '@/src/data/seed';
 import { useToast } from '@/src/hooks/useToast';
 import { formatFcfa } from '@/src/lib/format';
@@ -37,6 +50,7 @@ const blank = (): Product => ({
   isPopular: false,
   otherColorsAvailable: false,
   colorChartId: null,
+  measurements: [],
   createdAt: new Date().toISOString(),
 });
 
@@ -413,6 +427,92 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
                   </span>
                 </span>
               </label>
+            </div>
+
+            {/* ── Mesures de la pièce ───────────────────────── */}
+            <div className="mt-8 border-t border-line pt-6">
+              <h3 className="text-[16px]">Mesures de la pièce</h3>
+              <p className="mt-1 text-[12px] leading-relaxed text-stone">
+                Mesurez l'article à plat, en centimètres. Tant que rien n'est saisi, la fiche
+                n'affiche aucun tableau — mieux vaut pas de mesure qu'une mesure approximative
+                sur laquelle une cliente choisirait sa taille.
+              </p>
+
+              <div className="mt-4 grid gap-2">
+                {(editing.measurements ?? []).map((m, index) => (
+                  <div key={index} className="flex gap-2">
+                    <Input
+                      aria-label="Mesure"
+                      placeholder="Longueur totale"
+                      value={m.label}
+                      onChange={(e) =>
+                        setEditing({
+                          ...editing,
+                          measurements: (editing.measurements ?? []).map((x, i) =>
+                            i === index ? { ...x, label: e.target.value } : x,
+                          ),
+                        })
+                      }
+                    />
+                    <Input
+                      aria-label="Valeur"
+                      placeholder="140 cm"
+                      value={m.value}
+                      onChange={(e) =>
+                        setEditing({
+                          ...editing,
+                          measurements: (editing.measurements ?? []).map((x, i) =>
+                            i === index ? { ...x, value: e.target.value } : x,
+                          ),
+                        })
+                      }
+                    />
+                    <button
+                      type="button"
+                      aria-label="Retirer cette mesure"
+                      onClick={() =>
+                        setEditing({
+                          ...editing,
+                          measurements: (editing.measurements ?? []).filter((_, i) => i !== index),
+                        })
+                      }
+                      className="press shrink-0 rounded-[--radius-sm] border border-line px-3 text-stone"
+                    >
+                      <Trash2 className="size-4" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  icon={<Plus className="size-4" />}
+                  onClick={() =>
+                    setEditing({
+                      ...editing,
+                      measurements: [...(editing.measurements ?? []), { label: '', value: '' }],
+                    })
+                  }
+                >
+                  Ajouter une mesure
+                </Button>
+                {(editing.measurements ?? []).length === 0 && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() =>
+                      setEditing({
+                        ...editing,
+                        measurements: MESURES_ABAYA.map((label) => ({ label, value: '' })),
+                      })
+                    }
+                  >
+                    Modèle abaya
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         )}

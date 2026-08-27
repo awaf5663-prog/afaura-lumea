@@ -38,6 +38,8 @@ function defaultSettings(): StoreSettings {
     pricing: DEFAULT_PRICING,
     alertThresholds: DEFAULT_ALERT_THRESHOLDS,
     promotions: DEFAULT_PROMOTIONS,
+    // Aucun avis livré avec le site : ils viennent des vraies clientes.
+    reviews: [],
   };
 }
 

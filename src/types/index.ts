@@ -60,7 +60,42 @@ export interface Product {
   otherColorsAvailable?: boolean;
   /** Nuancier rattaché : la cliente choisit un numéro de teinte. */
   colorChartId?: string | null;
+  /**
+   * Mesures réelles de l'article, saisies depuis l'administration.
+   *
+   * Jamais de valeur inventée ici : tant que la boutique n'a pas mesuré la
+   * pièce, la fiche n'affiche pas de tableau plutôt qu'un chiffre approximatif
+   * sur lequel une cliente choisirait sa taille.
+   */
+  measurements?: ProductMeasurement[];
   createdAt: string;
+}
+
+/** Une ligne du tableau de mesures : « Longueur totale » → « 140 cm ». */
+export interface ProductMeasurement {
+  label: string;
+  value: string;
+}
+
+/**
+ * Avis d'une cliente, saisi par la boutique après accord de l'intéressée.
+ *
+ * Il n'y a pas de formulaire public : un avis n'apparaît que si la boutique
+ * l'a réellement reçu et l'a recopié. Aucun avis n'est généré ni inventé.
+ */
+export interface Review {
+  id: string;
+  customerName: string;
+  /** Ville de la cliente. Vide = non précisée. */
+  city: string;
+  /** 1 à 5. */
+  rating: number;
+  text: string;
+  /** Article concerné, si l'avis en vise un. Vide = avis sur la boutique. */
+  productId: string;
+  /** Date de l'avis (ISO). */
+  date: string;
+  published: boolean;
 }
 
 export interface Category {
@@ -326,6 +361,8 @@ export interface StoreSettings {
   alertThresholds: AlertThresholds;
   /** Offres en cours. Toutes les conditions sont modifiables depuis l'admin. */
   promotions: Promotion[];
+  /** Avis recueillis auprès des clientes et publiés par la boutique. */
+  reviews: Review[];
 }
 
 /* ─────────────────────────────────────────────────────────────

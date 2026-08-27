@@ -13,6 +13,7 @@ const NAV = [
   { to: '/boutique?categorie=piece_unique', label: 'Pièce unique' },
   { to: '/shein', label: 'Commande SHEIN' },
   { to: '/comment-ca-marche', label: 'Comment ça marche' },
+  { to: '/guide-des-tailles', label: 'Guide des tailles' },
   { to: '/suivi', label: 'Suivi' },
   { to: '/faq', label: 'FAQ' },
 ];

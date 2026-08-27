@@ -1,6 +1,7 @@
 import { FeaturedProducts } from '@/src/components/home/FeaturedProducts';
 import { GroupingSection } from '@/src/components/home/GroupingSection';
 import { Hero } from '@/src/components/home/Hero';
+import { Reviews } from '@/src/components/home/Reviews';
 import { HowItWorks } from '@/src/components/home/HowItWorks';
 import { SheinTeaser } from '@/src/components/home/SheinTeaser';
 import { TrustRow } from '@/src/components/home/TrustRow';
@@ -34,6 +35,7 @@ export function HomePage() {
       <FeaturedProducts products={products} loading={loading} />
       <HowItWorks />
       <GroupingSection />
+      <Reviews />
       <SheinTeaser />
     </>
   );

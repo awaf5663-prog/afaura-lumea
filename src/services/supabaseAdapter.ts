@@ -1,3 +1,11 @@
+import {
+  DELIVERY_ZONES,
+  ORANGE_MONEY_NUMBER,
+  PAYMENT_METHODS,
+  WAVE_NUMBER,
+  WHATSAPP_LINK,
+  WHATSAPP_NUMBER,
+} from '@/src/config/site';
 import { DEFAULT_PROMOTIONS } from '@/src/config/pricing';
 import { SEED_IMAGES } from '@/src/data/seed';
 import { normalizePhone } from '@/src/lib/format';
@@ -165,6 +173,20 @@ const fromProduct = (p: Product): Row => ({
   measurements: p.measurements ?? [],
 });
 
+/**
+ * Intitulés lisibles de la zone de livraison et du moyen de paiement.
+ *
+ * La fonction serveur n'a que les identifiants (« city », « orange_money ») :
+ * les libellés vivent dans la configuration du site, et le navigateur ne les
+ * envoie pas — on ne fait confiance qu'aux identifiants. On les résout donc à
+ * la lecture, ce qui répare aussi les commandes déjà enregistrées.
+ */
+const zoneLabel = (id: string, stocke?: string): string =>
+  DELIVERY_ZONES.find((z) => z.id === id)?.label ?? stocke ?? id;
+
+const paiementLabel = (id: string, stocke?: string): string =>
+  PAYMENT_METHODS.find((m) => m.id === id)?.label ?? stocke ?? id;
+
 const toOrder = (r: Row): Order => ({
   id: r.id,
   orderNumber: r.order_number,
@@ -174,7 +196,7 @@ const toOrder = (r: Row): Order => ({
   city: r.city ?? '',
   note: r.note ?? undefined,
   deliveryZoneId: r.delivery_zone_id,
-  deliveryLabel: r.delivery_label,
+  deliveryLabel: zoneLabel(r.delivery_zone_id, r.delivery_label),
   deliveryFee: r.delivery_fee,
   deliveryFeeBeforePromotion: r.delivery_fee_before_promotion ?? null,
   subtotal: r.subtotal,
@@ -183,7 +205,7 @@ const toOrder = (r: Row): Order => ({
   promoCode: r.promo_code ?? '',
   total: r.total,
   paymentMethod: r.payment_method,
-  paymentMethodLabel: r.payment_method_label,
+  paymentMethodLabel: paiementLabel(r.payment_method, r.payment_method_label),
   paymentStatus: r.payment_status,
   orderStatus: r.order_status,
   items: (r.order_items ?? []).map((i: Row) => ({
@@ -431,11 +453,21 @@ export const supabaseAdapter: DataSource = {
     /** La ligne a-t-elle déjà été enregistrée depuis l'admin ? */
     const configured = Boolean(r.pricing && Object.keys(r.pricing).length);
     return {
-      whatsappNumber: r.whatsapp_number ?? '',
-      whatsappLink: r.whatsapp_link ?? '',
+      /*
+       * Un champ vide en base signifie « pas encore renseigné », pas « aucun
+       * contact ». Sans ce repli, la ligne créée par schema.sql effaçait le
+       * numéro WhatsApp : le site retombait sur « copier puis ouvrir
+       * WhatsApp », et le message ne partait plus tout seul.
+       */
+      whatsappNumber: r.whatsapp_number?.trim() || WHATSAPP_NUMBER,
+      whatsappLink: r.whatsapp_link?.trim() || WHATSAPP_LINK,
       nextGroupingDate: r.next_grouping_date ?? '',
-      waveNumber: r.wave_number ?? '',
-      orangeMoneyNumber: r.orange_money_number ?? '',
+      waveNumber: r.wave_number?.trim() || WAVE_NUMBER,
+      orangeMoneyNumber: r.orange_money_number?.trim() || ORANGE_MONEY_NUMBER,
+      // Pas de repli ici : le montant de la livraison est appliqué par la
+      // fonction serveur à partir de cette même colonne. Inventer une valeur
+      // côté navigateur ferait afficher des frais que la commande ne compte
+      // pas. Une zone sans tarif reste « à confirmer ».
       deliveryFees: r.delivery_fees ?? {},
       announcement: r.announcement ?? '',
       // La ligne créée par schema.sql arrive avec `{}` dans ces colonnes :

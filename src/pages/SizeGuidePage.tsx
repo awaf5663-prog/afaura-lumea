@@ -10,6 +10,7 @@ import {
   measurementsMessage,
   suggestFromHeightWeight,
   suggestFromMeasurements,
+  type Fit,
   type SizeSuggestion,
 } from '@/src/config/sizeGuide';
 
@@ -152,10 +153,19 @@ export function SizeGuidePage() {
                 {suggestion.confidence === 'measured' ? 'Taille conseillée' : 'Taille estimée'}
               </p>
               <div className="mt-3 grid gap-3 sm:grid-cols-3">
-                <Resultat titre="Haut, chemise, top" taille={suggestion.top} />
-                <Resultat titre="Pantalon, jupe" taille={suggestion.bottom} />
-                <Resultat titre="Robe, ensemble" taille={suggestion.dress} />
+                <Resultat titre="Haut, chemise, top" fit={suggestion.top} />
+                <Resultat titre="Pantalon, jupe" fit={suggestion.bottom} />
+                <Resultat titre="Robe, ensemble" fit={suggestion.dress} />
               </div>
+
+              {suggestion.confidence === 'estimated' && suggestion.used.bust && (
+                <p className="mt-3 rounded-[--radius-sm] bg-cream/60 px-3.5 py-2.5 text-[12.5px] leading-relaxed text-graphite">
+                  Mesures estimées : poitrine ~{suggestion.used.bust} cm, taille ~
+                  {suggestion.used.waist} cm, hanches ~{suggestion.used.hips} cm. Si vous les
+                  connaissez vraiment, saisissez-les dans « Je prends mes mesures » : le résultat
+                  sera juste.
+                </p>
+              )}
 
               {suggestion.notes.map((note) => (
                 <p key={note} className="mt-3 flex items-start gap-2 text-[12.5px] leading-relaxed text-graphite">
@@ -167,12 +177,11 @@ export function SizeGuidePage() {
               <div className="mt-5">
                 <WhatsAppLink
                   message={measurementsMessage({
-                    // Seulement ce qui a servi au calcul : envoyer un tour de
-                    // hanches saisi puis abandonné ferait commander sur une
-                    // mesure que la cliente n'a pas validée.
-                    ...(methode === 'mesures'
-                      ? { bust: mesures.bust, waist: mesures.waist, hips: mesures.hips }
-                      : { height: mesures.height, weight: mesures.weight }),
+                    // Taille et poids ne partent que s'ils ont servi au calcul.
+                    // Les tours du corps, eux, sont dans `suggestion.used`.
+                    ...(methode === 'taille-poids'
+                      ? { height: mesures.height, weight: mesures.weight }
+                      : {}),
                     suggestion,
                   })}
                 >
@@ -243,12 +252,31 @@ export function SizeGuidePage() {
   );
 }
 
-function Resultat({ titre, taille }: { titre: string; taille: { label: string; fr: number } | null }) {
+/**
+ * Deux tailles par vêtement plutôt qu'une.
+ *
+ * La même personne prend M pour une chemise près du corps et L pour la porter
+ * fluide : afficher une seule taille obligerait à deviner laquelle. On donne
+ * les deux, et la cliente choisit comment elle veut le porter.
+ */
+function Resultat({ titre, fit }: { titre: string; fit: Fit }) {
   return (
     <div className="rounded-[--radius-md] border border-line bg-cream/40 p-4 text-center">
       <p className="text-[12px] text-stone">{titre}</p>
-      <p className="mt-1.5 text-[26px] leading-none">{taille ? taille.label : '—'}</p>
-      <p className="mt-1.5 text-[12px] text-stone">{taille ? `FR ${taille.fr}` : 'à préciser'}</p>
+      <div className="mt-2 grid grid-cols-2 gap-2">
+        <div>
+          <p className="text-[24px] leading-none">{fit.fitted ? fit.fitted.label : '—'}</p>
+          <p className="mt-1 text-[11.5px] text-stone">
+            {fit.fitted ? `près du corps · FR ${fit.fitted.fr}` : 'à préciser'}
+          </p>
+        </div>
+        <div className="border-l border-line">
+          <p className="text-[24px] leading-none">{fit.loose ? fit.loose.label : '—'}</p>
+          <p className="mt-1 text-[11.5px] text-stone">
+            {fit.loose ? `ample · FR ${fit.loose.fr}` : 'à préciser'}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

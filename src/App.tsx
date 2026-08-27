@@ -10,6 +10,7 @@ import { CartProvider } from '@/src/hooks/useCart';
 import { SettingsProvider } from '@/src/hooks/useSettings';
 import { ToastProvider } from '@/src/hooks/useToast';
 import { RouterProvider, matchPath, useRouter } from '@/src/lib/router';
+import { useVersionCheck } from '@/src/hooks/useVersionCheck';
 import { CartPage } from '@/src/pages/CartPage';
 import { CheckoutPage } from '@/src/pages/CheckoutPage';
 import { ConfirmationPage } from '@/src/pages/ConfirmationPage';
@@ -71,9 +72,24 @@ function Shell() {
   const { path } = useRouter();
   const [cartOpen, setCartOpen] = useState(false);
   const isAdmin = path.startsWith('/admin');
+  // Une version plus récente est en ligne : on recharge sur les pages
+  // tranquilles, on propose sur celles où quelqu'un est en train de saisir.
+  const { nouvelleVersion, recharger } = useVersionCheck(path);
 
   return (
     <div className="flex min-h-dvh flex-col">
+      {nouvelleVersion && (
+        <div className="animate-fade sticky top-0 z-[90] flex flex-wrap items-center justify-center gap-3 bg-ink px-4 py-2.5 text-center text-[12.5px] text-ivory">
+          Une version plus récente du site est en ligne.
+          <button
+            type="button"
+            onClick={recharger}
+            className="press rounded-full bg-ivory px-3.5 py-1.5 text-[12.5px] font-medium text-ink"
+          >
+            Recharger
+          </button>
+        </div>
+      )}
       <a
         href="#contenu"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-ink focus:px-5 focus:py-3 focus:text-ivory"

@@ -1,10 +1,26 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
+import fs from 'fs';
 import path from 'path';
 import {defineConfig} from 'vite';
 
+/**
+ * Empreinte de la publication en cours, écrite juste avant par
+ * scripts/generate-sitemap.mjs. Le site la compare à celle servie par
+ * version.json pour savoir qu'une nouvelle version est en ligne.
+ */
+function buildId(): string {
+  try {
+    const brut = fs.readFileSync(path.resolve(__dirname, 'public/version.json'), 'utf8');
+    return (JSON.parse(brut) as { build?: string }).build ?? 'dev';
+  } catch {
+    return 'dev';
+  }
+}
+
 export default defineConfig(() => {
   return {
+    define: { __BUILD_ID__: JSON.stringify(buildId()) },
     /*
      * Chemin de base du site publié.
      *

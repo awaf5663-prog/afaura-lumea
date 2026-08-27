@@ -45,4 +45,16 @@ Sitemap: ${origin}/sitemap.xml
 `;
 writeFileSync(join(root, 'public', 'robots.txt'), robots);
 
-console.log(`sitemap.xml et robots.txt générés${origin ? ` pour ${origin}` : ' (chemins relatifs)'}`);
+/*
+ * Empreinte de la publication.
+ *
+ * Les navigateurs — Safari sur iPhone en particulier — gardent longtemps
+ * l'ancien index.html en mémoire. Une correction publiée peut donc rester
+ * invisible pendant des heures, et la boutique croit de bonne foi qu'elle
+ * n'a pas été faite. Le site compare cette empreinte à la sienne et se
+ * recharge tout seul quand elle a changé (voir src/hooks/useVersionCheck).
+ */
+const build = new Date().toISOString();
+writeFileSync(join(root, 'public', 'version.json'), `${JSON.stringify({ build })}\n`);
+
+console.log(`sitemap.xml, robots.txt et version.json générés${origin ? ` pour ${origin}` : ' (chemins relatifs)'}`);

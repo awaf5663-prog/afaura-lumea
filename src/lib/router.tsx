@@ -38,6 +38,9 @@ const BASE = (() => {
   }
 })();
 
+/** Racine du site, terminée par « / ». Sert à demander un fichier public. */
+export const BASE_URL = `${BASE}/`;
+
 /**
  * L'History API est indisponible dans certains contextes embarqués.
  * On bascule alors sur le fragment (#) plutôt que de casser la navigation.

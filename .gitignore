@@ -9,3 +9,6 @@ coverage/
 
 # Aperçu autonome généré (npm run preview:build)
 preview/
+
+# Empreinte de publication, régénérée à chaque build.
+public/version.json

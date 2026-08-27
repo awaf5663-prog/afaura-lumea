@@ -187,6 +187,30 @@ const zoneLabel = (id: string, stocke?: string): string =>
 const paiementLabel = (id: string, stocke?: string): string =>
   PAYMENT_METHODS.find((m) => m.id === id)?.label ?? stocke ?? id;
 
+/**
+ * Mise à la corbeille ou restauration, en une seule requête.
+ *
+ * La colonne `deleted_at` est arrivée après la première mise en place de la
+ * base : si elle manque, on le dit clairement plutôt que de laisser croire
+ * que la commande a été rangée quelque part.
+ */
+async function corbeille(table: string, ids: string[], trashed: boolean): Promise<void> {
+  if (!ids.length) return;
+  try {
+    await rest(`${table}?id=in.(${ids.join(',')})`, {
+      method: 'PATCH',
+      headers: { Prefer: 'return=minimal' },
+      body: JSON.stringify({ deleted_at: trashed ? new Date().toISOString() : null }),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : '';
+    if (!/deleted_at/i.test(message)) throw error;
+    throw new Error(
+      "La corbeille n'est pas encore installée dans la base. Passez supabase/mise-a-jour.sql dans le SQL editor de Supabase, puis réessayez.",
+    );
+  }
+}
+
 const toOrder = (r: Row): Order => ({
   id: r.id,
   orderNumber: r.order_number,
@@ -217,6 +241,7 @@ const toOrder = (r: Row): Order => ({
   })),
   createdAt: r.created_at,
   updatedAt: r.updated_at,
+  deletedAt: r.deleted_at ?? null,
 });
 
 const toShein = (r: Row): SheinRequest => ({
@@ -245,6 +270,7 @@ const toShein = (r: Row): SheinRequest => ({
   promoCode: r.promo_code ?? '',
   createdAt: r.created_at,
   updatedAt: r.updated_at,
+  deletedAt: r.deleted_at ?? null,
 });
 
 const toGrouping = (r: Row): Grouping => ({
@@ -370,6 +396,15 @@ export const supabaseAdapter: DataSource = {
     return toOrder(rows[0]);
   },
 
+  async updateOrdersTrash(ids, trashed) {
+    await corbeille('orders', ids, trashed);
+  },
+
+  async deleteOrders(ids) {
+    if (!ids.length) return;
+    await rest(`orders?id=in.(${ids.join(',')})`, { method: 'DELETE' });
+  },
+
   async createSheinRequest(draft: SheinDraft) {
     const row = await rest<Row>('rpc/create_shein_request', {
       method: 'POST',
@@ -445,6 +480,15 @@ export const supabaseAdapter: DataSource = {
       body: JSON.stringify({ p_from: fromGroupingId, p_to: toGroupingId }),
     });
     return Number(row ?? 0);
+  },
+
+  async updateSheinTrash(ids, trashed) {
+    await corbeille('shein_requests', ids, trashed);
+  },
+
+  async deleteSheinRequests(ids) {
+    if (!ids.length) return;
+    await rest(`shein_requests?id=in.(${ids.join(',')})`, { method: 'DELETE' });
   },
 
   async getSettings() {

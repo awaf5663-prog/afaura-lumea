@@ -90,6 +90,15 @@ export function AdminPage() {
   };
 
   /*
+   * Les lignes à la corbeille sortent de tous les comptes : une commande
+   * rangée là ne doit plus peser sur un paiement en attente, sur le
+   * remplissage d'un groupage, ni sur le repère des nouveautés. Les listes,
+   * elles, reçoivent tout — c'est ainsi qu'elles affichent la corbeille.
+   */
+  const ordersActives = orders.filter((o) => !o.deletedAt);
+  const requestsActives = requests.filter((r) => !r.deletedAt);
+
+  /*
    * Repère « nouveau depuis ma dernière visite ».
    *
    * `depuis` sert à marquer les lignes et reste figé pendant la visite : une
@@ -97,8 +106,8 @@ export function AdminPage() {
    * boutique. Le compteur de l'onglet, lui, retombe dès qu'elle l'ouvre.
    */
   const nouveautes = {
-    commandes: countSince(orders, vu.commandes),
-    shein: countSince(requests, vu.shein),
+    commandes: countSince(ordersActives, vu.commandes),
+    shein: countSince(requestsActives, vu.shein),
   };
 
   const activeGrouping =
@@ -106,14 +115,16 @@ export function AdminPage() {
   const activeStats = activeGrouping
     ? computeGroupingStats(
         activeGrouping,
-        requests,
+        requestsActives,
         settings?.pricing?.tiers?.find((t) => t.fee !== null)?.fee ?? null,
       )
     : null;
 
-  const pendingPayments = orders.filter((o) => o.paymentStatus !== 'confirmed').length;
-  const openRequests = requests.filter((r) => !['delivered', 'cancelled'].includes(r.status)).length;
-  const confirmedRevenue = orders
+  const pendingPayments = ordersActives.filter((o) => o.paymentStatus !== 'confirmed').length;
+  const openRequests = requestsActives.filter(
+    (r) => !['delivered', 'cancelled'].includes(r.status),
+  ).length;
+  const confirmedRevenue = ordersActives
     .filter((o) => o.paymentStatus === 'confirmed')
     .reduce((sum, o) => sum + o.total, 0);
 
@@ -196,8 +207,8 @@ export function AdminPage() {
         <ErrorBoundary key={tab} label={`l'onglet ${TABS.find((t) => t.id === tab)?.label ?? tab}`}>
         {tab === 'apercu' && (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <Stat label="Commandes" value={String(orders.length)} hint={`${pendingPayments} paiement(s) à vérifier`} />
-            <Stat label="Demandes SHEIN" value={String(requests.length)} hint={`${openRequests} en cours`} />
+            <Stat label="Commandes" value={String(ordersActives.length)} hint={`${pendingPayments} paiement(s) à vérifier`} />
+            <Stat label="Demandes SHEIN" value={String(requestsActives.length)} hint={`${openRequests} en cours`} />
             <Stat label="Produits en vente" value={String(products.filter((p) => p.status === 'active').length)} hint={`${products.length} au total`} />
             <Stat
               label="Encaissé confirmé"
@@ -269,7 +280,7 @@ export function AdminPage() {
         {tab === 'groupages' && settings && (
           <AdminGroupings
             groupings={groupings}
-            requests={requests}
+            requests={requestsActives}
             thresholds={settings.alertThresholds}
             fallbackFee={settings.pricing?.tiers?.find((t) => t.fee !== null)?.fee ?? null}
             whatsappConfigured={isWhatsappConfigured(settings.whatsappNumber)}

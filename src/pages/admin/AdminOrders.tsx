@@ -6,6 +6,8 @@ import { Badge } from '@/src/components/ui/Badge';
 import { Select } from '@/src/components/ui/Field';
 import { EmptyState } from '@/src/components/ui/EmptyState';
 import { useToast } from '@/src/hooks/useToast';
+import { useTrash } from '@/src/hooks/useTrash';
+import { TrashBar } from '@/src/components/admin/TrashBar';
 import { cn } from '@/src/lib/cn';
 import { formatDateTime, formatFcfa, prettyPhone } from '@/src/lib/format';
 import { ORDER_STATUS_LABEL, ORDER_STEPS, PAYMENT_STATUS_LABEL, nextOrderStatus } from '@/src/lib/orderStatus';
@@ -27,6 +29,15 @@ export function AdminOrders({
 }) {
   const { notify } = useToast();
   const [busy, setBusy] = useState<string | null>(null);
+
+  const trash = useTrash({
+    lignes: orders,
+    nom: 'commande',
+    mettreCorbeille: (ids, trashed) => db.updateOrdersTrash(ids, trashed),
+    supprimer: (ids) => db.deleteOrders(ids),
+    reload,
+  });
+  const visibles = trash.visibles;
 
   const patch = async (order: Order, changes: Parameters<typeof db.updateOrder>[1]) => {
     setBusy(order.id);
@@ -53,12 +64,37 @@ export function AdminOrders({
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-[24px]">Commandes ({orders.length})</h2>
-        <ExportButton label="Exporter pour Excel" build={() => ordersCsv(orders)} />
+        <h2 className="text-[24px]">
+          {trash.vueCorbeille ? 'Corbeille' : 'Commandes'} ({visibles.length})
+        </h2>
+        <ExportButton label="Exporter pour Excel" build={() => ordersCsv(visibles)} />
       </div>
 
+      <TrashBar
+        nom="commande"
+        vueCorbeille={trash.vueCorbeille}
+        onChangerVue={trash.changerVue}
+        nombreCorbeille={trash.nombreCorbeille}
+        selection={trash.selection}
+        total={visibles.length}
+        onToutSelectionner={trash.toutSelectionner}
+        onEffacerSelection={trash.effacerSelection}
+        onMettreCorbeille={trash.mettreALaCorbeille}
+        onRestaurer={trash.restaurer}
+        onSupprimer={trash.supprimerDefinitivement}
+        occupe={trash.occupe}
+      />
+
+      {visibles.length === 0 && (
+        <p className="mt-8 text-[13.5px] text-stone">
+          {trash.vueCorbeille
+            ? "La corbeille est vide."
+            : "Aucune commande en cours. Regardez dans la corbeille si vous en cherchez une."}
+        </p>
+      )}
+
       <ul className="mt-6 space-y-4">
-        {orders.map((order) => (
+        {visibles.map((order) => (
           <li
             key={order.id}
             className={cn(
@@ -67,7 +103,15 @@ export function AdminOrders({
             )}
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  aria-label={`Sélectionner ${order.orderNumber}`}
+                  className="mt-1.5 size-4 shrink-0 accent-[#8f4b5b]"
+                  checked={trash.selection.includes(order.id)}
+                  onChange={() => trash.basculer(order.id)}
+                />
+                <div>
                 <p className="font-display text-[20px]">
                   {order.orderNumber}
                   {newSince && order.createdAt > newSince && (
@@ -77,6 +121,7 @@ export function AdminOrders({
                   )}
                 </p>
                 <p className="mt-0.5 text-[12.5px] text-stone">{formatDateTime(order.createdAt)}</p>
+                </div>
               </div>
               <div className="text-right">
                 <p className="text-[17px] font-medium tabular-nums">

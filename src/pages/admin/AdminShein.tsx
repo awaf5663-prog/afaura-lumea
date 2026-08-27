@@ -6,6 +6,8 @@ import { Badge } from '@/src/components/ui/Badge';
 import { EmptyState } from '@/src/components/ui/EmptyState';
 import { Select } from '@/src/components/ui/Field';
 import { useToast } from '@/src/hooks/useToast';
+import { useTrash } from '@/src/hooks/useTrash';
+import { TrashBar } from '@/src/components/admin/TrashBar';
 import { cn } from '@/src/lib/cn';
 import { formatDateTime, formatFcfa, prettyPhone } from '@/src/lib/format';
 import { SHEIN_STATUS_LABEL, SHEIN_STEPS, nextSheinStatus } from '@/src/lib/orderStatus';
@@ -29,6 +31,15 @@ export function AdminShein({
 }) {
   const { notify } = useToast();
   const [busy, setBusy] = useState<string | null>(null);
+
+  const trash = useTrash({
+    lignes: requests,
+    nom: 'demande',
+    mettreCorbeille: (ids, trashed) => db.updateSheinTrash(ids, trashed),
+    supprimer: (ids) => db.deleteSheinRequests(ids),
+    reload,
+  });
+  const visibles = trash.visibles;
 
   const patch = async (request: SheinRequest, changes: Parameters<typeof db.updateSheinRequest>[1]) => {
     setBusy(request.id);
@@ -55,12 +66,37 @@ export function AdminShein({
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-[24px]">Demandes SHEIN ({requests.length})</h2>
-        <ExportButton label="Exporter pour Excel" build={() => sheinCsv(requests)} />
+        <h2 className="text-[24px]">
+          {trash.vueCorbeille ? 'Corbeille' : 'Demandes SHEIN'} ({visibles.length})
+        </h2>
+        <ExportButton label="Exporter pour Excel" build={() => sheinCsv(visibles)} />
       </div>
 
+      <TrashBar
+        nom="demande"
+        vueCorbeille={trash.vueCorbeille}
+        onChangerVue={trash.changerVue}
+        nombreCorbeille={trash.nombreCorbeille}
+        selection={trash.selection}
+        total={visibles.length}
+        onToutSelectionner={trash.toutSelectionner}
+        onEffacerSelection={trash.effacerSelection}
+        onMettreCorbeille={trash.mettreALaCorbeille}
+        onRestaurer={trash.restaurer}
+        onSupprimer={trash.supprimerDefinitivement}
+        occupe={trash.occupe}
+      />
+
+      {visibles.length === 0 && (
+        <p className="mt-8 text-[13.5px] text-stone">
+          {trash.vueCorbeille
+            ? 'La corbeille est vide.'
+            : 'Aucune demande en cours. Regardez dans la corbeille si vous en cherchez une.'}
+        </p>
+      )}
+
       <ul className="mt-6 space-y-4">
-        {requests.map((request) => (
+        {visibles.map((request) => (
           <li
             key={request.id}
             className={cn(
@@ -69,7 +105,15 @@ export function AdminShein({
             )}
           >
             <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
+              <div className="flex items-start gap-3">
+                <input
+                  type="checkbox"
+                  aria-label={`Sélectionner ${request.requestNumber}`}
+                  className="mt-1.5 size-4 shrink-0 accent-[#8f4b5b]"
+                  checked={trash.selection.includes(request.id)}
+                  onChange={() => trash.basculer(request.id)}
+                />
+                <div>
                 <p className="font-display text-[20px]">
                   {request.requestNumber}
                   {newSince && request.createdAt > newSince && (
@@ -79,6 +123,7 @@ export function AdminShein({
                   )}
                 </p>
                 <p className="mt-0.5 text-[12.5px] text-stone">{formatDateTime(request.createdAt)}</p>
+                </div>
               </div>
               <div className="flex flex-wrap items-center gap-1.5">
                 <Badge tone="neutral">{SHEIN_STATUS_LABEL[request.status]}</Badge>

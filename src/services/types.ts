@@ -57,6 +57,10 @@ export interface DataSource {
     id: string,
     patch: Partial<Pick<Order, 'orderStatus' | 'paymentStatus' | 'deliveryFee' | 'note'>>,
   ): Promise<Order>;
+  /** Met à la corbeille (`true`) ou restaure (`false`). Rien n'est effacé. */
+  updateOrdersTrash(ids: string[], trashed: boolean): Promise<void>;
+  /** Suppression définitive, depuis la corbeille uniquement. Irréversible. */
+  deleteOrders(ids: string[]): Promise<void>;
 
   createSheinRequest(draft: SheinDraft): Promise<SheinRequest>;
   listSheinRequests(): Promise<SheinRequest[]>;
@@ -65,6 +69,8 @@ export interface DataSource {
     id: string,
     patch: Partial<Pick<SheinRequest, 'status' | 'quotedTotal' | 'note'>>,
   ): Promise<SheinRequest>;
+  updateSheinTrash(ids: string[], trashed: boolean): Promise<void>;
+  deleteSheinRequests(ids: string[]): Promise<void>;
 
   listGroupings(): Promise<Grouping[]>;
   saveGrouping(grouping: Grouping): Promise<Grouping>;

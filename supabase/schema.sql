@@ -63,7 +63,9 @@ create table if not exists orders (
   order_status text not null default 'received'
     check (order_status in ('received','payment_confirmed','grouped','in_transit','arrived','ready','delivered','cancelled')),
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  -- Corbeille : la ligne existe encore, elle n'est simplement plus active.
+  deleted_at timestamptz
 );
 
 create table if not exists order_items (
@@ -115,7 +117,8 @@ create table if not exists shein_requests (
   promo_code text not null default '',
   quote jsonb,                                         -- estimation calculée côté serveur
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now()
+  updated_at timestamptz not null default now(),
+  deleted_at timestamptz
 );
 
 create table if not exists shein_items (
@@ -155,6 +158,8 @@ create table if not exists settings (
 -- exists` ne les ajoute pas sur une base déjà créée.
 alter table settings add column if not exists reviews jsonb not null default '[]'::jsonb;
 alter table products add column if not exists measurements jsonb not null default '[]'::jsonb;
+alter table orders add column if not exists deleted_at timestamptz;
+alter table shein_requests add column if not exists deleted_at timestamptz;
 
 insert into settings (id) values (1) on conflict (id) do nothing;
 
@@ -550,6 +555,8 @@ as $$
   from orders o
   where upper(o.order_number) = upper(p_order_number)
     and meme_numero(o.phone, p_phone)
+    -- Une commande à la corbeille n'est plus suivie. La restaurer la rend.
+    and o.deleted_at is null
   limit 1;
 $$;
 
@@ -565,6 +572,7 @@ as $$
   from shein_requests r
   where upper(r.request_number) = upper(p_request_number)
     and meme_numero(r.phone, p_phone)
+    and r.deleted_at is null
   limit 1;
 $$;
 

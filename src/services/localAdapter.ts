@@ -207,7 +207,8 @@ export const localAdapter: DataSource = {
     const wanted = orderNumber.trim().toUpperCase();
     const wantedPhone = normalizePhone(phone);
     const found = readJson<Order[]>(STORAGE_KEYS.orders, []).find(
-      (o) => o.orderNumber.toUpperCase() === wanted && o.phone === wantedPhone,
+      // Une commande à la corbeille n'est plus suivie ; la restaurer la rend.
+      (o) => o.orderNumber.toUpperCase() === wanted && o.phone === wantedPhone && !o.deletedAt,
     );
     return delay(found ?? null);
   },
@@ -221,6 +222,24 @@ export const localAdapter: DataSource = {
     orders[index] = next;
     writeJson(STORAGE_KEYS.orders, orders);
     return delay(next);
+  },
+
+  async updateOrdersTrash(ids, trashed) {
+    const orders = readJson<Order[]>(STORAGE_KEYS.orders, []);
+    const cible = new Set(ids);
+    const quand = trashed ? new Date().toISOString() : null;
+    writeJson(
+      STORAGE_KEYS.orders,
+      orders.map((o) => (cible.has(o.id) ? { ...o, deletedAt: quand } : o)),
+    );
+    await delay(undefined);
+  },
+
+  async deleteOrders(ids) {
+    const cible = new Set(ids);
+    const orders = readJson<Order[]>(STORAGE_KEYS.orders, []);
+    writeJson(STORAGE_KEYS.orders, orders.filter((o) => !cible.has(o.id)));
+    await delay(undefined);
   },
 
   async createSheinRequest(draft: SheinDraft) {
@@ -352,7 +371,7 @@ export const localAdapter: DataSource = {
     const wanted = requestNumber.trim().toUpperCase();
     const wantedPhone = normalizePhone(phone);
     const found = readJson<SheinRequest[]>(STORAGE_KEYS.sheinRequests, []).find(
-      (r) => r.requestNumber.toUpperCase() === wanted && r.phone === wantedPhone,
+      (r) => r.requestNumber.toUpperCase() === wanted && r.phone === wantedPhone && !r.deletedAt,
     );
     return delay(found ?? null);
   },
@@ -365,6 +384,24 @@ export const localAdapter: DataSource = {
     all[index] = next;
     writeJson(STORAGE_KEYS.sheinRequests, all);
     return delay(next);
+  },
+
+  async updateSheinTrash(ids, trashed) {
+    const all = readJson<SheinRequest[]>(STORAGE_KEYS.sheinRequests, []);
+    const cible = new Set(ids);
+    const quand = trashed ? new Date().toISOString() : null;
+    writeJson(
+      STORAGE_KEYS.sheinRequests,
+      all.map((r) => (cible.has(r.id) ? { ...r, deletedAt: quand } : r)),
+    );
+    await delay(undefined);
+  },
+
+  async deleteSheinRequests(ids) {
+    const cible = new Set(ids);
+    const all = readJson<SheinRequest[]>(STORAGE_KEYS.sheinRequests, []);
+    writeJson(STORAGE_KEYS.sheinRequests, all.filter((r) => !cible.has(r.id)));
+    await delay(undefined);
   },
 
   async getSettings() {

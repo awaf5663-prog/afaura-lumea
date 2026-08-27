@@ -166,6 +166,14 @@ export interface Order {
   items: OrderItem[];
   createdAt: string;
   updatedAt: string;
+  /**
+   * Mise à la corbeille. null = ligne active.
+   *
+   * Rien n'est effacé par une mise à la corbeille : une commande porte de
+   * l'argent et un engagement pris auprès d'une cliente. Elle se restaure
+   * tant que la boutique n'a pas vidé la corbeille elle-même.
+   */
+  deletedAt?: string | null;
 }
 
 export interface SheinItem {
@@ -223,6 +231,14 @@ export interface SheinRequest {
   promoCode: string;
   createdAt: string;
   updatedAt: string;
+  /**
+   * Mise à la corbeille. null = ligne active.
+   *
+   * Rien n'est effacé par une mise à la corbeille : une commande porte de
+   * l'argent et un engagement pris auprès d'une cliente. Elle se restaure
+   * tant que la boutique n'a pas vidé la corbeille elle-même.
+   */
+  deletedAt?: string | null;
 }
 
 /* ─────────────────────────────────────────────────────────────

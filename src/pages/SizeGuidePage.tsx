@@ -24,6 +24,7 @@ const nombre = (valeur: string): number | null => {
 
 export function SizeGuidePage() {
   const [methode, setMethode] = useState<Methode>('mesures');
+  const [prenom, setPrenom] = useState('');
   const [bust, setBust] = useState('');
   const [waist, setWaist] = useState('');
   const [hips, setHips] = useState('');
@@ -99,6 +100,21 @@ export function SizeGuidePage() {
         </div>
 
         <div className="mt-5 rounded-[--radius-lg] border border-line bg-white p-6">
+          <FormRow>
+            <Label htmlFor="g-prenom" hint="pour qu'on sache qui écrit">
+              Votre prénom
+            </Label>
+            <Input
+              id="g-prenom"
+              value={prenom}
+              placeholder="Aïcha"
+              autoComplete="given-name"
+              onChange={(e) => setPrenom(e.target.value)}
+            />
+          </FormRow>
+
+          <div className="mb-5 border-t border-line" />
+
           {methode === 'mesures' ? (
             <>
               <h2 className="text-[20px]">Vos mesures</h2>
@@ -177,6 +193,7 @@ export function SizeGuidePage() {
               <div className="mt-5">
                 <WhatsAppLink
                   message={measurementsMessage({
+                    name: prenom,
                     // Taille et poids ne partent que s'ils ont servi au calcul.
                     // Les tours du corps, eux, sont dans `suggestion.used`.
                     ...(methode === 'taille-poids'

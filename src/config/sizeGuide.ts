@@ -246,14 +246,27 @@ const ligne = (titre: string, fit: Fit): string | null => {
   return `• ${titre} : ${fit.fitted.label} (FR ${fit.fitted.fr})${ample}`;
 };
 
-/** Résumé lisible, à envoyer sur WhatsApp avec une commande SHEIN. */
+/**
+ * Résumé lisible, à envoyer sur WhatsApp avec une commande SHEIN.
+ *
+ * Le prénom ouvre le message : la boutique reçoit des mesures toute la
+ * journée, et un message qui commence par « Bonjour, voici mes mesures »
+ * sans nom l'oblige à remonter la conversation pour savoir de qui il s'agit.
+ */
 export function measurementsMessage(input: {
+  name?: string;
   height?: number | null;
   weight?: number | null;
   suggestion: SizeSuggestion;
 }): string {
   const { suggestion } = input;
-  const lignes = ['Bonjour, voici mes mesures pour ma commande :', ''];
+  const prenom = (input.name ?? '').trim();
+  const lignes = [
+    prenom
+      ? `Bonjour, je suis ${prenom}. Voici mes mesures pour ma commande :`
+      : 'Bonjour, voici mes mesures pour ma commande :',
+    '',
+  ];
   if (input.height) lignes.push(`Taille : ${input.height} cm`);
   if (input.weight) lignes.push(`Poids : ${input.weight} kg`);
 

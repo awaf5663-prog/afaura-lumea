@@ -86,6 +86,7 @@ create table if not exists groupings (
   id uuid primary key default gen_random_uuid(),
   reference text unique not null,
   destination text default '',
+  opening_date timestamptz,
   closing_date timestamptz,
   max_orders integer not null check (max_orders > 0),
   min_orders integer not null default 0 check (min_orders >= 0),
@@ -143,6 +144,7 @@ create table if not exists settings (
   id integer primary key default 1 check (id = 1),
   whatsapp_number text default '',
   whatsapp_link text default '',
+  next_grouping_opening timestamptz,
   next_grouping_date timestamptz,
   wave_number text default '',
   orange_money_number text default '',
@@ -160,6 +162,8 @@ alter table settings add column if not exists reviews jsonb not null default '[]
 alter table products add column if not exists measurements jsonb not null default '[]'::jsonb;
 alter table orders add column if not exists deleted_at timestamptz;
 alter table shein_requests add column if not exists deleted_at timestamptz;
+alter table groupings add column if not exists opening_date timestamptz;
+alter table settings add column if not exists next_grouping_opening timestamptz;
 
 insert into settings (id) values (1) on conflict (id) do nothing;
 

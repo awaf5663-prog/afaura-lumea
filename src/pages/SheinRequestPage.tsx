@@ -224,7 +224,7 @@ export function SheinRequestPage() {
         <div className="mt-6 space-y-3">
           <PromotionNotice kind="shein" />
 
-          <GroupingCapacity grouping={displayed} compact />
+          <GroupingCapacity grouping={displayed} settings={settings} compact />
 
           {!active && displayed && (
             <p className="mt-2.5 text-[12.5px] leading-relaxed text-stone">

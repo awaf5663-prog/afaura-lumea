@@ -5,6 +5,7 @@ import { useCountdown } from '@/src/hooks/useCountdown';
 import { useGroupings } from '@/src/hooks/useGroupings';
 import { useSettings } from '@/src/hooks/useSettings';
 import { formatDate } from '@/src/lib/format';
+import { groupingWindow } from '@/src/lib/groupingWindow';
 import { useRouter } from '@/src/lib/router';
 
 /** Explication du groupage, sans jargon logistique, avec compte à rebours réel. */
@@ -12,8 +13,10 @@ export function GroupingSection() {
   const { settings } = useSettings();
   const { displayed } = useGroupings();
   const { navigate } = useRouter();
-  const target = displayed?.closingDate || settings?.nextGroupingDate || '';
-  const countdown = useCountdown(target);
+  // Même lecture des dates que partout ailleurs — voir lib/groupingWindow.
+  const fenetre = groupingWindow(displayed, settings);
+  const countdown = useCountdown(fenetre.target);
+  const avant = fenetre.phase === 'avant';
 
   const cells = [
     { value: countdown.days, label: countdown.days > 1 ? 'jours' : 'jour' },
@@ -36,7 +39,9 @@ export function GroupingSection() {
           <div className="mt-8 rounded-[--radius-lg] border border-line bg-white p-5">
             {countdown.configured && !countdown.isPast ? (
               <>
-                <p className="eyebrow">Clôture du prochain groupage</p>
+                <p className="eyebrow">
+                  {avant ? 'Ouverture des inscriptions' : 'Clôture du prochain groupage'}
+                </p>
                 <div className="mt-3 flex items-end gap-5">
                   {cells.map((cell) => (
                     <div key={cell.label}>
@@ -50,13 +55,31 @@ export function GroupingSection() {
                   ))}
                 </div>
                 <p className="mt-3 text-[13px] text-stone">
-                  Toute demande reçue avant le {formatDate(target)} part avec ce groupage.
+                  {avant ? (
+                    <>
+                      Les inscriptions ouvrent le {formatDate(fenetre.start)}
+                      {fenetre.end ? ` et se ferment le ${formatDate(fenetre.end)}` : ''}. Vous
+                      pouvez déjà envoyer votre demande : elle est rattachée à ce départ.
+                    </>
+                  ) : (
+                    <>
+                      Toute demande reçue avant le {formatDate(fenetre.end)} part avec ce groupage.
+                      {fenetre.start
+                        ? ` Inscriptions ouvertes depuis le ${formatDate(fenetre.start)}.`
+                        : ''}
+                    </>
+                  )}
                 </p>
               </>
-            ) : countdown.isPast ? (
+            ) : fenetre.phase === 'termine' ? (
               <p className="text-[14px] text-graphite">
-                Le groupage du {formatDate(target)} est clôturé. Les demandes reçues maintenant sont
-                intégrées au départ suivant, dont la date est annoncée sur WhatsApp.
+                Le groupage du {formatDate(fenetre.end)} est clôturé. Les demandes reçues maintenant
+                sont intégrées au départ suivant, dont la date est annoncée sur WhatsApp.
+              </p>
+            ) : fenetre.phase === 'ouvert' && fenetre.start ? (
+              <p className="text-[14px] text-graphite">
+                Inscriptions ouvertes depuis le {formatDate(fenetre.start)}. La date de clôture est
+                annoncée sur WhatsApp dès qu'elle est fixée.
               </p>
             ) : (
               <p className="text-[14px] text-graphite">

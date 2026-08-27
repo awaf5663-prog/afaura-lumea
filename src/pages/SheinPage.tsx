@@ -55,7 +55,7 @@ export function SheinPage() {
 
         <div className="mt-8 max-w-md space-y-3">
           <PromotionNotice kind="shein" />
-          <GroupingCapacity grouping={displayed} />
+          <GroupingCapacity grouping={displayed} settings={settings} />
         </div>
 
         <p className="mt-8 flex max-w-2xl gap-2.5 rounded-[--radius-md] border border-line bg-cream/60 px-4 py-3.5 text-[13px] leading-relaxed text-graphite">

@@ -110,26 +110,45 @@ export function AdminSettings() {
 
       <section className="rounded-[--radius-lg] border border-line bg-white p-5">
         <h3 className="text-[18px]">Groupage</h3>
-        <FormRow className="mt-4">
-          <Label htmlFor="s-group">Clôture du prochain groupage</Label>
-          <Input
-            id="s-group"
-            type="datetime-local"
-            value={toLocalInput(draft.nextGroupingDate)}
-            onChange={(e) =>
-              setDraft({
-                ...draft,
-                nextGroupingDate: e.target.value ? new Date(e.target.value).toISOString() : '',
-              })
-            }
-          />
-          <p className="mt-1.5 flex gap-2 text-[12px] text-stone">
-            <Info className="mt-0.5 size-3.5 shrink-0" />
-            Date de repli, utilisée seulement quand aucun groupage n'est ouvert (voir l'onglet
-            Groupages, qui fait autorité). Laissez vide tant qu'aucune date n'est arrêtée : le site
-            affichera « date annoncée sur WhatsApp » au lieu d'un compte à rebours fictif.
-          </p>
-        </FormRow>
+        <div className="mt-4 grid gap-x-4 sm:grid-cols-2">
+          <FormRow>
+            <Label htmlFor="s-group-open">Ouverture des inscriptions</Label>
+            <Input
+              id="s-group-open"
+              type="datetime-local"
+              value={toLocalInput(draft.nextGroupingOpening)}
+              onChange={(e) =>
+                setDraft({
+                  ...draft,
+                  nextGroupingOpening: e.target.value ? new Date(e.target.value).toISOString() : '',
+                })
+              }
+            />
+          </FormRow>
+
+          <FormRow>
+            <Label htmlFor="s-group">Clôture des inscriptions</Label>
+            <Input
+              id="s-group"
+              type="datetime-local"
+              value={toLocalInput(draft.nextGroupingDate)}
+              onChange={(e) =>
+                setDraft({
+                  ...draft,
+                  nextGroupingDate: e.target.value ? new Date(e.target.value).toISOString() : '',
+                })
+              }
+            />
+          </FormRow>
+        </div>
+
+        <p className="-mt-2 flex gap-2 text-[12px] leading-relaxed text-stone">
+          <Info className="mt-0.5 size-3.5 shrink-0" />
+          Dates de repli, utilisées seulement quand aucun groupage n'est ouvert (voir l'onglet
+          Groupages, qui fait autorité). Le site annonce « inscriptions du … au … ». Laissez vide
+          tant qu'une date n'est pas arrêtée : il affichera « date annoncée sur WhatsApp » au lieu
+          d'un compte à rebours fictif.
+        </p>
       </section>
 
       <section className="rounded-[--radius-lg] border border-line bg-white p-5">

@@ -338,6 +338,8 @@ export interface Grouping {
   id: string;
   reference: string;
   destination: string;
+  /** Ouverture des inscriptions (ISO). Vide = date pas encore arrêtée. */
+  openingDate: string;
   /** Clôture des inscriptions (ISO). Vide = date pas encore arrêtée. */
   closingDate: string;
   maxOrders: number;
@@ -364,6 +366,13 @@ export interface StoreSettings {
   whatsappNumber: string;
   /** Lien court WhatsApp Business, utilisé si aucun numéro n'est renseigné. */
   whatsappLink: string;
+  /*
+   * Dates de repli, utilisées seulement quand aucun groupage n'est ouvert.
+   * `nextGroupingOpening` = ouverture des inscriptions, `nextGroupingDate` =
+   * clôture. Le nom historique de la seconde est conservé : le renommer
+   * effacerait la date déjà enregistrée dans la base de la boutique.
+   */
+  nextGroupingOpening: string;
   nextGroupingDate: string;
   waveNumber: string;
   orangeMoneyNumber: string;

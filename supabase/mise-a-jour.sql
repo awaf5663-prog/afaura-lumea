@@ -13,7 +13,9 @@
 --    3. remet au bon format les numéros déjà enregistrés ;
 --    4. installe le comptage de la fréquentation du site ;
 --    5. referme une fonction d'administration que PostgreSQL laissait
---       ouverte à tout le monde.
+--       ouverte à tout le monde ;
+--    6. ajoute la date d'OUVERTURE des inscriptions d'un groupage, à côté
+--       de la date de clôture qui existait déjà.
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- ── 1. Colonnes ajoutées après la première mise en place ──────────────
@@ -162,3 +164,11 @@ grant execute on function stats_visites() to authenticated;
 -- peut l'appeler.
 revoke execute on function transfer_shein_requests(uuid, uuid) from public;
 grant execute on function transfer_shein_requests(uuid, uuid) to authenticated;
+
+-- ── 6. Ouverture des inscriptions ─────────────────────────────────────
+-- Un groupage avait une date de fin (clôture) mais pas de date de début.
+-- La boutique annonce désormais les deux : « inscriptions du 1er au 8 ».
+-- Colonne vide = date pas encore arrêtée, et le site n'affiche rien plutôt
+-- qu'une date inventée.
+alter table groupings add column if not exists opening_date timestamptz;
+alter table settings add column if not exists next_grouping_opening timestamptz;

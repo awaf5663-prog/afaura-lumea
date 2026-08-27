@@ -284,6 +284,9 @@ const toGrouping = (r: Row): Grouping => ({
   id: r.id,
   reference: r.reference,
   destination: r.destination ?? '',
+  // Colonne absente tant que la mise à jour SQL n'est pas passée : le
+  // groupage vit sans, simplement sans date d'ouverture affichée.
+  openingDate: r.opening_date ?? '',
   closingDate: r.closing_date ?? '',
   maxOrders: r.max_orders,
   minOrders: r.min_orders,
@@ -300,6 +303,7 @@ const fromGrouping = (g: Grouping): Row => ({
   id: g.id,
   reference: g.reference,
   destination: g.destination,
+  opening_date: g.openingDate || null,
   closing_date: g.closingDate || null,
   max_orders: g.maxOrders,
   min_orders: g.minOrders,
@@ -469,12 +473,25 @@ export const supabaseAdapter: DataSource = {
   },
 
   async saveGrouping(grouping) {
-    const rows = await rest<Row[]>('groupings?on_conflict=id', {
-      method: 'POST',
-      headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
-      body: JSON.stringify(fromGrouping(grouping)),
-    });
-    return toGrouping(rows[0]);
+    const envoyer = (corps: Row) =>
+      rest<Row[]>('groupings?on_conflict=id', {
+        method: 'POST',
+        headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
+        body: JSON.stringify(corps),
+      });
+
+    const colonnes = fromGrouping(grouping);
+    try {
+      return toGrouping((await envoyer(colonnes))[0]);
+    } catch (error) {
+      // `opening_date` est arrivée après la première mise en place de la base.
+      // Tant que la mise à jour SQL n'est pas passée, on réenregistre sans
+      // elle : le reste du groupage ne doit pas être bloqué par une date.
+      const message = error instanceof Error ? error.message : '';
+      if (!/opening_date/i.test(message)) throw error;
+      const { opening_date: _ouverture, ...sansOuverture } = colonnes;
+      return toGrouping((await envoyer(sansOuverture))[0]);
+    }
   },
 
   async deleteGrouping(id) {
@@ -512,6 +529,7 @@ export const supabaseAdapter: DataSource = {
        */
       whatsappNumber: r.whatsapp_number?.trim() || WHATSAPP_NUMBER,
       whatsappLink: r.whatsapp_link?.trim() || WHATSAPP_LINK,
+      nextGroupingOpening: r.next_grouping_opening ?? '',
       nextGroupingDate: r.next_grouping_date ?? '',
       waveNumber: r.wave_number?.trim() || WAVE_NUMBER,
       orangeMoneyNumber: r.orange_money_number?.trim() || ORANGE_MONEY_NUMBER,
@@ -544,6 +562,7 @@ export const supabaseAdapter: DataSource = {
       id: 1,
       whatsapp_number: settings.whatsappNumber,
       whatsapp_link: settings.whatsappLink,
+      next_grouping_opening: settings.nextGroupingOpening || null,
       next_grouping_date: settings.nextGroupingDate || null,
       wave_number: settings.waveNumber,
       orange_money_number: settings.orangeMoneyNumber,
@@ -569,9 +588,9 @@ export const supabaseAdapter: DataSource = {
       // la base. Tant que la mise à jour SQL n'est pas passée, on réenregistre
       // sans elle : le reste des réglages ne doit pas être bloqué par les avis.
       const message = error instanceof Error ? error.message : '';
-      if (!/reviews/i.test(message)) throw error;
-      const { reviews: _avis, ...sansAvis } = colonnes;
-      await envoyer(sansAvis);
+      if (!/reviews|next_grouping_opening/i.test(message)) throw error;
+      const { reviews: _avis, next_grouping_opening: _ouverture, ...sansNouveautes } = colonnes;
+      await envoyer(sansNouveautes);
     }
     return settings;
   },

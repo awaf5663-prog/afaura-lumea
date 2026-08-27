@@ -32,6 +32,7 @@ function defaultSettings(): StoreSettings {
   return {
     whatsappNumber: WHATSAPP_NUMBER,
     whatsappLink: WHATSAPP_LINK,
+    nextGroupingOpening: '',
     nextGroupingDate: NEXT_GROUPING_DATE,
     waveNumber: WAVE_NUMBER,
     orangeMoneyNumber: ORANGE_MONEY_NUMBER,

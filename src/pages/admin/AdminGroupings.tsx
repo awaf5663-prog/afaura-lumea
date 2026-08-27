@@ -82,6 +82,7 @@ const blank = (existing: Grouping[]): Grouping => {
     id: uid(),
     reference: `GROUPAGE-${next}`,
     destination: DEFAULT_GROUPING.destination,
+    openingDate: '',
     closingDate: '',
     maxOrders: DEFAULT_GROUPING.maxOrders,
     minOrders: DEFAULT_GROUPING.minOrders,
@@ -280,7 +281,14 @@ function GroupingCard({
           <p className="font-display text-[20px]">{grouping.reference}</p>
           <p className="mt-0.5 text-[12.5px] text-stone">
             {grouping.destination || 'Destination non précisée'}
-            {grouping.closingDate ? ` · clôture le ${formatDate(grouping.closingDate)}` : ' · date non fixée'}
+            {' · '}
+            {grouping.openingDate && grouping.closingDate
+              ? `du ${formatDate(grouping.openingDate)} au ${formatDate(grouping.closingDate)}`
+              : grouping.closingDate
+                ? `clôture le ${formatDate(grouping.closingDate)}`
+                : grouping.openingDate
+                  ? `ouverture le ${formatDate(grouping.openingDate)}`
+                  : 'date non fixée'}
           </p>
         </div>
         <div className="flex items-center gap-1.5">
@@ -451,6 +459,14 @@ function GroupingEditor({
   // Le brouillon suit l'élément ouvert.
   if (grouping && (!draft || draft.id !== grouping.id)) setDraft(grouping);
 
+  // Deux dates saisies à la main : on signale l'inversion plutôt que de la
+  // corriger en silence — c'est la boutique qui sait laquelle est fausse.
+  const dateIncoherente = Boolean(
+    draft?.openingDate &&
+      draft?.closingDate &&
+      new Date(draft.openingDate).getTime() > new Date(draft.closingDate).getTime(),
+  );
+
   return (
     <Sheet
       open={Boolean(grouping)}
@@ -488,25 +504,54 @@ function GroupingEditor({
             </FormRow>
           </div>
 
-          <FormRow>
-            <Label htmlFor="g-date" hint="(vide = non fixée)">
-              Clôture des inscriptions
-            </Label>
-            <Input
-              id="g-date"
-              type="datetime-local"
-              value={toLocalInput(draft.closingDate)}
-              onChange={(e) =>
-                setDraft({
-                  ...draft,
-                  closingDate: e.target.value ? new Date(e.target.value).toISOString() : '',
-                })
-              }
-            />
-            <p className="mt-1.5 text-[12px] text-stone">
-              Cette date alimente le compte à rebours affiché sur le site.
+          <div className="grid gap-x-4 sm:grid-cols-2">
+            <FormRow>
+              <Label htmlFor="g-ouverture" hint="(vide = non fixée)">
+                Ouverture des inscriptions
+              </Label>
+              <Input
+                id="g-ouverture"
+                type="datetime-local"
+                value={toLocalInput(draft.openingDate)}
+                onChange={(e) =>
+                  setDraft({
+                    ...draft,
+                    openingDate: e.target.value ? new Date(e.target.value).toISOString() : '',
+                  })
+                }
+              />
+            </FormRow>
+
+            <FormRow>
+              <Label htmlFor="g-date" hint="(vide = non fixée)">
+                Clôture des inscriptions
+              </Label>
+              <Input
+                id="g-date"
+                type="datetime-local"
+                value={toLocalInput(draft.closingDate)}
+                onChange={(e) =>
+                  setDraft({
+                    ...draft,
+                    closingDate: e.target.value ? new Date(e.target.value).toISOString() : '',
+                  })
+                }
+              />
+            </FormRow>
+          </div>
+
+          <p className="-mt-2 mb-5 text-[12px] leading-relaxed text-stone">
+            Le site annonce « inscriptions du … au … » et fait tourner le compte à rebours :
+            jusqu'à l'ouverture d'abord, puis jusqu'à la clôture. Une date laissée vide n'est pas
+            affichée — jamais de date inventée.
+          </p>
+
+          {dateIncoherente && (
+            <p className="mb-5 flex gap-2 rounded-[--radius-sm] bg-[#f6e9e9] px-4 py-3 text-[12.5px] text-[#8a2f2f]">
+              <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+              L'ouverture tombe après la clôture. Vérifiez les deux dates.
             </p>
-          </FormRow>
+          )}
 
           <div className="grid gap-x-4 sm:grid-cols-2">
             <FormRow>

@@ -2,7 +2,8 @@ import { CalendarClock, CheckCircle2, Users } from 'lucide-react';
 import { groupingCount, groupingFillRate } from '@/src/hooks/useGroupings';
 import { cn } from '@/src/lib/cn';
 import { formatDate } from '@/src/lib/format';
-import type { Grouping } from '@/src/types';
+import { groupingWindow } from '@/src/lib/groupingWindow';
+import type { Grouping, StoreSettings } from '@/src/types';
 
 /**
  * Bloc « prochain groupage » côté cliente.
@@ -11,11 +12,48 @@ import type { Grouping } from '@/src/types';
  */
 export function GroupingCapacity({
   grouping,
+  settings,
   compact,
 }: {
   grouping: Grouping | null;
+  /** Sert de repli quand aucun groupage n'est ouvert. */
+  settings?: StoreSettings | null;
   compact?: boolean;
 }) {
+  if (!grouping) {
+    // Aucun groupage ouvert : la boutique peut tout de même avoir annoncé les
+    // dates du prochain dans ses réglages. Autant les dire.
+    const repli = groupingWindow(null, settings);
+    if (repli.phase === 'avant' || repli.phase === 'ouvert') {
+      return (
+        <div className="rounded-[--radius-lg] border border-line bg-white p-5">
+          <p className="eyebrow inline-flex items-center gap-1.5">
+            <CalendarClock className="size-3.5" /> Prochain groupage
+          </p>
+          <p className="mt-2 text-[14px] leading-relaxed text-graphite">
+            {repli.start && repli.end ? (
+              <>
+                Inscriptions du <strong className="font-medium">{formatDate(repli.start)}</strong> au{' '}
+                <strong className="font-medium">{formatDate(repli.end)}</strong>.
+              </>
+            ) : repli.end ? (
+              <>
+                Inscriptions ouvertes jusqu'au{' '}
+                <strong className="font-medium">{formatDate(repli.end)}</strong>.
+              </>
+            ) : (
+              <>
+                Les inscriptions ouvrent le{' '}
+                <strong className="font-medium">{formatDate(repli.start)}</strong>.
+              </>
+            )}{' '}
+            Envoyez votre demande : elle sera rattachée à ce départ.
+          </p>
+        </div>
+      );
+    }
+  }
+
   if (!grouping) {
     return (
       <div className="rounded-[--radius-lg] border border-line bg-white p-5">
@@ -90,10 +128,14 @@ export function GroupingCapacity({
         </p>
       )}
 
-      {!compact && grouping.closingDate && !isFull && (
+      {!compact && !isFull && (grouping.openingDate || grouping.closingDate) && (
         <p className="mt-3 inline-flex items-center gap-2 text-[12.5px] text-stone">
           <CalendarClock className="size-3.5" />
-          Clôture des inscriptions le {formatDate(grouping.closingDate)}
+          {grouping.openingDate && grouping.closingDate
+            ? `Inscriptions du ${formatDate(grouping.openingDate)} au ${formatDate(grouping.closingDate)}`
+            : grouping.closingDate
+              ? `Clôture des inscriptions le ${formatDate(grouping.closingDate)}`
+              : `Inscriptions ouvertes depuis le ${formatDate(grouping.openingDate)}`}
         </p>
       )}
 

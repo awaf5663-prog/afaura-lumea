@@ -1,6 +1,7 @@
 import { Lock, Menu, Search, ShoppingBag, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import symbole from '@/src/assets/brand/symbole-sombre.webp';
+import { AnnouncementTicker } from '@/src/components/layout/AnnouncementTicker';
 import { BRAND } from '@/src/config/site';
 import { useCart } from '@/src/hooks/useCart';
 import { useSettings } from '@/src/hooks/useSettings';
@@ -56,11 +57,7 @@ export function Header({ onOpenCart }: { onOpenCart: () => void }) {
 
   return (
     <>
-      {settings?.announcement ? (
-        <div className="bg-rosedark px-4 py-2 text-center text-[12px] tracking-wide text-ivory">
-          {settings.announcement}
-        </div>
-      ) : null}
+      <AnnouncementTicker message={settings?.announcement ?? ''} />
 
       <header
         className={cn(

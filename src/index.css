@@ -161,6 +161,23 @@
   }
 }
 
+/*
+ * Bandeau d'annonce défilant.
+ *
+ * Le texte est rendu deux fois à la suite dans la même piste : l'animation
+ * la fait glisser d'exactement la moitié de sa largeur, si bien que la
+ * seconde copie prend la place de la première au moment où la boucle
+ * repart. Le raccord est invisible, sans saut ni blanc.
+ */
+@keyframes lumea-ticker {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
 @keyframes lumea-pop {
   0% {
     transform: scale(1);
@@ -193,6 +210,18 @@
 
 .animate-sheet {
   animation: lumea-slide-up 0.3s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: lumea-ticker linear infinite;
+}
+
+/* Poser le doigt ou la souris arrête le défilement, le temps de lire. */
+.ticker:hover .ticker-track,
+.ticker:active .ticker-track {
+  animation-play-state: paused;
 }
 
 .animate-drawer {
@@ -247,6 +276,17 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+  }
+  /*
+   * Animation coupée : le bandeau ne défile plus. On rend alors la piste
+   * lisible à la main plutôt que de laisser un texte tronqué — et on masque
+   * la seconde copie, qui n'a plus de raison d'être.
+   */
+  .ticker {
+    overflow-x: auto;
+  }
+  .ticker-track [data-ticker-copie='2'] {
+    display: none;
   }
   .reveal {
     opacity: 1;

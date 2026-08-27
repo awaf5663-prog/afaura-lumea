@@ -91,7 +91,7 @@ export function AdminSettings() {
         </FormRow>
 
         <FormRow>
-          <Label htmlFor="s-announce" hint="(vide = pas de bandeau)">
+          <Label htmlFor="s-announce" hint="défile en haut du site · vide = pas de bandeau">
             Bandeau d'annonce
           </Label>
           <Textarea
@@ -100,6 +100,10 @@ export function AdminSettings() {
             onChange={(e) => setDraft({ ...draft, announcement: e.target.value })}
             placeholder="Ex : Clôture des demandes SHEIN vendredi à 18h."
           />
+          <p className="mt-1.5 text-[12px] leading-relaxed text-stone">
+            Le texte défile en continu, en rose foncé, tout en haut de chaque page. Une phrase
+            courte se lit mieux qu'un paragraphe.
+          </p>
         </FormRow>
       </section>
 

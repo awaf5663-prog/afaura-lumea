@@ -12,7 +12,13 @@ import { normalizePhone } from '@/src/lib/format';
 import { fromStoredImages, toStoredImages } from '@/src/lib/image';
 import type { Grouping, Order, Product, SheinRequest, StoreSettings } from '@/src/types';
 import { normalizeAlertThresholds, normalizePricing, normalizePromotions } from './settingsShape';
-import type { DataSource, OrderDraft, SheinDraft, VisitStats } from './types';
+import type {
+  AlertSettings,
+  DataSource,
+  OrderDraft,
+  SheinDraft,
+  VisitStats,
+} from './types';
 
 /**
  * Adaptateur Supabase (PostgREST + Auth) — sans SDK, uniquement `fetch`,
@@ -91,6 +97,22 @@ export function supabaseSignOut(): void {
   } catch {
     /* no-op */
   }
+}
+
+/**
+ * L'étape 7 de mise-a-jour.sql n'est pas passée : la table et les fonctions
+ * de l'alerte n'existent pas encore. On le dit en clair, plutôt que de
+ * laisser remonter un code d'erreur PostgREST.
+ */
+function alerteNonInstallee(error: unknown): Error {
+  const message = error instanceof Error ? error.message : '';
+  if (/alert_settings|tester_alerte|resultat_alerte|PGRST(202|205)|404/i.test(message)) {
+    return new Error(
+      "L'alerte n'est pas encore installée dans votre base. Ouvrez Supabase → SQL Editor, " +
+        'exécutez supabase/mise-a-jour.sql, puis revenez ici.',
+    );
+  }
+  return error instanceof Error ? error : new Error(String(error));
 }
 
 async function rest<T>(path: string, init: RequestInit = {}): Promise<T> {
@@ -662,6 +684,82 @@ export const supabaseAdapter: DataSource = {
       // Une visite non comptée n'est pas un incident : la cliente ne doit
       // rien en voir, et surtout pas un message d'erreur.
     }
+  },
+
+  /*
+   * Alerte « nouvelle commande ».
+   *
+   * Tout se passe côté base : le déclencheur installé par mise-a-jour.sql
+   * envoie le message. Ici on ne fait que lire et écrire le réglage, et
+   * demander un test. Le jeton du robot n'est jamais exposé au site public
+   * — la table n'accorde aucun droit au rôle anonyme.
+   */
+  async getAlertSettings() {
+    try {
+      const rows = await rest<Row[]>('alert_settings?select=*&id=eq.1');
+      const r = rows[0] ?? {};
+      return {
+        telegramToken: r.telegram_token ?? '',
+        telegramChatId: r.telegram_chat_id ?? '',
+        enabled: Boolean(r.enabled),
+      } satisfies AlertSettings;
+    } catch (error) {
+      throw alerteNonInstallee(error);
+    }
+  },
+
+  async saveAlertSettings(settings) {
+    try {
+      await rest('alert_settings?on_conflict=id', {
+        method: 'POST',
+        headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
+        body: JSON.stringify({
+          id: 1,
+          telegram_token: settings.telegramToken.trim(),
+          telegram_chat_id: settings.telegramChatId.trim(),
+          enabled: settings.enabled,
+          updated_at: new Date().toISOString(),
+        }),
+      });
+    } catch (error) {
+      throw alerteNonInstallee(error);
+    }
+    return settings;
+  },
+
+  async testAlert() {
+    let requete: number;
+    try {
+      requete = await rest<number>('rpc/tester_alerte', {
+        method: 'POST',
+        body: JSON.stringify({}),
+      });
+    } catch (error) {
+      throw alerteNonInstallee(error);
+    }
+
+    /*
+     * L'envoi est asynchrone : la base met le message en file, un ouvrier
+     * l'expédie, la réponse arrive ensuite. On interroge quelques secondes
+     * plutôt que d'annoncer un succès qu'on n'a pas constaté.
+     */
+    for (let essai = 0; essai < 10; essai += 1) {
+      await new Promise((r) => setTimeout(r, 700));
+      const reponse = await rest<{ ok: boolean; detail: string } | null>('rpc/resultat_alerte', {
+        method: 'POST',
+        body: JSON.stringify({ requete }),
+      });
+      if (reponse) {
+        return { ok: Boolean(reponse.ok), enAttente: false, detail: reponse.detail ?? '' };
+      }
+    }
+    return {
+      ok: false,
+      enAttente: true,
+      detail:
+        "Telegram n'a pas encore répondu. Regardez votre téléphone : le message est peut-être " +
+        'arrivé quand même.',
+    };
   },
 
   async getVisitStats() {

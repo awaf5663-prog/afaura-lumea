@@ -6,6 +6,7 @@ import { useSettingsDraft } from '@/src/hooks/useSettingsDraft';
 import { DraftStatus } from '@/src/components/admin/DraftStatus';
 import { useProducts } from '@/src/hooks/useProducts';
 import { useToast } from '@/src/hooks/useToast';
+import { AlertEditor } from '@/src/components/admin/AlertEditor';
 import { ReviewEditor } from '@/src/components/admin/ReviewEditor';
 import { normalizePhone } from '@/src/lib/format';
 
@@ -207,6 +208,18 @@ export function AdminSettings() {
               onChange={(e) => setDraft({ ...draft, orangeMoneyNumber: e.target.value })}
             />
           </FormRow>
+        </div>
+      </section>
+
+      {/*
+        L'alerte s'enregistre dans une autre table, par un autre chemin que
+        les réglages : elle a donc son propre bouton, et intercepte la touche
+        Entrée pour ne pas déclencher l'enregistrement du formulaire voisin.
+      */}
+      <section className="rounded-[--radius-lg] border border-line bg-white p-5">
+        <h3 className="text-[18px]">Alerte nouvelle commande</h3>
+        <div className="mt-4">
+          <AlertEditor />
         </div>
       </section>
 

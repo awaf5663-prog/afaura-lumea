@@ -18,7 +18,7 @@ import { aggregateVisits, type VisitEntry } from './visitStats';
 import { normalizePhone } from '@/src/lib/format';
 import { fromStoredImages, toStoredImages } from '@/src/lib/image';
 import type { Grouping, Order, Product, SheinRequest, StoreSettings } from '@/src/types';
-import type { DataSource, OrderDraft, SheinDraft } from './types';
+import type { AlertSettings, DataSource, OrderDraft, SheinDraft } from './types';
 
 /**
  * Source de données locale (localStorage).
@@ -447,5 +447,36 @@ export const localAdapter: DataSource = {
 
   async getVisitStats() {
     return delay(aggregateVisits(readJson<VisitEntry[]>(STORAGE_KEYS.visits, [])));
+  },
+
+  /*
+   * Alerte « nouvelle commande ». En mode local il n'y a pas de serveur pour
+   * l'envoyer : le réglage se saisit et se garde, mais rien ne part. On le
+   * dit franchement au moment du test plutôt que d'afficher un succès qui
+   * n'aurait rien envoyé.
+   */
+  async getAlertSettings() {
+    return delay(
+      readJson<AlertSettings>(STORAGE_KEYS.alerts, {
+        telegramToken: '',
+        telegramChatId: '',
+        enabled: false,
+      }),
+    );
+  },
+
+  async saveAlertSettings(settings) {
+    writeJson(STORAGE_KEYS.alerts, settings);
+    return delay(settings);
+  },
+
+  async testAlert() {
+    return delay({
+      ok: false,
+      enAttente: false,
+      detail:
+        "Le site fonctionne en mode local : aucun message ne peut partir. L'alerte marche " +
+        'une fois la boutique connectée à Supabase.',
+    });
   },
 };

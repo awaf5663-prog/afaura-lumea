@@ -44,6 +44,30 @@ export interface VisitPeriod {
 }
 
 /**
+ * Réglage de l'alerte « nouvelle commande ».
+ *
+ * Le jeton du robot ne transite QUE entre l'administration connectée et la
+ * base : il est rangé dans une table sans accès public (voir supabase/
+ * mise-a-jour.sql, étape 7), jamais dans `settings` qui est lisible par
+ * tout visiteur du site.
+ */
+export interface AlertSettings {
+  telegramToken: string;
+  telegramChatId: string;
+  enabled: boolean;
+}
+
+/** Ce que Telegram a répondu au message de test. */
+export interface AlertTestResult {
+  /** `true` = le message est parti et Telegram l'a accepté. */
+  ok: boolean;
+  /** `true` tant que la réponse n'est pas encore revenue. */
+  enAttente: boolean;
+  /** Explication de l'échec, telle que Telegram la donne. Vide si tout va bien. */
+  detail: string;
+}
+
+/**
  * Fréquentation du site, agrégée côté serveur.
  * L'administration reçoit ces quelques chiffres, jamais la liste des visites.
  */
@@ -113,6 +137,12 @@ export interface DataSource {
   /** Signale une page vue. N'échoue jamais bruyamment : ce n'est pas vital. */
   recordVisit(path: string, visitor: string): Promise<void>;
   getVisitStats(): Promise<VisitStats>;
+
+  /* Alerte « nouvelle commande ». Réservée à l'administration connectée. */
+  getAlertSettings(): Promise<AlertSettings>;
+  saveAlertSettings(settings: AlertSettings): Promise<AlertSettings>;
+  /** Envoie un message de test et attend la réponse de Telegram. */
+  testAlert(): Promise<AlertTestResult>;
 }
 
 export type {

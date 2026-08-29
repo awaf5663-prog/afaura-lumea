@@ -82,3 +82,26 @@ qui ne marchait pas avant.
   `node scripts/generate-supabase-seed.mjs`.
 - Les réglages (tarifs, offres, groupages) sont stockés dans la table
   `settings`, ligne 1. Ils suivent automatiquement.
+
+---
+
+## Recevoir une alerte à chaque commande (facultatif)
+
+Sans cela, une commande dont la cliente n'envoie pas le message WhatsApp
+attend sans prévenir personne dans l'administration.
+
+1. Passez `supabase/mise-a-jour.sql` (SQL Editor → New query → coller → Run).
+   L'étape 7 installe le nécessaire ; rien ne part tant que le robot n'est
+   pas renseigné.
+2. Sur Telegram, écrivez à **@BotFather**, envoyez `/newbot`, choisissez un
+   nom. Il répond avec un **jeton** de la forme `123456789:AA…`.
+3. Toujours sur Telegram, écrivez à **@userinfobot** : il répond avec votre
+   **identifiant**, un nombre.
+4. Ouvrez votre robot et envoyez-lui n'importe quel message — sans ce
+   premier contact, Telegram lui interdit de vous écrire.
+5. Administration → Réglages → **Alerte nouvelle commande** : collez les
+   deux valeurs, cochez « Envoyer les alertes », enregistrez, puis
+   « Envoyer un test ».
+
+Le jeton est rangé dans une table à laquelle le site public n'a aucun accès
+— jamais dans les réglages, qui sont lisibles par tout visiteur.

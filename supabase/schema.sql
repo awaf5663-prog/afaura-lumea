@@ -723,3 +723,223 @@ $$;
 
 revoke execute on function stats_visites() from public;
 grant execute on function stats_visites() to authenticated;
+
+-- ── 7. Alerte quand une commande arrive ───────────────────────────────
+-- Le problème : une cliente qui commande sans cliquer sur « Continuer sur
+-- WhatsApp » laisse sa commande dormir dans l'administration. Une commande
+-- vue six heures trop tard est souvent une commande perdue.
+--
+-- La base prévient donc elle-même, par un message Telegram. Le robot est
+-- créé par la boutique (@BotFather) ; ses identifiants sont rangés dans une
+-- table à part, JAMAIS dans `settings` — celle-là est lisible publiquement
+-- par le site, et le jeton du robot en sortirait aussitôt.
+
+create extension if not exists pg_net with schema extensions;
+
+create table if not exists alert_settings (
+  id integer primary key default 1 check (id = 1),
+  -- Jeton du robot Telegram, donné par @BotFather.
+  telegram_token text not null default '',
+  -- Identifiant de la conversation où le robot doit écrire.
+  telegram_chat_id text not null default '',
+  -- Interrupteur : rien ne part tant qu'il est à false.
+  enabled boolean not null default false,
+  updated_at timestamptz not null default now()
+);
+insert into alert_settings (id) values (1) on conflict (id) do nothing;
+
+alter table alert_settings enable row level security;
+
+-- Aucune politique pour `anon` : un visiteur du site ne doit jamais
+-- pouvoir lire le jeton du robot, même en interrogeant l'API directement.
+drop policy if exists "alertes admin" on alert_settings;
+create policy "alertes admin" on alert_settings
+  for all to authenticated using (true) with check (true);
+
+-- Deuxième barrière, volontairement redondante. Supabase accorde d'office
+-- les droits de table à `anon` et `authenticated` ; la sécurité ne tient
+-- alors qu'à la politique ci-dessus. Pour un jeton, une seule serrure ne
+-- suffit pas : on retire aussi le droit de table à `anon`, de sorte qu'une
+-- politique désactivée par erreur ne suffirait pas à le laisser sortir.
+revoke all on table alert_settings from anon;
+grant select, insert, update on table alert_settings to authenticated;
+
+-- Les identifiants techniques rendus lisibles. Ils doublent ceux de
+-- src/config/site.ts : ici c'est un confort de lecture pour un message
+-- privé, et tout code inconnu retombe sur lui-même plutôt que de
+-- disparaître.
+create or replace function libelle_alerte(code text)
+returns text
+language sql
+immutable
+as $$
+  select case coalesce(code, '')
+    when 'pickup' then 'Point de retrait'
+    when 'city' then 'Livraison Saint-Louis'
+    when 'around' then 'Environs de Saint-Louis'
+    when 'regions' then 'Louga, Thiès, Dakar'
+    when 'wave' then 'Wave'
+    when 'orange_money' then 'Orange Money'
+    when 'cash' then 'Paiement à la livraison'
+    else coalesce(nullif(code, ''), '—')
+  end;
+$$;
+
+-- Le texte du message, à partir de la ligne RELUE en fin de transaction.
+create or replace function texte_alerte(source text, ligne jsonb)
+returns text
+language sql
+immutable
+as $$
+  select case when source = 'orders' then
+    E'\U0001F6CD️ Nouvelle commande\n'
+      || 'N° ' || (ligne->>'order_number') || E'\n'
+      || (ligne->>'customer_name') || ' — ' || (ligne->>'phone') || E'\n'
+      || 'Total : ' || (ligne->>'total') || E' FCFA\n'
+      || 'Livraison : ' || libelle_alerte(ligne->>'delivery_zone_id')
+      -- Frais non encore paramétrés : on l'annonce, on n'invente pas 0.
+      -- Sauf pour un retrait en main propre, qui n'a pas de frais du tout.
+      || case when ligne->>'delivery_fee' is null and ligne->>'delivery_zone_id' <> 'pickup'
+              then ' (frais à confirmer)' else '' end
+      || E'\n'
+      || 'Paiement : ' || libelle_alerte(ligne->>'payment_method')
+      || case when coalesce(ligne->>'address', '') <> ''
+              then E'\n' || (ligne->>'address') else '' end
+  else
+    E'\U0001F4E6 Nouvelle demande SHEIN\n'
+      || 'N° ' || (ligne->>'request_number') || E'\n'
+      || (ligne->>'customer_name') || ' — ' || (ligne->>'phone') || E'\n'
+      || 'À chiffrer, puis à confirmer à la cliente.'
+  end;
+$$;
+
+create or replace function alerter_nouvelle_demande()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  conf alert_settings%rowtype;
+  ligne jsonb;
+begin
+  select * into conf from alert_settings where id = 1;
+
+  -- Rien de configuré, ou interrupteur fermé : on ne fait rien, en silence.
+  if not found or not conf.enabled
+     or conf.telegram_token = '' or conf.telegram_chat_id = '' then
+    return null;
+  end if;
+
+  -- `new` est la ligne telle qu'elle vient d'être insérée : à cet instant
+  -- `create_order` n'a pas encore calculé le sous-total ni le total, et
+  -- l'alerte annonçait « Total : 0 FCFA ». Le déclencheur est différé en
+  -- fin de transaction (voir plus bas) et on RELIT la ligne ici, pour
+  -- annoncer le montant réellement enregistré.
+  if tg_table_name = 'orders' then
+    select to_jsonb(o) into ligne from orders o where o.id = new.id;
+  else
+    select to_jsonb(s) into ligne from shein_requests s where s.id = new.id;
+  end if;
+  if ligne is null then
+    return null;
+  end if;
+
+  -- Une alerte qui échoue ne doit JAMAIS faire perdre une commande :
+  -- l'envoi est enfermé dans son propre bloc, et l'insertion continue
+  -- quoi qu'il arrive.
+  begin
+    perform net.http_post(
+      url := 'https://api.telegram.org/bot' || conf.telegram_token || '/sendMessage',
+      body := jsonb_build_object(
+        'chat_id', conf.telegram_chat_id,
+        'text', texte_alerte(tg_table_name::text, ligne)
+      ),
+      headers := '{"Content-Type": "application/json"}'::jsonb
+    );
+  exception when others then
+    null;
+  end;
+
+  return null;
+end;
+$$;
+
+-- Déclencheurs DIFFÉRÉS : ils s'exécutent à la validation de la
+-- transaction, une fois les montants calculés. Deuxième bénéfice, non
+-- négligeable : une commande qui échoue en cours de route n'envoie aucune
+-- alerte, puisque la transaction n'est jamais validée.
+drop trigger if exists alerte_commande on orders;
+create constraint trigger alerte_commande
+  after insert on orders
+  deferrable initially deferred
+  for each row execute function alerter_nouvelle_demande();
+
+drop trigger if exists alerte_shein on shein_requests;
+create constraint trigger alerte_shein
+  after insert on shein_requests
+  deferrable initially deferred
+  for each row execute function alerter_nouvelle_demande();
+
+-- Bouton « Envoyer un test » de l'administration. Renvoie le numéro de la
+-- requête, pour pouvoir aller lire ce que Telegram a répondu.
+create or replace function tester_alerte()
+returns bigint
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  conf alert_settings%rowtype;
+begin
+  select * into conf from alert_settings where id = 1;
+  if not found or conf.telegram_token = '' or conf.telegram_chat_id = '' then
+    raise exception 'Renseignez le jeton du robot et l''identifiant de conversation, puis enregistrez.';
+  end if;
+
+  return net.http_post(
+    url := 'https://api.telegram.org/bot' || conf.telegram_token || '/sendMessage',
+    body := jsonb_build_object(
+      'chat_id', conf.telegram_chat_id,
+      'text', E'✅ Afaura Luméa : l''alerte fonctionne. '
+              || 'Vous recevrez ce genre de message à chaque nouvelle commande.'
+    ),
+    headers := '{"Content-Type": "application/json"}'::jsonb
+  );
+end;
+$$;
+
+-- Ce que Telegram a répondu. `null` = la réponse n'est pas encore arrivée.
+create or replace function resultat_alerte(requete bigint)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  r record;
+begin
+  select status_code, content, error_msg, timed_out
+    into r from net._http_response where id = requete;
+  if not found then return null; end if;
+
+  return jsonb_build_object(
+    'statut', r.status_code,
+    'ok', coalesce(r.status_code, 0) between 200 and 299,
+    -- Message d'erreur de Telegram, utile pour distinguer un mauvais jeton
+    -- d'un mauvais identifiant de conversation.
+    'detail', coalesce(r.error_msg, case when coalesce(r.status_code, 0) between 200 and 299
+                                         then '' else left(coalesce(r.content, ''), 300) end),
+    'expire', coalesce(r.timed_out, false)
+  );
+end;
+$$;
+
+-- Réservées à l'administration : PostgreSQL ouvre toute fonction à tout le
+-- monde par défaut, et un « grant … to authenticated » ne l'annule pas.
+revoke execute on function tester_alerte() from public;
+revoke execute on function resultat_alerte(bigint) from public;
+revoke execute on function texte_alerte(text, jsonb) from public;
+revoke execute on function libelle_alerte(text) from public;
+grant execute on function tester_alerte() to authenticated;
+grant execute on function resultat_alerte(bigint) to authenticated;

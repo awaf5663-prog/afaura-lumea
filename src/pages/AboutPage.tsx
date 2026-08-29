@@ -1,10 +1,12 @@
 import { Eye, HeartHandshake, MapPin, Sparkles, TrendingUp } from 'lucide-react';
-import atelier from '@/src/assets/images/atelier-editorial.webp';
-import fondatrice from '@/src/assets/images/fondatrice.webp';
+import mjRose from '@/src/assets/products/mj-rose-poudre.webp';
+import satinSable from '@/src/assets/products/satin-sable-paillete.webp';
+import viscoseEcru from '@/src/assets/products/viscose-ecru.webp';
 import { WhatsAppLink } from '@/src/components/whatsapp/WhatsAppLink';
 import { Button } from '@/src/components/ui/Button';
 import { Reveal } from '@/src/components/ui/Reveal';
 import { BRAND } from '@/src/config/site';
+import { cn } from '@/src/lib/cn';
 import { useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 
@@ -43,6 +45,16 @@ const ENGAGEMENTS = [
   },
 ];
 
+/*
+ * Les trois pièces montrées en ouverture. Ce sont des articles réellement
+ * proposés — on ne met pas en vitrine ce qui ne se vend pas.
+ */
+const VITRINE = [
+  { src: satinSable, alt: 'Voile en satin sable pailleté, porté' },
+  { src: viscoseEcru, alt: 'Voile en viscose écru, porté' },
+  { src: mjRose, alt: 'Voile MJ rose poudré, porté' },
+];
+
 /** Les critères de sélection, tels que la boutique les applique. */
 const CRITERES = ['L’esthétique', 'L’utilité', 'Le rapport qualité-prix', 'La tendance', 'Les avis disponibles'];
 
@@ -78,14 +90,27 @@ export function AboutPage() {
           le moment où vous repérez une pièce jusqu’à celui où vous l’avez entre les mains.
         </p>
 
-        <Reveal className="mt-10 overflow-hidden rounded-[--radius-lg] border border-line">
-          <img
-            src={atelier}
-            alt="Voiles et tissus pliés dans une lumière douce"
-            width={1400}
-            height={784}
-            className="h-full w-full object-cover"
-          />
+        {/*
+          Trois pièces réellement vendues, plutôt qu'une image d'ambiance :
+          la page parle de la marque, autant montrer ce qu'elle propose.
+          La troisième disparaît sous 768 px — trois portraits côte à côte
+          sur un téléphone deviennent trois bandes illisibles.
+        */}
+        <Reveal className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
+          {VITRINE.map((piece, index) => (
+            <img
+              key={piece.alt}
+              src={piece.src}
+              alt={piece.alt}
+              width={900}
+              height={1200}
+              loading={index === 0 ? 'eager' : 'lazy'}
+              className={cn(
+                'aspect-[3/4] w-full rounded-[--radius-lg] border border-line object-cover',
+                index === 2 && 'hidden md:block',
+              )}
+            />
+          ))}
         </Reveal>
       </section>
 
@@ -188,36 +213,20 @@ export function AboutPage() {
 
       <section className="container-page mt-20">
         <Reveal className="rounded-[--radius-lg] border border-line bg-blush/35 p-8 sm:p-12">
-          <div className="grid items-center gap-8 md:grid-cols-[minmax(0,320px)_1fr] md:gap-12">
-            {/*
-              Le portrait de la fondatrice. C'est la pièce qui lève le doute :
-              une cliente qui s'apprête à payer par Wave veut voir à qui elle
-              a affaire. Cadré en 4:5, il garde ses proportions à toutes les
-              largeurs — d'où le rapport fixé plutôt qu'une hauteur devinée.
-            */}
-            <img
-              src={fondatrice}
-              alt="Portrait de la fondatrice d’Afaura Luméa"
-              width={1020}
-              height={1275}
-              className="aspect-[4/5] w-full max-w-[320px] justify-self-center rounded-[--radius-lg] object-cover shadow-lg shadow-black/5 md:justify-self-start"
-            />
-
-            <div>
-              <p className="eyebrow">Derrière la marque</p>
-              <h2 className="mt-3 text-[28px] leading-snug sm:text-[34px]">
-                Une jeune entrepreneure, passionnée de création et de digital.
-              </h2>
-              <p className="mt-5 text-[15px] leading-relaxed text-graphite">
-                Afaura Luméa, c’est l’envie de transformer une idée en quelque chose de concret.
-                C’est aussi un espace d’expérimentation : on teste, on apprend, on corrige, et on
-                construit petit à petit une marque qui nous ressemble.
-              </p>
-              <p className="mt-3 text-[15px] leading-relaxed text-graphite">
-                Nous ne prétendons pas être parfaites dès le départ. Nous préférons le dire
-                franchement, et grandir avec vous. C’est aussi pour ça que chaque remarque compte.
-              </p>
-            </div>
+          <p className="eyebrow">Derrière la marque</p>
+          <h2 className="mt-3 max-w-2xl text-[28px] leading-snug sm:text-[34px]">
+            Une jeune entrepreneure, passionnée de création et de digital.
+          </h2>
+          <div className="mt-5 grid max-w-4xl gap-4 text-[15px] leading-relaxed text-graphite sm:grid-cols-2">
+            <p>
+              Afaura Luméa, c’est l’envie de transformer une idée en quelque chose de concret. C’est
+              aussi un espace d’expérimentation : on teste, on apprend, on corrige, et on construit
+              petit à petit une marque qui nous ressemble.
+            </p>
+            <p>
+              Nous ne prétendons pas être parfaites dès le départ. Nous préférons le dire
+              franchement, et grandir avec vous. C’est aussi pour ça que chaque remarque compte.
+            </p>
           </div>
         </Reveal>
       </section>

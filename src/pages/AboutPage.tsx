@@ -1,5 +1,6 @@
 import { Eye, HeartHandshake, MapPin, Sparkles, TrendingUp } from 'lucide-react';
 import atelier from '@/src/assets/images/atelier-editorial.webp';
+import fondatrice from '@/src/assets/images/fondatrice.webp';
 import { WhatsAppLink } from '@/src/components/whatsapp/WhatsAppLink';
 import { Button } from '@/src/components/ui/Button';
 import { Reveal } from '@/src/components/ui/Reveal';
@@ -187,20 +188,36 @@ export function AboutPage() {
 
       <section className="container-page mt-20">
         <Reveal className="rounded-[--radius-lg] border border-line bg-blush/35 p-8 sm:p-12">
-          <p className="eyebrow">Derrière la marque</p>
-          <h2 className="mt-3 max-w-2xl text-[28px] leading-snug sm:text-[34px]">
-            Une jeune entrepreneure, passionnée de création et de digital.
-          </h2>
-          <div className="mt-5 grid max-w-4xl gap-4 text-[15px] leading-relaxed text-graphite sm:grid-cols-2">
-            <p>
-              Afaura Luméa, c’est l’envie de transformer une idée en quelque chose de concret. C’est
-              aussi un espace d’expérimentation : on teste, on apprend, on corrige, et on construit
-              petit à petit une marque qui nous ressemble.
-            </p>
-            <p>
-              Nous ne prétendons pas être parfaites dès le départ. Nous préférons le dire
-              franchement, et grandir avec vous. C’est aussi pour ça que chaque remarque compte.
-            </p>
+          <div className="grid items-center gap-8 md:grid-cols-[minmax(0,320px)_1fr] md:gap-12">
+            {/*
+              Le portrait de la fondatrice. C'est la pièce qui lève le doute :
+              une cliente qui s'apprête à payer par Wave veut voir à qui elle
+              a affaire. Cadré en 4:5, il garde ses proportions à toutes les
+              largeurs — d'où le rapport fixé plutôt qu'une hauteur devinée.
+            */}
+            <img
+              src={fondatrice}
+              alt="Portrait de la fondatrice d’Afaura Luméa"
+              width={1020}
+              height={1275}
+              className="aspect-[4/5] w-full max-w-[320px] justify-self-center rounded-[--radius-lg] object-cover shadow-lg shadow-black/5 md:justify-self-start"
+            />
+
+            <div>
+              <p className="eyebrow">Derrière la marque</p>
+              <h2 className="mt-3 text-[28px] leading-snug sm:text-[34px]">
+                Une jeune entrepreneure, passionnée de création et de digital.
+              </h2>
+              <p className="mt-5 text-[15px] leading-relaxed text-graphite">
+                Afaura Luméa, c’est l’envie de transformer une idée en quelque chose de concret.
+                C’est aussi un espace d’expérimentation : on teste, on apprend, on corrige, et on
+                construit petit à petit une marque qui nous ressemble.
+              </p>
+              <p className="mt-3 text-[15px] leading-relaxed text-graphite">
+                Nous ne prétendons pas être parfaites dès le départ. Nous préférons le dire
+                franchement, et grandir avec vous. C’est aussi pour ça que chaque remarque compte.
+              </p>
+            </div>
           </div>
         </Reveal>
       </section>

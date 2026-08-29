@@ -10,6 +10,7 @@ import { EmptyState } from '@/src/components/ui/EmptyState';
 import { Input, Label } from '@/src/components/ui/Field';
 import { Price } from '@/src/components/ui/Price';
 import { QuantityStepper } from '@/src/components/ui/QuantityStepper';
+import { ShareButton } from '@/src/components/ui/ShareButton';
 import { BRAND, SITE_URL } from '@/src/config/site';
 import { CATEGORIES } from '@/src/data/seed';
 import { findColorChart } from '@/src/config/colorCharts';
@@ -154,11 +155,8 @@ export function ProductPage({ slug }: { slug: string }) {
     );
   }
 
-  const productMessage = buildProductMessage(
-    product.name,
-    formatFcfa(product.price),
-    `${SITE_URL}/produit/${product.slug}`,
-  );
+  const productUrl = `${SITE_URL}/produit/${product.slug}`;
+  const productMessage = buildProductMessage(product.name, formatFcfa(product.price), productUrl);
 
   const handleAdd = () => {
     if (missingOption) {
@@ -351,6 +349,20 @@ export function ProductPage({ slug }: { slug: string }) {
               Le montant total vous est confirmé avant tout paiement.
             </li>
           </ul>
+
+          {/*
+            Le partage d'une pièce précise. La boutique vend surtout en
+            message privé : pouvoir envoyer le lien d'un seul article, et
+            laisser les clientes le faire circuler, vaut mieux qu'un lien
+            vers la boutique entière.
+          */}
+          <ShareButton
+            className="mt-6"
+            url={productUrl}
+            title={`${product.name} — ${BRAND.name}`}
+            text={`${product.name} à ${formatFcfa(product.price)} chez ${BRAND.name}`}
+            label="Partager cette pièce"
+          />
         </div>
       </div>
 

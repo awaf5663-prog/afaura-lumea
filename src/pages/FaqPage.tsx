@@ -32,6 +32,10 @@ const FAQ = [
     a: "Wave, Orange Money, et le paiement à la livraison à Saint-Louis et dans les environs. Après un paiement mobile, envoyez-nous la capture de confirmation sur WhatsApp.",
   },
   {
+    q: 'Où livrez-vous ?',
+    a: "À Saint-Louis et dans ses environs, et par transporteur jusqu'à Louga, Thiès et Dakar. Vous pouvez aussi récupérer votre commande en main propre au point de retrait. Nous ne desservons pas encore d'autres villes : écrivez-nous sur WhatsApp, nous vous dirons ce qui est possible.",
+  },
+  {
     q: 'Combien coûte la livraison ?',
     a: "Cela dépend de la zone. Les frais fixés sont affichés au moment de la commande ; lorsqu'une zone n'a pas encore de tarif défini, nous vous confirmons le montant sur WhatsApp avant paiement plutôt que d'afficher un prix approximatif.",
   },

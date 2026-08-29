@@ -344,7 +344,7 @@ export function ProductPage({ slug }: { slug: string }) {
             </li>
             <li className="flex items-center gap-2.5">
               <Truck className="size-4" strokeWidth={1.6} />
-              Livraison Saint-Louis, environs et régions — ou retrait sur place.
+              Livraison Saint-Louis, environs, Louga, Thiès et Dakar — ou retrait sur place.
             </li>
             <li className="flex items-center gap-2.5">
               <ShieldCheck className="size-4" strokeWidth={1.6} />

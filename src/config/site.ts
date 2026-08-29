@@ -113,9 +113,15 @@ export const DELIVERY_ZONES: DeliveryZone[] = [
     type: 'delivery',
   },
   {
+    /*
+     * L'identifiant reste `regions` : les commandes déjà enregistrées le
+     * portent, et les frais configurés dans l'administration sont rangés
+     * sous cette clé. Seul le libellé change quand la boutique dessert de
+     * nouvelles villes — on ne nomme que celles où elle livre vraiment.
+     */
     id: 'regions',
-    label: 'Autres régions',
-    hint: 'Expédition par transporteur, frais selon la destination.',
+    label: 'Louga, Thiès, Dakar',
+    hint: 'Expédition par transporteur. Frais selon la ville, confirmés sur WhatsApp.',
     fee: null,
     type: 'delivery',
   },

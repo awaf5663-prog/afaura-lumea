@@ -12,6 +12,7 @@ import { ToastProvider } from '@/src/hooks/useToast';
 import { RouterProvider, matchPath, useRouter } from '@/src/lib/router';
 import { useVersionCheck } from '@/src/hooks/useVersionCheck';
 import { useVisitTracking } from '@/src/hooks/useVisitTracking';
+import { AboutPage } from '@/src/pages/AboutPage';
 import { CartPage } from '@/src/pages/CartPage';
 import { CheckoutPage } from '@/src/pages/CheckoutPage';
 import { ConfirmationPage } from '@/src/pages/ConfirmationPage';
@@ -60,6 +61,8 @@ function Routes() {
       return <TrackingPage />;
     case '/faq':
       return <FaqPage />;
+    case '/a-propos':
+      return <AboutPage />;
     case '/guide-des-tailles':
       return <SizeGuidePage />;
     case '/admin':

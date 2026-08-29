@@ -33,6 +33,7 @@ const COLUMNS = [
       { to: '/guide-des-tailles', label: 'Guide des tailles' },
       { to: '/suivi', label: 'Suivre ma commande' },
       { to: '/faq', label: 'Questions fréquentes' },
+      { to: '/a-propos', label: 'À propos' },
     ],
   },
 ];

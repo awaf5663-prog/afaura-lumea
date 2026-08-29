@@ -17,6 +17,7 @@ const NAV = [
   { to: '/guide-des-tailles', label: 'Guide des tailles' },
   { to: '/suivi', label: 'Suivi' },
   { to: '/faq', label: 'FAQ' },
+  { to: '/a-propos', label: 'À propos' },
 ];
 
 function NavLink({ to, label, exact }: { to: string; label: string; exact?: boolean }) {
@@ -25,7 +26,7 @@ function NavLink({ to, label, exact }: { to: string; label: string; exact?: bool
     <Link
       to={to}
       className={cn(
-        'link-underline py-1 text-[13.5px] transition-colors',
+        'link-underline whitespace-nowrap py-1 text-[13.5px] transition-colors',
         active ? 'text-ink' : 'text-stone hover:text-ink',
       )}
     >
@@ -68,7 +69,7 @@ export function Header({ onOpenCart }: { onOpenCart: () => void }) {
         <div className="container-page flex h-16 items-center justify-between gap-3">
           <button
             type="button"
-            className="press -ml-2 grid size-10 place-items-center rounded-full text-ink lg:hidden"
+            className="press -ml-2 grid size-10 place-items-center rounded-full text-ink xl:hidden"
             aria-label="Ouvrir le menu"
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen(true)}
@@ -88,7 +89,13 @@ export function Header({ onOpenCart }: { onOpenCart: () => void }) {
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-7 lg:flex" aria-label="Navigation principale">
+          {/*
+            Le menu complet ne s'affiche qu'à partir de 1280 px : en dessous, les
+            neuf entrées passaient à la ligne et la barre montait sur deux ou
+            trois étages. Sur les écrans plus étroits, c'est le bouton menu qui
+            prend le relais — il donne accès exactement aux mêmes pages.
+          */}
+          <nav className="hidden items-center gap-5 xl:flex" aria-label="Navigation principale">
             {NAV.map((item) => (
               <NavLink key={item.to} {...item} />
             ))}
@@ -124,7 +131,7 @@ export function Header({ onOpenCart }: { onOpenCart: () => void }) {
       </header>
 
       {menuOpen && (
-        <div className="fixed inset-0 z-[85] lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
+        <div className="fixed inset-0 z-[85] xl:hidden" role="dialog" aria-modal="true" aria-label="Menu">
           <div className="animate-fade absolute inset-0 bg-ink/35" onClick={() => setMenuOpen(false)} />
           <nav className="animate-sheet absolute inset-x-0 top-0 rounded-b-[--radius-xl] bg-ivory px-6 pb-8 pt-5">
             <div className="mb-6 flex items-center justify-between">

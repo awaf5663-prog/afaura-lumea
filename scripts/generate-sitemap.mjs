@@ -15,6 +15,7 @@ const ROUTES = [
   { path: '/comment-ca-marche', priority: '0.7' },
   { path: '/suivi', priority: '0.6' },
   { path: '/faq', priority: '0.6' },
+  { path: '/a-propos', priority: '0.6' },
 ];
 
 const origin = (process.env.VITE_SITE_URL ?? '').replace(/\/$/, '');

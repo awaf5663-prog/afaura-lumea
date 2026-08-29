@@ -775,7 +775,9 @@ immutable
 as $$
   select case coalesce(code, '')
     when 'pickup' then 'Point de retrait'
-    when 'city' then 'Livraison Saint-Louis'
+    -- Sans « Livraison » : la ligne du message le dit déjà, et l'alerte
+    -- affichait « Livraison : Livraison Saint-Louis ».
+    when 'city' then 'Saint-Louis'
     when 'around' then 'Environs de Saint-Louis'
     when 'regions' then 'Louga, Thiès, Dakar'
     when 'wave' then 'Wave'

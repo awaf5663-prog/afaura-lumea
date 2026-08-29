@@ -740,11 +740,16 @@ export const supabaseAdapter: DataSource = {
 
     /*
      * L'envoi est asynchrone : la base met le message en file, un ouvrier
-     * l'expédie, la réponse arrive ensuite. On interroge quelques secondes
-     * plutôt que d'annoncer un succès qu'on n'a pas constaté.
+     * l'expédie, la réponse arrive ensuite. On interroge plutôt que
+     * d'annoncer un succès qu'on n'a pas constaté.
+     *
+     * 25 s d'attente, et non 7 : la base laisse désormais 20 s à Telegram
+     * pour répondre (constaté en vrai, la seule poignée de main TLS avait
+     * pris 4,9 s). Abandonner au bout de 7 s ferait dire « pas de réponse »
+     * alors que le message est encore en route.
      */
-    for (let essai = 0; essai < 10; essai += 1) {
-      await new Promise((r) => setTimeout(r, 700));
+    for (let essai = 0; essai < 31; essai += 1) {
+      await new Promise((r) => setTimeout(r, 800));
       const reponse = await rest<{ ok: boolean; detail: string } | null>('rpc/resultat_alerte', {
         method: 'POST',
         body: JSON.stringify({ requete }),
@@ -757,8 +762,8 @@ export const supabaseAdapter: DataSource = {
       ok: false,
       enAttente: true,
       detail:
-        "Telegram n'a pas encore répondu. Regardez votre téléphone : le message est peut-être " +
-        'arrivé quand même.',
+        "Telegram n'a pas répondu dans les 25 secondes. Regardez votre téléphone : le message " +
+        'est peut-être arrivé quand même. Sinon, réessayez — la connexion est parfois lente.',
     };
   },
 

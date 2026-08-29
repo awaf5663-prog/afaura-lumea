@@ -855,7 +855,11 @@ begin
         'chat_id', conf.telegram_chat_id,
         'text', texte_alerte(tg_table_name::text, ligne)
       ),
-      headers := '{"Content-Type": "application/json"}'::jsonb
+      headers := '{"Content-Type": "application/json"}'::jsonb,
+      -- 20 s, et non les 5 s par défaut de pg_net. Constaté en vrai : la
+      -- poignée de main TLS avec Telegram a consommé 4 988 ms à elle seule,
+      -- et l'envoi expirait à 5 001 ms sans même avoir posé la question.
+      timeout_milliseconds := 20000
     );
   exception when others then
     null;
@@ -904,7 +908,10 @@ begin
       'text', E'✅ Afaura Luméa : l''alerte fonctionne. '
               || 'Vous recevrez ce genre de message à chaque nouvelle commande.'
     ),
-    headers := '{"Content-Type": "application/json"}'::jsonb
+    headers := '{"Content-Type": "application/json"}'::jsonb,
+    -- Même raison que pour le déclencheur : 5 s ne suffisent pas toujours
+    -- à établir la connexion avec Telegram.
+    timeout_milliseconds := 20000
   );
 end;
 $$;

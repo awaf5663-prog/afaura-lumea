@@ -458,9 +458,9 @@ export const localAdapter: DataSource = {
   async getAlertSettings() {
     return delay(
       readJson<AlertSettings>(STORAGE_KEYS.alerts, {
-        telegramToken: '',
-        telegramChatId: '',
+        ntfyTopic: '',
         enabled: false,
+        includeCustomer: false,
       }),
     );
   },

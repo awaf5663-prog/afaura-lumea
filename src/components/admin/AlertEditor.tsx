@@ -6,6 +6,25 @@ import { useToast } from '@/src/hooks/useToast';
 import { db } from '@/src/services';
 import type { AlertSettings, AlertTestResult } from '@/src/services/types';
 
+/** Un nom de canal ntfy : lettres, chiffres, tirets. Rien d'autre ne passe. */
+const nettoyerCanal = (valeur: string) =>
+  valeur
+    .toLowerCase()
+    .replace(/[^a-z0-9-]/g, '-')
+    .replace(/-{2,}/g, '-')
+    .slice(0, 48);
+
+/**
+ * Un nom tiré au hasard. Le canal tient lieu de mot de passe : un nom
+ * devinable (« afaura », « boutique ») serait lu par n'importe qui. Douze
+ * caractères tirés du générateur du navigateur, c'est hors de portée.
+ */
+const nouveauCanal = () => {
+  const lettres = 'abcdefghijkmnpqrstuvwxyz23456789';
+  const octets = crypto.getRandomValues(new Uint8Array(12));
+  return 'afaura-' + Array.from(octets, (o) => lettres[o % lettres.length]).join('');
+};
+
 /**
  * Réglage de l'alerte « nouvelle commande ».
  *
@@ -80,7 +99,7 @@ export function AlertEditor() {
     return <p className="text-[13.5px] text-[#8a2f2f]">{erreur || 'Réglage indisponible.'}</p>;
   }
 
-  const complet = draft.telegramToken.trim() !== '' && draft.telegramChatId.trim() !== '';
+  const complet = draft.ntfyTopic.trim().length >= 8;
 
   return (
     /*
@@ -99,12 +118,10 @@ export function AlertEditor() {
       }}
     >
       <p className="text-[13px] leading-relaxed text-stone">
-        Recevez un message sur Telegram dès qu’une commande ou une demande SHEIN arrive — même si
-        la cliente n’envoie pas de message WhatsApp. Créez un robot avec{' '}
-        <span className="font-medium text-graphite">@BotFather</span> sur Telegram, il vous donne
-        un jeton ; puis écrivez à{' '}
-        <span className="font-medium text-graphite">@userinfobot</span>, il vous donne votre
-        identifiant.
+        Recevez une notification sur votre téléphone dès qu’une commande ou une demande SHEIN
+        arrive — même si la cliente n’envoie pas de message WhatsApp. Installez l’application
+        gratuite <span className="font-medium text-graphite">ntfy</span>, ajoutez-y le nom de
+        canal ci-dessous, et c’est tout : ni compte, ni mot de passe.
       </p>
 
       {erreur && (
@@ -114,34 +131,24 @@ export function AlertEditor() {
       )}
 
       <FormRow className="mt-4">
-        <Label htmlFor="a-token" hint="donné par @BotFather">
-          Jeton du robot
+        <Label htmlFor="a-topic" hint="à recopier dans l’application ntfy">
+          Nom secret de votre canal
         </Label>
-        {/*
-          `type="password"` : le jeton donne le droit d'écrire au nom du
-          robot. Il ne doit pas rester lisible sur un écran qu'on montre.
-        */}
         <Input
-          id="a-token"
-          type="password"
+          id="a-topic"
           autoComplete="off"
-          placeholder="123456789:AA…"
-          value={draft.telegramToken}
-          onChange={(e) => setDraft({ ...draft, telegramToken: e.target.value })}
+          spellCheck={false}
+          placeholder="afaura-xxxxxxxxxxxx"
+          value={draft.ntfyTopic}
+          onChange={(e) => setDraft({ ...draft, ntfyTopic: nettoyerCanal(e.target.value) })}
         />
-      </FormRow>
-
-      <FormRow>
-        <Label htmlFor="a-chat" hint="donné par @userinfobot">
-          Votre identifiant Telegram
-        </Label>
-        <Input
-          id="a-chat"
-          inputMode="numeric"
-          placeholder="123456789"
-          value={draft.telegramChatId}
-          onChange={(e) => setDraft({ ...draft, telegramChatId: e.target.value })}
-        />
+        <button
+          type="button"
+          onClick={() => setDraft({ ...draft, ntfyTopic: nouveauCanal() })}
+          className="mt-2 self-start text-[12.5px] text-mauve underline underline-offset-2"
+        >
+          Générer un nom au hasard
+        </button>
       </FormRow>
 
       <label className="mt-2 flex items-start gap-3 text-[13.5px]">
@@ -154,7 +161,29 @@ export function AlertEditor() {
         <span>
           <span className="font-medium">Envoyer les alertes</span>
           <span className="mt-0.5 block text-[12.5px] text-stone">
-            Décoché, rien ne part : vos identifiants restent enregistrés, simplement inutilisés.
+            Décoché, rien ne part : le nom du canal reste enregistré, simplement inutilisé.
+          </span>
+        </span>
+      </label>
+
+      {/*
+        Le canal fait office de mot de passe : sur ntfy.sh, qui connaît son
+        nom reçoit les messages. D'où le générateur ci-dessus, et d'où le
+        choix par défaut de ne PAS y mettre les coordonnées des clientes.
+      */}
+      <label className="mt-3 flex items-start gap-3 text-[13.5px]">
+        <input
+          type="checkbox"
+          className="mt-0.5 size-4 accent-[--color-mauve]"
+          checked={draft.includeCustomer}
+          onChange={(e) => setDraft({ ...draft, includeCustomer: e.target.checked })}
+        />
+        <span>
+          <span className="font-medium">Inclure le nom et le téléphone de la cliente</span>
+          <span className="mt-0.5 block text-[12.5px] text-stone">
+            Pratique pour rappeler tout de suite. Mais un canal ntfy est lisible par qui devine
+            son nom : décoché, l’alerte ne donne que le numéro de commande et le montant, et
+            vous ouvrez l’administration pour voir qui c’est.
           </span>
         </span>
       </label>
@@ -167,7 +196,9 @@ export function AlertEditor() {
         ) : (
           <>
             <BellOff className="size-4" />
-            {complet ? 'Renseigné mais éteint.' : 'Pas encore configurée : aucun message ne part.'}
+            {complet
+              ? 'Renseigné mais éteint.'
+              : 'Pas encore configurée : aucun message ne part.'}
           </>
         )}
       </p>
@@ -211,8 +242,9 @@ export function AlertEditor() {
           )}
           <span>
             {resultat.ok
-              ? 'Telegram a accepté le message : regardez votre téléphone.'
-              : resultat.detail || "Telegram a refusé le message. Vérifiez le jeton et l'identifiant."}
+              ? 'Message accepté : regardez votre téléphone.'
+              : resultat.detail ||
+                'Le message a été refusé. Vérifiez le nom du canal, puis réessayez.'}
           </span>
         </p>
       )}

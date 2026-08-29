@@ -950,3 +950,133 @@ revoke execute on function texte_alerte(text, jsonb) from public;
 revoke execute on function libelle_alerte(text) from public;
 grant execute on function tester_alerte() to authenticated;
 grant execute on function resultat_alerte(bigint) to authenticated;
+
+-- ── 8. L'alerte passe par ntfy.sh ─────────────────────────────────────
+-- Mesuré depuis la base de la boutique : api.telegram.org ne répond jamais
+-- (trois essais, 5 s, 12 s et 20 s — la connexion expire toujours au même
+-- point, avant même d'avoir posé sa question), alors que github.com et
+-- example.com répondent 200 depuis le même endroit. Le chemin vers
+-- Telegram est fermé, ce n'est pas réglable de notre côté.
+--
+-- ntfy.sh a été testé depuis la même base : 200. Il ne demande ni compte
+-- ni jeton — juste un nom de canal secret, que l'on tape dans une
+-- application gratuite pour recevoir les notifications.
+
+alter table alert_settings add column if not exists ntfy_topic text not null default '';
+-- Par défaut, l'alerte ne dit PAS qui est la cliente : un canal ntfy est
+-- lisible par quiconque devine son nom. La boutique peut l'activer en
+-- connaissance de cause depuis l'administration.
+alter table alert_settings add column if not exists include_customer boolean not null default false;
+
+create or replace function texte_alerte(source text, ligne jsonb, avec_client boolean default true)
+returns text
+language sql
+immutable
+as $$
+  select case when source = 'orders' then
+    'N° ' || (ligne->>'order_number') || E'\n'
+      || case when avec_client
+              then (ligne->>'customer_name') || ' — ' || (ligne->>'phone') || E'\n'
+              else '' end
+      || 'Total : ' || (ligne->>'total') || E' FCFA\n'
+      || 'Livraison : ' || libelle_alerte(ligne->>'delivery_zone_id')
+      || case when ligne->>'delivery_fee' is null and ligne->>'delivery_zone_id' <> 'pickup'
+              then ' (frais à confirmer)' else '' end
+      || E'\n'
+      || 'Paiement : ' || libelle_alerte(ligne->>'payment_method')
+      || case when avec_client and coalesce(ligne->>'address', '') <> ''
+              then E'\n' || (ligne->>'address') else '' end
+  else
+    'N° ' || (ligne->>'request_number') || E'\n'
+      || case when avec_client
+              then (ligne->>'customer_name') || ' — ' || (ligne->>'phone') || E'\n'
+              else '' end
+      || 'À chiffrer, puis à confirmer à la cliente.'
+  end;
+$$;
+
+create or replace function alerter_nouvelle_demande()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  conf alert_settings%rowtype;
+  ligne jsonb;
+begin
+  select * into conf from alert_settings where id = 1;
+  if not found or not conf.enabled or coalesce(conf.ntfy_topic, '') = '' then
+    return null;
+  end if;
+
+  if tg_table_name = 'orders' then
+    select to_jsonb(o) into ligne from orders o where o.id = new.id;
+  else
+    select to_jsonb(s) into ligne from shein_requests s where s.id = new.id;
+  end if;
+  if ligne is null then
+    return null;
+  end if;
+
+  begin
+    /*
+     * On publie par l'entrée JSON de ntfy, et non en texte brut sur
+     * /<canal>. Raison : pg_net sérialise le corps en JSON. Un texte passé
+     * tel quel serait parti entre guillemets, avec des \n littéraux au
+     * lieu de retours à la ligne. En JSON, le message est un champ, et il
+     * arrive correctement mis en forme — accents compris.
+     */
+    perform net.http_post(
+      url := 'https://ntfy.sh/',
+      body := jsonb_build_object(
+        'topic', conf.ntfy_topic,
+        'title', case when tg_table_name = 'orders'
+                      then 'Nouvelle commande' else 'Nouvelle demande SHEIN' end,
+        'message', texte_alerte(tg_table_name::text, ligne, conf.include_customer),
+        'priority', 4,
+        'tags', jsonb_build_array('shopping_cart')
+      ),
+      headers := '{"Content-Type": "application/json"}'::jsonb,
+      timeout_milliseconds := 20000
+    );
+  exception when others then
+    null;
+  end;
+
+  return null;
+end;
+$$;
+
+create or replace function tester_alerte()
+returns bigint
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  conf alert_settings%rowtype;
+begin
+  select * into conf from alert_settings where id = 1;
+  if not found or coalesce(conf.ntfy_topic, '') = '' then
+    raise exception 'Renseignez le nom de votre canal, puis enregistrez.';
+  end if;
+
+  return net.http_post(
+    url := 'https://ntfy.sh/',
+    body := jsonb_build_object(
+      'topic', conf.ntfy_topic,
+      'title', 'Afaura Luméa',
+      'message', 'L''alerte fonctionne. Vous recevrez ce genre de message à chaque nouvelle commande.',
+      'priority', 4,
+      'tags', jsonb_build_array('white_check_mark')
+    ),
+    headers := '{"Content-Type": "application/json"}'::jsonb,
+    timeout_milliseconds := 20000
+  );
+end;
+$$;
+
+revoke execute on function tester_alerte() from public;
+revoke execute on function texte_alerte(text, jsonb, boolean) from public;
+grant execute on function tester_alerte() to authenticated;

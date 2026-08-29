@@ -46,15 +46,17 @@ export interface VisitPeriod {
 /**
  * Réglage de l'alerte « nouvelle commande ».
  *
- * Le jeton du robot ne transite QUE entre l'administration connectée et la
+ * Le nom du canal ne transite QU'entre l'administration connectée et la
  * base : il est rangé dans une table sans accès public (voir supabase/
- * mise-a-jour.sql, étape 7), jamais dans `settings` qui est lisible par
- * tout visiteur du site.
+ * mise-a-jour.sql), jamais dans `settings` qui est lisible par tout
+ * visiteur du site.
  */
 export interface AlertSettings {
-  telegramToken: string;
-  telegramChatId: string;
+  /** Nom du canal ntfy. Secret : qui le connaît reçoit les alertes. */
+  ntfyTopic: string;
   enabled: boolean;
+  /** Inclure le nom, le téléphone et l'adresse de la cliente. Voir AlertEditor. */
+  includeCustomer: boolean;
 }
 
 /** Ce que Telegram a répondu au message de test. */

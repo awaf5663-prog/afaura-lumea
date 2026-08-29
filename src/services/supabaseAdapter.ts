@@ -106,7 +106,7 @@ export function supabaseSignOut(): void {
  */
 function alerteNonInstallee(error: unknown): Error {
   const message = error instanceof Error ? error.message : '';
-  if (/alert_settings|tester_alerte|resultat_alerte|PGRST(202|205)|404/i.test(message)) {
+  if (/alert_settings|ntfy_topic|tester_alerte|resultat_alerte|PGRST(202|204|205)|404/i.test(message)) {
     return new Error(
       "L'alerte n'est pas encore installée dans votre base. Ouvrez Supabase → SQL Editor, " +
         'exécutez supabase/mise-a-jour.sql, puis revenez ici.',
@@ -699,9 +699,9 @@ export const supabaseAdapter: DataSource = {
       const rows = await rest<Row[]>('alert_settings?select=*&id=eq.1');
       const r = rows[0] ?? {};
       return {
-        telegramToken: r.telegram_token ?? '',
-        telegramChatId: r.telegram_chat_id ?? '',
+        ntfyTopic: r.ntfy_topic ?? '',
         enabled: Boolean(r.enabled),
+        includeCustomer: Boolean(r.include_customer),
       } satisfies AlertSettings;
     } catch (error) {
       throw alerteNonInstallee(error);
@@ -715,9 +715,9 @@ export const supabaseAdapter: DataSource = {
         headers: { Prefer: 'resolution=merge-duplicates,return=minimal' },
         body: JSON.stringify({
           id: 1,
-          telegram_token: settings.telegramToken.trim(),
-          telegram_chat_id: settings.telegramChatId.trim(),
+          ntfy_topic: settings.ntfyTopic.trim(),
           enabled: settings.enabled,
+          include_customer: settings.includeCustomer,
           updated_at: new Date().toISOString(),
         }),
       });

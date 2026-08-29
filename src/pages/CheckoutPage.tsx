@@ -248,7 +248,7 @@ export function CheckoutPage() {
                     value={z.id}
                     checked={form.zoneId === z.id}
                     onChange={() => set('zoneId', z.id)}
-                    className="mt-1 accent-[#8f4b5b]"
+                    className="mt-1 accent-[#8e2961]"
                   />
                   <span className="flex-1">
                     <span className="flex items-baseline justify-between gap-3">
@@ -311,7 +311,7 @@ export function CheckoutPage() {
                   type="checkbox"
                   checked={form.isStudent}
                   onChange={(e) => set('isStudent', e.target.checked)}
-                  className="mt-1 size-4 accent-[#8f4b5b]"
+                  className="mt-1 size-4 accent-[#8e2961]"
                 />
                 <span className="text-[13.5px] leading-relaxed text-graphite">
                   <span className="font-medium">Je suis étudiante</span>
@@ -349,7 +349,7 @@ export function CheckoutPage() {
                     value={m.id}
                     checked={form.paymentMethod === m.id}
                     onChange={() => set('paymentMethod', m.id)}
-                    className="mt-1 accent-[#8f4b5b]"
+                    className="mt-1 accent-[#8e2961]"
                   />
                   <span>
                     <span className="block text-[15px] font-medium">{m.label}</span>

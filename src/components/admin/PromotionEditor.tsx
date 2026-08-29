@@ -75,7 +75,7 @@ export function PromotionEditor({
                   type="checkbox"
                   checked={promotion.active}
                   onChange={(e) => patch(index, { active: e.target.checked })}
-                  className="size-4 accent-[#8f4b5b]"
+                  className="size-4 accent-[#8e2961]"
                 />
                 <span className="font-medium">
                   {promotion.active ? 'Offre en cours' : 'Offre désactivée'}
@@ -210,7 +210,7 @@ export function PromotionEditor({
                 type="checkbox"
                 checked={promotion.studentOnly}
                 onChange={(e) => patch(index, { studentOnly: e.target.checked })}
-                className="mt-0.5 size-4 accent-[#8f4b5b]"
+                className="mt-0.5 size-4 accent-[#8e2961]"
               />
               <span>
                 Réservée aux étudiantes

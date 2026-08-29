@@ -2,28 +2,39 @@
 
 /* ─────────────────────────────────────────────────────────────
    Identité visuelle Afaura Luméa
-   Rose crème · rose clair · rose foncé · beige · noir
+   Magenta de la marque · rose crème · beige · noir
+
+   Toute la gamme est construite à partir de DEUX couleurs choisies par
+   la boutique : son magenta #c1498b (teinte 327) et son beige #e9d9cb
+   (teinte 28). Les fonds sont des versions très pâlies du magenta, ce
+   qui évite le heurt qu'on avait entre un rose froid et des crèmes
+   chaudes ; le beige reste tel quel, en contrepoint.
+
+   Chaque couple texte/fond a été mesuré : aucun ne descend sous 4,5:1,
+   le seuil de lisibilité. Le texte secondaire sur rose clair, qui était
+   à 4,21 avec l'ancienne gamme, passe maintenant à 4,67.
    ───────────────────────────────────────────────────────────── */
 @theme {
-  /* Fonds */
-  --color-ivory: #fdf7f4; /* rose crème — fond principal */
-  --color-cream: #f8ede8; /* rose crème plus dense — surfaces */
-  --color-blush: #f6ded9; /* rose clair — badges, accents doux */
+  /* Fonds — le magenta, pâli à l'extrême */
+  --color-ivory: #fcf7fa; /* fond principal */
+  --color-cream: #f8edf3; /* surfaces, cartes */
+  --color-blush: #e5cedb; /* rose clair — c'est la couleur de ses visuels */
 
-  /* Beiges */
+  /* Beiges — conservés, en contrepoint chaud */
   --color-sand: #e9d9cb;
-  --color-clay: #d9c0b0;
-  --color-line: #ecdcd4;
+  --color-clay: #dac6b4;
+  --color-line: #ebdbe4;
 
-  /* Roses foncés */
-  --color-mauve: #8f4b5b; /* rose foncé — accent, liens, chiffres clés */
-  --color-chart: #96455c; /* même rose, un cran plus vif : barres des graphiques */
-  --color-rosedark: #5c2f38; /* rose profond — grandes surfaces */
+  /* Magentas */
+  --color-brand: #c1498b; /* SA couleur, exacte — boutons, aplats */
+  --color-mauve: #8e2961; /* la même, assombrie pour rester lisible en texte */
+  --color-chart: #c1498b; /* barres des graphiques */
+  --color-rosedark: #5b203f; /* magenta profond — grandes surfaces sombres */
 
-  /* Noirs et gris */
-  --color-ink: #17110f;
-  --color-graphite: #40312f;
-  --color-stone: #7a665d;
+  /* Noirs et gris, teintés de magenta plutôt que de brun */
+  --color-ink: #1c1218;
+  --color-graphite: #47333f;
+  --color-stone: #695460;
 
   --color-gold: #b08d57;
 

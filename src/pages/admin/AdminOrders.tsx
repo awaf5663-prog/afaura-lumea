@@ -107,7 +107,7 @@ export function AdminOrders({
                 <input
                   type="checkbox"
                   aria-label={`Sélectionner ${order.orderNumber}`}
-                  className="mt-1.5 size-4 shrink-0 accent-[#8f4b5b]"
+                  className="mt-1.5 size-4 shrink-0 accent-[#8e2961]"
                   checked={trash.selection.includes(order.id)}
                   onChange={() => trash.basculer(order.id)}
                 />

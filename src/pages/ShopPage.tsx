@@ -231,7 +231,7 @@ export function ShopPage() {
               step={500}
               value={effectiveMax}
               onChange={(e) => setMaxPrice(Number(e.target.value))}
-              className="w-full accent-[#8f4b5b]"
+              className="w-full accent-[#8e2961]"
               aria-label="Prix maximum"
             />
             <p className="mt-2 text-[13px] text-stone">

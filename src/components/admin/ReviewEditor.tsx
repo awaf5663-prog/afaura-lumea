@@ -53,7 +53,7 @@ export function ReviewEditor({
               <label className="inline-flex items-center gap-2 text-[13.5px]">
                 <input
                   type="checkbox"
-                  className="size-4 accent-[#8f4b5b]"
+                  className="size-4 accent-[#8e2961]"
                   checked={review.published}
                   onChange={(e) => patch(index, { published: e.target.checked })}
                 />

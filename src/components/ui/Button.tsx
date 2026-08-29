@@ -5,7 +5,12 @@ type Variant = 'primary' | 'secondary' | 'ghost' | 'light' | 'danger';
 type Size = 'sm' | 'md' | 'lg';
 
 const VARIANTS: Record<Variant, string> = {
-  primary: 'bg-ink text-ivory hover:bg-graphite disabled:bg-stone',
+  /*
+   * Le bouton principal porte la couleur de la marque. `text-white` et non
+   * `text-ivory` : l'ivoire tombait à 4,32:1 sur ce magenta, le blanc pur
+   * atteint 4,57 — juste au-dessus du seuil de lisibilité.
+   */
+  primary: 'bg-brand text-white hover:bg-mauve disabled:bg-stone',
   secondary: 'bg-transparent text-ink border border-ink/25 hover:border-ink hover:bg-ink/[0.03]',
   ghost: 'bg-cream text-ink hover:bg-sand',
   /** Sur fond sombre : impossible à obtenir par surcharge, les classes se neutralisent. */

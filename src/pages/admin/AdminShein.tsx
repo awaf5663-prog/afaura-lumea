@@ -109,7 +109,7 @@ export function AdminShein({
                 <input
                   type="checkbox"
                   aria-label={`Sélectionner ${request.requestNumber}`}
-                  className="mt-1.5 size-4 shrink-0 accent-[#8f4b5b]"
+                  className="mt-1.5 size-4 shrink-0 accent-[#8e2961]"
                   checked={trash.selection.includes(request.id)}
                   onChange={() => trash.basculer(request.id)}
                 />

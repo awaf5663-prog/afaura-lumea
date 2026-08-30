@@ -23,6 +23,7 @@ const COLUMNS = [
       { to: '/boutique?categorie=jersey', label: 'Jersey' },
       { to: '/boutique?categorie=dentelle', label: 'Dentelle' },
       { to: '/boutique?categorie=hijab_tape', label: 'Hijab tape' },
+      { to: '/boutique?categorie=rentree', label: 'Rentrée' },
     ],
   },
   {

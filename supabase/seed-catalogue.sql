@@ -9,7 +9,7 @@
 --  et les photos déjà téléversées depuis l'admin ne sont jamais écrasées.
 -- ═══════════════════════════════════════════════════════════════════
 
--- Catégories du catalogue : Abaya, Pièce unique, Viscose premium, Voile MJ, Modal imprimé, Modal simple, Satin imprimé, Dentelle, Jersey, Jersey frisé, Hijab tape
+-- Catégories du catalogue : Abaya, Pièce unique, Viscose premium, Voile MJ, Modal imprimé, Modal simple, Satin imprimé, Dentelle, Jersey, Jersey frisé, Hijab tape, Rentrée
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
@@ -241,6 +241,226 @@ insert into products (
   '[]'::jsonb, '[]'::jsonb, null, 'active',
   false, false,
   false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'bics-souligneurs', 'bics-souligneurs', 'Bics et souligneurs', 'Un lot de stylos et de souligneurs pour la rentrée. Commandé pour vous et acheminé avec le prochain groupage.',
+  550, null, 'rentree',
+  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'classeur', 'classeur', 'Classeur à soufflets', 'Classeur à compartiments pour trier cours, feuilles et documents. Commandé pour vous et acheminé avec le prochain groupage.',
+  1000, null, 'rentree',
+  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'protec-ordinateur', 'protec-ordinateur', 'Protection de clavier', 'Film souple à poser sur le clavier de l’ordinateur, contre la poussière et les éclaboussures. Précisez le modèle de votre ordinateur au moment de commander.',
+  1000, null, 'rentree',
+  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'coque-telephone', 'coque-telephone', 'Coque de téléphone', 'Coque transparente à motif. Précisez le modèle de votre téléphone au moment de commander : nous confirmons la disponibilité avant paiement.',
+  1500, null, 'rentree',
+  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'adaptateur-usb', 'adaptateur-usb', 'Adaptateur USB', 'Adaptateur pour brancher une clé USB ou un disque sur téléphone et tablette. Précisez le type de prise de votre appareil au moment de commander.',
+  3000, null, 'rentree',
+  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'gourde', 'gourde', 'Gourde', 'Gourde isotherme pour la journée de cours. Plusieurs coloris : précisez celui que vous souhaitez, nous confirmons la disponibilité.',
+  3500, null, 'rentree',
+  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'bloc-note', 'bloc-note', 'Bloc-notes', 'Carnet à spirale, couverture rigide gravée. Pour les cours, les listes ou le planning de la semaine.',
+  4000, null, 'rentree',
+  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'miroir', 'miroir', 'Miroir', 'Petit miroir à poser, cadre ondulé. Pour le bureau, la chambre ou la table de chevet.',
+  400, null, 'rentree',
+  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'sac-ordinateur', 'sac-ordinateur', 'Sac ordinateur', 'Housse matelassée pour ordinateur portable. Précisez la taille de votre écran au moment de commander.',
+  10000, null, 'rentree',
+  '[]'::jsonb, '[]'::jsonb, null, 'draft',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'mini-gourde', 'mini-gourde', 'Mini-gourde', 'Petite gourde isotherme à emporter. Plusieurs coloris : précisez celui que vous souhaitez, nous confirmons la disponibilité.',
+  0, null, 'rentree',
+  '[]'::jsonb, '[]'::jsonb, null, 'draft',
+  true, false,
+  true, null
 )
 on conflict (id) do update set
   slug = excluded.slug,

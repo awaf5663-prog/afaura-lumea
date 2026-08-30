@@ -1,5 +1,15 @@
 import type { Category, Product } from '@/src/types';
 
+import adaptateurUsb from '@/src/assets/products/adaptateur-usb.webp';
+import bicsSouligneurs from '@/src/assets/products/bics-souligneurs.webp';
+import blocNote from '@/src/assets/products/bloc-note.webp';
+import classeur from '@/src/assets/products/classeur.webp';
+import coqueTelephone from '@/src/assets/products/coque-telephone.webp';
+import gourde from '@/src/assets/products/gourde.webp';
+import miniGourde from '@/src/assets/products/mini-gourde.webp';
+import miroir from '@/src/assets/products/miroir.webp';
+import protecOrdinateur from '@/src/assets/products/protec-ordinateur.webp';
+import sacOrdinateur from '@/src/assets/products/sac-ordinateur.webp';
 import abayaBeigeLeopard from '@/src/assets/products/abaya-beige-leopard.webp';
 import abayaBleuDelave from '@/src/assets/products/abaya-bleu-delave.webp';
 import abayaBleuZebre from '@/src/assets/products/abaya-bleu-zebre.webp';
@@ -64,6 +74,7 @@ export const CATEGORIES: Category[] = [
   { id: 'jersey', name: 'Jersey' },
   { id: 'jersey_frise', name: 'Jersey frisé' },
   { id: 'hijab_tape', name: 'Hijab tape' },
+  { id: 'rentree', name: 'Rentrée' },
 ];
 
 /**
@@ -326,6 +337,179 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     createdAt: '2026-01-05T09:50:00.000Z',
+  },
+
+/*
+ * Rentrée. Prix et intitulés repris de la liste « FAC 🎓 » de la boutique.
+ * Deux articles sont en brouillon — donc invisibles sur le site — parce que
+ * leur prix n'était pas lisible sur la liste : le sac ordinateur, dont la
+ * ligne était coupée, et la mini-gourde, sans prix indiqué. La boutique les
+ * renseigne et les publie depuis /admin → Produits.
+ *
+ * Les visuels viennent des vignettes de la liste : environ 230 px d'origine,
+ * agrandis. À remplacer par de vraies photos dès que possible.
+ */
+  {
+    id: 'bics-souligneurs',
+    slug: 'bics-souligneurs',
+    name: 'Bics et souligneurs',
+    description:
+      "Un lot de stylos et de souligneurs pour la rentrée. Commandé pour vous et acheminé avec le prochain groupage.",
+    price: 550,
+    compareAtPrice: null,
+    category: 'rentree',
+    images: [bicsSouligneurs],
+    variants: [],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    createdAt: '2026-08-30T11:00:00.000Z',
+  },
+  {
+    id: 'classeur',
+    slug: 'classeur',
+    name: 'Classeur à soufflets',
+    description:
+      "Classeur à compartiments pour trier cours, feuilles et documents. Commandé pour vous et acheminé avec le prochain groupage.",
+    price: 1000,
+    compareAtPrice: null,
+    category: 'rentree',
+    images: [classeur],
+    variants: [],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    createdAt: '2026-08-30T11:01:00.000Z',
+  },
+  {
+    id: 'protec-ordinateur',
+    slug: 'protec-ordinateur',
+    name: 'Protection de clavier',
+    description:
+      "Film souple à poser sur le clavier de l’ordinateur, contre la poussière et les éclaboussures. Précisez le modèle de votre ordinateur au moment de commander.",
+    price: 1000,
+    compareAtPrice: null,
+    category: 'rentree',
+    images: [protecOrdinateur],
+    variants: [],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    createdAt: '2026-08-30T11:02:00.000Z',
+  },
+  {
+    id: 'coque-telephone',
+    slug: 'coque-telephone',
+    name: 'Coque de téléphone',
+    description:
+      "Coque transparente à motif. Précisez le modèle de votre téléphone au moment de commander : nous confirmons la disponibilité avant paiement.",
+    price: 1500,
+    compareAtPrice: null,
+    category: 'rentree',
+    images: [coqueTelephone],
+    variants: [],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    createdAt: '2026-08-30T11:03:00.000Z',
+  },
+  {
+    id: 'adaptateur-usb',
+    slug: 'adaptateur-usb',
+    name: 'Adaptateur USB',
+    description:
+      "Adaptateur pour brancher une clé USB ou un disque sur téléphone et tablette. Précisez le type de prise de votre appareil au moment de commander.",
+    price: 3000,
+    compareAtPrice: null,
+    category: 'rentree',
+    images: [adaptateurUsb],
+    variants: [],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    createdAt: '2026-08-30T11:04:00.000Z',
+  },
+  {
+    id: 'gourde',
+    slug: 'gourde',
+    name: 'Gourde',
+    description:
+      "Gourde isotherme pour la journée de cours. Plusieurs coloris : précisez celui que vous souhaitez, nous confirmons la disponibilité.",
+    price: 3500,
+    compareAtPrice: null,
+    category: 'rentree',
+    images: [gourde],
+    variants: [],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-08-30T11:05:00.000Z',
+  },
+  {
+    id: 'bloc-note',
+    slug: 'bloc-note',
+    name: 'Bloc-notes',
+    description:
+      "Carnet à spirale, couverture rigide gravée. Pour les cours, les listes ou le planning de la semaine.",
+    price: 4000,
+    compareAtPrice: null,
+    category: 'rentree',
+    images: [blocNote],
+    variants: [],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    createdAt: '2026-08-30T11:06:00.000Z',
+  },
+  {
+    id: 'miroir',
+    slug: 'miroir',
+    name: 'Miroir',
+    description:
+      "Petit miroir à poser, cadre ondulé. Pour le bureau, la chambre ou la table de chevet.",
+    price: 400,
+    compareAtPrice: null,
+    category: 'rentree',
+    images: [miroir],
+    variants: [],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    createdAt: '2026-08-30T11:07:00.000Z',
+  },
+  {
+    id: 'sac-ordinateur',
+    slug: 'sac-ordinateur',
+    name: 'Sac ordinateur',
+    description:
+      "Housse matelassée pour ordinateur portable. Précisez la taille de votre écran au moment de commander.",
+    price: 10000,
+    compareAtPrice: null,
+    category: 'rentree',
+    images: [sacOrdinateur],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    createdAt: '2026-08-30T11:08:00.000Z',
+  },
+  {
+    id: 'mini-gourde',
+    slug: 'mini-gourde',
+    name: 'Mini-gourde',
+    description:
+      "Petite gourde isotherme à emporter. Plusieurs coloris : précisez celui que vous souhaitez, nous confirmons la disponibilité.",
+    price: 0,
+    compareAtPrice: null,
+    category: 'rentree',
+    images: [miniGourde],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-08-30T11:09:00.000Z',
   },
 ];
 

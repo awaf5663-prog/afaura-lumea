@@ -92,14 +92,16 @@ export const CATEGORIES: Category[] = [
   { id: 'jersey_frise', name: 'Jersey frisé' },
   { id: 'hijab_tape', name: 'Hijab tape' },
   /*
-   * Photos carrées, montrées en entier : ce sont des articles posés sur fond
-   * neutre. Recadrés en portrait, la gourde perdait son bouchon et le sac
-   * ordinateur sa bandoulière.
+   * Cadre portrait, comme les voiles. On a essayé le carré « photo entière » :
+   * les photos de la boutique sont des captures d'écran bordées de bandes
+   * noires, et le carré les montrait justement en entier. Le portrait les
+   * recadre, et c'est ce qu'on veut ici.
    */
-  { id: 'rentree', name: 'Rentrée', photo: 'carre' },
+  { id: 'rentree', name: 'Rentrée' },
   /*
-   * Prêt-à-porter vendu par lots. Chaque photo montre une tenue du lot, sur le
-   * fond beige des visuels : cadre carré, vue entière, comme la rentrée.
+   * Prêt-à-porter vendu par lots. Chaque photo montre une tenue du lot,
+   * détourée sur le fond beige des visuels : cadre carré et vue entière, pour
+   * qu'un pantalon long ne soit pas coupé aux chevilles.
    */
   { id: 'packs', name: 'Packs', photo: 'carre' },
 ];

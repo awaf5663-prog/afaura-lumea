@@ -68,7 +68,7 @@ export function ProductCard({ product, priority }: { product: Product; priority?
           <Link to={`/produit/${product.slug}`}>
             <h3 className="line-clamp-2 font-display text-[17px] leading-tight">{product.name}</h3>
           </Link>
-          <span className="mt-1 flex items-baseline gap-1.5">
+          <span className="mt-1 flex items-baseline gap-1.5 whitespace-nowrap">
             {aPlusieursPrix && <span className="text-[12.5px] text-stone">dès</span>}
             <Price
               amount={prixLePlusBas(product)}

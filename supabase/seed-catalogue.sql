@@ -9,7 +9,7 @@
 --  et les photos déjà téléversées depuis l'admin ne sont jamais écrasées.
 -- ═══════════════════════════════════════════════════════════════════
 
--- Catégories du catalogue : Abaya, Pièce unique, Viscose premium, Voile MJ, Modal imprimé, Modal simple, Satin imprimé, Dentelle, Jersey, Jersey frisé, Hijab tape, Rentrée
+-- Catégories du catalogue : Abaya, Pièce unique, Viscose premium, Voile MJ, Modal imprimé, Modal simple, Satin imprimé, Dentelle, Jersey, Jersey frisé, Hijab tape, Rentrée, Packs
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
@@ -479,6 +479,143 @@ insert into products (
   'mini-gourde', 'mini-gourde', 'Mini-gourde', 'Petite gourde isotherme à emporter. Plusieurs coloris : précisez celui que vous souhaitez, nous confirmons la disponibilité.',
   0, null, 'rentree',
   '[]'::jsonb, '[{"name":"Couleur","options":["Crème","Rose poudré","Lilas"]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'pack-8-tops-flare', 'pack-8-tops-flare', 'Pack 8 — Tops drapés & flare', 'Trois tenues : top asymétrique drapé à pan tombant, et pantalon flare taille haute à boucle dorée.
+(1) Bold & Sleek — noir. Existe aussi en crème et bordeaux.
+(2) Soft & Flow — blanc. Existe aussi en marron, crème, bordeaux et noir.
+(3) Wild & Chic — top léopard, pantalon crème. Existe aussi en noir, crème, orange et marron.
+Choisissez la tenue ci-dessus. Pour un coloris absent des photos, dites-le nous : nous confirmons la disponibilité avant paiement.',
+  0, null, 'packs',
+  '[]'::jsonb, '[{"name":"Tenue","options":["Bold & Sleek","Soft & Flow","Wild & Chic"]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'pack-8-tshirts-jupes', 'pack-8-tshirts-jupes', 'Pack 8 — T-shirts, flare & jupes', 'Trois tenues : haut ajusté drapé, avec pantalon flare ou jupe sirène.
+(1) Bold & Sleek — t-shirt drapé noir ou bordeaux, pantalon flare crème, bordeaux ou noir ; jupe assortie disponible.
+(2) Soft & Flow — haut col montant blanc ou noir, jupe sirène léopard, marron ou noire.
+(3) Sweet & Feminine — haut blanc, rose ou fleuri, jupe sirène léopard, fleurie ou rose.
+Choisissez la tenue ci-dessus. Pour un coloris absent des photos, dites-le nous : nous confirmons la disponibilité avant paiement.',
+  0, null, 'packs',
+  '[]'::jsonb, '[{"name":"Tenue","options":["Bold & Sleek","Soft & Flow","Sweet & Feminine"]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'pack-7', 'pack-7', 'Pack 7 — Chemises & jean', 'Trois tenues autour du jean.
+(1) Soft Pink Chic — chemise rayée rose froncée, jean large brodé de fleurs. Chemise aussi en beige, blanc et rose.
+(2) Sunny Yellow Vibes — chemise jaune, débardeur blanc, bermuda en jean. Chemise aussi en rayé rose et rayé noir.
+(3) Clean & Sweet — haut rose à col carré, jean large brodé. Haut aussi en blanc, bleu ciel et noir.
+Choisissez la tenue ci-dessus. Pour un coloris absent des photos, dites-le nous : nous confirmons la disponibilité avant paiement.',
+  0, null, 'packs',
+  '[]'::jsonb, '[{"name":"Tenue","options":["Soft Pink Chic","Sunny Yellow Vibes","Clean & Sweet"]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'pack-5-ensembles', 'pack-5-ensembles', 'Pack 5 — Ensembles chic', 'Trois ensembles assortis, deux pièces chacun.
+(1) Chemise blanche à nouer, pantalon large coffee brown.
+(2) Chemise marron à carreaux, pantalon large noir.
+(3) Ensemble bleu : top et jupe fluide fendue.
+Choisissez l''ensemble ci-dessus. Pour un coloris absent des photos, dites-le nous : nous confirmons la disponibilité avant paiement.',
+  0, null, 'packs',
+  '[]'::jsonb, '[{"name":"Ensemble","options":["Chemise blanche + pantalon marron","Chemise à carreaux + pantalon noir","Ensemble bleu top + jupe"]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'pack-5-tshirts', 'pack-5-tshirts', 'Pack 5 — T-shirts sport', 'Cinq trios de t-shirts imprimés, esprit varsity et sport américain.
+(1) NY Varsity — New York marine, 80 rose, Brooklyn blanc.
+(2) Legendary 01 — 01 rose, California crème, Chicago noir.
+(3) Vintage Sport — 01 bordeaux, 98 marron, 23 léopard.
+(4) Athletic Chic — Los Angeles 91 noir, California 08 rose, Hawaii 86 blanc.
+(5) Retro Racing — Switch 07 noir, Speedway 23 rose, Racing 07 noir.
+Choisissez le trio ci-dessus. Pour un modèle absent des photos, dites-le nous : nous confirmons la disponibilité avant paiement.',
+  0, null, 'packs',
+  '[]'::jsonb, '[{"name":"Trio","options":["NY Varsity","Legendary 01","Vintage Sport","Athletic Chic","Retro Racing"]}]'::jsonb, '{}'::jsonb, null, 'draft',
   true, false,
   true, null
 )

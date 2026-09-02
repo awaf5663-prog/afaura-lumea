@@ -8,6 +8,23 @@ import coqueTelephone from '@/src/assets/products/coque-telephone.webp';
 import gourde from '@/src/assets/products/gourde.webp';
 import miniGourde from '@/src/assets/products/mini-gourde.webp';
 import miroir from '@/src/assets/products/miroir.webp';
+import pack5ens1 from '@/src/assets/products/pack5ens-1.webp';
+import pack5ens2 from '@/src/assets/products/pack5ens-2.webp';
+import pack5ens3 from '@/src/assets/products/pack5ens-3.webp';
+import pack5ts1 from '@/src/assets/products/pack5ts-1.webp';
+import pack5ts2 from '@/src/assets/products/pack5ts-2.webp';
+import pack5ts3 from '@/src/assets/products/pack5ts-3.webp';
+import pack5ts4 from '@/src/assets/products/pack5ts-4.webp';
+import pack5ts5 from '@/src/assets/products/pack5ts-5.webp';
+import pack71 from '@/src/assets/products/pack7-1.webp';
+import pack72 from '@/src/assets/products/pack7-2.webp';
+import pack73 from '@/src/assets/products/pack7-3.webp';
+import pack8a1 from '@/src/assets/products/pack8a-1.webp';
+import pack8a2 from '@/src/assets/products/pack8a-2.webp';
+import pack8a3 from '@/src/assets/products/pack8a-3.webp';
+import pack8b1 from '@/src/assets/products/pack8b-1.webp';
+import pack8b2 from '@/src/assets/products/pack8b-2.webp';
+import pack8b3 from '@/src/assets/products/pack8b-3.webp';
 import protecOrdinateur from '@/src/assets/products/protec-ordinateur.webp';
 import sacOrdinateur from '@/src/assets/products/sac-ordinateur.webp';
 import abayaBeigeLeopard from '@/src/assets/products/abaya-beige-leopard.webp';
@@ -80,6 +97,11 @@ export const CATEGORIES: Category[] = [
    * ordinateur sa bandoulière.
    */
   { id: 'rentree', name: 'Rentrée', photo: 'carre' },
+  /*
+   * Prêt-à-porter vendu par lots. Chaque photo montre une tenue du lot, sur le
+   * fond beige des visuels : cadre carré, vue entière, comme la rentrée.
+   */
+  { id: 'packs', name: 'Packs', photo: 'carre' },
 ];
 
 /**
@@ -515,6 +537,116 @@ export const SEED_PRODUCTS: Product[] = [
     isNew: true,
     otherColorsAvailable: true,
     createdAt: '2026-08-30T11:09:00.000Z',
+  },
+  /*
+   * Packs de prêt-à-porter, repris des visuels de la boutique. Une photo par
+   * tenue, dans l'ordre des tenues : la galerie choisit alors la tenue, et
+   * chacune peut porter son propre prix (voir lib/optionPrice).
+   *
+   * Livrés en brouillon, à 0 FCFA : les prix ne sont pas encore arrêtés et on
+   * n'en invente pas. Ils restent invisibles pour les clientes tant que la
+   * boutique ne les a pas fixés depuis l'administration.
+   */
+  {
+    id: 'pack-8-tops-flare',
+    slug: 'pack-8-tops-flare',
+    name: 'Pack 8 — Tops drapés & flare',
+    description:
+      "Trois tenues : top asymétrique drapé à pan tombant, et pantalon flare taille haute à boucle dorée.\n(1) Bold & Sleek — noir. Existe aussi en crème et bordeaux.\n(2) Soft & Flow — blanc. Existe aussi en marron, crème, bordeaux et noir.\n(3) Wild & Chic — top léopard, pantalon crème. Existe aussi en noir, crème, orange et marron.\nChoisissez la tenue ci-dessus. Pour un coloris absent des photos, dites-le nous : nous confirmons la disponibilité avant paiement.",
+    price: 0,
+    compareAtPrice: null,
+    category: 'packs',
+    images: [pack8a1, pack8a2, pack8a3],
+    variants: [{ name: 'Tenue', options: ['Bold & Sleek', 'Soft & Flow', 'Wild & Chic'] }],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-02T11:00:00.000Z',
+  },
+  {
+    id: 'pack-8-tshirts-jupes',
+    slug: 'pack-8-tshirts-jupes',
+    name: 'Pack 8 — T-shirts, flare & jupes',
+    description:
+      "Trois tenues : haut ajusté drapé, avec pantalon flare ou jupe sirène.\n(1) Bold & Sleek — t-shirt drapé noir ou bordeaux, pantalon flare crème, bordeaux ou noir ; jupe assortie disponible.\n(2) Soft & Flow — haut col montant blanc ou noir, jupe sirène léopard, marron ou noire.\n(3) Sweet & Feminine — haut blanc, rose ou fleuri, jupe sirène léopard, fleurie ou rose.\nChoisissez la tenue ci-dessus. Pour un coloris absent des photos, dites-le nous : nous confirmons la disponibilité avant paiement.",
+    price: 0,
+    compareAtPrice: null,
+    category: 'packs',
+    images: [pack8b1, pack8b2, pack8b3],
+    variants: [{ name: 'Tenue', options: ['Bold & Sleek', 'Soft & Flow', 'Sweet & Feminine'] }],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-02T11:01:00.000Z',
+  },
+  {
+    id: 'pack-7',
+    slug: 'pack-7',
+    name: 'Pack 7 — Chemises & jean',
+    description:
+      "Trois tenues autour du jean.\n(1) Soft Pink Chic — chemise rayée rose froncée, jean large brodé de fleurs. Chemise aussi en beige, blanc et rose.\n(2) Sunny Yellow Vibes — chemise jaune, débardeur blanc, bermuda en jean. Chemise aussi en rayé rose et rayé noir.\n(3) Clean & Sweet — haut rose à col carré, jean large brodé. Haut aussi en blanc, bleu ciel et noir.\nChoisissez la tenue ci-dessus. Pour un coloris absent des photos, dites-le nous : nous confirmons la disponibilité avant paiement.",
+    price: 0,
+    compareAtPrice: null,
+    category: 'packs',
+    images: [pack71, pack72, pack73],
+    variants: [
+      { name: 'Tenue', options: ['Soft Pink Chic', 'Sunny Yellow Vibes', 'Clean & Sweet'] },
+    ],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-02T11:02:00.000Z',
+  },
+  {
+    id: 'pack-5-ensembles',
+    slug: 'pack-5-ensembles',
+    name: 'Pack 5 — Ensembles chic',
+    description:
+      "Trois ensembles assortis, deux pièces chacun.\n(1) Chemise blanche à nouer, pantalon large coffee brown.\n(2) Chemise marron à carreaux, pantalon large noir.\n(3) Ensemble bleu : top et jupe fluide fendue.\nChoisissez l'ensemble ci-dessus. Pour un coloris absent des photos, dites-le nous : nous confirmons la disponibilité avant paiement.",
+    price: 0,
+    compareAtPrice: null,
+    category: 'packs',
+    images: [pack5ens1, pack5ens2, pack5ens3],
+    variants: [
+      {
+        name: 'Ensemble',
+        options: [
+          'Chemise blanche + pantalon marron',
+          'Chemise à carreaux + pantalon noir',
+          'Ensemble bleu top + jupe',
+        ],
+      },
+    ],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-02T11:03:00.000Z',
+  },
+  {
+    id: 'pack-5-tshirts',
+    slug: 'pack-5-tshirts',
+    name: 'Pack 5 — T-shirts sport',
+    description:
+      "Cinq trios de t-shirts imprimés, esprit varsity et sport américain.\n(1) NY Varsity — New York marine, 80 rose, Brooklyn blanc.\n(2) Legendary 01 — 01 rose, California crème, Chicago noir.\n(3) Vintage Sport — 01 bordeaux, 98 marron, 23 léopard.\n(4) Athletic Chic — Los Angeles 91 noir, California 08 rose, Hawaii 86 blanc.\n(5) Retro Racing — Switch 07 noir, Speedway 23 rose, Racing 07 noir.\nChoisissez le trio ci-dessus. Pour un modèle absent des photos, dites-le nous : nous confirmons la disponibilité avant paiement.",
+    price: 0,
+    compareAtPrice: null,
+    category: 'packs',
+    images: [pack5ts1, pack5ts2, pack5ts3, pack5ts4, pack5ts5],
+    variants: [
+      {
+        name: 'Trio',
+        options: ['NY Varsity', 'Legendary 01', 'Vintage Sport', 'Athletic Chic', 'Retro Racing'],
+      },
+    ],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-02T11:04:00.000Z',
   },
 ];
 

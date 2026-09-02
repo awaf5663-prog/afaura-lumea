@@ -11,7 +11,6 @@ import {
   DEFAULT_ALERT_THRESHOLDS,
   DEFAULT_PRICING,
   DEFAULT_PROMOTIONS,
-  DEFAULT_STORE_FEE_TIERS,
 } from '@/src/config/pricing';
 import { normalizeSettings } from './settingsShape';
 import { SEED_IMAGES, SEED_PRODUCTS } from '@/src/data/seed';
@@ -44,7 +43,6 @@ function defaultSettings(): StoreSettings {
     orangeMoneyNumber: ORANGE_MONEY_NUMBER,
     deliveryFees: Object.fromEntries(DELIVERY_ZONES.map((z) => [z.id, z.fee])),
     announcement: '',
-    storeFeeTiers: DEFAULT_STORE_FEE_TIERS,
     pricing: DEFAULT_PRICING,
     alertThresholds: DEFAULT_ALERT_THRESHOLDS,
     promotions: DEFAULT_PROMOTIONS,
@@ -156,7 +154,7 @@ export const localAdapter: DataSource = {
     const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
     // Frais de traitement : relus dans la grille des réglages, jamais reçus
     // du navigateur. Voir lib/pricing/storeFee.
-    const serviceFee = fraisBoutique(nombreArticles(items), settings.storeFeeTiers ?? []);
+    const serviceFee = fraisBoutique(nombreArticles(items), settings.pricing?.tiers ?? []);
 
     // Les offres sont appliquées ici, à partir des règles enregistrées : le
     // navigateur ne transmet qu'un code et une déclaration, jamais un montant.

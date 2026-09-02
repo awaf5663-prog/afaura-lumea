@@ -224,7 +224,7 @@ begin
 
   select (delivery_fees ->> p_delivery_zone_id)::integer,
          coalesce(promotions, '[]'::jsonb),
-         coalesce(store_fee_tiers, '[]'::jsonb)
+         coalesce(pricing -> 'tiers', '[]'::jsonb)
     into v_fee, v_promotions, v_tiers
     from settings where id = 1;
   v_label := p_delivery_zone_id;
@@ -1144,14 +1144,15 @@ revoke execute on function prix_option(products, jsonb) from public;
 
 
 -- ── 10. Frais de traitement des commandes de la boutique ─────────────
--- Au-delà d'un certain nombre d'articles, préparer et acheminer une commande
--- demande un travail que le prix des pièces ne couvre pas. La grille se règle
--- depuis Administration → Tarification ; vide, aucun frais n'est appliqué.
+-- Préparer et acheminer une commande demande un travail que le prix des
+-- pièces ne couvre pas. Les commandes de la boutique portent donc les mêmes
+-- frais que les demandes SHEIN, d'après LA GRILLE DÉJÀ RÉGLÉE dans
+-- Administration → Tarification (« Tranches par nombre d'articles »).
 --
+-- Une seule grille pour les deux services : rien de nouveau à saisir.
 -- Comme tous les montants du site : calculé ICI, jamais reçu du navigateur.
 
-alter table settings add column if not exists store_fee_tiers jsonb not null default '[]'::jsonb;
-alter table orders   add column if not exists service_fee integer not null default 0;
+alter table orders add column if not exists service_fee integer not null default 0;
 
 create or replace function frais_boutique(p_articles integer, p_tiers jsonb)
 returns integer
@@ -1169,6 +1170,7 @@ begin
 
   -- Première tranche qui contient ce nombre d'articles, dans l'ordre de la
   -- grille : c'est aussi la règle appliquée à l'affichage (lib/pricing/storeFee).
+  -- La grille est celle de Tarification, partagée avec le devis SHEIN.
   for v_tranche in select * from jsonb_array_elements(p_tiers) loop
     v_min := coalesce((v_tranche ->> 'minItems')::integer, 1);
     v_max := v_tranche -> 'maxItems';

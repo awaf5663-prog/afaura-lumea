@@ -94,13 +94,13 @@ export function CheckoutPage() {
     promotion?.effect.type === 'free_delivery' && rawDeliveryFee !== null && rawDeliveryFee > 0;
   const deliveryFee = freeDelivery ? 0 : rawDeliveryFee;
   /*
-   * Frais de traitement au-delà d'un certain nombre d'articles. La grille vient
-   * des réglages : rien n'est écrit en dur ici, et c'est la base de données qui
-   * recalcule ce montant à l'enregistrement. Ce que la cliente lit ici n'est
-   * qu'un aperçu fidèle.
+   * Frais de traitement, d'après la grille de Administration → Tarification :
+   * la même que pour SHEIN, rien n'est écrit en dur ici. C'est la base de
+   * données qui recalcule ce montant à l'enregistrement ; ce que la cliente
+   * lit ici n'en est qu'un aperçu fidèle.
    */
   const articles = nombreArticles(items);
-  const serviceFee = fraisBoutique(articles, settings?.storeFeeTiers ?? []);
+  const serviceFee = fraisBoutique(articles, settings?.pricing?.tiers ?? []);
   const discount =
     promotion?.effect.type === 'discount_amount'
       ? Math.min(Math.max(0, promotion.effect.amount), subtotal + serviceFee + (rawDeliveryFee ?? 0))

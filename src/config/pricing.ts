@@ -1,4 +1,4 @@
-import type { AlertThresholds, PricingConfig, Promotion, ServiceFeeTier } from '@/src/types';
+import type { AlertThresholds, PricingConfig, Promotion } from '@/src/types';
 
 /**
  * ─────────────────────────────────────────────────────────────
@@ -13,24 +13,14 @@ import type { AlertThresholds, PricingConfig, Promotion, ServiceFeeTier } from '
  *  distincts du prix des articles facturés par SHEIN.
  */
 
-/**
- * Frais de traitement des commandes de la BOUTIQUE, par tranche d'articles.
- *
- * Valeur de départ, modifiable depuis /admin → Tarification comme tout le
- * reste. Elle reprend la règle de la boutique : au-delà de dix articles, la
- * préparation demande un travail que le prix des pièces ne couvre pas.
- *
- * Liste vide = aucun frais. Les unités comptent, pas les lignes : douze
- * cahiers font douze articles.
- */
-export const DEFAULT_STORE_FEE_TIERS: ServiceFeeTier[] = [
-  { id: 'boutique-11', minItems: 11, maxItems: null, fee: 2500 },
-];
-
 export const DEFAULT_PRICING: PricingConfig = {
   strategy: 'item_tiers',
 
-  /** Frais de traitement par tranche de nombre d'articles. */
+  /**
+   * Frais de traitement par tranche de nombre d'articles. UNE SEULE grille,
+   * pour les demandes SHEIN comme pour les commandes de la boutique : c'est
+   * le même travail de préparation.
+   */
   tiers: [
     { id: 't1', minItems: 1, maxItems: 3, fee: 2000 },
     { id: 't2', minItems: 4, maxItems: 6, fee: 2500 },

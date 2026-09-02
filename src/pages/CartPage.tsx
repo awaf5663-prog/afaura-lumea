@@ -18,10 +18,10 @@ export function CartPage() {
 
   /*
    * Le même calcul qu'à la validation, pour que le montant ne surgisse pas à la
-   * dernière étape. La grille vient des réglages, et la base recalcule tout à
-   * l'enregistrement : cet aperçu ne décide de rien.
+   * dernière étape. La grille est celle de Tarification, et la base recalcule
+   * tout à l'enregistrement : cet aperçu ne décide de rien.
    */
-  const serviceFee = fraisBoutique(count, settings?.storeFeeTiers ?? []);
+  const serviceFee = fraisBoutique(count, settings?.pricing?.tiers ?? []);
 
   useSeo({
     title: 'Mon panier',

@@ -3,9 +3,9 @@ import type { ServiceFeeTier } from '@/src/types';
 /**
  * Frais de traitement d'une commande de la boutique.
  *
- * Même grille que le devis SHEIN, appliquée aux commandes de la boutique :
- * au-delà d'un certain nombre d'articles, préparer et acheminer la commande
- * demande un travail que le prix des articles ne couvre pas.
+ * La grille est CELLE DÉJÀ RÉGLÉE dans Administration → Tarification
+ * (`PricingConfig.tiers`) : une seule grille pour la boutique et pour SHEIN,
+ * jamais deux à tenir à jour.
  *
  * Cette fonction reproduit exactement `frais_boutique` en SQL. Elle sert à
  * ANNONCER le montant à la cliente ; celui qui est facturé est recalculé par

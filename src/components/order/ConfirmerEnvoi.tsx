@@ -1,4 +1,4 @@
-import { AlertTriangle, Phone } from 'lucide-react';
+import { AlertTriangle, Phone, Ruler } from 'lucide-react';
 import { Button } from '@/src/components/ui/Button';
 import { Sheet } from '@/src/components/ui/Sheet';
 
@@ -30,6 +30,7 @@ export function ConfirmerEnvoi({
   busy,
   lignes,
   action,
+  rappel,
 }: {
   open: boolean;
   onClose: () => void;
@@ -38,6 +39,11 @@ export function ConfirmerEnvoi({
   lignes: LigneRecap[];
   /** Libellé du bouton qui envoie pour de bon. */
   action: string;
+  /**
+   * Rappel supplémentaire, affiché sous le numéro. Sert à la taille : un
+   * vêtement commandé pour vous ne se ré-essaie pas avant d'arriver.
+   */
+  rappel?: string;
 }) {
   return (
     <Sheet
@@ -64,6 +70,13 @@ export function ConfirmerEnvoi({
           pouvons plus vous joindre.
         </span>
       </p>
+
+      {rappel && (
+        <p className="mt-3 flex gap-2.5 rounded-[--radius-md] bg-cream/70 px-4 py-3 text-[12.5px] leading-relaxed text-graphite">
+          <Ruler className="mt-0.5 size-4 shrink-0 text-mauve" strokeWidth={1.8} />
+          <span>{rappel}</span>
+        </p>
+      )}
 
       <dl className="mt-4 divide-y divide-line">
         {lignes.map((ligne) => (

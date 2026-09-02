@@ -1,5 +1,6 @@
 import { AlertCircle, ImagePlus, Plus, Trash2, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { RappelMesures } from '@/src/components/guide/GuideMesures';
 import { GroupingCapacity } from '@/src/components/shein/GroupingCapacity';
 import { ConfirmerEnvoi, type LigneRecap } from '@/src/components/order/ConfirmerEnvoi';
 import { PromoCodeField } from '@/src/components/order/PromoCodeField';
@@ -570,6 +571,10 @@ export function SheinRequestPage() {
             )}
 
             <div className="mt-6">
+              <RappelMesures contexte="shein" />
+            </div>
+
+            <div className="mt-4">
               <Button type="submit" size="lg" full loading={submitting}>
                 Envoyer ma demande
               </Button>
@@ -596,6 +601,7 @@ export function SheinRequestPage() {
         busy={submitting}
         lignes={recapitulatif}
         action="Oui, envoyer ma demande"
+        rappel="Vérifiez les tailles saisies : elles varient beaucoup d'un article SHEIN à l'autre, et un article commandé ne s'échange pas. Le guide des mesures est sur la page, au-dessus du bouton d'envoi."
       />
     </form>
   );

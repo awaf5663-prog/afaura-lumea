@@ -1,6 +1,7 @@
 import { AlertCircle, Info, Lock, MessageCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { ConfirmerEnvoi, type LigneRecap } from '@/src/components/order/ConfirmerEnvoi';
+import { RappelMesures } from '@/src/components/guide/GuideMesures';
 import { PromoCodeField } from '@/src/components/order/PromoCodeField';
 import { PromotionNotice } from '@/src/components/shein/PromotionNotice';
 import { Button } from '@/src/components/ui/Button';
@@ -518,7 +519,11 @@ export function CheckoutPage() {
               </p>
             )}
 
-            <Button type="submit" full size="lg" className="mt-6" loading={submitting}>
+            <div className="mt-6">
+              <RappelMesures contexte="boutique" />
+            </div>
+
+            <Button type="submit" full size="lg" className="mt-4" loading={submitting}>
               <MessageCircle className="size-4" />
               Envoyer ma commande sur WhatsApp
             </Button>
@@ -547,6 +552,7 @@ export function CheckoutPage() {
         busy={submitting}
         lignes={recapitulatif}
         action="Oui, envoyer ma commande"
+        rappel="Vérifiez aussi la taille choisie : la pièce est commandée pour vous, elle ne s'essaie pas avant d'arriver. Le guide des mesures est sur la page, sous le récapitulatif."
       />
     </form>
   );

@@ -1,6 +1,13 @@
-import { Info, Ruler } from 'lucide-react';
+import { Info, Ruler, Sparkles } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { WhatsAppLink } from '@/src/components/whatsapp/WhatsAppLink';
+import { RAPPEL_MESURES } from '@/src/config/morphologies';
+import {
+  AFFICHE_MESURES,
+  AFFICHE_MORPHOLOGIES,
+  Affiche,
+  LesMorphologies,
+} from '@/src/components/guide/GuideMesures';
 import { FormRow, Input, Label } from '@/src/components/ui/Field';
 import { cn } from '@/src/lib/cn';
 import { useSeo } from '@/src/lib/seo';
@@ -32,9 +39,9 @@ export function SizeGuidePage() {
   const [weight, setWeight] = useState('');
 
   useSeo({
-    title: 'Guide des tailles',
+    title: 'Guide des tailles et des morphologies',
     description:
-      'Trouvez votre taille de haut, de pantalon et de robe à partir de vos mesures, ou de votre taille et votre poids.',
+      'Prenez vos mesures, identifiez votre morphologie, et trouvez votre taille de haut, de pantalon et de robe.',
   });
 
   const mesures = {
@@ -62,7 +69,8 @@ export function SizeGuidePage() {
         <h1 className="mt-2 text-[34px] sm:text-[42px]">Trouver ma taille</h1>
         <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-graphite">
           Deux façons de faire : avec un mètre ruban, c'est fiable. Sans mètre ruban, votre taille
-          et votre poids donnent une première idée.
+          et votre poids donnent une première idée. Plus bas, le guide des mesures et celui des
+          morphologies.
         </p>
 
         {/* ── Avertissement, affiché avant tout résultat ──────── */}
@@ -229,6 +237,38 @@ export function SizeGuidePage() {
             Pas de mètre ruban ? Un fil ou une bande de tissu fait l'affaire : entourez, marquez au
             stylo, puis mesurez le fil contre une règle.
           </p>
+          <p className="mt-3 rounded-[--radius-sm] bg-cream/70 px-3.5 py-2.5 text-[12.5px] leading-relaxed text-graphite">
+            <strong className="font-medium">Rappel.</strong> {RAPPEL_MESURES}
+          </p>
+
+          <div className="mt-5">
+            <Affiche
+              src={AFFICHE_MESURES}
+              alt="Guide des mesures Afaura Luméa : buste, taille et hanches, avec la façon de placer le mètre."
+              legende="Guide des mesures"
+            />
+          </div>
+        </section>
+
+        {/* ── Morphologies ────────────────────────────────────── */}
+        <section className="mt-10">
+          <h2 className="flex items-center gap-2 text-[24px]">
+            <Sparkles className="size-5 text-mauve" strokeWidth={1.8} /> Ma morphologie
+          </h2>
+          <p className="mt-1.5 text-[12.5px] leading-relaxed text-stone">
+            Une morphologie n'est ni une taille ni une règle : c'est une aide au choix. Aucune ne
+            vaut mieux qu'une autre, et rien ici ne conditionne une commande.
+          </p>
+          <div className="mt-4">
+            <LesMorphologies />
+          </div>
+          <div className="mt-5">
+            <Affiche
+              src={AFFICHE_MORPHOLOGIES}
+              alt="Guide des morphologies Afaura Luméa : sablier, triangle, ronde, rectangle et triangle inversé, avec un conseil de style pour chacune."
+              legende="Guide des morphologies"
+            />
+          </div>
         </section>
 
         {/* ── Le tableau complet ──────────────────────────────── */}

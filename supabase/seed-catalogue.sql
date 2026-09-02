@@ -292,6 +292,30 @@ insert into products (
   images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
+  'bic-gel', 'bic-gel', 'Bic', 'Stylo gel à encre à séchage rapide, pointe 0,5 mm. Bleu ou rouge : précisez la couleur au moment de commander.
+Prix à l''unité — la photo montre la boîte de 6, mais chaque stylo se commande séparément.',
+  100, null, 'rentree',
+  '[]'::jsonb, '[{"name":"Couleur","options":["Bleu","Rouge"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
   'classeur', 'classeur', 'Classeur à soufflets', 'Classeur à compartiments pour trier cours, feuilles et documents, coloris rose. Planche d''étiquettes de couleur fournie.',
   1000, null, 'rentree',
   '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',

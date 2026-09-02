@@ -1,6 +1,7 @@
 import type { Category, Product } from '@/src/types';
 
 import adaptateurUsb from '@/src/assets/products/adaptateur-usb.webp';
+import bicGel from '@/src/assets/products/bic-gel.webp';
 import bicsSouligneurs from '@/src/assets/products/bics-souligneurs.webp';
 import blocNote from '@/src/assets/products/bloc-note.webp';
 import classeur from '@/src/assets/products/classeur.webp';
@@ -393,6 +394,24 @@ export const SEED_PRODUCTS: Product[] = [
     status: 'active',
     isNew: true,
     createdAt: '2026-08-30T11:00:00.000Z',
+  },
+  {
+    id: 'bic-gel',
+    slug: 'bic-gel',
+    name: 'Bic',
+    description:
+      "Stylo gel à encre à séchage rapide, pointe 0,5 mm. Bleu ou rouge : précisez la couleur au moment de commander.\nPrix à l'unité — la photo montre la boîte de 6, mais chaque stylo se commande séparément.",
+    price: 100,
+    compareAtPrice: null,
+    category: 'rentree',
+    // Une seule photo, celle du rouge : le bleu n'a pas encore été photographié.
+    // Deux couleurs pour une photo, donc la galerie ne prétend pas les accorder.
+    images: [bicGel],
+    variants: [{ name: 'Couleur', options: ['Bleu', 'Rouge'] }],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    createdAt: '2026-09-02T12:50:00.000Z',
   },
   {
     id: 'classeur',

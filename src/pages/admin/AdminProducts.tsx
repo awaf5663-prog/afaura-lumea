@@ -1,5 +1,5 @@
 import { ImagePlus, Pencil, Plus, Trash2, X } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Badge } from '@/src/components/ui/Badge';
 import { Button } from '@/src/components/ui/Button';
 import { FormRow, Input, Label, Select, Textarea } from '@/src/components/ui/Field';
@@ -26,6 +26,8 @@ import { useToast } from '@/src/hooks/useToast';
 import { formatFcfa } from '@/src/lib/format';
 import { compressImage } from '@/src/lib/image';
 import { uid } from '@/src/lib/orderNumber';
+import { findPhotoGroup, photoOptionsOf } from '@/src/lib/variants';
+import { ecrireVariantes, lireVariantes } from '@/src/lib/variantText';
 import { db } from '@/src/services';
 import type { Product } from '@/src/types';
 
@@ -65,21 +67,30 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
 
   const openEditor = (product: Product) => {
     setEditing({ ...product });
-    setVariantText(
-      product.variants
-        .map((group) => {
-          const options = group.options.map((option) => {
-            const prix = product.optionPrices?.[group.name]?.[option];
-            // « Lot de 12 (1200) (épuisé) » : le prix propre à l'option, puis
-            // l'indisponibilité. Les deux marqueurs se cumulent.
-            const avecPrix = typeof prix === 'number' ? `${option} (${prix})` : option;
-            return (group.soldOutOptions ?? []).includes(option) ? `${avecPrix} (épuisé)` : avecPrix;
-          });
-          return `${group.name}: ${options.join(', ')}`;
-        })
-        .join('\n'),
-    );
+    setVariantText(ecrireVariantes(product.variants, product.optionPrices));
   };
+
+  /*
+   * Ce que le site comprendra du champ « Variantes », relu à chaque frappe.
+   *
+   * L'accord photo ↔ modèle est la seule chose qu'on ne peut pas deviner en
+   * lisant le texte : il dépend du nombre de photos. Autant le dire ici, au
+   * moment où elle tape, plutôt que de la laisser découvrir sur la fiche que
+   * la galerie ne suit pas.
+   */
+  const apercu = useMemo(() => {
+    if (!editing) return null;
+    const { groups, optionPrices } = lireVariantes(variantText);
+    if (groups.length === 0) return null;
+    const groupePhoto = findPhotoGroup({ ...editing, variants: groups });
+    return {
+      groups,
+      optionPrices,
+      photos: editing.images.length,
+      groupePhoto,
+      correspondance: groupePhoto ? photoOptionsOf(groupePhoto) : [],
+    };
+  }, [editing, variantText]);
 
   const save = async () => {
     if (!editing) return;
@@ -92,64 +103,27 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
      * et « Lot de 12 » n'ont pas le même prix. On les saisit dans le même
      * champ, entre parenthèses, plutôt que d'ajouter un deuxième tableau à
      * remplir. Le montant retenu à la commande reste celui que la base relit.
+     *
+     * Même lecture que l'aperçu affiché sous le champ : c'est la même
+     * fonction, donc ce qu'elle montre est exactement ce qui sera enregistré.
      */
-    const optionPrices: Record<string, Record<string, number>> = {};
+    const { groups, optionPrices } = lireVariantes(variantText);
 
-    const variants = variantText
-      .split('\n')
-      .map((line) => line.trim())
-      .filter(Boolean)
-      .map((line) => {
-        const [name, rawOptions = ''] = line.split(':');
-        const entries = rawOptions
-          .split(',')
-          .map((option) => option.trim())
-          .filter(Boolean);
-
-        const groupName = name.trim();
-        const options: string[] = [];
-        const soldOutOptions: string[] = [];
-
-        for (const entry of entries) {
-          // Deux marqueurs, dans n'importe quel ordre :
-          //   (épuisé) → retire le modèle de la vente sans le supprimer
-          //   (1200)   → prix propre à cette option, en FCFA
-          const epuise = /\(épuisé\)/i.test(entry);
-          const prix = /\((\d[\d\s]*)\)/.exec(entry);
-          const label = entry
-            .replace(/\(épuisé\)/gi, '')
-            .replace(/\(\d[\d\s]*\)/g, '')
-            .replace(/\s+/g, ' ')
-            .trim();
-          if (!label) continue;
-          options.push(label);
-          if (epuise) soldOutOptions.push(label);
-          if (prix) {
-            const montant = Number(prix[1].replace(/\s/g, ''));
-            if (Number.isFinite(montant) && montant >= 0) {
-              optionPrices[groupName] = { ...optionPrices[groupName], [label]: montant };
-            }
-          }
-        }
-
-        return { name: groupName, options, soldOutOptions };
-      })
-      .filter((group) => group.name && group.options.length > 0)
-      .map((group) => {
-        /*
-         * `photoOptions` (quelle photo montre quel modèle) ne s'édite pas dans
-         * ce champ texte : on le reprend tel quel sur le groupe existant, sinon
-         * modifier un simple libellé casserait la synchronisation galerie ↔
-         * modèle. On l'abandonne s'il ne colle plus — nombre de photos changé,
-         * ou modèle renommé ou supprimé.
-         */
-        const previous = editing.variants.find((g) => g.name === group.name)?.photoOptions;
-        const valid =
-          previous &&
-          previous.length === editing.images.length &&
-          previous.every((option) => group.options.includes(option));
-        return valid ? { ...group, photoOptions: previous } : group;
-      });
+    const variants = groups.map((group) => {
+      /*
+       * `photoOptions` (quelle photo montre quel modèle) ne s'édite pas dans
+       * ce champ texte : on le reprend tel quel sur le groupe existant, sinon
+       * modifier un simple libellé casserait la synchronisation galerie ↔
+       * modèle. On l'abandonne s'il ne colle plus — nombre de photos changé,
+       * ou modèle renommé ou supprimé.
+       */
+      const previous = editing.variants.find((g) => g.name === group.name)?.photoOptions;
+      const valid =
+        previous &&
+        previous.length === editing.images.length &&
+        previous.every((option) => group.options.includes(option));
+      return valid ? { ...group, photoOptions: previous } : group;
+    });
 
     setSaving(true);
     try {
@@ -397,13 +371,94 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
               />
               <p className="mt-1.5 text-[12px] leading-relaxed text-stone">
                 Ajoutez <span className="font-medium">(épuisé)</span> après un modèle vendu : il
-                reste visible, barré, mais ne peut plus être commandé. Si le groupe a autant
-                d'options que de photos, faire défiler la galerie sélectionne le modèle.
+                reste visible, barré, mais ne peut plus être commandé.
                 <br />
                 Un <span className="font-medium">nombre entre parenthèses</span> donne son propre
                 prix à l'option : <span className="font-medium">Lot de 12 (1200)</span>. Les autres
                 gardent le prix de l'article. La vignette affiche alors « dès… ».
               </p>
+
+              {apercu && (
+                <div className="mt-3 rounded-[--radius-md] border border-line bg-cream/70 p-3.5">
+                  <p className="text-[11px] uppercase tracking-[0.12em] text-stone">
+                    Ce que la fiche fera
+                  </p>
+
+                  {/* L'accord photo ↔ modèle, dit dans les deux sens. */}
+                  {apercu.groupePhoto ? (
+                    <>
+                      <p className="mt-2 text-[12.5px] leading-relaxed text-graphite">
+                        <span className="font-medium text-mauve">
+                          Chaque photo choisit son modèle.
+                        </span>{' '}
+                        La cliente fait défiler la galerie ou appuie sur une photo, et le modèle —
+                        donc son prix — suit.
+                      </p>
+                      <ul className="mt-2 space-y-1">
+                        {apercu.correspondance.map((option, index) => {
+                          const prix = apercu.optionPrices[apercu.groupePhoto!.name]?.[option];
+                          return (
+                            <li
+                              key={`${option}-${index}`}
+                              className="flex items-center gap-2.5 text-[12.5px] text-graphite"
+                            >
+                              {editing.images[index] ? (
+                                <img
+                                  src={editing.images[index]}
+                                  alt=""
+                                  className="size-9 shrink-0 rounded-[--radius-xs] bg-white object-cover"
+                                />
+                              ) : (
+                                <span className="size-9 shrink-0 rounded-[--radius-xs] bg-white" />
+                              )}
+                              <span className="min-w-0 flex-1">{option}</span>
+                              <span className="shrink-0 text-right tabular-nums">
+                                {formatFcfa(typeof prix === 'number' ? prix : editing.price)}
+                                {typeof prix !== 'number' && (
+                                  <span className="block text-[11px] text-stone">
+                                    prix de l'article
+                                  </span>
+                                )}
+                              </span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </>
+                  ) : (
+                    <p className="mt-2 text-[12.5px] leading-relaxed text-graphite">
+                      {apercu.photos === 0
+                        ? "Ajoutez des photos : avec autant de photos que de modèles dans un groupe, appuyer sur une photo choisira le modèle."
+                        : `Les photos ne choisissent pas le modèle : ${apercu.photos} photo${
+                            apercu.photos > 1 ? 's' : ''
+                          } pour ${apercu.groups
+                            .map((g) => `${g.options.length} dans « ${g.name} »`)
+                            .join(', ')}. Il en faut autant des deux côtés.`}
+                    </p>
+                  )}
+
+                  {/* Les prix des autres groupes, ceux qui ne suivent pas les photos. */}
+                  {apercu.groups
+                    .filter((group) => group.name !== apercu.groupePhoto?.name)
+                    .filter((group) => apercu.optionPrices[group.name])
+                    .map((group) => (
+                      <p
+                        key={group.name}
+                        className="mt-2 text-[12.5px] leading-relaxed text-graphite"
+                      >
+                        <span className="font-medium">{group.name}</span> :{' '}
+                        {group.options
+                          .map((option) => {
+                            const prix = apercu.optionPrices[group.name]?.[option];
+                            return typeof prix === 'number'
+                              ? `${option} ${formatFcfa(prix)}`
+                              : `${option} ${formatFcfa(editing.price)}`;
+                          })
+                          .join(' · ')}
+                      </p>
+                    ))}
+                </div>
+              )}
             </FormRow>
 
             <FormRow>

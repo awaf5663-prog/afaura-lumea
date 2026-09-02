@@ -1,4 +1,4 @@
-import { ImagePlus, Pencil, Plus, Trash2, X } from 'lucide-react';
+import { Crop, ImagePlus, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Badge } from '@/src/components/ui/Badge';
 import { Button } from '@/src/components/ui/Button';
@@ -24,7 +24,7 @@ const MESURES_ABAYA = [
 import { CATEGORIES } from '@/src/data/seed';
 import { useToast } from '@/src/hooks/useToast';
 import { formatFcfa } from '@/src/lib/format';
-import { compressImage } from '@/src/lib/image';
+import { compressImage, rognerCapture } from '@/src/lib/image';
 import { uid } from '@/src/lib/orderNumber';
 import { findPhotoGroup, photoOptionsOf } from '@/src/lib/variants';
 import { ecrireVariantes, lireVariantes } from '@/src/lib/variantText';
@@ -162,6 +162,33 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
       setEditing({ ...editing, images: [...editing.images, data] });
     } catch {
       notify("Cette image n'a pas pu être lue.", 'error');
+    }
+  };
+
+  /*
+   * Les captures téléversées avant que le rognage existe gardent leurs bandes
+   * noires et le bandeau de l'application. Ce bouton les reprend sur place,
+   * sans rien re-téléverser. Rien n'est enregistré tant qu'on n'a pas cliqué
+   * sur « Enregistrer » : la boutique voit d'abord le résultat.
+   */
+  const [recadrage, setRecadrage] = useState(false);
+  const recadrerPhotos = async () => {
+    if (!editing) return;
+    setRecadrage(true);
+    try {
+      const avant = editing.images;
+      const apres = await Promise.all(avant.map((src) => rognerCapture(src)));
+      const changees = apres.filter((src, i) => src !== avant[i]).length;
+      setEditing({ ...editing, images: apres });
+      notify(
+        changees === 0
+          ? 'Aucune bande à retirer sur ces photos.'
+          : `${changees} photo${changees > 1 ? 's' : ''} recadrée${changees > 1 ? 's' : ''}. Vérifiez, puis enregistrez.`,
+      );
+    } catch {
+      notify("Le recadrage n'a pas abouti.", 'error');
+    } finally {
+      setRecadrage(false);
     }
   };
 
@@ -489,6 +516,26 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
                   />
                 </label>
               </div>
+
+              {editing.images.length > 0 && (
+                <div className="mt-2.5">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    icon={<Crop className="size-4" />}
+                    disabled={recadrage}
+                    onClick={() => void recadrerPhotos()}
+                  >
+                    {recadrage ? 'Recadrage…' : 'Retirer les bandes de capture'}
+                  </Button>
+                  <p className="mt-1.5 text-[12px] leading-relaxed text-stone">
+                    Une capture d'écran garde la barre d'état, les bandes noires et le bouton de
+                    l'application autour de la photo. Ce bouton ne garde que la photo. Les nouvelles
+                    photos sont recadrées toutes seules ; celui-ci sert à reprendre les anciennes.
+                    Vérifiez le résultat avant d'enregistrer.
+                  </p>
+                </div>
+              )}
             </FormRow>
 
             <div className="flex flex-wrap gap-5 pt-1">

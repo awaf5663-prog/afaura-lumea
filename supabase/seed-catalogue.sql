@@ -9,7 +9,7 @@
 --  et les photos déjà téléversées depuis l'admin ne sont jamais écrasées.
 -- ═══════════════════════════════════════════════════════════════════
 
--- Catégories du catalogue : Abaya, Pièce unique, Viscose premium, Voile MJ, Modal imprimé, Modal simple, Satin imprimé, Dentelle, Jersey, Jersey frisé, Hijab tape, Rentrée, Packs
+-- Catégories du catalogue : Abaya, Pièce unique, Viscose premium, Voile MJ, Modal imprimé, Modal simple, Satin imprimé, Dentelle, Jersey, Jersey frisé, Hijab tape, Rentrée, Packs, Robes
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
@@ -510,6 +510,122 @@ insert into products (
   'mini-gourde', 'mini-gourde', 'Mini-gourde', 'Petite gourde isotherme à emporter. Plusieurs coloris : précisez celui que vous souhaitez, nous confirmons la disponibilité.',
   0, null, 'rentree',
   '[]'::jsonb, '[{"name":"Couleur","options":["Crème","Rose poudré","Lilas"]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'robe-bordeaux', 'robe-bordeaux', 'Robe longue bordeaux', 'Robe longue en maille souple, décolleté V et manches chauve-souris en voile. Buste et taille froncés, jupe fluide jusqu''au sol.',
+  11000, null, 'robes',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'robe-bleu-ciel', 'robe-bleu-ciel', 'Robe cintrée bleu ciel', 'Robe mi-longue près du corps, col croisé et manches longues, taille marquée par un drapé. Se porte au bureau comme en soirée.',
+  11000, null, 'robes',
+  '[]'::jsonb, '[{"name":"Couleur","options":["Bleu ciel","Noir","Rouge","Bleu roi","Vert forêt"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'robe-rayures', 'robe-rayures', 'Robe longue à rayures', 'Robe longue à fines rayures, col bateau et manches courtes légèrement évasées. Taille froncée sur le côté, coupe droite.',
+  11000, null, 'robes',
+  '[]'::jsonb, '[{"name":"Couleur","options":["Marine rayé","Noir rayé","Bordeaux rayé","Marron rayé"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'robe-rose', 'robe-rose', 'Robe longue rose', 'Robe longue sans manches, col rond, taille froncée et bas évasé qui s''ouvre en sirène.
+Coloris vus sur le visuel : rose, noir, bleu jean, bleu ciel, vert d''eau, bleu marine. La liste n''y tenait pas en entier — demandez le vôtre, nous confirmons la disponibilité.',
+  11000, null, 'robes',
+  '[]'::jsonb, '[{"name":"Couleur","options":["Rose","Noir","Bleu jean","Bleu ciel","Vert d''eau","Bleu marine"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'robe-blanche', 'robe-blanche', 'Robe mi-longue blanche', 'Robe mi-longue drapée, manches courtes tombantes et taille croisée. Bas légèrement évasé, coupe près du corps.',
+  11000, null, 'robes',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   true, null
 )

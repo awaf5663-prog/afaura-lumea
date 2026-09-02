@@ -27,6 +27,11 @@ import pack8a3 from '@/src/assets/products/pack8a-3.webp';
 import pack8b1 from '@/src/assets/products/pack8b-1.webp';
 import pack8b2 from '@/src/assets/products/pack8b-2.webp';
 import pack8b3 from '@/src/assets/products/pack8b-3.webp';
+import robeBlanche from '@/src/assets/products/robe-blanche.webp';
+import robeBleuCiel from '@/src/assets/products/robe-bleu-ciel.webp';
+import robeBordeaux from '@/src/assets/products/robe-bordeaux.webp';
+import robeRayures from '@/src/assets/products/robe-rayures.webp';
+import robeRose from '@/src/assets/products/robe-rose.webp';
 import protecOrdinateur from '@/src/assets/products/protec-ordinateur.webp';
 import sacOrdinateur from '@/src/assets/products/sac-ordinateur.webp';
 import abayaBeigeLeopard from '@/src/assets/products/abaya-beige-leopard.webp';
@@ -106,6 +111,11 @@ export const CATEGORIES: Category[] = [
    * qu'un pantalon long ne soit pas coupé aux chevilles.
    */
   { id: 'packs', name: 'Packs', photo: 'carre' },
+  /*
+   * Robes portées, photographiées en pied : le cadre portrait 3/4 leur va tel
+   * quel — les photos sont déjà exactement à ce format, rien n'est rogné.
+   */
+  { id: 'robes', name: 'Robes' },
 ];
 
 /**
@@ -599,6 +609,103 @@ export const SEED_PRODUCTS: Product[] = [
     isNew: true,
     otherColorsAvailable: true,
     createdAt: '2026-08-30T11:09:00.000Z',
+  },
+  /*
+   * Robes, toutes à 11 000 FCFA. Les coloris annoncés sont ceux lisibles sur
+   * les visuels du fournisseur, pas une supposition : là où la liste n'était
+   * pas entière à l'écran, on le dit et la cliente demande le sien.
+   */
+  {
+    id: 'robe-bordeaux',
+    slug: 'robe-bordeaux',
+    name: 'Robe longue bordeaux',
+    description:
+      "Robe longue en maille souple, décolleté V et manches chauve-souris en voile. Buste et taille froncés, jupe fluide jusqu'au sol.",
+    price: 11000,
+    compareAtPrice: null,
+    category: 'robes',
+    images: [robeBordeaux],
+    variants: [],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-02T16:10:00.000Z',
+  },
+  {
+    id: 'robe-bleu-ciel',
+    slug: 'robe-bleu-ciel',
+    name: 'Robe cintrée bleu ciel',
+    description:
+      "Robe mi-longue près du corps, col croisé et manches longues, taille marquée par un drapé. Se porte au bureau comme en soirée.",
+    price: 11000,
+    compareAtPrice: null,
+    category: 'robes',
+    images: [robeBleuCiel],
+    variants: [{ name: 'Couleur', options: ['Bleu ciel', 'Noir', 'Rouge', 'Bleu roi', 'Vert forêt'] }],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-02T16:11:00.000Z',
+  },
+  {
+    id: 'robe-rayures',
+    slug: 'robe-rayures',
+    name: 'Robe longue à rayures',
+    description:
+      "Robe longue à fines rayures, col bateau et manches courtes légèrement évasées. Taille froncée sur le côté, coupe droite.",
+    price: 11000,
+    compareAtPrice: null,
+    category: 'robes',
+    images: [robeRayures],
+    variants: [
+      { name: 'Couleur', options: ['Marine rayé', 'Noir rayé', 'Bordeaux rayé', 'Marron rayé'] },
+    ],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-02T16:12:00.000Z',
+  },
+  {
+    id: 'robe-rose',
+    slug: 'robe-rose',
+    name: 'Robe longue rose',
+    description:
+      "Robe longue sans manches, col rond, taille froncée et bas évasé qui s'ouvre en sirène.\nColoris vus sur le visuel : rose, noir, bleu jean, bleu ciel, vert d'eau, bleu marine. La liste n'y tenait pas en entier — demandez le vôtre, nous confirmons la disponibilité.",
+    price: 11000,
+    compareAtPrice: null,
+    category: 'robes',
+    images: [robeRose],
+    variants: [
+      {
+        name: 'Couleur',
+        options: ['Rose', 'Noir', 'Bleu jean', 'Bleu ciel', "Vert d'eau", 'Bleu marine'],
+      },
+    ],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-02T16:13:00.000Z',
+  },
+  {
+    id: 'robe-blanche',
+    slug: 'robe-blanche',
+    name: 'Robe mi-longue blanche',
+    description:
+      "Robe mi-longue drapée, manches courtes tombantes et taille croisée. Bas légèrement évasé, coupe près du corps.",
+    price: 11000,
+    compareAtPrice: null,
+    category: 'robes',
+    images: [robeBlanche],
+    variants: [],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-02T16:14:00.000Z',
   },
   /*
    * Packs de prêt-à-porter, repris des visuels de la boutique. Une photo par

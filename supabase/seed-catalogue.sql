@@ -269,9 +269,13 @@ insert into products (
   images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
-  'bics-souligneurs', 'bics-souligneurs', 'Bics et souligneurs', 'Lot de 6 stylos et souligneurs, coloris rose. Commandé pour vous et acheminé avec le prochain groupage.',
+  'bics-souligneurs', 'bics-souligneurs', 'Bics et souligneurs', 'Trois façons de commander, chacune à son prix.
+• Lot de 6 stylos et souligneurs, coloris rose.
+• Bic bleu, à l''unité — stylo gel, encre à séchage rapide, pointe 0,5 mm.
+• Bic rouge, à l''unité — le même, en rouge.
+Les bics se commandent à la pièce : la photo montre la boîte de 6, mais vous n''en prenez qu''un si vous voulez.',
   550, null, 'rentree',
-  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  '[]'::jsonb, '[{"name":"Modèle","options":["Lot de 6 stylos et souligneurs","Bic bleu","Bic rouge"]}]'::jsonb, '{"Modèle":{"Lot de 6 stylos et souligneurs":550,"Bic bleu":100,"Bic rouge":100}}'::jsonb, null, 'active',
   true, false,
   false, null
 )
@@ -292,10 +296,10 @@ insert into products (
   images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
-  'bic-gel', 'bic-gel', 'Bic', 'Stylo gel à encre à séchage rapide, pointe 0,5 mm. Bleu ou rouge : précisez la couleur au moment de commander.
-Prix à l''unité — la photo montre la boîte de 6, mais chaque stylo se commande séparément.',
-  100, null, 'rentree',
-  '[]'::jsonb, '[{"name":"Couleur","options":["Bleu","Rouge"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  'crayon-criterium', 'crayon-criterium', 'Crayons critérium', 'Boîte complète : 6 crayons critérium en coloris pastel, 4 étuis de mines de rechange et 4 gommes, dans un coffret transparent refermable. Mines HB, 0,5 et 0,7 mm.
+La boîte se commande entière.',
+  1000, null, 'rentree',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   false, null
 )
@@ -362,9 +366,9 @@ insert into products (
   images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
-  'coque-telephone', 'coque-telephone', 'Coque de téléphone', 'Coque transparente, motif squelette et fleurs. Précisez le modèle de votre téléphone au moment de commander : nous confirmons la disponibilité avant paiement.',
+  'coque-telephone', 'coque-telephone', 'Coque de téléphone', 'Coque transparente, motif squelette et fleurs. Choisissez le modèle de votre téléphone ci-dessous — nous confirmons la disponibilité avant paiement. Si le vôtre n''est pas dans la liste, prenez « Autre modèle » et dites-le nous sur WhatsApp.',
   1500, null, 'rentree',
-  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  '[]'::jsonb, '[{"name":"Modèle de téléphone","options":["iPhone 11","iPhone 11 Pro Max","iPhone 12","iPhone 12 Pro Max","iPhone 13","iPhone 13 Pro Max","iPhone 14","iPhone 14 Pro Max","iPhone 15","iPhone 15 Pro Max","iPhone 16","iPhone 16 Pro Max","Samsung Galaxy A","Tecno","Infinix","Xiaomi / Redmi","Autre modèle"]}]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   false, null
 )

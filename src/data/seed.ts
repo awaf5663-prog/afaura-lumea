@@ -2,6 +2,7 @@ import type { Category, Product } from '@/src/types';
 
 import adaptateurUsb from '@/src/assets/products/adaptateur-usb.webp';
 import bicGel from '@/src/assets/products/bic-gel.webp';
+import crayonCriterium from '@/src/assets/products/crayon-criterium.webp';
 import bicsSouligneurs from '@/src/assets/products/bics-souligneurs.webp';
 import blocNote from '@/src/assets/products/bloc-note.webp';
 import classeur from '@/src/assets/products/classeur.webp';
@@ -384,34 +385,45 @@ export const SEED_PRODUCTS: Product[] = [
     slug: 'bics-souligneurs',
     name: 'Bics et souligneurs',
     description:
-      "Lot de 6 stylos et souligneurs, coloris rose. Commandé pour vous et acheminé avec le prochain groupage.",
+      "Trois façons de commander, chacune à son prix.\n• Lot de 6 stylos et souligneurs, coloris rose.\n• Bic bleu, à l'unité — stylo gel, encre à séchage rapide, pointe 0,5 mm.\n• Bic rouge, à l'unité — le même, en rouge.\nLes bics se commandent à la pièce : la photo montre la boîte de 6, mais vous n'en prenez qu'un si vous voulez.",
     price: 550,
     compareAtPrice: null,
     category: 'rentree',
-    images: [bicsSouligneurs],
-    variants: [],
+    /*
+     * Deux photos pour trois choix : la galerie ne prétend donc pas les
+     * accorder, et la cliente choisit au bouton. La première montre le lot
+     * rose, la seconde les bics.
+     */
+    images: [bicsSouligneurs, bicGel],
+    variants: [
+      {
+        name: 'Modèle',
+        options: ['Lot de 6 stylos et souligneurs', 'Bic bleu', 'Bic rouge'],
+      },
+    ],
+    optionPrices: {
+      Modèle: { 'Lot de 6 stylos et souligneurs': 550, 'Bic bleu': 100, 'Bic rouge': 100 },
+    },
     stock: null,
     status: 'active',
     isNew: true,
     createdAt: '2026-08-30T11:00:00.000Z',
   },
   {
-    id: 'bic-gel',
-    slug: 'bic-gel',
-    name: 'Bic',
+    id: 'crayon-criterium',
+    slug: 'crayon-criterium',
+    name: 'Crayons critérium',
     description:
-      "Stylo gel à encre à séchage rapide, pointe 0,5 mm. Bleu ou rouge : précisez la couleur au moment de commander.\nPrix à l'unité — la photo montre la boîte de 6, mais chaque stylo se commande séparément.",
-    price: 100,
+      "Boîte complète : 6 crayons critérium en coloris pastel, 4 étuis de mines de rechange et 4 gommes, dans un coffret transparent refermable. Mines HB, 0,5 et 0,7 mm.\nLa boîte se commande entière.",
+    price: 1000,
     compareAtPrice: null,
     category: 'rentree',
-    // Une seule photo, celle du rouge : le bleu n'a pas encore été photographié.
-    // Deux couleurs pour une photo, donc la galerie ne prétend pas les accorder.
-    images: [bicGel],
-    variants: [{ name: 'Couleur', options: ['Bleu', 'Rouge'] }],
+    images: [crayonCriterium],
+    variants: [],
     stock: null,
     status: 'active',
     isNew: true,
-    createdAt: '2026-09-02T12:50:00.000Z',
+    createdAt: '2026-09-02T13:20:00.000Z',
   },
   {
     id: 'classeur',
@@ -450,12 +462,41 @@ export const SEED_PRODUCTS: Product[] = [
     slug: 'coque-telephone',
     name: 'Coque de téléphone',
     description:
-      "Coque transparente, motif squelette et fleurs. Précisez le modèle de votre téléphone au moment de commander : nous confirmons la disponibilité avant paiement.",
+      "Coque transparente, motif squelette et fleurs. Choisissez le modèle de votre téléphone ci-dessous — nous confirmons la disponibilité avant paiement. Si le vôtre n'est pas dans la liste, prenez « Autre modèle » et dites-le nous sur WhatsApp.",
     price: 1500,
     compareAtPrice: null,
     category: 'rentree',
     images: [coqueTelephone],
-    variants: [],
+    /*
+     * La coque n'a de sens que pour un modèle précis : autant le faire choisir
+     * ici plutôt que de le demander après coup sur WhatsApp. La liste couvre
+     * les téléphones les plus courants ; « Autre modèle » ramène les autres à
+     * la conversation, sans promettre que tout existe.
+     */
+    variants: [
+      {
+        name: 'Modèle de téléphone',
+        options: [
+          'iPhone 11',
+          'iPhone 11 Pro Max',
+          'iPhone 12',
+          'iPhone 12 Pro Max',
+          'iPhone 13',
+          'iPhone 13 Pro Max',
+          'iPhone 14',
+          'iPhone 14 Pro Max',
+          'iPhone 15',
+          'iPhone 15 Pro Max',
+          'iPhone 16',
+          'iPhone 16 Pro Max',
+          'Samsung Galaxy A',
+          'Tecno',
+          'Infinix',
+          'Xiaomi / Redmi',
+          'Autre modèle',
+        ],
+      },
+    ],
     stock: null,
     status: 'active',
     isNew: true,

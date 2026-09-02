@@ -4,14 +4,24 @@ import { Button } from '@/src/components/ui/Button';
 import { EmptyState } from '@/src/components/ui/EmptyState';
 import { useCart } from '@/src/hooks/useCart';
 import { useProducts } from '@/src/hooks/useProducts';
+import { useSettings } from '@/src/hooks/useSettings';
 import { formatFcfa } from '@/src/lib/format';
+import { fraisBoutique } from '@/src/lib/pricing/storeFee';
 import { useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 
 export function CartPage() {
   const { items, subtotal, setQuantity, remove, updateOptions, count } = useCart();
   const { products } = useProducts();
+  const { settings } = useSettings();
   const { navigate } = useRouter();
+
+  /*
+   * Le même calcul qu'à la validation, pour que le montant ne surgisse pas à la
+   * dernière étape. La grille vient des réglages, et la base recalcule tout à
+   * l'enregistrement : cet aperçu ne décide de rien.
+   */
+  const serviceFee = fraisBoutique(count, settings?.storeFeeTiers ?? []);
 
   useSeo({
     title: 'Mon panier',
@@ -70,13 +80,19 @@ export function CartPage() {
                 <dt className="text-stone">Sous-total</dt>
                 <dd className="tabular-nums">{formatFcfa(subtotal)}</dd>
               </div>
+              {serviceFee > 0 && (
+                <div className="flex justify-between">
+                  <dt className="text-stone">Frais de traitement</dt>
+                  <dd className="tabular-nums">{formatFcfa(serviceFee)}</dd>
+                </div>
+              )}
               <div className="flex justify-between">
                 <dt className="text-stone">Livraison</dt>
                 <dd className="text-stone">Choisie à l'étape suivante</dd>
               </div>
               <div className="hairline flex justify-between pt-3 text-[17px]">
                 <dt>Total</dt>
-                <dd className="font-medium tabular-nums">{formatFcfa(subtotal)}</dd>
+                <dd className="font-medium tabular-nums">{formatFcfa(subtotal + serviceFee)}</dd>
               </div>
             </dl>
 

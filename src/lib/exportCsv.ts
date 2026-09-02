@@ -33,8 +33,8 @@ export function ordersCsv(orders: Order[]): { filename: string; content: string 
   const content = toCsv(
     [
       'Numéro', 'Date', 'Cliente', 'Téléphone', 'Ville', 'Adresse',
-      'Articles', 'Sous-total FCFA', 'Livraison', 'Frais livraison FCFA',
-      'Total FCFA', 'Code promo', 'Offre', 'Remise FCFA',
+      'Articles', 'Sous-total FCFA', 'Frais de traitement FCFA',
+      'Livraison', 'Frais livraison FCFA', 'Total FCFA', 'Code promo', 'Offre', 'Remise FCFA',
       'Paiement', 'État paiement', 'Étape', 'Commentaire',
     ],
     orders.map((order) => [
@@ -53,6 +53,7 @@ export function ordersCsv(orders: Order[]): { filename: string; content: string 
         })
         .join(' | '),
       order.subtotal,
+      order.serviceFee ?? 0,
       order.deliveryLabel,
       order.deliveryFee ?? 'à confirmer',
       order.total,

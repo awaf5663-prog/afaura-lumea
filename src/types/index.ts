@@ -178,6 +178,11 @@ export interface Order {
   /** null = frais non encore paramétrés, à confirmer avec la cliente. */
   deliveryFee: number | null;
   subtotal: number;
+  /**
+   * Frais de traitement, calculés par la base d'après la grille des réglages
+   * et le nombre d'articles. 0 = aucun. Voir StoreSettings.storeFeeTiers.
+   */
+  serviceFee: number;
   /** Frais de livraison avant promotion, quand une offre les a annulés. */
   deliveryFeeBeforePromotion?: number | null;
   /** Remise appliquée, en FCFA. 0 = aucune. */
@@ -186,7 +191,7 @@ export interface Order {
   promotionLabel: string | null;
   /** Code saisi par la cliente, tel quel. Vide = aucun. */
   promoCode: string;
-  /** subtotal + deliveryFee − discount (deliveryFee null compté comme 0, l'UI le signale). */
+  /** subtotal + serviceFee + deliveryFee − discount (deliveryFee null compté comme 0, l'UI le signale). */
   total: number;
   paymentMethod: string;
   paymentMethodLabel: string;
@@ -409,6 +414,21 @@ export interface StoreSettings {
   deliveryFees: Record<string, number | null>;
   /** Message court affiché en bandeau haut de page. Vide = pas de bandeau. */
   announcement: string;
+  /**
+   * Frais de traitement d'une commande de la boutique, par tranche de nombre
+   * d'articles — la même grille que le service SHEIN, appliquée aux commandes
+   * de la boutique.
+   *
+   * Liste vide = aucun frais, et c'est le cas par défaut : une petite
+   * commande n'en porte pas. Les tranches se règlent depuis
+   * Administration → Tarification, jamais dans le code.
+   *
+   * Le nombre d'articles compte les UNITÉS, pas les lignes : douze cahiers
+   * font douze articles. C'est la convention du devis SHEIN, et deux façons
+   * de compter dans la même boutique donneraient deux totaux différents pour
+   * le même panier.
+   */
+  storeFeeTiers: ServiceFeeTier[];
   /** Tarification du service SHEIN, entièrement pilotée depuis l'admin. */
   pricing: PricingConfig;
   /** Seuils d'alerte de remplissage des groupages. */

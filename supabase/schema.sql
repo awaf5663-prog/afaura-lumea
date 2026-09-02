@@ -201,6 +201,9 @@ declare
   v_order_id uuid;
   v_number text;
   v_subtotal integer := 0;
+  v_articles integer := 0;
+  v_service integer := 0;
+  v_tiers jsonb;
   v_fee integer;
   v_item jsonb;
   v_product products%rowtype;
@@ -219,8 +222,10 @@ begin
     raise exception 'Panier vide';
   end if;
 
-  select (delivery_fees ->> p_delivery_zone_id)::integer, coalesce(promotions, '[]'::jsonb)
-    into v_fee, v_promotions
+  select (delivery_fees ->> p_delivery_zone_id)::integer,
+         coalesce(promotions, '[]'::jsonb),
+         coalesce(store_fee_tiers, '[]'::jsonb)
+    into v_fee, v_promotions, v_tiers
     from settings where id = 1;
   v_label := p_delivery_zone_id;
   v_number := 'CMD-' || to_char(now(), 'YYYY') || '-' || lpad(nextval('order_seq')::text, 5, '0');
@@ -257,11 +262,18 @@ begin
     );
 
     v_subtotal := v_subtotal + v_unit * v_quantity;
+    -- Les articles se comptent en unités, pas en lignes : douze cahiers font
+    -- douze articles. Même règle que pour les demandes SHEIN.
+    v_articles := v_articles + v_quantity;
 
     if v_product.stock is not null then
       update products set stock = greatest(0, stock - v_quantity) where id = v_product.id;
     end if;
   end loop;
+
+  -- Frais de traitement, d'après la grille des réglages. Grille vide : aucun
+  -- frais. Calculé ici, jamais reçu du navigateur.
+  v_service := frais_boutique(v_articles, v_tiers);
 
   -- Offres. Toutes les conditions renseignées doivent être remplies ; une liste
   -- vide ne restreint rien. Vérifiées ici, jamais d'après le navigateur, qui ne
@@ -289,7 +301,7 @@ begin
       -- Plafonnée au montant connu : une remise ne rend jamais d'argent.
       v_discount := least(
         greatest(0, coalesce((v_promo -> 'effect' ->> 'amount')::integer, 0)),
-        v_subtotal + coalesce(v_fee, 0)
+        v_subtotal + v_service + coalesce(v_fee, 0)
       );
       if v_discount > 0 then
         v_promo_label := v_promo ->> 'label';
@@ -300,11 +312,12 @@ begin
 
   update orders
      set subtotal = v_subtotal,
+         service_fee = v_service,
          delivery_fee = v_fee,
          delivery_fee_before_promotion = v_fee_before,
          discount = v_discount,
          promotion_label = v_promo_label,
-         total = v_subtotal + coalesce(v_fee, 0) - v_discount
+         total = v_subtotal + v_service + coalesce(v_fee, 0) - v_discount
    where id = v_order_id;
 
   return (
@@ -1128,3 +1141,50 @@ end;
 $$;
 
 revoke execute on function prix_option(products, jsonb) from public;
+
+
+-- ── 10. Frais de traitement des commandes de la boutique ─────────────
+-- Au-delà d'un certain nombre d'articles, préparer et acheminer une commande
+-- demande un travail que le prix des pièces ne couvre pas. La grille se règle
+-- depuis Administration → Tarification ; vide, aucun frais n'est appliqué.
+--
+-- Comme tous les montants du site : calculé ICI, jamais reçu du navigateur.
+
+alter table settings add column if not exists store_fee_tiers jsonb not null default '[]'::jsonb;
+alter table orders   add column if not exists service_fee integer not null default 0;
+
+create or replace function frais_boutique(p_articles integer, p_tiers jsonb)
+returns integer
+language plpgsql
+immutable
+as $$
+declare
+  v_tranche jsonb;
+  v_min integer;
+  v_max jsonb;
+  v_frais jsonb;
+begin
+  if p_articles is null or p_articles <= 0 then return 0; end if;
+  if jsonb_typeof(coalesce(p_tiers, '[]'::jsonb)) <> 'array' then return 0; end if;
+
+  -- Première tranche qui contient ce nombre d'articles, dans l'ordre de la
+  -- grille : c'est aussi la règle appliquée à l'affichage (lib/pricing/storeFee).
+  for v_tranche in select * from jsonb_array_elements(p_tiers) loop
+    v_min := coalesce((v_tranche ->> 'minItems')::integer, 1);
+    v_max := v_tranche -> 'maxItems';
+    continue when p_articles < v_min;
+    continue when v_max is not null and jsonb_typeof(v_max) = 'number'
+                  and p_articles > (v_max #>> '{}')::integer;
+    v_frais := v_tranche -> 'fee';
+    if v_frais is not null and jsonb_typeof(v_frais) = 'number' then
+      return greatest(0, (v_frais #>> '{}')::numeric::integer);
+    end if;
+    -- Tranche « devis manuel » : rien de facturé automatiquement.
+    return 0;
+  end loop;
+
+  return 0;
+end;
+$$;
+
+revoke execute on function frais_boutique(integer, jsonb) from public;

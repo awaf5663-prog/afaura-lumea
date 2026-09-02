@@ -11,7 +11,8 @@ import { useToast } from '@/src/hooks/useToast';
 import { formatFcfa } from '@/src/lib/format';
 import { uid } from '@/src/lib/orderNumber';
 import { SERVICE_FEE_STRATEGIES, computeQuoteFromInput, describeStrategy } from '@/src/lib/pricing';
-import type { Grouping, PricingConfig } from '@/src/types';
+import { fraisBoutique } from '@/src/lib/pricing/storeFee';
+import type { Grouping, PricingConfig, ServiceFeeTier } from '@/src/types';
 
 /**
  * PARAMÈTRES → TARIFICATION
@@ -54,10 +55,30 @@ export function AdminPricing({ groupings = [] }: { groupings?: Grouping[] }) {
   const setPricing = (patch: Partial<PricingConfig>) =>
     setDraft({ ...draft, pricing: { ...pricing, ...patch } });
 
+  /*
+   * Frais de la boutique : une grille indépendante de SHEIN. Une liste vide est
+   * une réponse valable — elle veut dire « aucun frais » — donc on ne la
+   * remplace jamais par une valeur de confort.
+   */
+  const storeFeeTiers = draft.storeFeeTiers ?? [];
+  const setStoreFeeTiers = (tiers: ServiceFeeTier[]) => setDraft({ ...draft, storeFeeTiers: tiers });
+  const apercuArticles = Math.max(
+    1,
+    ...storeFeeTiers.map((t) => (t.maxItems === null ? t.minItems : t.maxItems)),
+  );
+  const apercuFrais = fraisBoutique(apercuArticles, storeFeeTiers);
+
   const enregistrer = async () => {
     const invalid = pricing.tiers.find((t) => t.maxItems !== null && t.maxItems < t.minItems);
     if (invalid) {
       notify('Une tranche a un maximum inférieur à son minimum.', 'error');
+      return;
+    }
+    const invalidBoutique = storeFeeTiers.find(
+      (t) => t.maxItems !== null && t.maxItems < t.minItems,
+    );
+    if (invalidBoutique) {
+      notify('Une tranche de la boutique a un maximum inférieur à son minimum.', 'error');
       return;
     }
     if (await commit()) notify('Tarification enregistrée');
@@ -395,6 +416,118 @@ export function AdminPricing({ groupings = [] }: { groupings?: Grouping[] }) {
               ))}
             </Select>
           </FormRow>
+        </section>
+
+        {/* ── Frais de la boutique ──────────────────────────── */}
+        <section className="mt-5 rounded-[--radius-lg] border border-line bg-white p-5">
+          <div className="flex items-center justify-between gap-3">
+            <h3 className="text-[18px]">Frais de traitement de la boutique</h3>
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={() =>
+                setDraft({
+                  ...draft,
+                  storeFeeTiers: [
+                    ...storeFeeTiers,
+                    { id: uid(), minItems: 1, maxItems: null, fee: 0 },
+                  ],
+                })
+              }
+            >
+              <Plus className="size-4" /> Tranche
+            </Button>
+          </div>
+
+          <p className="mt-2 text-[12px] leading-relaxed text-stone">
+            S'ajoute aux commandes de la boutique selon le nombre d'articles commandés — les
+            unités, pas les lignes : douze cahiers comptent pour douze articles. Sans aucune
+            tranche, aucun frais n'est ajouté. La cliente voit ce montant sur une ligne à part,
+            avant de valider.
+          </p>
+
+          {storeFeeTiers.length > 0 && (
+            <ul className="mt-4 space-y-3">
+              {storeFeeTiers.map((tier, index) => (
+                <li
+                  key={tier.id}
+                  className="grid grid-cols-2 items-end gap-2 sm:grid-cols-[1fr_1fr_1.2fr_auto]"
+                >
+                  <label className="text-[11.5px] text-stone">
+                    De
+                    <Input
+                      type="number"
+                      min={1}
+                      className="mt-1"
+                      value={tier.minItems}
+                      onChange={(e) =>
+                        setStoreFeeTiers(
+                          storeFeeTiers.map((t, i) =>
+                            i === index ? { ...t, minItems: Number(e.target.value) } : t,
+                          ),
+                        )
+                      }
+                    />
+                  </label>
+                  <label className="text-[11.5px] text-stone">
+                    À <span className="text-[10px]">(vide = ∞)</span>
+                    <Input
+                      type="number"
+                      min={1}
+                      className="mt-1"
+                      value={tier.maxItems ?? ''}
+                      onChange={(e) =>
+                        setStoreFeeTiers(
+                          storeFeeTiers.map((t, i) =>
+                            i === index
+                              ? { ...t, maxItems: e.target.value === '' ? null : Number(e.target.value) }
+                              : t,
+                          ),
+                        )
+                      }
+                    />
+                  </label>
+                  <label className="text-[11.5px] text-stone">
+                    Frais (FCFA)
+                    <Input
+                      type="number"
+                      min={0}
+                      step={1}
+                      className="mt-1"
+                      value={tier.fee ?? ''}
+                      onChange={(e) =>
+                        setStoreFeeTiers(
+                          storeFeeTiers.map((t, i) =>
+                            i === index
+                              ? { ...t, fee: e.target.value === '' ? null : Number(e.target.value) }
+                              : t,
+                          ),
+                        )
+                      }
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    aria-label="Supprimer la tranche de la boutique"
+                    onClick={() => setStoreFeeTiers(storeFeeTiers.filter((_, i) => i !== index))}
+                    className="press mb-1 col-span-2 grid size-10 justify-self-end place-items-center rounded-full bg-cream text-[#8a2f2f] sm:col-span-1"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <p className="mt-4 flex gap-2 rounded-[--radius-sm] bg-cream/70 px-3.5 py-3 text-[12px] leading-relaxed text-graphite">
+            <Info className="mt-0.5 size-3.5 shrink-0" />
+            {storeFeeTiers.length === 0
+              ? "Aucune tranche : les commandes de la boutique n'ont aucun frais de traitement."
+              : `Exemple : une commande de ${apercuArticles} article${apercuArticles > 1 ? 's' : ''} paie ${formatFcfa(apercuFrais)} de frais.`}{' '}
+            Le montant définitif est recalculé par la base de données à l'enregistrement, jamais
+            par le navigateur de la cliente.
+          </p>
         </section>
 
         {/* ── Seuils d'alerte ───────────────────────────────── */}

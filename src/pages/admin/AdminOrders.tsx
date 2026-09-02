@@ -177,6 +177,11 @@ export function AdminOrders({
                     — {formatFcfa(item.unitPrice * item.quantity)}
                   </li>
                 ))}
+                {order.serviceFee > 0 && (
+                  <li className="text-ink">
+                    Frais de traitement — {formatFcfa(order.serviceFee)}
+                  </li>
+                )}
               </ul>
             </div>
 

@@ -318,6 +318,9 @@ const toOrder = (r: Row): Order => ({
   address: r.address ?? '',
   city: r.city ?? '',
   note: r.note ?? undefined,
+  // Colonne absente tant que la mise à jour SQL n'est pas passée : la
+  // boutique fonctionne sans, simplement sans frais de traitement.
+  serviceFee: Number(r.service_fee ?? 0) || 0,
   deliveryZoneId: r.delivery_zone_id,
   deliveryLabel: zoneLabel(r.delivery_zone_id, r.delivery_label),
   deliveryFee: r.delivery_fee,
@@ -630,6 +633,12 @@ export const supabaseAdapter: DataSource = {
       // pas. Une zone sans tarif reste « à confirmer ».
       deliveryFees: r.delivery_fees ?? {},
       announcement: r.announcement ?? '',
+      // Colonne absente = aucune tranche, donc aucun frais. On n'installe pas
+      // de grille par défaut sur une boutique déjà en service : des frais qui
+      // apparaissent tout seuls sur une commande, cela ne se fait pas.
+      storeFeeTiers: Array.isArray(r.store_fee_tiers)
+        ? (r.store_fee_tiers as StoreSettings['storeFeeTiers'])
+        : [],
       // La ligne créée par schema.sql arrive avec `{}` dans ces colonnes :
       // on les complète champ par champ, sinon l'admin plante à l'affichage.
       pricing: normalizePricing(r.pricing),
@@ -659,6 +668,7 @@ export const supabaseAdapter: DataSource = {
       orange_money_number: settings.orangeMoneyNumber,
       delivery_fees: settings.deliveryFees,
       announcement: settings.announcement,
+      store_fee_tiers: settings.storeFeeTiers,
       pricing: settings.pricing,
       promotions: settings.promotions,
       alert_thresholds: settings.alertThresholds,
@@ -675,6 +685,7 @@ export const supabaseAdapter: DataSource = {
     await enregistrerSansColonnesAbsentes(envoyer, colonnes, [
       { colonne: 'reviews', etiquette: 'les avis clientes' },
       { colonne: 'next_grouping_opening', etiquette: "la date d'ouverture des inscriptions" },
+      { colonne: 'store_fee_tiers', etiquette: 'les frais de traitement de la boutique' },
     ]);
     return settings;
   },

@@ -99,6 +99,9 @@ export function ConfirmationPage({ orderNumber }: { orderNumber: string }) {
               {formatFcfa(order.total)}
               {order.deliveryFee === null && <span className="text-[12.5px] text-stone"> + livraison</span>}
             </Row>
+            {order.serviceFee > 0 && (
+              <Row label="Frais de traitement">{formatFcfa(order.serviceFee)}</Row>
+            )}
             <Row label="Livraison">
               {order.deliveryLabel}
               {order.deliveryFeeBeforePromotion ? (

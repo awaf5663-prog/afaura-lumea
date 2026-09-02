@@ -58,6 +58,9 @@ export function buildOrderMessage(order: Order): string {
   });
   lines.push('');
   lines.push(`Sous-total : ${formatFcfa(order.subtotal)}`);
+  if (order.serviceFee > 0) {
+    lines.push(`Frais de traitement : ${formatFcfa(order.serviceFee)}`);
+  }
   lines.push(
     `Livraison : ${order.deliveryLabel}${
       order.deliveryFeeBeforePromotion

@@ -7,7 +7,12 @@ import {
   WHATSAPP_LINK,
   WHATSAPP_NUMBER,
 } from '@/src/config/site';
-import { DEFAULT_ALERT_THRESHOLDS, DEFAULT_PRICING, DEFAULT_PROMOTIONS } from '@/src/config/pricing';
+import {
+  DEFAULT_ALERT_THRESHOLDS,
+  DEFAULT_PRICING,
+  DEFAULT_PROMOTIONS,
+  DEFAULT_STORE_FEE_TIERS,
+} from '@/src/config/pricing';
 import { normalizeSettings } from './settingsShape';
 import { SEED_IMAGES, SEED_PRODUCTS } from '@/src/data/seed';
 import { computeQuote } from '@/src/lib/pricing';
@@ -16,6 +21,7 @@ import { nextNumber, uid } from '@/src/lib/orderNumber';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
 import { aggregateVisits, type VisitEntry } from './visitStats';
 import { normalizePhone } from '@/src/lib/format';
+import { fraisBoutique, nombreArticles } from '@/src/lib/pricing/storeFee';
 import { fromStoredImages, toStoredImages } from '@/src/lib/image';
 import type { Grouping, Order, Product, SheinRequest, StoreSettings } from '@/src/types';
 import type { AlertSettings, DataSource, OrderDraft, SheinDraft } from './types';
@@ -38,6 +44,7 @@ function defaultSettings(): StoreSettings {
     orangeMoneyNumber: ORANGE_MONEY_NUMBER,
     deliveryFees: Object.fromEntries(DELIVERY_ZONES.map((z) => [z.id, z.fee])),
     announcement: '',
+    storeFeeTiers: DEFAULT_STORE_FEE_TIERS,
     pricing: DEFAULT_PRICING,
     alertThresholds: DEFAULT_ALERT_THRESHOLDS,
     promotions: DEFAULT_PROMOTIONS,
@@ -147,6 +154,9 @@ export const localAdapter: DataSource = {
     const method = PAYMENT_METHODS.find((m) => m.id === draft.paymentMethod) ?? PAYMENT_METHODS[0];
     const rawDeliveryFee = settings.deliveryFees[zone.id] ?? zone.fee;
     const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+    // Frais de traitement : relus dans la grille des réglages, jamais reçus
+    // du navigateur. Voir lib/pricing/storeFee.
+    const serviceFee = fraisBoutique(nombreArticles(items), settings.storeFeeTiers ?? []);
 
     // Les offres sont appliquées ici, à partir des règles enregistrées : le
     // navigateur ne transmet qu'un code et une déclaration, jamais un montant.
@@ -166,7 +176,10 @@ export const localAdapter: DataSource = {
         deliveryFeeBeforePromotion = rawDeliveryFee;
       } else if (promotion.effect.type === 'discount_amount') {
         // Plafonnée au montant connu : une remise ne rend jamais d'argent.
-        discount = Math.min(Math.max(0, promotion.effect.amount), subtotal + (rawDeliveryFee ?? 0));
+        discount = Math.min(
+          Math.max(0, promotion.effect.amount),
+          subtotal + serviceFee + (rawDeliveryFee ?? 0),
+        );
       }
       // « Frais de traitement offerts » ne concerne que le service SHEIN :
       // une commande de la boutique n'en a pas.
@@ -187,10 +200,11 @@ export const localAdapter: DataSource = {
       deliveryFee,
       deliveryFeeBeforePromotion,
       subtotal,
+      serviceFee,
       discount,
       promotionLabel: applied ? promotion.label : null,
       promoCode: draft.promoCode.trim(),
-      total: subtotal + (deliveryFee ?? 0) - discount,
+      total: subtotal + serviceFee + (deliveryFee ?? 0) - discount,
       paymentMethod: method.id,
       paymentMethodLabel: method.label,
       paymentStatus: 'pending',
@@ -239,7 +253,7 @@ export const localAdapter: DataSource = {
     if (patch.phone !== undefined) next.phone = normalizePhone(patch.phone);
     // La remise déjà accordée fait partie du total : la recalculer sans elle
     // la ferait disparaître au premier changement de statut.
-    next.total = next.subtotal + (next.deliveryFee ?? 0) - (next.discount ?? 0);
+    next.total = next.subtotal + (next.serviceFee ?? 0) + (next.deliveryFee ?? 0) - (next.discount ?? 0);
     orders[index] = next;
     writeJson(STORAGE_KEYS.orders, orders);
     return delay(next);

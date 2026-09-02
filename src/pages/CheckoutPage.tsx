@@ -10,6 +10,7 @@ import { useCart } from '@/src/hooks/useCart';
 import { useSettings, useWhatsapp } from '@/src/hooks/useSettings';
 import { useToast } from '@/src/hooks/useToast';
 import { findPromotion, visiblePromotions } from '@/src/lib/pricing/promotions';
+import { fraisBoutique, nombreArticles } from '@/src/lib/pricing/storeFee';
 import { cn } from '@/src/lib/cn';
 import { formatFcfa, isValidSenegalPhone, normalizePhone, prettyPhone } from '@/src/lib/format';
 import { useRouter } from '@/src/lib/router';
@@ -92,11 +93,19 @@ export function CheckoutPage() {
   const freeDelivery =
     promotion?.effect.type === 'free_delivery' && rawDeliveryFee !== null && rawDeliveryFee > 0;
   const deliveryFee = freeDelivery ? 0 : rawDeliveryFee;
+  /*
+   * Frais de traitement au-delà d'un certain nombre d'articles. La grille vient
+   * des réglages : rien n'est écrit en dur ici, et c'est la base de données qui
+   * recalcule ce montant à l'enregistrement. Ce que la cliente lit ici n'est
+   * qu'un aperçu fidèle.
+   */
+  const articles = nombreArticles(items);
+  const serviceFee = fraisBoutique(articles, settings?.storeFeeTiers ?? []);
   const discount =
     promotion?.effect.type === 'discount_amount'
-      ? Math.min(Math.max(0, promotion.effect.amount), subtotal + (rawDeliveryFee ?? 0))
+      ? Math.min(Math.max(0, promotion.effect.amount), subtotal + serviceFee + (rawDeliveryFee ?? 0))
       : 0;
-  const total = subtotal + (deliveryFee ?? 0) - discount;
+  const total = subtotal + serviceFee + (deliveryFee ?? 0) - discount;
 
   const asksStudent = visiblePromotions(settings?.promotions ?? [], 'store').some(
     (offer) => offer.studentOnly,
@@ -202,13 +211,20 @@ export function CheckoutPage() {
     { label: 'Paiement', value: method.label },
     {
       label: 'Articles',
-      value: `${items.reduce((n, i) => n + i.quantity, 0)} article${items.reduce((n, i) => n + i.quantity, 0) > 1 ? 's' : ''}`,
+      value: `${articles} article${articles > 1 ? 's' : ''}`,
     },
     {
       label: 'Total',
       value: deliveryFee === null ? `${formatFcfa(total)} + livraison` : formatFcfa(total),
     },
   ];
+
+  if (serviceFee > 0) {
+    recapitulatif.splice(recapitulatif.length - 1, 0, {
+      label: 'Frais de traitement',
+      value: formatFcfa(serviceFee),
+    });
+  }
 
   return (
     <form onSubmit={submit} className="container-page py-8">
@@ -457,6 +473,12 @@ export function CheckoutPage() {
                 <dt className="text-stone">Sous-total</dt>
                 <dd className="tabular-nums">{formatFcfa(subtotal)}</dd>
               </div>
+              {serviceFee > 0 && (
+                <div className="flex justify-between">
+                  <dt className="text-stone">Frais de traitement</dt>
+                  <dd className="tabular-nums">{formatFcfa(serviceFee)}</dd>
+                </div>
+              )}
               <div className="flex justify-between">
                 <dt className="text-stone">{zone?.label}</dt>
                 <dd className="tabular-nums">

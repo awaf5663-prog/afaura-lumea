@@ -167,6 +167,9 @@ export function TrackingPage() {
             createdAt={result.data.createdAt}
             rows={[
               ['Montant', `${formatFcfa(result.data.total)}${result.data.deliveryFee === null ? ' + livraison' : ''}`],
+              ...(result.data.serviceFee > 0
+                ? [['Frais de traitement', formatFcfa(result.data.serviceFee)] as [string, string]]
+                : []),
               ['Livraison', result.data.deliveryLabel],
               ['Paiement', `${result.data.paymentMethodLabel} — ${PAYMENT_STATUS_LABEL[result.data.paymentStatus]}`],
             ]}

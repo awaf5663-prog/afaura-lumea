@@ -296,7 +296,10 @@ insert into products (
   images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
-  'crayon-criterium', 'crayon-criterium', 'Crayons critérium', 'Boîte complète : 6 crayons critérium en coloris pastel, 4 étuis de mines de rechange et 4 gommes, dans un coffret transparent refermable. Mines HB, 0,5 et 0,7 mm.
+  'crayon-criterium', 'crayon-criterium', 'Crayons critérium', 'Coffret transparent refermable, compté sur la photo :
+• 6 crayons critérium en coloris pastel — trois en 0,5 mm, trois en 0,7 mm ;
+• 6 étuis de mines HB — trois en 0,5 mm, trois en 0,7 mm, 60 mines par étui ;
+• 3 gommes dégradées, plus des recharges de gomme pour les crayons.
 La boîte se commande entière.',
   1000, null, 'rentree',
   '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',

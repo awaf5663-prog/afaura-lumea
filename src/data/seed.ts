@@ -414,7 +414,7 @@ export const SEED_PRODUCTS: Product[] = [
     slug: 'crayon-criterium',
     name: 'Crayons critérium',
     description:
-      "Boîte complète : 6 crayons critérium en coloris pastel, 4 étuis de mines de rechange et 4 gommes, dans un coffret transparent refermable. Mines HB, 0,5 et 0,7 mm.\nLa boîte se commande entière.",
+      "Coffret transparent refermable, compté sur la photo :\n• 6 crayons critérium en coloris pastel — trois en 0,5 mm, trois en 0,7 mm ;\n• 6 étuis de mines HB — trois en 0,5 mm, trois en 0,7 mm, 60 mines par étui ;\n• 3 gommes dégradées, plus des recharges de gomme pour les crayons.\nLa boîte se commande entière.",
     price: 1000,
     compareAtPrice: null,
     category: 'rentree',

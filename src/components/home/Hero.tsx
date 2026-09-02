@@ -3,11 +3,19 @@ import logo from '@/src/assets/brand/logo-sombre.webp';
 import heroImage from '@/src/assets/products/dentelle-noir-blanc.webp';
 import { Button } from '@/src/components/ui/Button';
 import { BRAND } from '@/src/config/site';
+import { useOuvertureGroupage } from '@/src/hooks/useOuvertureGroupage';
 import { Link, useRouter } from '@/src/lib/router';
 import { GroupingBadge } from './GroupingBadge';
 
 export function Hero() {
   const { navigate } = useRouter();
+  /*
+   * Quand le bandeau d'ouverture s'affiche juste en dessous, il porte déjà le
+   * même compte à rebours et les mêmes dates. La carte posée sur la photo
+   * ferait doublon : on la garde pour tous les autres cas — groupage clôturé,
+   * date pas encore fixée — où elle est la seule à dire où on en est.
+   */
+  const { bandeau } = useOuvertureGroupage();
 
   return (
     <section className="container-page pt-6 lg:pt-14">
@@ -72,9 +80,11 @@ export function Hero() {
                 decoding="async"
               />
             </div>
-            <div className="absolute -bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:w-[268px]">
-              <GroupingBadge />
-            </div>
+            {!bandeau && (
+              <div className="absolute -bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:w-[268px]">
+                <GroupingBadge />
+              </div>
+            )}
           </div>
         </div>
       </div>

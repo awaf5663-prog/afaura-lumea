@@ -244,6 +244,54 @@
   animation: lumea-pop 0.35s ease both;
 }
 
+/*
+ * Point « en cours ».
+ *
+ * Une pulsation lente et de faible amplitude : elle signale qu'un compte à
+ * rebours tourne vraiment, sans clignoter comme une alarme. C'est la seule
+ * animation permanente du site, et elle disparaît en mouvement réduit.
+ */
+@keyframes lumea-pouls {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(193 73 139 / 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgb(193 73 139 / 0);
+  }
+}
+
+/*
+ * Lueur qui traverse le bandeau du groupage.
+ *
+ * Une bande claire, très diluée, qui passe une fois toutes les sept secondes.
+ * Elle attire l'œil sur l'annonce sans rien recouvrir : le texte reste au-dessus.
+ */
+@keyframes lumea-lueur {
+  0% {
+    transform: translateX(-60%) skewX(-14deg);
+  }
+  55%,
+  100% {
+    transform: translateX(320%) skewX(-14deg);
+  }
+}
+
+.pouls {
+  animation: lumea-pouls 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.lueur::before {
+  content: '';
+  position: absolute;
+  inset-block: -30%;
+  left: 0;
+  width: 22%;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.34), transparent);
+  animation: lumea-lueur 7s ease-in-out infinite;
+}
+
 .skeleton {
   position: relative;
   overflow: hidden;
@@ -288,6 +336,10 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
+  }
+  /* Le point reste visible, simplement immobile ; la lueur, elle, disparaît. */
+  .lueur::before {
+    display: none;
   }
   /*
    * Animation coupée : le bandeau ne défile plus. On rend alors la piste

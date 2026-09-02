@@ -1,5 +1,6 @@
 import { AlertCircle, Info, Lock, MessageCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { ConfirmerEnvoi, type LigneRecap } from '@/src/components/order/ConfirmerEnvoi';
 import { PromoCodeField } from '@/src/components/order/PromoCodeField';
 import { PromotionNotice } from '@/src/components/shein/PromotionNotice';
 import { Button } from '@/src/components/ui/Button';
@@ -10,7 +11,7 @@ import { useSettings, useWhatsapp } from '@/src/hooks/useSettings';
 import { useToast } from '@/src/hooks/useToast';
 import { findPromotion, visiblePromotions } from '@/src/lib/pricing/promotions';
 import { cn } from '@/src/lib/cn';
-import { formatFcfa, isValidSenegalPhone, normalizePhone } from '@/src/lib/format';
+import { formatFcfa, isValidSenegalPhone, normalizePhone, prettyPhone } from '@/src/lib/format';
 import { useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
@@ -53,6 +54,13 @@ export function CheckoutPage() {
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  /*
+   * Dernière relecture avant l'envoi. Le formulaire est déjà valide quand ce
+   * panneau s'ouvre : on ne redemande pas à la machine de vérifier, on
+   * demande à la cliente de relire — un numéro juste en apparence, la machine
+   * ne saura jamais le corriger.
+   */
+  const [relecture, setRelecture] = useState(false);
 
   useSeo({
     title: 'Validation de commande',
@@ -130,9 +138,14 @@ export function CheckoutPage() {
     return Object.keys(next).length === 0;
   };
 
-  const submit = async (event: React.FormEvent) => {
+  const submit = (event: React.FormEvent) => {
     event.preventDefault();
     if (!validate()) return;
+    setSubmitError(null);
+    setRelecture(true);
+  };
+
+  const envoyer = async () => {
     setSubmitting(true);
     setSubmitError(null);
     try {
@@ -160,6 +173,7 @@ export function CheckoutPage() {
         ...mine.filter((m) => m.orderNumber !== order.orderNumber),
       ]);
 
+      setRelecture(false);
       clear();
       // La confirmation est empilée d'abord : le bouton retour depuis
       // WhatsApp ramène dessus, avec le récapitulatif.
@@ -172,8 +186,29 @@ export function CheckoutPage() {
       setSubmitError(message);
       notify(message, 'error');
       setSubmitting(false);
+      // On referme la relecture : l'erreur s'affiche dans le formulaire,
+      // derrière le panneau, où la cliente peut corriger.
+      setRelecture(false);
     }
   };
+
+  const recapitulatif: LigneRecap[] = [
+    { label: 'Nom', value: `${form.firstName.trim()} ${form.lastName.trim()}`.trim() || '—' },
+    { label: 'Téléphone', value: prettyPhone(form.phone) || '—', cle: true },
+    {
+      label: 'Livraison',
+      value: [zone?.label, form.address.trim(), form.city.trim()].filter(Boolean).join(' — ') || '—',
+    },
+    { label: 'Paiement', value: method.label },
+    {
+      label: 'Articles',
+      value: `${items.reduce((n, i) => n + i.quantity, 0)} article${items.reduce((n, i) => n + i.quantity, 0) > 1 ? 's' : ''}`,
+    },
+    {
+      label: 'Total',
+      value: deliveryFee === null ? `${formatFcfa(total)} + livraison` : formatFcfa(total),
+    },
+  ];
 
   return (
     <form onSubmit={submit} className="container-page py-8">
@@ -482,6 +517,15 @@ export function CheckoutPage() {
           </div>
         </aside>
       </div>
+
+      <ConfirmerEnvoi
+        open={relecture}
+        onClose={() => setRelecture(false)}
+        onConfirm={() => void envoyer()}
+        busy={submitting}
+        lignes={recapitulatif}
+        action="Oui, envoyer ma commande"
+      />
     </form>
   );
 }

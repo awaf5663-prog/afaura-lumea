@@ -234,7 +234,12 @@ export const localAdapter: DataSource = {
     const index = orders.findIndex((o) => o.id === id);
     if (index < 0) throw new Error('Commande introuvable.');
     const next: Order = { ...orders[index], ...patch, updatedAt: new Date().toISOString() };
-    next.total = next.subtotal + (next.deliveryFee ?? 0);
+    // Numéro normalisé comme à la création : la page Suivi doit retrouver la
+    // commande avec le numéro corrigé.
+    if (patch.phone !== undefined) next.phone = normalizePhone(patch.phone);
+    // La remise déjà accordée fait partie du total : la recalculer sans elle
+    // la ferait disparaître au premier changement de statut.
+    next.total = next.subtotal + (next.deliveryFee ?? 0) - (next.discount ?? 0);
     orders[index] = next;
     writeJson(STORAGE_KEYS.orders, orders);
     return delay(next);
@@ -397,6 +402,7 @@ export const localAdapter: DataSource = {
     const index = all.findIndex((r) => r.id === id);
     if (index < 0) throw new Error('Demande introuvable.');
     const next = { ...all[index], ...patch, updatedAt: new Date().toISOString() };
+    if (patch.phone !== undefined) next.phone = normalizePhone(patch.phone);
     all[index] = next;
     writeJson(STORAGE_KEYS.sheinRequests, all);
     return delay(next);

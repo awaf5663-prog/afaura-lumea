@@ -101,9 +101,33 @@ export interface DataSource {
   createOrder(draft: OrderDraft): Promise<Order>;
   listOrders(): Promise<Order[]>;
   findOrder(orderNumber: string, phone: string): Promise<Order | null>;
+  /**
+   * Modifier une commande depuis l'administration.
+   *
+   * Les coordonnées sont modifiables : une cliente qui se trompe d'un chiffre
+   * en tapant son numéro n'est plus joignable, et la boutique doit pouvoir la
+   * corriger à sa place plutôt que de perdre la commande.
+   *
+   * Les montants, eux, ne le sont pas — hors les frais de livraison, que la
+   * boutique fixe elle-même. Le sous-total, la remise et le total restent ceux
+   * que la base a calculés à l'enregistrement : c'est la règle de la boutique
+   * et elle ne souffre pas d'exception, pas même pour l'administration.
+   */
   updateOrder(
     id: string,
-    patch: Partial<Pick<Order, 'orderStatus' | 'paymentStatus' | 'deliveryFee' | 'note'>>,
+    patch: Partial<
+      Pick<
+        Order,
+        | 'orderStatus'
+        | 'paymentStatus'
+        | 'deliveryFee'
+        | 'note'
+        | 'customerName'
+        | 'phone'
+        | 'address'
+        | 'city'
+      >
+    >,
   ): Promise<Order>;
   /** Met à la corbeille (`true`) ou restaure (`false`). Rien n'est effacé. */
   updateOrdersTrash(ids: string[], trashed: boolean): Promise<void>;
@@ -113,9 +137,10 @@ export interface DataSource {
   createSheinRequest(draft: SheinDraft): Promise<SheinRequest>;
   listSheinRequests(): Promise<SheinRequest[]>;
   findSheinRequest(requestNumber: string, phone: string): Promise<SheinRequest | null>;
+  /** Même principe que `updateOrder` : coordonnées modifiables, montants non. */
   updateSheinRequest(
     id: string,
-    patch: Partial<Pick<SheinRequest, 'status' | 'quotedTotal' | 'note'>>,
+    patch: Partial<Pick<SheinRequest, 'status' | 'quotedTotal' | 'note' | 'customerName' | 'phone'>>,
   ): Promise<SheinRequest>;
   updateSheinTrash(ids: string[], trashed: boolean): Promise<void>;
   deleteSheinRequests(ids: string[]): Promise<void>;

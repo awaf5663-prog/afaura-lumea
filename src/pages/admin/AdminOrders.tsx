@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowRight, MessageCircle } from 'lucide-react';
 import { AmountField } from '@/src/components/admin/AmountField';
+import { CoordonneesEditor } from '@/src/components/admin/CoordonneesEditor';
 import { ExportButton } from '@/src/components/admin/ExportButton';
 import { Badge } from '@/src/components/ui/Badge';
 import { Select } from '@/src/components/ui/Field';
@@ -223,6 +224,21 @@ export function AdminOrders({
                     ? "Renseignez les frais pour figer le total avant d'annoncer le montant."
                     : undefined
                 }
+              />
+            </div>
+
+            <div className="mt-4 border-t border-line pt-4">
+              <CoordonneesEditor
+                reference={`Commande ${order.orderNumber}`}
+                disabled={busy === order.id}
+                valeur={{
+                  customerName: order.customerName,
+                  phone: order.phone,
+                  address: order.address,
+                  city: order.city,
+                  note: order.note,
+                }}
+                onSave={(c) => patch(order, c)}
               />
             </div>
 

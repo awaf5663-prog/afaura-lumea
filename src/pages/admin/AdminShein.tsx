@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowRight, MessageCircle } from 'lucide-react';
 import { AmountField } from '@/src/components/admin/AmountField';
+import { CoordonneesEditor } from '@/src/components/admin/CoordonneesEditor';
 import { ExportButton } from '@/src/components/admin/ExportButton';
 import { Badge } from '@/src/components/ui/Badge';
 import { EmptyState } from '@/src/components/ui/EmptyState';
@@ -200,6 +201,26 @@ export function AdminShein({
                 <QuoteStat label="Total estimé" value={request.quote.total} emphasis />
               </dl>
             )}
+
+            <div className="mt-4 border-t border-line pt-4">
+              <CoordonneesEditor
+                reference={`Demande ${request.requestNumber}`}
+                avecAdresse={false}
+                disabled={busy === request.id}
+                valeur={{
+                  customerName: request.customerName,
+                  phone: request.phone,
+                  note: request.note,
+                }}
+                onSave={(c) =>
+                  patch(request, {
+                    customerName: c.customerName,
+                    phone: c.phone,
+                    note: c.note,
+                  })
+                }
+              />
+            </div>
 
             <Workflow request={request} busy={busy === request.id} patch={patch} />
           </li>

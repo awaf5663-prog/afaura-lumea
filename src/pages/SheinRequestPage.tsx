@@ -1,6 +1,7 @@
 import { AlertCircle, ImagePlus, Plus, Trash2, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { GroupingCapacity } from '@/src/components/shein/GroupingCapacity';
+import { ConfirmerEnvoi, type LigneRecap } from '@/src/components/order/ConfirmerEnvoi';
 import { PromoCodeField } from '@/src/components/order/PromoCodeField';
 import { PromotionNotice } from '@/src/components/shein/PromotionNotice';
 import { QuoteSummary } from '@/src/components/shein/QuoteSummary';
@@ -15,7 +16,7 @@ import { computeQuote } from '@/src/lib/pricing';
 import { visiblePromotions } from '@/src/lib/pricing/promotions';
 import { MAX_UPLOAD_BYTES, compressImage } from '@/src/lib/image';
 import { cn } from '@/src/lib/cn';
-import { formatFcfa, isValidSenegalPhone, normalizePhone } from '@/src/lib/format';
+import { formatFcfa, isValidSenegalPhone, normalizePhone, prettyPhone } from '@/src/lib/format';
 import { Link, useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
@@ -69,6 +70,8 @@ export function SheinRequestPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  /* Dernière relecture : voir components/order/ConfirmerEnvoi. */
+  const [relecture, setRelecture] = useState(false);
 
   useSeo({
     title: 'Transmettre mon panier SHEIN',
@@ -168,12 +171,17 @@ export function SheinRequestPage() {
     return Object.keys(next).length === 0;
   };
 
-  const submit = async (event: React.FormEvent) => {
+  const submit = (event: React.FormEvent) => {
     event.preventDefault();
     if (!validate()) {
       notify('Vérifiez les champs signalés.', 'error');
       return;
     }
+    setSubmitError(null);
+    setRelecture(true);
+  };
+
+  const envoyer = async () => {
     setSubmitting(true);
     setSubmitError(null);
     try {
@@ -193,6 +201,7 @@ export function SheinRequestPage() {
         ...mine.filter((m) => m.requestNumber !== request.requestNumber),
       ]);
 
+      setRelecture(false);
       navigate(`/shein/confirmation/${request.requestNumber}`);
       // WhatsApp part avec la demande en main : c'est ce message qui
       // prévient la boutique qu'une demande vient d'arriver.
@@ -202,8 +211,26 @@ export function SheinRequestPage() {
       setSubmitError(message);
       notify(message, 'error');
       setSubmitting(false);
+      setRelecture(false);
     }
   };
+
+  const retenus = items.filter((item) => item.productUrl.trim() || item.reference.trim());
+  const nbArticles = retenus.reduce((n, i) => n + Math.max(1, i.quantity), 0);
+  const optionLivraison = (pricing?.deliveryOptions ?? []).find((o) => o.id === deliveryOptionId);
+  const recapitulatif: LigneRecap[] = [
+    { label: 'Nom', value: customerName.trim() || '—' },
+    { label: 'Téléphone', value: prettyPhone(phone) || '—', cle: true },
+    { label: 'Livraison', value: optionLivraison?.label ?? '—' },
+    { label: 'Articles', value: `${nbArticles} article${nbArticles > 1 ? 's' : ''}` },
+    {
+      label: 'Estimation',
+      value:
+        quote && quote.total !== null
+          ? `${formatFcfa(quote.total)} — à confirmer`
+          : 'confirmée avant paiement',
+    },
+  ];
 
   return (
     <form onSubmit={submit} className="container-page py-8">
@@ -561,6 +588,15 @@ export function SheinRequestPage() {
           </aside>
         </div>
       </div>
+
+      <ConfirmerEnvoi
+        open={relecture}
+        onClose={() => setRelecture(false)}
+        onConfirm={() => void envoyer()}
+        busy={submitting}
+        lignes={recapitulatif}
+        action="Oui, envoyer ma demande"
+      />
     </form>
   );
 }

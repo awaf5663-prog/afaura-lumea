@@ -491,6 +491,12 @@ export const supabaseAdapter: DataSource = {
     if (patch.paymentStatus) body.payment_status = patch.paymentStatus;
     if (patch.deliveryFee !== undefined) body.delivery_fee = patch.deliveryFee;
     if (patch.note !== undefined) body.note = patch.note;
+    // Coordonnées. Le numéro est normalisé comme à la création, sans quoi la
+    // page Suivi ne retrouverait plus la commande avec le numéro corrigé.
+    if (patch.customerName !== undefined) body.customer_name = patch.customerName;
+    if (patch.phone !== undefined) body.phone = normalizePhone(patch.phone);
+    if (patch.address !== undefined) body.address = patch.address;
+    if (patch.city !== undefined) body.city = patch.city;
     const rows = await rest<Row[]>(`orders?id=eq.${id}&select=${ORDER_SELECT}`, {
       method: 'PATCH',
       body: JSON.stringify(body),
@@ -551,6 +557,8 @@ export const supabaseAdapter: DataSource = {
     if (patch.status) body.status = patch.status;
     if (patch.quotedTotal !== undefined) body.quoted_total = patch.quotedTotal;
     if (patch.note !== undefined) body.note = patch.note;
+    if (patch.customerName !== undefined) body.customer_name = patch.customerName;
+    if (patch.phone !== undefined) body.phone = normalizePhone(patch.phone);
     const rows = await rest<Row[]>(`shein_requests?id=eq.${id}&select=${SHEIN_SELECT}`, {
       method: 'PATCH',
       body: JSON.stringify(body),

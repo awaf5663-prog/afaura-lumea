@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
 import { findPhotoGroup, photoOfOption } from '@/src/lib/variants';
+import { prixUnitaire } from '@/src/lib/optionPrice';
 import type { CartItem, Product } from '@/src/types';
 
 interface CartValue {
@@ -88,7 +89,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
           name: product.name,
           slug: product.slug,
           image: pickImage(product, options),
-          unitPrice: product.price,
+          // Le prix peut dépendre de l'option choisie (lot de 4 / lot de 12).
+          // Affichage seulement : la base recalcule le montant à la commande.
+          unitPrice: prixUnitaire(product, options),
           quantity,
           options,
         },

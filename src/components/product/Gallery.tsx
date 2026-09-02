@@ -19,9 +19,16 @@ export function Gallery({
   labels,
   activeIndex,
   onIndexChange,
+  cadrage = 'portrait',
 }: {
   images: string[];
   alt: string;
+  /**
+   * `portrait` : la photo remplit le cadre, quitte à rogner — un voile porté.
+   * `carre` : la photo entière tient dans un carré — un article photographié
+   * sur fond neutre, qu'on ne peut pas rogner sans lui couper un bout.
+   */
+  cadrage?: 'portrait' | 'carre';
   /** Libellé de chaque photo (nom du modèle), affiché sous la galerie. */
   labels?: string[];
   activeIndex: number;
@@ -111,13 +118,16 @@ export function Gallery({
               remplit l'écran, et les vignettes comme le bouton « Ajouter au
               panier » passent sous la ligne de flottaison.
             */
-            className="aspect-[4/5] max-h-[56vh] w-full shrink-0 snap-center sm:max-h-none lg:max-h-[min(68vh,600px)]"
+            className={cn(
+              'w-full shrink-0 snap-center max-h-[56vh] sm:max-h-none lg:max-h-[min(68vh,600px)]',
+              cadrage === 'carre' ? 'aspect-square' : 'aspect-[4/5]',
+            )}
           >
               {image ? (
                 <img
                   src={image}
                   alt={labels?.[index] ? `${alt} — ${labels[index]}` : alt}
-                  className="size-full object-cover"
+                  className={cn('size-full', cadrage === 'carre' ? 'object-contain p-3' : 'object-cover')}
                   loading={index === 0 ? 'eager' : 'lazy'}
                   decoding="async"
                   draggable={false}
@@ -167,7 +177,12 @@ export function Gallery({
                   activeIndex === index ? 'border-mauve' : 'border-transparent',
                 )}
               >
-                <img src={image} alt="" className="size-full object-cover" loading="lazy" />
+                <img
+                  src={image}
+                  alt=""
+                  className={cn('size-full', cadrage === 'carre' ? 'object-contain' : 'object-cover')}
+                  loading="lazy"
+                />
               </button>
             ))}
           </div>

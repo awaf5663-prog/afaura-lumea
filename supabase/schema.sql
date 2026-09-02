@@ -205,6 +205,7 @@ declare
   v_item jsonb;
   v_product products%rowtype;
   v_quantity integer;
+  v_unit integer;
   v_label text;
   v_promotions jsonb;
   v_promo jsonb;
@@ -245,13 +246,17 @@ begin
       raise exception 'Stock insuffisant pour %', v_product.name;
     end if;
 
+    -- Prix unitaire : celui de l'option choisie s'il en a un, sinon celui de
+    -- l'article. Relu dans la table, jamais reçu du navigateur.
+    v_unit := prix_option(v_product, coalesce(v_item -> 'options', '{}'::jsonb));
+
     insert into order_items (order_id, product_id, name, quantity, unit_price, options)
     values (
-      v_order_id, v_product.id, v_product.name, v_quantity, v_product.price,
+      v_order_id, v_product.id, v_product.name, v_quantity, v_unit,
       coalesce(v_item -> 'options', '{}'::jsonb)
     );
 
-    v_subtotal := v_subtotal + v_product.price * v_quantity;
+    v_subtotal := v_subtotal + v_unit * v_quantity;
 
     if v_product.stock is not null then
       update products set stock = greatest(0, stock - v_quantity) where id = v_product.id;
@@ -1082,3 +1087,44 @@ $$;
 revoke execute on function tester_alerte() from public;
 revoke execute on function texte_alerte(text, jsonb, boolean) from public;
 grant execute on function tester_alerte() to authenticated;
+
+-- ── 9. Un prix par option (lot de 4, lot de 12…) ──────────────────────
+-- Le même article peut se vendre en plusieurs conditionnements. L'option
+-- choisie porte alors son propre prix, et `price` sert de valeur par défaut.
+--
+-- Le navigateur n'envoie QUE le libellé de l'option. Le montant est relu
+-- ici, dans la table — comme tous les autres montants du site.
+
+alter table products add column if not exists option_prices jsonb not null default '{}'::jsonb;
+
+create or replace function prix_option(p_product products, p_options jsonb)
+returns integer
+language plpgsql
+immutable
+as $$
+declare
+  v_groupe text;
+  v_choix text;
+  v_prix jsonb;
+begin
+  if jsonb_typeof(coalesce(p_product.option_prices, '{}'::jsonb)) <> 'object' then
+    return p_product.price;
+  end if;
+
+  -- Groupes parcourus dans l'ordre alphabétique : si deux groupes portaient
+  -- un prix, le montant ne doit pas dépendre de l'ordre de stockage du JSON.
+  -- Le premier qui correspond gagne, et l'application applique la même règle.
+  for v_groupe in select k from jsonb_object_keys(p_product.option_prices) k order by k loop
+    v_choix := p_options ->> v_groupe;
+    continue when v_choix is null;
+    v_prix := p_product.option_prices -> v_groupe -> v_choix;
+    if v_prix is not null and jsonb_typeof(v_prix) = 'number' then
+      return greatest(0, (v_prix #>> '{}')::numeric::integer);
+    end if;
+  end loop;
+
+  return p_product.price;
+end;
+$$;
+
+revoke execute on function prix_option(products, jsonb) from public;

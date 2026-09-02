@@ -20,6 +20,7 @@ import { useCart } from '@/src/hooks/useCart';
 import { useProducts } from '@/src/hooks/useProducts';
 import { useToast } from '@/src/hooks/useToast';
 import { formatFcfa } from '@/src/lib/format';
+import { cadragePhoto, prixUnitaire } from '@/src/lib/optionPrice';
 import { Link, useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 import { findPhotoGroup, photoOfOption, photoOptionsOf } from '@/src/lib/variants';
@@ -155,8 +156,15 @@ export function ProductPage({ slug }: { slug: string }) {
     );
   }
 
+  /*
+   * Le prix suit l'option choisie : un lot de 12 ne coûte pas le prix d'un
+   * lot de 4. Tant qu'aucune option tarifée n'est choisie, on affiche le
+   * prix de base. Le montant qui engage reste celui que la base recalcule.
+   */
+  const prixAffiche = prixUnitaire(product, options);
+
   const productUrl = `${SITE_URL}/produit/${product.slug}`;
-  const productMessage = buildProductMessage(product.name, formatFcfa(product.price), productUrl);
+  const productMessage = buildProductMessage(product.name, formatFcfa(prixAffiche), productUrl);
 
   const handleAdd = () => {
     if (missingOption) {
@@ -193,6 +201,7 @@ export function ProductPage({ slug }: { slug: string }) {
           labels={photoGroup && photoOptionsOf(photoGroup)}
           activeIndex={photoIndex}
           onIndexChange={handlePhotoIndex}
+          cadrage={cadragePhoto(product)}
         />
 
         <div>
@@ -207,7 +216,7 @@ export function ProductPage({ slug }: { slug: string }) {
           <h1 className="mt-3 text-[32px] sm:text-[40px]">{product.name}</h1>
 
           <Price
-            amount={product.price}
+            amount={prixAffiche}
             compareAt={product.compareAtPrice}
             className="mt-3 text-[22px]"
           />
@@ -297,7 +306,7 @@ export function ProductPage({ slug }: { slug: string }) {
                   <Check className="size-4" /> Ajouté
                 </>
               ) : (
-                <>Ajouter au panier · {formatFcfa(product.price * quantity)}</>
+                <>Ajouter au panier · {formatFcfa(prixAffiche * quantity)}</>
               )}
             </Button>
             <WhatsAppLink
@@ -399,7 +408,7 @@ export function ProductPage({ slug }: { slug: string }) {
             ) : soldOut ? (
               'Indisponible'
             ) : (
-              <>Ajouter · {formatFcfa(product.price * quantity)}</>
+              <>Ajouter · {formatFcfa(prixAffiche * quantity)}</>
             )}
           </Button>
         </div>

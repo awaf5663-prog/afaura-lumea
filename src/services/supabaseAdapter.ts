@@ -177,6 +177,10 @@ const toProduct = (r: Row): Product => ({
   isPopular: r.is_popular ?? false,
   otherColorsAvailable: r.other_colors_available ?? false,
   colorChartId: r.color_chart_id ?? null,
+  // Colonne absente tant que la mise à jour SQL n'est pas passée : l'article
+  // garde alors simplement son prix unique.
+  optionPrices:
+    r.option_prices && typeof r.option_prices === 'object' ? r.option_prices : undefined,
   measurements: Array.isArray(r.measurements) ? r.measurements : [],
   createdAt: r.created_at,
 });
@@ -199,6 +203,7 @@ const fromProduct = (p: Product): Row => ({
   is_popular: p.isPopular ?? false,
   other_colors_available: p.otherColorsAvailable ?? false,
   color_chart_id: p.colorChartId ?? null,
+  option_prices: p.optionPrices ?? {},
   measurements: p.measurements ?? [],
 });
 
@@ -421,19 +426,18 @@ export const supabaseAdapter: DataSource = {
         headers: { Prefer: 'resolution=merge-duplicates,return=representation' },
         body: JSON.stringify(r),
       });
-    try {
-      const rows = await envoyer(corps);
-      return toProduct(rows[0]);
-    } catch (error) {
-      // La colonne `measurements` est arrivée après la première mise en place
-      // de la base : sans la mise à jour SQL, on enregistre le reste de la
-      // fiche plutôt que de refuser la modification entière.
-      const message = error instanceof Error ? error.message : '';
-      if (!/measurements/i.test(message)) throw error;
-      const { measurements: _m, ...sansMesures } = corps;
-      const rows = await envoyer(sansMesures);
-      return toProduct(rows[0]);
-    }
+    /*
+     * Deux colonnes sont arrivées après la première mise en place de la base.
+     * Sans la mise à jour SQL, PostgREST refuse TOUTE la fiche à cause d'une
+     * seule d'entre elles. On réessaie donc sans, et si le contenu écarté
+     * n'était pas vide, on le dit clairement — plutôt que d'annoncer un
+     * enregistrement réussi qui a perdu quelque chose en route.
+     */
+    const rows = await enregistrerSansColonnesAbsentes(envoyer, corps, [
+      { colonne: 'measurements', etiquette: 'les mesures de la pièce' },
+      { colonne: 'option_prices', etiquette: 'les prix par option' },
+    ]);
+    return toProduct(rows[0]);
   },
 
   async deleteProduct(id) {

@@ -13,12 +13,12 @@
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
   'jersey', 'jersey', 'Jersey', 'Le hijab du quotidien. Maille jersey souple, tombé net, aucune épingle nécessaire. Choisissez votre teinte dans le nuancier ci-dessous.',
   1500, null, 'jersey',
-  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, 'modal36'
 )
@@ -29,18 +29,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
   'jersey-frise', 'jersey-frise', 'Jersey frisé', 'Jersey à bord frisé : la maille est terminée par des volants qui tiennent la forme et habillent le visage sans épingle. Faites défiler les photos pour voir le tombé et le détail du frisé, puis choisissez votre numéro de teinte dans le nuancier ci-dessous.',
   2000, null, 'jersey_frise',
-  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, 'frise36'
 )
@@ -51,18 +52,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
   'satin-imprime', 'satin-imprime', 'Satin imprimé', 'Satin fluide au léger reflet, en dégradés et pailletés. Faites défiler les photos pour voir les modèles, puis choisissez le vôtre.',
   3500, null, 'satin_imprime',
-  '[]'::jsonb, '[{"name":"Modèle","options":["Dégradé vert & bleu","Sable pailleté","Noir pailleté","Vert d''eau","Dégradé vert & rouille"],"soldOutOptions":[]}]'::jsonb, null, 'active',
+  '[]'::jsonb, '[{"name":"Modèle","options":["Dégradé vert & bleu","Sable pailleté","Noir pailleté","Vert d''eau","Dégradé vert & rouille"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   true, null
 )
@@ -73,18 +75,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
   'voile-mj', 'voile-mj', 'Voile MJ', 'Notre voile le plus fluide : un mélange de modal et de jersey. Il a la douceur et le tombé du modal, avec le maintien du jersey — il ne glisse pas et ne demande pas d''épingle. 170 × 60 cm. Faites défiler les photos pour voir le tombé, puis choisissez votre numéro de teinte dans le nuancier ci-dessous.',
   4500, null, 'voile_mj',
-  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, 'modal36'
 )
@@ -95,18 +98,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
   'modal-simple', 'modal-simple', 'Modal simple', 'Modal uni, doux et respirant, très léger à porter. Un drapé souple qui reste impeccable toute la journée. Choisissez votre teinte dans le nuancier ci-dessous.',
   4500, null, 'modal_simple',
-  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, 'modal36'
 )
@@ -117,18 +121,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
   'modal-imprime', 'modal-imprime', 'Modal imprimé', 'Le confort du modal avec un imprimé travaillé. Faites défiler les photos pour voir les modèles, puis choisissez celui qui vous plaît. Vendu à l''unité.',
   5500, null, 'modal_imprime',
-  '[]'::jsonb, '[{"name":"Modèle","options":["Zébré bordeaux","Pois sur brun","Pois sur blanc","Aquarelle","Léopard"],"soldOutOptions":[]}]'::jsonb, null, 'active',
+  '[]'::jsonb, '[{"name":"Modèle","options":["Zébré bordeaux","Pois sur brun","Pois sur blanc","Aquarelle","Léopard"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   true, null
 )
@@ -139,18 +144,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
   'dentelle', 'dentelle', 'Dentelle', 'Hijab bordé de dentelle, pour les occasions : cérémonies, fêtes, invitations. Choisissez votre teinte dans le nuancier ci-dessous.',
   5000, null, 'dentelle',
-  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, 'dentelle12'
 )
@@ -161,18 +167,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
   'piece-unique', 'piece-unique', 'Pièce unique', 'Des modèles rares, reçus à l''unité. Faites défiler les photos pour les voir un par un, puis choisissez celui que vous voulez : chaque modèle n''existe qu''en un seul exemplaire.',
   6000, null, 'piece_unique',
-  '[]'::jsonb, '[{"name":"Modèle","options":["Noir fleuri","Crème fleuri","Taupe fleuri","Fauve","Écru & or"],"soldOutOptions":[]}]'::jsonb, null, 'active',
+  '[]'::jsonb, '[{"name":"Modèle","options":["Noir fleuri","Crème fleuri","Taupe fleuri","Fauve","Écru & or"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, null
 )
@@ -183,18 +190,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
   'voile-viscose', 'voile-viscose', 'Voile viscose premium', 'Ce n''est pas du modal : la viscose est une autre matière, nettement plus légère et plus aérienne. Le voile se pose presque sans poids, avec un tombé long et un léger effet froissé — parfait pour les journées chaudes. Faites défiler les photos pour voir le rendu, puis choisissez votre numéro de teinte dans le nuancier ci-dessous.',
   6500, null, 'voile_viscose',
-  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, 'modal36'
 )
@@ -205,18 +213,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
   'abaya', 'abaya', 'Abaya', 'Abayas longues, coupe ample et ouverte, à porter sur une tenue. Chaque modèle a son propre tissu et son propre imprimé. Faites défiler les photos pour les voir un par un, puis choisissez le vôtre — la coupe et la longueur vous sont confirmées sur WhatsApp avant la validation de la commande.',
   15000, null, 'abaya',
-  '[]'::jsonb, '[{"name":"Modèle","options":["Noir & blanc plissé","Bleu zébré","Rose cachemire","Beige léopard satiné","Noir uni","Marbré brun & écru","Bleu délavé","Prune plissé","Kaki marbré","Léopard fauve"],"soldOutOptions":[],"photoOptions":["Noir & blanc plissé","Bleu zébré","Rose cachemire","Beige léopard satiné","Noir uni","Marbré brun & écru","Bleu délavé","Prune plissé","Kaki marbré","Léopard fauve","Léopard fauve"]}]'::jsonb, null, 'active',
+  '[]'::jsonb, '[{"name":"Modèle","options":["Noir & blanc plissé","Bleu zébré","Rose cachemire","Beige léopard satiné","Noir uni","Marbré brun & écru","Bleu délavé","Prune plissé","Kaki marbré","Léopard fauve"],"soldOutOptions":[],"photoOptions":["Noir & blanc plissé","Bleu zébré","Rose cachemire","Beige léopard satiné","Noir uni","Marbré brun & écru","Bleu délavé","Prune plissé","Kaki marbré","Léopard fauve","Léopard fauve"]}]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, null
 )
@@ -227,18 +236,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
   'hijab-tape', 'hijab-tape', 'Hijab tape', 'Les bandes adhésives double face qui remplacent les épingles : on colle, le voile reste en place toute la journée, et rien ne marque ni n''abîme le tissu. Un sachet contient plusieurs bandes.',
   1000, null, 'hijab_tape',
-  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, null
 )
@@ -249,18 +259,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
-  'bics-souligneurs', 'bics-souligneurs', 'Bics et souligneurs', 'Un lot de stylos et de souligneurs pour la rentrée. Commandé pour vous et acheminé avec le prochain groupage.',
+  'bics-souligneurs', 'bics-souligneurs', 'Bics et souligneurs', 'Lot de 6 stylos et souligneurs, coloris rose. Commandé pour vous et acheminé avec le prochain groupage.',
   550, null, 'rentree',
-  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   false, null
 )
@@ -271,18 +282,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
-  'classeur', 'classeur', 'Classeur à soufflets', 'Classeur à compartiments pour trier cours, feuilles et documents. Commandé pour vous et acheminé avec le prochain groupage.',
+  'classeur', 'classeur', 'Classeur à soufflets', 'Classeur à compartiments pour trier cours, feuilles et documents, coloris rose. Planche d''étiquettes de couleur fournie.',
   1000, null, 'rentree',
-  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   false, null
 )
@@ -293,18 +305,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
-  'protec-ordinateur', 'protec-ordinateur', 'Protection de clavier', 'Film souple à poser sur le clavier de l’ordinateur, contre la poussière et les éclaboussures. Précisez le modèle de votre ordinateur au moment de commander.',
+  'protec-ordinateur', 'protec-ordinateur', 'Protection de clavier', 'Film souple à poser sur le clavier de l’ordinateur, coloris rose translucide, contre la poussière et les éclaboussures. Précisez le modèle de votre ordinateur au moment de commander.',
   1000, null, 'rentree',
-  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   false, null
 )
@@ -315,18 +328,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
-  'coque-telephone', 'coque-telephone', 'Coque de téléphone', 'Coque transparente à motif. Précisez le modèle de votre téléphone au moment de commander : nous confirmons la disponibilité avant paiement.',
+  'coque-telephone', 'coque-telephone', 'Coque de téléphone', 'Coque transparente, motif squelette et fleurs. Précisez le modèle de votre téléphone au moment de commander : nous confirmons la disponibilité avant paiement.',
   1500, null, 'rentree',
-  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   false, null
 )
@@ -337,18 +351,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
-  'adaptateur-usb', 'adaptateur-usb', 'Adaptateur USB', 'Adaptateur pour brancher une clé USB ou un disque sur téléphone et tablette. Précisez le type de prise de votre appareil au moment de commander.',
+  'adaptateur-usb', 'adaptateur-usb', 'Adaptateur USB', 'Adaptateur pour brancher une clé USB ou un disque sur téléphone et tablette, coloris lilas. Précisez le type de prise de votre appareil au moment de commander.',
   3000, null, 'rentree',
-  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   false, null
 )
@@ -359,18 +374,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
   'gourde', 'gourde', 'Gourde', 'Gourde isotherme pour la journée de cours. Plusieurs coloris : précisez celui que vous souhaitez, nous confirmons la disponibilité.',
   3500, null, 'rentree',
-  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  '[]'::jsonb, '[{"name":"Couleur","options":["Rose","Blanc","Noir"]}]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   true, null
 )
@@ -381,18 +397,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
-  'bloc-note', 'bloc-note', 'Bloc-notes', 'Carnet à spirale, couverture rigide gravée. Pour les cours, les listes ou le planning de la semaine.',
+  'bloc-note', 'bloc-note', 'Bloc-notes', 'Carnet à spirale, couverture rigide gravée, coloris rose. Pour les cours, les listes ou le planning de la semaine.',
   4000, null, 'rentree',
-  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   false, null
 )
@@ -403,18 +420,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
-  'miroir', 'miroir', 'Miroir', 'Petit miroir à poser, cadre ondulé. Pour le bureau, la chambre ou la table de chevet.',
+  'miroir', 'miroir', 'Miroir', 'Petit miroir à poser, cadre ondulé, coloris rose poudré. Pour le bureau, la chambre ou la table de chevet.',
   400, null, 'rentree',
-  '[]'::jsonb, '[]'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   false, null
 )
@@ -425,18 +443,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
   'sac-ordinateur', 'sac-ordinateur', 'Sac ordinateur', 'Housse matelassée pour ordinateur portable. Précisez la taille de votre écran au moment de commander.',
   10000, null, 'rentree',
-  '[]'::jsonb, '[]'::jsonb, null, 'draft',
+  '[]'::jsonb, '[{"name":"Couleur","options":["Blanc","Noir","Rose"]}]'::jsonb, '{}'::jsonb, null, 'draft',
   true, false,
   false, null
 )
@@ -447,18 +466,19 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
-  images, variants, stock, status, is_new, is_popular,
+  images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
   'mini-gourde', 'mini-gourde', 'Mini-gourde', 'Petite gourde isotherme à emporter. Plusieurs coloris : précisez celui que vous souhaitez, nous confirmons la disponibilité.',
   0, null, 'rentree',
-  '[]'::jsonb, '[]'::jsonb, null, 'draft',
+  '[]'::jsonb, '[{"name":"Couleur","options":["Crème","Rose poudré","Lilas"]}]'::jsonb, '{}'::jsonb, null, 'draft',
   true, false,
   true, null
 )
@@ -469,6 +489,7 @@ on conflict (id) do update set
   price = excluded.price,
   category = excluded.category,
   variants = excluded.variants,
+  option_prices = excluded.option_prices,
   status = excluded.status,
   other_colors_available = excluded.other_colors_available,
   color_chart_id = excluded.color_chart_id;

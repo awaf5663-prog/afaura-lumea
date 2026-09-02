@@ -74,7 +74,12 @@ export const CATEGORIES: Category[] = [
   { id: 'jersey', name: 'Jersey' },
   { id: 'jersey_frise', name: 'Jersey frisé' },
   { id: 'hijab_tape', name: 'Hijab tape' },
-  { id: 'rentree', name: 'Rentrée' },
+  /*
+   * Photos carrées, montrées en entier : ce sont des articles posés sur fond
+   * neutre. Recadrés en portrait, la gourde perdait son bouchon et le sac
+   * ordinateur sa bandoulière.
+   */
+  { id: 'rentree', name: 'Rentrée', photo: 'carre' },
 ];
 
 /**
@@ -354,7 +359,7 @@ export const SEED_PRODUCTS: Product[] = [
     slug: 'bics-souligneurs',
     name: 'Bics et souligneurs',
     description:
-      "Un lot de stylos et de souligneurs pour la rentrée. Commandé pour vous et acheminé avec le prochain groupage.",
+      "Lot de 6 stylos et souligneurs, coloris rose. Commandé pour vous et acheminé avec le prochain groupage.",
     price: 550,
     compareAtPrice: null,
     category: 'rentree',
@@ -370,7 +375,7 @@ export const SEED_PRODUCTS: Product[] = [
     slug: 'classeur',
     name: 'Classeur à soufflets',
     description:
-      "Classeur à compartiments pour trier cours, feuilles et documents. Commandé pour vous et acheminé avec le prochain groupage.",
+      "Classeur à compartiments pour trier cours, feuilles et documents, coloris rose. Planche d'étiquettes de couleur fournie.",
     price: 1000,
     compareAtPrice: null,
     category: 'rentree',
@@ -386,7 +391,7 @@ export const SEED_PRODUCTS: Product[] = [
     slug: 'protec-ordinateur',
     name: 'Protection de clavier',
     description:
-      "Film souple à poser sur le clavier de l’ordinateur, contre la poussière et les éclaboussures. Précisez le modèle de votre ordinateur au moment de commander.",
+      "Film souple à poser sur le clavier de l’ordinateur, coloris rose translucide, contre la poussière et les éclaboussures. Précisez le modèle de votre ordinateur au moment de commander.",
     price: 1000,
     compareAtPrice: null,
     category: 'rentree',
@@ -402,7 +407,7 @@ export const SEED_PRODUCTS: Product[] = [
     slug: 'coque-telephone',
     name: 'Coque de téléphone',
     description:
-      "Coque transparente à motif. Précisez le modèle de votre téléphone au moment de commander : nous confirmons la disponibilité avant paiement.",
+      "Coque transparente, motif squelette et fleurs. Précisez le modèle de votre téléphone au moment de commander : nous confirmons la disponibilité avant paiement.",
     price: 1500,
     compareAtPrice: null,
     category: 'rentree',
@@ -418,7 +423,7 @@ export const SEED_PRODUCTS: Product[] = [
     slug: 'adaptateur-usb',
     name: 'Adaptateur USB',
     description:
-      "Adaptateur pour brancher une clé USB ou un disque sur téléphone et tablette. Précisez le type de prise de votre appareil au moment de commander.",
+      "Adaptateur pour brancher une clé USB ou un disque sur téléphone et tablette, coloris lilas. Précisez le type de prise de votre appareil au moment de commander.",
     price: 3000,
     compareAtPrice: null,
     category: 'rentree',
@@ -439,7 +444,7 @@ export const SEED_PRODUCTS: Product[] = [
     compareAtPrice: null,
     category: 'rentree',
     images: [gourde],
-    variants: [],
+    variants: [{ name: 'Couleur', options: ['Rose', 'Blanc', 'Noir'] }],
     stock: null,
     status: 'active',
     isNew: true,
@@ -451,7 +456,7 @@ export const SEED_PRODUCTS: Product[] = [
     slug: 'bloc-note',
     name: 'Bloc-notes',
     description:
-      "Carnet à spirale, couverture rigide gravée. Pour les cours, les listes ou le planning de la semaine.",
+      "Carnet à spirale, couverture rigide gravée, coloris rose. Pour les cours, les listes ou le planning de la semaine.",
     price: 4000,
     compareAtPrice: null,
     category: 'rentree',
@@ -467,7 +472,7 @@ export const SEED_PRODUCTS: Product[] = [
     slug: 'miroir',
     name: 'Miroir',
     description:
-      "Petit miroir à poser, cadre ondulé. Pour le bureau, la chambre ou la table de chevet.",
+      "Petit miroir à poser, cadre ondulé, coloris rose poudré. Pour le bureau, la chambre ou la table de chevet.",
     price: 400,
     compareAtPrice: null,
     category: 'rentree',
@@ -488,7 +493,7 @@ export const SEED_PRODUCTS: Product[] = [
     compareAtPrice: null,
     category: 'rentree',
     images: [sacOrdinateur],
-    variants: [],
+    variants: [{ name: 'Couleur', options: ['Blanc', 'Noir', 'Rose'] }],
     stock: null,
     status: 'draft',
     isNew: true,
@@ -504,7 +509,7 @@ export const SEED_PRODUCTS: Product[] = [
     compareAtPrice: null,
     category: 'rentree',
     images: [miniGourde],
-    variants: [],
+    variants: [{ name: 'Couleur', options: ['Crème', 'Rose poudré', 'Lilas'] }],
     stock: null,
     status: 'draft',
     isNew: true,

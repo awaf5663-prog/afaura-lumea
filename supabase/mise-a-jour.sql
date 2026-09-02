@@ -534,3 +534,184 @@ $$;
 revoke execute on function tester_alerte() from public;
 revoke execute on function texte_alerte(text, jsonb, boolean) from public;
 grant execute on function tester_alerte() to authenticated;
+
+-- ── 9. Un prix par option (lot de 4, lot de 12…) ──────────────────────
+-- Le même article peut se vendre en plusieurs conditionnements. L'option
+-- choisie porte alors son propre prix, et `price` sert de valeur par défaut.
+--
+-- Le navigateur n'envoie QUE le libellé de l'option. Le montant est relu
+-- ici, dans la table — comme tous les autres montants du site.
+
+alter table products add column if not exists option_prices jsonb not null default '{}'::jsonb;
+
+create or replace function prix_option(p_product products, p_options jsonb)
+returns integer
+language plpgsql
+immutable
+as $$
+declare
+  v_groupe text;
+  v_choix text;
+  v_prix jsonb;
+begin
+  if jsonb_typeof(coalesce(p_product.option_prices, '{}'::jsonb)) <> 'object' then
+    return p_product.price;
+  end if;
+
+  -- Groupes parcourus dans l'ordre alphabétique : si deux groupes portaient
+  -- un prix, le montant ne doit pas dépendre de l'ordre de stockage du JSON.
+  -- Le premier qui correspond gagne, et l'application applique la même règle.
+  for v_groupe in select k from jsonb_object_keys(p_product.option_prices) k order by k loop
+    v_choix := p_options ->> v_groupe;
+    continue when v_choix is null;
+    v_prix := p_product.option_prices -> v_groupe -> v_choix;
+    if v_prix is not null and jsonb_typeof(v_prix) = 'number' then
+      return greatest(0, (v_prix #>> '{}')::numeric::integer);
+    end if;
+  end loop;
+
+  return p_product.price;
+end;
+$$;
+
+revoke execute on function prix_option(products, jsonb) from public;
+
+-- La fonction de commande doit appliquer ce prix : on la remplace en entier.
+-- (Même corps que dans schema.sql, à la ligne du prix unitaire près.)
+
+create or replace function create_order(
+  p_customer_name text,
+  p_phone text,
+  p_address text,
+  p_city text,
+  p_note text,
+  p_delivery_zone_id text,
+  p_payment_method text,
+  p_items jsonb,
+  p_promo_code text default '',
+  p_is_student boolean default false
+) returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_order_id uuid;
+  v_number text;
+  v_subtotal integer := 0;
+  v_fee integer;
+  v_item jsonb;
+  v_product products%rowtype;
+  v_quantity integer;
+  v_unit integer;
+  v_label text;
+  v_promotions jsonb;
+  v_promo jsonb;
+  v_promo_label text;
+  v_fee_before integer;
+  v_discount integer := 0;
+  v_today text := to_char(now(), 'YYYY-MM-DD');
+  v_code text := upper(btrim(coalesce(p_promo_code, '')));
+begin
+  if jsonb_array_length(coalesce(p_items, '[]'::jsonb)) = 0 then
+    raise exception 'Panier vide';
+  end if;
+
+  select (delivery_fees ->> p_delivery_zone_id)::integer, coalesce(promotions, '[]'::jsonb)
+    into v_fee, v_promotions
+    from settings where id = 1;
+  v_label := p_delivery_zone_id;
+  v_number := 'CMD-' || to_char(now(), 'YYYY') || '-' || lpad(nextval('order_seq')::text, 5, '0');
+
+  insert into orders (
+    order_number, customer_name, phone, address, city, note,
+    delivery_zone_id, delivery_label, delivery_fee, subtotal, total,
+    payment_method, payment_method_label, promo_code
+  ) values (
+    v_number, p_customer_name, p_phone, p_address, p_city, p_note,
+    p_delivery_zone_id, v_label, v_fee, 0, 0,
+    p_payment_method, p_payment_method, v_code
+  ) returning id into v_order_id;
+
+  for v_item in select * from jsonb_array_elements(p_items) loop
+    select * into v_product from products where id = v_item ->> 'product_id';
+    if not found or v_product.status <> 'active' then
+      raise exception 'Produit indisponible : %', v_item ->> 'product_id';
+    end if;
+
+    v_quantity := greatest(1, least(99, (v_item ->> 'quantity')::integer));
+    if v_product.stock is not null and v_quantity > v_product.stock then
+      raise exception 'Stock insuffisant pour %', v_product.name;
+    end if;
+
+    -- Prix unitaire : celui de l'option choisie s'il en a un, sinon celui de
+    -- l'article. Relu dans la table, jamais reçu du navigateur.
+    v_unit := prix_option(v_product, coalesce(v_item -> 'options', '{}'::jsonb));
+
+    insert into order_items (order_id, product_id, name, quantity, unit_price, options)
+    values (
+      v_order_id, v_product.id, v_product.name, v_quantity, v_unit,
+      coalesce(v_item -> 'options', '{}'::jsonb)
+    );
+
+    v_subtotal := v_subtotal + v_unit * v_quantity;
+
+    if v_product.stock is not null then
+      update products set stock = greatest(0, stock - v_quantity) where id = v_product.id;
+    end if;
+  end loop;
+
+  -- Offres. Toutes les conditions renseignées doivent être remplies ; une liste
+  -- vide ne restreint rien. Vérifiées ici, jamais d'après le navigateur, qui ne
+  -- transmet qu'un code et une déclaration.
+  for v_promo in select * from jsonb_array_elements(v_promotions) loop
+    continue when not coalesce((v_promo ->> 'active')::boolean, false);
+    continue when coalesce(v_promo ->> 'scope', 'all') not in ('all', 'store');
+    continue when coalesce((v_promo ->> 'studentOnly')::boolean, false)
+                  and not coalesce(p_is_student, false);
+    continue when v_promo ->> 'startsAt' is not null and v_today < (v_promo ->> 'startsAt');
+    continue when v_promo ->> 'endsAt' is not null and v_today > (v_promo ->> 'endsAt');
+    continue when jsonb_array_length(coalesce(v_promo -> 'deliveryOptionIds', '[]'::jsonb)) > 0
+                  and not (coalesce(v_promo -> 'deliveryOptionIds', '[]'::jsonb)
+                           ? p_delivery_zone_id);
+    -- Une offre à code ne s'applique jamais toute seule.
+    continue when upper(btrim(coalesce(v_promo ->> 'code', ''))) <> v_code;
+
+    if coalesce(v_promo -> 'effect' ->> 'type', '') = 'free_delivery'
+       and v_fee is not null and v_fee > 0 then
+      v_fee_before := v_fee;
+      v_fee := 0;
+      v_promo_label := v_promo ->> 'label';
+      exit;
+    elsif coalesce(v_promo -> 'effect' ->> 'type', '') = 'discount_amount' then
+      -- Plafonnée au montant connu : une remise ne rend jamais d'argent.
+      v_discount := least(
+        greatest(0, coalesce((v_promo -> 'effect' ->> 'amount')::integer, 0)),
+        v_subtotal + coalesce(v_fee, 0)
+      );
+      if v_discount > 0 then
+        v_promo_label := v_promo ->> 'label';
+        exit;
+      end if;
+    end if;
+  end loop;
+
+  update orders
+     set subtotal = v_subtotal,
+         delivery_fee = v_fee,
+         delivery_fee_before_promotion = v_fee_before,
+         discount = v_discount,
+         promotion_label = v_promo_label,
+         total = v_subtotal + coalesce(v_fee, 0) - v_discount
+   where id = v_order_id;
+
+  return (
+    select to_jsonb(o) || jsonb_build_object(
+      'order_items', coalesce((select jsonb_agg(to_jsonb(i)) from order_items i where i.order_id = o.id), '[]'::jsonb)
+    )
+    from orders o where o.id = v_order_id
+  );
+end;
+$$;
+
+grant execute on function create_order(text, text, text, text, text, text, text, jsonb, text, boolean) to anon, authenticated;

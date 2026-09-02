@@ -68,9 +68,13 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
     setVariantText(
       product.variants
         .map((group) => {
-          const options = group.options.map((option) =>
-            (group.soldOutOptions ?? []).includes(option) ? `${option} (épuisé)` : option,
-          );
+          const options = group.options.map((option) => {
+            const prix = product.optionPrices?.[group.name]?.[option];
+            // « Lot de 12 (1200) (épuisé) » : le prix propre à l'option, puis
+            // l'indisponibilité. Les deux marqueurs se cumulent.
+            const avecPrix = typeof prix === 'number' ? `${option} (${prix})` : option;
+            return (group.soldOutOptions ?? []).includes(option) ? `${avecPrix} (épuisé)` : avecPrix;
+          });
           return `${group.name}: ${options.join(', ')}`;
         })
         .join('\n'),
@@ -83,6 +87,14 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
     if (!Number.isFinite(editing.price) || editing.price <= 0)
       return notify('Le prix doit être supérieur à 0.', 'error');
 
+    /*
+     * Un article peut se vendre en plusieurs conditionnements : « Lot de 4 »
+     * et « Lot de 12 » n'ont pas le même prix. On les saisit dans le même
+     * champ, entre parenthèses, plutôt que d'ajouter un deuxième tableau à
+     * remplir. Le montant retenu à la commande reste celui que la base relit.
+     */
+    const optionPrices: Record<string, Record<string, number>> = {};
+
     const variants = variantText
       .split('\n')
       .map((line) => line.trim())
@@ -93,12 +105,34 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
           .split(',')
           .map((option) => option.trim())
           .filter(Boolean);
-        // « Noir fleuri (épuisé) » retire le modèle de la vente sans le supprimer.
-        const options = entries.map((entry) => entry.replace(/\s*\(épuisé\)\s*$/i, '').trim());
-        const soldOutOptions = entries
-          .filter((entry) => /\(épuisé\)\s*$/i.test(entry))
-          .map((entry) => entry.replace(/\s*\(épuisé\)\s*$/i, '').trim());
-        return { name: name.trim(), options, soldOutOptions };
+
+        const groupName = name.trim();
+        const options: string[] = [];
+        const soldOutOptions: string[] = [];
+
+        for (const entry of entries) {
+          // Deux marqueurs, dans n'importe quel ordre :
+          //   (épuisé) → retire le modèle de la vente sans le supprimer
+          //   (1200)   → prix propre à cette option, en FCFA
+          const epuise = /\(épuisé\)/i.test(entry);
+          const prix = /\((\d[\d\s]*)\)/.exec(entry);
+          const label = entry
+            .replace(/\(épuisé\)/gi, '')
+            .replace(/\(\d[\d\s]*\)/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+          if (!label) continue;
+          options.push(label);
+          if (epuise) soldOutOptions.push(label);
+          if (prix) {
+            const montant = Number(prix[1].replace(/\s/g, ''));
+            if (Number.isFinite(montant) && montant >= 0) {
+              optionPrices[groupName] = { ...optionPrices[groupName], [label]: montant };
+            }
+          }
+        }
+
+        return { name: groupName, options, soldOutOptions };
       })
       .filter((group) => group.name && group.options.length > 0)
       .map((group) => {
@@ -124,6 +158,7 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
         name: editing.name.trim(),
         slug: editing.slug.trim() || slugify(editing.name),
         variants,
+        optionPrices,
       });
       await reload();
       setEditing(null);
@@ -356,12 +391,18 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
                 id="p-variants"
                 value={variantText}
                 onChange={(e) => setVariantText(e.target.value)}
-                placeholder={'Modèle: Noir fleuri, Fauve (épuisé)\nTaille: 1m80, 2m00'}
+                placeholder={
+                  'Modèle: Noir fleuri, Fauve (épuisé)\nFormat: Lot de 4 (550), Lot de 12 (1200)'
+                }
               />
               <p className="mt-1.5 text-[12px] leading-relaxed text-stone">
                 Ajoutez <span className="font-medium">(épuisé)</span> après un modèle vendu : il
                 reste visible, barré, mais ne peut plus être commandé. Si le groupe a autant
                 d'options que de photos, faire défiler la galerie sélectionne le modèle.
+                <br />
+                Un <span className="font-medium">nombre entre parenthèses</span> donne son propre
+                prix à l'option : <span className="font-medium">Lot de 12 (1200)</span>. Les autres
+                gardent le prix de l'article. La vignette affiche alors « dès… ».
               </p>
             </FormRow>
 

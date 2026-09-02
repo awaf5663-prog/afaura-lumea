@@ -61,6 +61,25 @@ export interface Product {
   /** Nuancier rattaché : la cliente choisit un numéro de teinte. */
   colorChartId?: string | null;
   /**
+   * Prix propre à certaines options, en FCFA.
+   *
+   * Forme : { "Format": { "Lot de 4": 550, "Lot de 12": 1200 } }
+   *
+   * Le même article peut se vendre en plusieurs conditionnements : un paquet
+   * de 4 crayons n'a pas le prix d'un paquet de 12. L'option choisie porte
+   * alors son propre prix, et `price` sert de valeur par défaut pour les
+   * options qui n'en ont pas.
+   *
+   * Un SEUL groupe devrait porter des prix : si plusieurs en portaient, le
+   * montant dépendrait de l'ordre des groupes, ce qui n'aurait aucun sens
+   * pour la cliente. Le serveur, lui, tranche de façon déterministe (voir
+   * create_order dans supabase/schema.sql).
+   *
+   * ⚠️ Ce n'est PAS ce que le navigateur envoie. Il ne transmet qu'un
+   * libellé d'option ; le montant est relu ici, côté serveur.
+   */
+  optionPrices?: Record<string, Record<string, number>>;
+  /**
    * Mesures réelles de l'article, saisies depuis l'administration.
    *
    * Jamais de valeur inventée ici : tant que la boutique n'a pas mesuré la
@@ -99,6 +118,16 @@ export interface Review {
 }
 
 export interface Category {
+  /**
+   * Cadrage des photos de la catégorie.
+   *
+   * `portrait` (défaut) : photo recadrée en 3/4, comme un voile porté par un
+   * mannequin — on remplit le cadre, quitte à rogner les bords.
+   * `carre` : photo entière dans un carré, sans rien rogner. C'est ce qu'il
+   * faut pour des articles photographiés sur fond neutre — une gourde
+   * recadrée en portrait perdait son bouchon ou son pied.
+   */
+  photo?: 'portrait' | 'carre';
   id: string;
   name: string;
 }

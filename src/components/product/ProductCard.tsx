@@ -1,4 +1,6 @@
 import { Plus, SlidersHorizontal } from 'lucide-react';
+import { cn } from '@/src/lib/cn';
+import { cadragePhoto, plusieursPrix, prixLePlusBas } from '@/src/lib/optionPrice';
 import { Badge } from '@/src/components/ui/Badge';
 import { Price } from '@/src/components/ui/Price';
 import { useCart } from '@/src/hooks/useCart';
@@ -13,18 +15,36 @@ export function ProductCard({ product, priority }: { product: Product; priority?
   const needsChoice = product.variants.length > 0;
   /** Nombre de modèles proposés, quand la fiche en regroupe plusieurs. */
   const choiceCount = product.variants[0]?.options.length ?? 0;
+  const carre = cadragePhoto(product) === 'carre';
+  // « dès 550 FCFA » quand le prix dépend du conditionnement choisi.
+  const aPlusieursPrix = plusieursPrix(product);
 
   return (
     <article className="group relative">
       <Link to={`/produit/${product.slug}`} className="block">
-        <div className="relative aspect-[3/4] overflow-hidden rounded-[--radius-md] bg-cream">
+        {/*
+          Deux cadrages selon la catégorie. Un voile porté remplit un cadre
+          portrait ; une gourde photographiée sur fond neutre, elle, y perdait
+          son bouchon ou son pied. Voir Category.photo.
+        */}
+        <div
+          className={cn(
+            'relative overflow-hidden rounded-[--radius-md] bg-cream',
+            carre ? 'aspect-square' : 'aspect-[3/4]',
+          )}
+        >
           {product.images[0] ? (
             <img
               src={product.images[0]}
               alt={product.name}
               loading={priority ? 'eager' : 'lazy'}
               decoding="async"
-              className="size-full object-cover transition-transform duration-[600ms] ease-out group-hover:scale-[1.04]"
+              className={cn(
+                'size-full transition-transform duration-[600ms] ease-out group-hover:scale-[1.04]',
+                // `contain` : on montre l'article entier, quitte à laisser du
+                // fond crème autour. `cover` remplit, mais rogne.
+                carre ? 'object-contain p-2' : 'object-cover',
+              )}
             />
           ) : (
             <div className="grid size-full place-items-center text-xs text-stone">Photo à venir</div>
@@ -48,7 +68,14 @@ export function ProductCard({ product, priority }: { product: Product; priority?
           <Link to={`/produit/${product.slug}`}>
             <h3 className="line-clamp-2 font-display text-[17px] leading-tight">{product.name}</h3>
           </Link>
-          <Price amount={product.price} compareAt={product.compareAtPrice} className="mt-1 text-[14px]" />
+          <span className="mt-1 flex items-baseline gap-1.5">
+            {aPlusieursPrix && <span className="text-[12.5px] text-stone">dès</span>}
+            <Price
+              amount={prixLePlusBas(product)}
+              compareAt={product.compareAtPrice}
+              className="text-[14px]"
+            />
+          </span>
           {choiceCount > 1 && (
             <p className="mt-0.5 text-[12px] text-mauve">{choiceCount} modèles au choix</p>
           )}

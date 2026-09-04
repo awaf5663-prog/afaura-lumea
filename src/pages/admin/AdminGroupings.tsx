@@ -1,5 +1,6 @@
 import { AlertTriangle, ArrowRightLeft, MessageCircle, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { RepartitionColis } from '@/src/components/admin/RepartitionColis';
 import { Badge } from '@/src/components/ui/Badge';
 import { Button } from '@/src/components/ui/Button';
 import { EmptyState } from '@/src/components/ui/EmptyState';
@@ -232,6 +233,21 @@ export function AdminGroupings({
           ))}
         </ul>
       )}
+
+      {/*
+        Le calcul du colis : c'est ici que se décide ce que chaque cliente doit
+        payer. Le transport SHEIN se paie par colis, jamais par article.
+      */}
+      <div className="mt-8">
+        <RepartitionColis
+          groupings={groupings}
+          onSaveCost={async (id, cost) => {
+            const cible = groupings.find((g) => g.id === id);
+            if (!cible) return;
+            await save({ ...cible, logisticsCost: cost });
+          }}
+        />
+      </div>
 
       <GroupingEditor
         grouping={editing}

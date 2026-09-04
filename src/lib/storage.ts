@@ -38,4 +38,6 @@ export const STORAGE_KEYS = {
   myShein: 'lumea.myshein.v1',
   visits: 'lumea.visits.v1',
   alerts: 'lumea.alerts.v1',
+  /** Brouillon du calcul de répartition d'un colis groupé (administration). */
+  repartition: 'lumea.admin.repartition.v1',
 } as const;

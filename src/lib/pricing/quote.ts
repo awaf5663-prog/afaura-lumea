@@ -143,7 +143,9 @@ export function computeQuote(
   const promo = applyPromotion(
     { deliveryFee: option?.fee ?? null, serviceFee: service.fee, base },
     promotions,
-    context,
+    // Le sous-total est calculé ici, pas reçu : une offre à montant minimum se
+    // vérifie sur le prix des articles, jamais sur ce que la page affirme.
+    context ? { ...context, subtotal: itemsSubtotal } : undefined,
   );
 
   const total =

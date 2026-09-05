@@ -58,7 +58,14 @@ export function normalizePromotions(raw: unknown): Promotion[] {
   if (!Array.isArray(raw)) return DEFAULT_PROMOTIONS;
   // Un tableau vide est un choix légitime : la boutique a pu supprimer
   // toutes ses offres. On ne les réinstalle donc pas.
-  return raw as Promotion[];
+  //
+  // Les offres enregistrées avant l'ajout du montant minimum n'ont pas le
+  // champ : absent vaut « aucun minimum », c'est-à-dire ce qu'elles faisaient
+  // déjà. Une offre ne change jamais de sens toute seule.
+  return raw.map((promotion) => {
+    const p = promotion as Promotion;
+    return { ...p, minSubtotal: typeof p?.minSubtotal === 'number' ? p.minSubtotal : null };
+  });
 }
 
 /** Complète des réglages partiels (base ou navigateur) en réglages utilisables. */

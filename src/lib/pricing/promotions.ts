@@ -13,6 +13,13 @@ export interface PromotionContext {
   deliveryOptionId: string;
   /** Code saisi par la cliente. Vide = aucun. */
   code?: string;
+  /**
+   * Prix des articles, en FCFA, hors frais et hors livraison.
+   * `null` = pas encore chiffré (demande SHEIN sans prix déclarés) : une offre
+   * à montant minimum ne s'applique alors PAS. Mieux vaut l'annoncer plus tard
+   * que promettre une remise qu'on devra retirer.
+   */
+  subtotal?: number | null;
   /** Date de la commande. Injectée pour rester testable. */
   now?: Date;
 }
@@ -48,6 +55,10 @@ export function promotionApplies(promotion: Promotion, context: PromotionContext
   if (promotion.deliveryOptionIds.length > 0) {
     if (!promotion.deliveryOptionIds.includes(context.deliveryOptionId)) return false;
   }
+  if (typeof promotion.minSubtotal === 'number' && promotion.minSubtotal > 0) {
+    if (typeof context.subtotal !== 'number') return false;
+    if (context.subtotal < promotion.minSubtotal) return false;
+  }
   // Une offre à code ne s'applique jamais toute seule, même si tout le reste
   // est rempli : c'est la cliente qui la déclenche.
   if (normalizeCode(promotion.code) !== normalizeCode(context.code)) return false;
@@ -64,6 +75,13 @@ export function describeEffect(effect: Promotion['effect']): string {
     case 'discount_amount':
       return `Remise de ${effect.amount.toLocaleString('fr-FR')} FCFA`;
   }
+}
+
+/** « à partir de 25 000 FCFA d'articles », ou rien s'il n'y a pas de seuil. */
+export function describeMinSubtotal(promotion: Promotion): string {
+  return typeof promotion.minSubtotal === 'number' && promotion.minSubtotal > 0
+    ? `à partir de ${promotion.minSubtotal.toLocaleString('fr-FR')} FCFA d'articles`
+    : '';
 }
 
 /**
@@ -104,6 +122,19 @@ export function explainCode(
     !match.deliveryOptionIds.includes(context.deliveryOptionId)
   ) {
     return { reason: "Ce code ne s'applique pas au mode de livraison choisi." };
+  }
+  if (typeof match.minSubtotal === 'number' && match.minSubtotal > 0) {
+    if (typeof context.subtotal !== 'number') {
+      return {
+        reason: `Ce code s'applique à partir de ${match.minSubtotal.toLocaleString('fr-FR')} FCFA d'articles. Indiquez le prix de vos articles pour en profiter.`,
+      };
+    }
+    if (context.subtotal < match.minSubtotal) {
+      const manque = match.minSubtotal - context.subtotal;
+      return {
+        reason: `Ce code s'applique à partir de ${match.minSubtotal.toLocaleString('fr-FR')} FCFA d'articles. Il vous manque ${manque.toLocaleString('fr-FR')} FCFA.`,
+      };
+    }
   }
   return { reason: "Ce code ne s'applique pas à cette commande." };
 }

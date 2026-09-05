@@ -478,6 +478,16 @@ export interface Promotion {
   startsAt: string | null;
   /** Fin de la période, incluse. null = pas de date de fin. */
   endsAt: string | null;
+  /**
+   * Montant minimum d'ARTICLES, en FCFA, pour que l'offre s'applique.
+   * null = aucun minimum, l'offre vaut quel que soit le panier.
+   *
+   * Il porte sur le prix des articles seuls : ni les frais de traitement, ni
+   * la livraison, ni le transport ne comptent pour l'atteindre. Une remise
+   * sort de la poche de la boutique — ce seuil garantit qu'elle n'est donnée
+   * que sur une commande assez grosse pour l'absorber.
+   */
+  minSubtotal: number | null;
   /** Groupages concernés. Vide = tous. */
   groupingIds: string[];
   /** Options de livraison concernées. Vide = toutes. */

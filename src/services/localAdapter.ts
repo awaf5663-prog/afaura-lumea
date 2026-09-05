@@ -164,6 +164,9 @@ export const localAdapter: DataSource = {
       groupingId: null,
       deliveryOptionId: zone.id,
       code: draft.promoCode,
+      // Sous-total relu ici, à partir des prix de la base : le navigateur
+      // n'a pas voix au chapitre sur ce qui déclenche une remise.
+      subtotal,
     });
     let deliveryFee = rawDeliveryFee;
     let deliveryFeeBeforePromotion: number | null = null;

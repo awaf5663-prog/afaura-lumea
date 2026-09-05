@@ -107,6 +107,7 @@ export const DEFAULT_PROMOTIONS: Promotion[] = [
     studentOnly: true,
     startsAt: null,
     endsAt: null,
+    minSubtotal: null,
     groupingIds: [],
     deliveryOptionIds: ['local'],
     effect: { type: 'free_delivery' },

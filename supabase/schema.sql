@@ -288,6 +288,10 @@ begin
     continue when jsonb_array_length(coalesce(v_promo -> 'deliveryOptionIds', '[]'::jsonb)) > 0
                   and not (coalesce(v_promo -> 'deliveryOptionIds', '[]'::jsonb)
                            ? p_delivery_zone_id);
+    -- Montant minimum d'articles : le seuil porte sur le prix des articles
+    -- seuls, jamais sur les frais ni la livraison. Absent = aucun minimum.
+    continue when jsonb_typeof(v_promo -> 'minSubtotal') = 'number'
+                  and v_subtotal < (v_promo ->> 'minSubtotal')::numeric;
     -- Une offre à code ne s'applique jamais toute seule.
     continue when upper(btrim(coalesce(v_promo ->> 'code', ''))) <> v_code;
 
@@ -441,6 +445,12 @@ begin
       continue when jsonb_array_length(coalesce(v_promo -> 'deliveryOptionIds', '[]'::jsonb)) > 0
                     and not (coalesce(v_promo -> 'deliveryOptionIds', '[]'::jsonb)
                              ? p_delivery_option_id);
+      -- Montant minimum d'articles. Tant que le sous-total n'est pas chiffré
+      -- (prix non déclarés), une offre à seuil ne s'applique pas : mieux vaut
+      -- l'annoncer plus tard que promettre une remise qu'il faudra retirer.
+      continue when jsonb_typeof(v_promo -> 'minSubtotal') = 'number'
+                    and (not v_subtotal_known
+                         or v_subtotal < (v_promo ->> 'minSubtotal')::numeric);
       continue when upper(btrim(coalesce(v_promo ->> 'code', ''))) <> v_code;
       continue when coalesce(v_promo -> 'effect' ->> 'type', '') <> 'free_delivery';
 

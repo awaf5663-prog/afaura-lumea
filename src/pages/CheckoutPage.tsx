@@ -84,8 +84,11 @@ export function CheckoutPage() {
       isStudent: form.isStudent,
       groupingId: null,
       deliveryOptionId: form.zoneId,
+      // Prix des articles seuls : c'est lui que regarde une offre à montant
+      // minimum. Vérifié à nouveau côté données à l'enregistrement.
+      subtotal,
     }),
-    [form.isStudent, form.zoneId],
+    [form.isStudent, form.zoneId, subtotal],
   );
   const promotion = findPromotion(settings?.promotions ?? [], {
     ...promoContext,

@@ -44,6 +44,7 @@ export function PromotionEditor({
         studentOnly: false,
         startsAt: null,
         endsAt: null,
+        minSubtotal: null,
         groupingIds: [],
         deliveryOptionIds: [],
         effect: { type: 'free_delivery' },
@@ -204,6 +205,34 @@ export function PromotionEditor({
                 {invalidPeriod && <ErrorText>La fin est avant le début.</ErrorText>}
               </FormRow>
             </div>
+
+            <FormRow>
+              <Label htmlFor={`p-min-${index}`} hint="vide = aucun minimum">
+                Montant minimum d'articles (FCFA)
+              </Label>
+              <Input
+                id={`p-min-${index}`}
+                type="number"
+                inputMode="numeric"
+                min={0}
+                step={100}
+                placeholder="25000"
+                value={promotion.minSubtotal ?? ''}
+                onChange={(e) =>
+                  patch(index, { minSubtotal: e.target.value === '' ? null : Number(e.target.value) })
+                }
+              />
+              <p className="mt-1.5 text-[12px] leading-relaxed text-stone">
+                L'offre ne s'applique qu'au-delà de ce montant d'articles — les frais de traitement,
+                la livraison et le transport ne comptent pas pour l'atteindre. Une remise sort de
+                votre poche : ce seuil vous évite de la donner sur une toute petite commande, et
+                pousse à compléter le panier pour l'atteindre.
+                {promotion.effect.type === 'discount_amount' &&
+                  promotion.minSubtotal !== null &&
+                  promotion.minSubtotal > 0 &&
+                  ` Ici : remise de ${promotion.effect.amount.toLocaleString('fr-FR')} FCFA à partir de ${promotion.minSubtotal.toLocaleString('fr-FR')} FCFA d'articles.`}
+              </p>
+            </FormRow>
 
             <label className="flex cursor-pointer items-start gap-2.5 text-[13px] text-graphite">
               <input

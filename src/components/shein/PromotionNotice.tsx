@@ -1,5 +1,5 @@
 import { GraduationCap, Sparkles } from 'lucide-react';
-import { visiblePromotions } from '@/src/lib/pricing/promotions';
+import { describeMinSubtotal, visiblePromotions } from '@/src/lib/pricing/promotions';
 import { useSettings } from '@/src/hooks/useSettings';
 
 /**
@@ -26,6 +26,7 @@ export function PromotionNotice({ kind }: { kind: 'shein' | 'store' }) {
     <div className="space-y-3">
       {offers.map((offer) => {
         const end = endLabel(offer.endsAt);
+        const seuil = describeMinSubtotal(offer);
         return (
           <div
             key={offer.id}
@@ -41,6 +42,12 @@ export function PromotionNotice({ kind }: { kind: 'shein' | 'store' }) {
               <p className="mt-0.5">{offer.description}</p>
               <p className="mt-1 text-[12px] text-stone">
                 {end ? `Jusqu'au ${end}.` : 'Offre en cours.'}
+                {/*
+                  La condition de montant s'annonce avec l'offre : une remise
+                  qu'on découvre inapplicable au moment de payer est une
+                  déception qu'on peut éviter d'une phrase.
+                */}
+                {seuil && ` Valable ${seuil}.`}
                 {offer.studentOnly && ' Carte d’étudiante demandée sur WhatsApp avant validation.'}
               </p>
             </div>

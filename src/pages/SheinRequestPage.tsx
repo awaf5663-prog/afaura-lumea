@@ -534,7 +534,11 @@ export function SheinRequestPage() {
               )}
 
               <div className="mt-4">
-                <PromoCodeField value={promoCode} onChange={setPromoCode} context={promoContext} />
+                <PromoCodeField
+                  value={promoCode}
+                  onChange={setPromoCode}
+                  context={{ ...promoContext, subtotal: quote?.itemsSubtotal ?? null }}
+                />
               </div>
             </section>
 

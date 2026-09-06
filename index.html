@@ -23,7 +23,23 @@
     <meta name="twitter:card" content="summary_large_image" />
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <!--
+      Icône de l'écran d'accueil. iPhone ne sait pas se servir d'un SVG ici :
+      sans ce PNG, l'icône installée serait une capture grise de la page.
+    -->
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <!--
+      Le site s'installe depuis le navigateur, sans passer par un store :
+      « Ajouter à l'écran d'accueil » pose l'icône Afaura Luméa à côté des
+      autres applications, et le site s'ouvre en plein écran.
+    -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Afaura Luméa" />
+    <meta name="application-name" content="Afaura Luméa" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

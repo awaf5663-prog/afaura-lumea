@@ -40,4 +40,6 @@ export const STORAGE_KEYS = {
   alerts: 'lumea.alerts.v1',
   /** Brouillon du calcul de répartition d'un colis groupé (administration). */
   repartition: 'lumea.admin.repartition.v1',
+  /** La cliente a écarté la proposition d'installer le site. */
+  installationEcartee: 'lumea.installation.ecartee.v1',
 } as const;

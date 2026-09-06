@@ -2,6 +2,7 @@ import { FeaturedProducts } from '@/src/components/home/FeaturedProducts';
 import { GroupingSection } from '@/src/components/home/GroupingSection';
 import { Hero } from '@/src/components/home/Hero';
 import { Reviews } from '@/src/components/home/Reviews';
+import { InstallerApp } from '@/src/components/pwa/InstallerApp';
 import { HowItWorks } from '@/src/components/home/HowItWorks';
 import { PremierGroupage } from '@/src/components/home/PremierGroupage';
 import { SheinTeaser } from '@/src/components/home/SheinTeaser';
@@ -39,6 +40,7 @@ export function HomePage() {
       <GroupingSection />
       <Reviews />
       <SheinTeaser />
+      <InstallerApp />
     </>
   );
 }

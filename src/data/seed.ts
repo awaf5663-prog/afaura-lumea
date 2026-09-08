@@ -35,10 +35,13 @@ import gommageBosuyaOuvert from '@/src/assets/products/gommage-bosuya-ouvert.web
 import bandeauSpa from '@/src/assets/products/bandeau-spa.webp';
 import bonnetDouche from '@/src/assets/products/bonnet-douche.webp';
 import gelDoucheFreshCozy from '@/src/assets/products/gel-douche-fresh-cozy.webp';
+import gelDouchePinkChampagne from '@/src/assets/products/gel-douche-pink-champagne.webp';
 import gelDoucheGrenade from '@/src/assets/products/gel-douche-grenade.webp';
 import gelDouchePistache from '@/src/assets/products/gel-douche-pistache.webp';
 import lotionEos from '@/src/assets/products/lotion-eos.webp';
 import lotionEosBeachWaves from '@/src/assets/products/lotion-eos-beach-waves.webp';
+import lotionEosSansParfum from '@/src/assets/products/lotion-eos-sans-parfum.webp';
+import lotionEosVanilla from '@/src/assets/products/lotion-eos-vanilla.webp';
 import bonnetSatin from '@/src/assets/products/bonnet-satin.webp';
 import coffretParfumsDignife from '@/src/assets/products/coffret-parfums-dignife.webp';
 import combinaisonRayee from '@/src/assets/products/combinaison-rayee.webp';
@@ -1509,14 +1512,17 @@ export const SEED_PRODUCTS: Product[] = [
     price: 0,
     compareAtPrice: null,
     category: 'gel_douche',
-    images: [gelDouchePistache, gelDoucheGrenade, gelDoucheFreshCozy],
+    images: [gelDouchePistache, gelDoucheGrenade, gelDoucheFreshCozy, gelDouchePinkChampagne],
     /*
-     * Trois parfums seulement : ce sont ceux dont la boutique a envoyé la
-     * photo. La gamme en compte peut-être davantage, mais un parfum ajouté
-     * de mémoire est un parfum qu'on ne pourra pas remettre.
+     * Quatre parfums : ce sont ceux dont la boutique a envoyé la photo. La
+     * gamme en compte peut-être davantage, mais un parfum ajouté de mémoire
+     * est un parfum qu'on ne pourra pas remettre.
      */
     variants: [
-      { name: 'Parfum', options: ['Crème de pistache', 'Grenade & framboise', 'Fresh & Cozy'] },
+      {
+        name: 'Parfum',
+        options: ['Crème de pistache', 'Grenade & framboise', 'Fresh & Cozy', 'Pink Champagne'],
+      },
     ],
     stock: null,
     status: 'draft',
@@ -1533,7 +1539,7 @@ export const SEED_PRODUCTS: Product[] = [
     price: 0,
     compareAtPrice: null,
     category: 'lait_corps',
-    images: [lotionEos, lotionEosBeachWaves],
+    images: [lotionEos, lotionEosVanilla, lotionEosBeachWaves, lotionEosSansParfum],
     /*
      * Dix senteurs, toutes lues sur les visuels de la boutique : les neuf de
      * son affiche, plus « Beach Waves » photographiée à part.

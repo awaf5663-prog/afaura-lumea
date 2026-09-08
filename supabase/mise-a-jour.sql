@@ -38,7 +38,8 @@
 --   17. ouvre le rayon chaussures et celui des combinaisons, et ajoute un
 --       coffret de parfums et un bonnet de douche ;
 --   18. ouvre les rayons gel de douche, lait corporel et accessoires
---       beauté.
+--       beauté ;
+--   19. ajoute « Pink Champagne » aux parfums du gel douche.
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- ── 1. Colonnes ajoutées après la première mise en place ──────────────
@@ -1917,3 +1918,11 @@ on conflict (id) do update set
   slug = excluded.slug, name = excluded.name, description = excluded.description,
   category = excluded.category, variants = excluded.variants,
   is_new = excluded.is_new, ready_to_ship = excluded.ready_to_ship;
+
+-- ── 19. Un quatrième parfum pour le gel douche ───────────────────────
+-- « Pink Champagne » : la boutique en a envoyé la photo. Le prix ne change
+-- pas ici — l'article reste en brouillon jusqu'à ce qu'elle le fixe.
+
+update products
+   set variants = '[{"name": "Parfum", "options": ["Crème de pistache", "Grenade & framboise", "Fresh & Cozy", "Pink Champagne"]}]'::jsonb
+ where id = 'gel-douche-eos';

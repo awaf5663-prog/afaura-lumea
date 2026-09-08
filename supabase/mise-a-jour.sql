@@ -43,7 +43,9 @@
 --   20. ajoute quatre eaux de parfum, chacune sur sa propre fiche ;
 --   21. ajoute Choco Musk, dont les trois saveurs tiennent sur une fiche
 --       unique puisqu'elles sont au même prix ;
---   22. donne leur prix à sept articles, qui entrent en ligne.
+--   22. donne leur prix à sept articles, qui entrent en ligne ;
+--   23. en met quinze de plus en vente, dont deux qui annoncent
+--       franchement ce qui reste à préciser.
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- ── 1. Colonnes ajoutées après la première mise en place ──────────────
@@ -2131,6 +2133,98 @@ insert into products (
   8000, null, 'parfum',
   '[]'::jsonb,
   '[{"name": "Senteur", "options": ["Bare Vanilla", "Lovely Sunny"]}]'::jsonb,
+  '{}'::jsonb, null, 'active',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  price = excluded.price, category = excluded.category, variants = excluded.variants,
+  status = excluded.status, is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+-- ── 23. Deuxième vague de prix : quinze articles de plus ─────────────
+-- Douze fiches qui attendaient reçoivent leur prix, trois sont créées à
+-- partir de visuels mis de côté.
+--
+-- Deux articles partent en vente sans que tout soit connu, et la fiche le dit
+-- plutôt que de faire semblant :
+--   • l'anti-cernes n'a toujours pas la liste de ses quatorze teintes, donc
+--     aucune n'est proposée au choix — le champ « coloris souhaité » prend le
+--     relais et la boutique confirme ;
+--   • les sandales n'ont pas de pointures connues, et leur description
+--     demande à la cliente d'indiquer la sienne.
+-- Une teinte ou une pointure inventée se paierait au moment de la remise.
+
+update products set price = 6000,  status = 'active', other_colors_available = true
+ where id = 'anticernes-sheglam';
+update products set price = 1500,  status = 'active' where id = 'bougies-latte';
+update products set price = 14000, status = 'active' where id = 'sac-leopard-brun';
+update products set price = 16000, status = 'active' where id = 'sac-bordeaux';
+update products set price = 15500, status = 'active' where id = 'sac-cabas-brun';
+update products set price = 11500, status = 'active' where id = 'shorts-lot-trois';
+update products set price = 16000, status = 'active' where id = 'pyjama-noir-rose';
+update products set price = 16000, status = 'active' where id = 'pyjama-raye-rose';
+update products set price = 16000, status = 'active' where id = 'pyjama-pois';
+update products set price = 5000,  status = 'active' where id = 'bandeau-spa';
+
+update products
+   set price = 14000, status = 'active',
+       description = 'Sandales plates à bride croisée et boucle dorée, semelle rembourrée. Précisez votre pointure à la commande : nous confirmons sa disponibilité avant tout paiement.'
+ where id = 'sandales-leopard';
+
+update products
+   set price = 3000, status = 'active',
+       name = 'Bonnets de douche satin — lot de deux',
+       description = 'Deux bonnets de douche doublés, bord élastique froncé, imprimés de petits nœuds. Gardent les cheveux au sec.'
+ where id = 'bonnet-douche';
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'parfum-miss-milk', 'parfum-miss-milk', 'Parfum Miss Milk',
+  'Eau de parfum 50 mL. Un lacté vanillé, doux et poudré, dans un flacon à bouchon ciselé.',
+  6000, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  price = excluded.price, category = excluded.category,
+  status = excluded.status, is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'coffret-mini-parfums', 'coffret-mini-parfums', 'Coffret mini parfums',
+  'Trois flacons vaporisateurs dans un écrin noué, chacun sa senteur. Prêt à offrir.',
+  12000, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  price = excluded.price, category = excluded.category,
+  status = excluded.status, is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'bougie-fruitee', 'bougie-fruitee', 'Petite bougie fruitée',
+  'Bougie parfumée coulée en forme de fruit, dans sa boîte dorée à couvercle. Quatre parfums au choix, au même prix.',
+  1500, null, 'bougie',
+  '[]'::jsonb,
+  '[{"name": "Parfum", "options": ["Framboise", "Mandarine", "Myrtille", "Fleur violette"]}]'::jsonb,
   '{}'::jsonb, null, 'active',
   true, false,
   false, true, null

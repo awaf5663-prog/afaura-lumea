@@ -50,6 +50,10 @@ import shortsLotQuatre from '@/src/assets/products/shorts-lot-quatre.webp';
 import brumeAmberRose from '@/src/assets/products/brume-amber-rose.webp';
 import brumeClarkDoris from '@/src/assets/products/brume-clark-doris.webp';
 import bougiesLatte from '@/src/assets/products/bougies-latte.webp';
+import bougiesParfumees from '@/src/assets/products/bougies-parfumees.webp';
+import coffretMsBeautiful from '@/src/assets/products/coffret-ms-beautiful.webp';
+import coffretMsBeautifulFlacons from '@/src/assets/products/coffret-ms-beautiful-flacons.webp';
+import parfumMissMilk from '@/src/assets/products/parfum-miss-milk.webp';
 import gommageDoveCoco from '@/src/assets/products/gommage-dove-coco.webp';
 import gommageDoveGrenade from '@/src/assets/products/gommage-dove-grenade.webp';
 import parfumFlatpea from '@/src/assets/products/parfum-flatpea-vanilla-blackberry.webp';
@@ -1193,20 +1197,22 @@ export const SEED_PRODUCTS: Product[] = [
     description:
       'Anti-cernes fluide à applicateur mousse : couvre les cernes et unifie sans marquer. Quatorze teintes, du plus clair au plus foncé.',
     /* Prix à fixer par la boutique : l'article reste invisible d'ici là. */
-    price: 0,
+    price: 6000,
     compareAtPrice: null,
     category: 'maquillage',
     images: [anticernesSheglam],
     /*
-     * Quatorze teintes annoncées par la boutique, dont la liste n'est pas
-     * encore arrivée. Choisir une teinte de maquillage à l'aveugle se paie au
-     * retrait : tant que les noms exacts manquent, aucune n'est proposée.
+     * Quatorze teintes annoncées par la boutique, dont la liste n'est toujours
+     * pas arrivée : aucune n'est proposée au choix, plutôt qu'une liste
+     * inventée qu'on ne pourrait pas honorer. Le champ « coloris souhaité »
+     * prend le relais — la cliente écrit la sienne, la boutique confirme.
      */
     variants: [],
     stock: null,
-    status: 'draft',
+    status: 'active',
     isNew: true,
     readyToShip: true,
+    otherColorsAvailable: true,
     createdAt: '2026-09-08T15:30:00.000Z',
   },
   {
@@ -1216,7 +1222,7 @@ export const SEED_PRODUCTS: Product[] = [
     description:
       "Bougie parfumée en verre, coulée en deux couches comme un café glacé. Huit parfums au choix.",
     /* Prix à fixer par la boutique : l'article reste invisible d'ici là. */
-    price: 0,
+    price: 1500,
     compareAtPrice: null,
     category: 'bougie',
     images: [bougiesLatte],
@@ -1236,7 +1242,7 @@ export const SEED_PRODUCTS: Product[] = [
       },
     ],
     stock: null,
-    status: 'draft',
+    status: 'active',
     isNew: true,
     readyToShip: true,
     createdAt: '2026-09-08T16:00:00.000Z',
@@ -1256,13 +1262,13 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Sac cabas léopard',
     description:
       "Grand cabas souple en suédine imprimée léopard, ceinturé d'une lanière rose à boucle dorée. Anses longues, porté à l'épaule.",
-    price: 0,
+    price: 14000,
     compareAtPrice: null,
     category: 'sac',
     images: [sacLeopardBrun],
     variants: [],
     stock: null,
-    status: 'draft',
+    status: 'active',
     isNew: true,
     readyToShip: true,
     otherColorsAvailable: true,
@@ -1274,13 +1280,13 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Sac épaule bordeaux',
     description:
       "Petit sac d'épaule arrondi, cuir grainé, fermeture zippée et bandoulière réglable.",
-    price: 0,
+    price: 16000,
     compareAtPrice: null,
     category: 'sac',
     images: [sacBordeaux],
     variants: [],
     stock: null,
-    status: 'draft',
+    status: 'active',
     isNew: true,
     readyToShip: true,
     otherColorsAvailable: true,
@@ -1292,13 +1298,13 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Sac cabas brun',
     description:
       'Cabas en cuir grainé souple, plis latéraux et anses longues. Se porte à la main comme à l\u2019épaule.',
-    price: 0,
+    price: 15500,
     compareAtPrice: null,
     category: 'sac',
     images: [sacCabasBrun],
     variants: [],
     stock: null,
-    status: 'draft',
+    status: 'active',
     isNew: true,
     readyToShip: true,
     otherColorsAvailable: true,
@@ -1334,13 +1340,13 @@ export const SEED_PRODUCTS: Product[] = [
     description:
       'Haut cache-cœur manches longues à nouer, liseré rose, et pantalon large à taille élastique et cordon. Deux pièces.',
     /* Prix à fixer par la boutique : l'article reste invisible d'ici là. */
-    price: 0,
+    price: 16000,
     compareAtPrice: null,
     category: 'lingerie',
     images: [pyjamaNoirRose],
     variants: [],
     stock: null,
-    status: 'draft',
+    status: 'active',
     isNew: true,
     readyToShip: true,
     otherColorsAvailable: true,
@@ -1352,13 +1358,13 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Ensemble pyjama à pois',
     description:
       'Haut cache-cœur manches longues à pois blancs, taille froncée, et pantalon large assorti à ceinture rose. Deux pièces.',
-    price: 0,
+    price: 16000,
     compareAtPrice: null,
     category: 'lingerie',
     images: [pyjamaPois],
     variants: [],
     stock: null,
-    status: 'draft',
+    status: 'active',
     isNew: true,
     readyToShip: true,
     otherColorsAvailable: true,
@@ -1370,13 +1376,13 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Ensemble pyjama rayé rose',
     description:
       'Haut manches longues à rayures roses, noué devant sur un débardeur blanc, et pantalon évasé assorti. Deux pièces.',
-    price: 0,
+    price: 16000,
     compareAtPrice: null,
     category: 'lingerie',
     images: [pyjamaRayeRose],
     variants: [],
     stock: null,
-    status: 'draft',
+    status: 'active',
     isNew: true,
     readyToShip: true,
     otherColorsAvailable: true,
@@ -1388,13 +1394,13 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Lot de trois shorts',
     description:
       'Trois shorts courts à taille haute large : noir uni, gris chiné et imprimé léopard rose.',
-    price: 0,
+    price: 11500,
     compareAtPrice: null,
     category: 'lingerie',
     images: [shortsLotTrois],
     variants: [],
     stock: null,
-    status: 'draft',
+    status: 'active',
     isNew: true,
     readyToShip: true,
     otherColorsAvailable: true,
@@ -1424,9 +1430,9 @@ export const SEED_PRODUCTS: Product[] = [
     slug: 'sandales-leopard',
     name: 'Sandales plates à boucle',
     description:
-      'Sandales plates à bride croisée et boucle dorée, semelle rembourrée. Se portent en ville comme à la maison.',
+      'Sandales plates à bride croisée et boucle dorée, semelle rembourrée. Précisez votre pointure à la commande : nous confirmons sa disponibilité avant tout paiement.',
     /* Prix à fixer par la boutique : l'article reste invisible d'ici là. */
-    price: 0,
+    price: 14000,
     compareAtPrice: null,
     category: 'chaussure',
     images: [sandalesLeopard],
@@ -1437,7 +1443,7 @@ export const SEED_PRODUCTS: Product[] = [
      */
     variants: [],
     stock: null,
-    status: 'draft',
+    status: 'active',
     isNew: true,
     readyToShip: true,
     otherColorsAvailable: true,
@@ -1499,10 +1505,10 @@ export const SEED_PRODUCTS: Product[] = [
   {
     id: 'bonnet-douche',
     slug: 'bonnet-douche',
-    name: 'Bonnet de douche satin',
+    name: 'Bonnets de douche satin — lot de deux',
     description:
-      'Bonnet de douche doublé, bord élastique froncé, imprimé de petits nœuds. Garde les cheveux au sec.',
-    price: 0,
+      'Deux bonnets de douche doublés, bord élastique froncé, imprimés de petits nœuds. Gardent les cheveux au sec.',
+    price: 3000,
     compareAtPrice: null,
     category: 'lingerie',
     images: [bonnetDouche],
@@ -1510,7 +1516,7 @@ export const SEED_PRODUCTS: Product[] = [
       { name: 'Coloris', options: ['Blanc à nœuds bruns', 'Rose poudré', 'Beige', 'Blanc bord brun'] },
     ],
     stock: null,
-    status: 'draft',
+    status: 'active',
     isNew: true,
     readyToShip: true,
     createdAt: '2026-09-08T16:24:00.000Z',
@@ -1586,7 +1592,7 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Bandeau spa et manchettes',
     description:
       'Bandeau matelassé et paire de manchettes en éponge, pour dégager le visage et garder les poignets au sec pendant le soin.',
-    price: 0,
+    price: 5000,
     compareAtPrice: null,
     category: 'accessoire_beaute',
     images: [bandeauSpa],
@@ -1597,7 +1603,7 @@ export const SEED_PRODUCTS: Product[] = [
       },
     ],
     stock: null,
-    status: 'draft',
+    status: 'active',
     isNew: true,
     readyToShip: true,
     createdAt: '2026-09-08T16:32:00.000Z',
@@ -1606,6 +1612,58 @@ export const SEED_PRODUCTS: Product[] = [
    * Articles dont la boutique vient de donner le prix : ils entrent en ligne
    * directement, sans passer par le brouillon.
    */
+  {
+    id: 'parfum-miss-milk',
+    slug: 'parfum-miss-milk',
+    name: 'Parfum Miss Milk',
+    description: 'Eau de parfum 50 mL. Un lacté vanillé, doux et poudré, dans un flacon à bouchon ciselé.',
+    price: 6000,
+    compareAtPrice: null,
+    category: 'parfum',
+    images: [parfumMissMilk],
+    variants: [],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T17:10:00.000Z',
+  },
+  {
+    id: 'coffret-mini-parfums',
+    slug: 'coffret-mini-parfums',
+    name: 'Coffret mini parfums',
+    description:
+      'Trois flacons vaporisateurs dans un écrin noué, chacun sa senteur. Prêt à offrir.',
+    price: 12000,
+    compareAtPrice: null,
+    category: 'parfum',
+    images: [coffretMsBeautiful, coffretMsBeautifulFlacons],
+    variants: [],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T17:11:00.000Z',
+  },
+  {
+    id: 'bougie-fruitee',
+    slug: 'bougie-fruitee',
+    name: 'Petite bougie fruitée',
+    description:
+      'Bougie parfumée coulée en forme de fruit, dans sa boîte dorée à couvercle. Quatre parfums au choix, au même prix.',
+    price: 1500,
+    compareAtPrice: null,
+    category: 'bougie',
+    images: [bougiesParfumees],
+    variants: [
+      { name: 'Parfum', options: ['Framboise', 'Mandarine', 'Myrtille', 'Fleur violette'] },
+    ],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T17:12:00.000Z',
+  },
   {
     id: 'gommage-dove',
     slug: 'gommage-dove',

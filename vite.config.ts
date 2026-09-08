@@ -18,6 +18,36 @@ function buildId(): string {
   }
 }
 
+/**
+ * Prévient le navigateur de l'adresse de la base, dès la lecture de l'entête.
+ *
+ * Sans cela, la poignée de main réseau — DNS, TLS — n'a lieu qu'au moment où
+ * le catalogue est demandé, soit après le téléchargement et l'analyse de tout
+ * le JavaScript. Sur mobile, ce sont quelques centaines de millisecondes
+ * perdues à ne rien faire. L'adresse n'a rien de secret : elle est déjà dans
+ * le code envoyé au navigateur, et la clé, elle, ne passe pas par ici.
+ */
+function preconnexionBase() {
+  return {
+    name: 'preconnexion-base',
+    transformIndexHtml(html: string) {
+      const url = process.env.VITE_SUPABASE_URL;
+      if (!url) return html;
+      let origine: string;
+      try {
+        origine = new URL(url).origin;
+      } catch {
+        return html;
+      }
+      return html.replace(
+        '</head>',
+        `  <link rel="preconnect" href="${origine}" crossorigin />\n` +
+          `    <link rel="dns-prefetch" href="${origine}" />\n  </head>`,
+      );
+    },
+  };
+}
+
 export default defineConfig(() => {
   return {
     define: { __BUILD_ID__: JSON.stringify(buildId()) },
@@ -30,7 +60,7 @@ export default defineConfig(() => {
      * reste vide et tout part de « / ».
      */
     base: process.env.VITE_BASE_PATH || '/',
-    plugins: [react(), tailwindcss()],
+    plugins: [react(), tailwindcss(), preconnexionBase()],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

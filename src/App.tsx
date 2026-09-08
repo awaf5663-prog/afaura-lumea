@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Suspense, lazy, useState } from 'react';
 import { CartDrawer } from '@/src/components/cart/CartDrawer';
 import { ErrorBoundary } from '@/src/components/ErrorBoundary';
 import { BottomNav } from '@/src/components/layout/BottomNav';
@@ -12,22 +12,58 @@ import { ToastProvider } from '@/src/hooks/useToast';
 import { RouterProvider, matchPath, useRouter } from '@/src/lib/router';
 import { useVersionCheck } from '@/src/hooks/useVersionCheck';
 import { useVisitTracking } from '@/src/hooks/useVisitTracking';
-import { AboutPage } from '@/src/pages/AboutPage';
+
 import { CartPage } from '@/src/pages/CartPage';
 import { CheckoutPage } from '@/src/pages/CheckoutPage';
-import { ConfirmationPage } from '@/src/pages/ConfirmationPage';
-import { FaqPage } from '@/src/pages/FaqPage';
+
+
 import { HomePage } from '@/src/pages/HomePage';
-import { HowItWorksPage } from '@/src/pages/HowItWorksPage';
-import { NotFoundPage } from '@/src/pages/NotFoundPage';
+
+
 import { ProductPage } from '@/src/pages/ProductPage';
 import { ShopPage } from '@/src/pages/ShopPage';
-import { SizeGuidePage } from '@/src/pages/SizeGuidePage';
-import { SheinConfirmationPage } from '@/src/pages/SheinConfirmationPage';
+
+
 import { SheinPage } from '@/src/pages/SheinPage';
 import { SheinRequestPage } from '@/src/pages/SheinRequestPage';
-import { TrackingPage } from '@/src/pages/TrackingPage';
-import { AdminPage } from '@/src/pages/admin/AdminPage';
+
+/*
+ * L'administration est chargée à la demande, et pas avec le reste du site.
+ *
+ * Elle pèse plus lourd que la boutique entière — tableaux, calculateur de
+ * groupage, éditeur de fiches — et aucune cliente ne l'ouvrira jamais.
+ * Statiquement importée, elle partait pourtant dans le même fichier : chaque
+ * visiteuse la téléchargeait avant de voir un seul foulard, sur une connexion
+ * mobile qui n'a pas de temps à perdre.
+ */
+/*
+ * Ces pages-là non plus n'ont pas à voyager avec la boutique : on les ouvre
+ * après avoir vu les articles, ou jamais. Chacune arrive quand on y va.
+ */
+const AboutPage = lazy(() => import('@/src/pages/AboutPage').then((m) => ({ default: m.AboutPage })));
+const FaqPage = lazy(() => import('@/src/pages/FaqPage').then((m) => ({ default: m.FaqPage })));
+const HowItWorksPage = lazy(() =>
+  import('@/src/pages/HowItWorksPage').then((m) => ({ default: m.HowItWorksPage })),
+);
+const SizeGuidePage = lazy(() =>
+  import('@/src/pages/SizeGuidePage').then((m) => ({ default: m.SizeGuidePage })),
+);
+const TrackingPage = lazy(() =>
+  import('@/src/pages/TrackingPage').then((m) => ({ default: m.TrackingPage })),
+);
+const SheinConfirmationPage = lazy(() =>
+  import('@/src/pages/SheinConfirmationPage').then((m) => ({ default: m.SheinConfirmationPage })),
+);
+const ConfirmationPage = lazy(() =>
+  import('@/src/pages/ConfirmationPage').then((m) => ({ default: m.ConfirmationPage })),
+);
+const NotFoundPage = lazy(() =>
+  import('@/src/pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
+);
+
+const AdminPage = lazy(() =>
+  import('@/src/pages/admin/AdminPage').then((m) => ({ default: m.AdminPage })),
+);
 
 function Routes() {
   const { path } = useRouter();
@@ -109,7 +145,21 @@ function Shell() {
         {/* Le reste de la page (entête, menu, panier) survit à une erreur de
             rendu : la cliente garde de quoi naviguer au lieu d'une page vide. */}
         <ErrorBoundary key={path} label="cette page" className="container-page my-10">
-          <Routes />
+          {/*
+            Les pages chargées à la demande arrivent avec un temps de retard.
+            Une seule attente les couvre toutes, discrète : la boutique et
+            l'accueil, eux, sont dans le fichier principal et s'affichent sans
+            passer par ici.
+          */}
+          <Suspense
+            fallback={
+              <div className="container-page py-20 text-center text-[13.5px] text-stone">
+                Un instant…
+              </div>
+            }
+          >
+            <Routes />
+          </Suspense>
         </ErrorBoundary>
       </main>
 

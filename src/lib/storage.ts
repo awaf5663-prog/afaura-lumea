@@ -42,4 +42,9 @@ export const STORAGE_KEYS = {
   repartition: 'lumea.admin.repartition.v1',
   /** La cliente a écarté la proposition d'installer le site. */
   installationEcartee: 'lumea.installation.ecartee.v1',
+  /**
+   * Dernier catalogue reçu, gardé pour l'affichage immédiat de la visite
+   * suivante. Ce n'est pas la source de vérité — voir hooks/useProducts.
+   */
+  catalogueEnCache: 'lumea.catalogue.cache.v1',
 } as const;

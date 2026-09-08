@@ -43,10 +43,29 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!--
+      Les polices se chargent SANS bloquer l'affichage.
+
+      Une feuille de style classique arrête le rendu tant qu'elle n'est pas
+      arrivée : deux allers-retours réseau avant qu'une cliente voie quoi que
+      ce soit, ce qui se compte en demi-secondes sur un téléphone en 4G. Le
+      « media=print » fait passer celle-ci pour une feuille d'impression —
+      donc sans importance pour l'écran — puis on la réactive une fois reçue.
+      La page s'affiche tout de suite avec les polices du téléphone, et
+      Fraunces et Inter prennent le relais en arrivant.
+    -->
     <link
       href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap"
       rel="stylesheet"
+      media="print"
+      onload="this.media='all'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500&family=Inter:wght@400;500;600&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
   </head>
   <body>
     <div id="root"></div>

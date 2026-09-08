@@ -1,4 +1,5 @@
 import { Plus, SlidersHorizontal } from 'lucide-react';
+import { apercuDe } from '@/src/lib/apercu';
 import { cn } from '@/src/lib/cn';
 import { cadragePhoto, plusieursPrix, prixLePlusBas } from '@/src/lib/optionPrice';
 import { Badge } from '@/src/components/ui/Badge';
@@ -35,7 +36,8 @@ export function ProductCard({ product, priority }: { product: Product; priority?
         >
           {product.images[0] ? (
             <img
-              src={product.images[0]}
+              /* Une vignette n'a pas besoin de la grande photo. Voir lib/apercu. */
+              src={apercuDe(product.images[0])}
               alt={product.name}
               loading={priority ? 'eager' : 'lazy'}
               decoding="async"

@@ -1,17 +1,45 @@
 import { useCallback, useEffect, useState } from 'react';
+import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
 import { db, onDataChanged } from '@/src/services';
 import type { Product } from '@/src/types';
 
+/**
+ * ─────────────────────────────────────────────────────────────
+ *  LE CATALOGUE, AFFICHÉ SANS ATTENDRE
+ * ─────────────────────────────────────────────────────────────
+ *  À la première visite, il n'y a rien à montrer avant que la base réponde :
+ *  la boutique affiche ses squelettes, et c'est honnête.
+ *
+ *  Aux visites suivantes, en revanche, faire patienter devant un écran gris
+ *  alors qu'on connaît déjà le catalogue n'a aucun sens — surtout sur une
+ *  connexion mobile. On garde donc le dernier catalogue reçu, on l'affiche
+ *  immédiatement, et on va vérifier derrière : ce qui a changé se corrige
+ *  tout seul en une fraction de seconde, sans écran d'attente.
+ *
+ *  CE CACHE N'EST PAS UNE SOURCE DE VÉRITÉ. Un prix qu'il afficherait le
+ *  temps d'un battement de cil ne peut pas devenir un montant encaissé : les
+ *  totaux d'une commande sont recalculés côté serveur, à partir des prix de
+ *  la base, jamais de ce que le navigateur affiche.
+ */
+
+/** Le cache ne sert qu'au catalogue public : l'administration lit toujours la base. */
+function lireCache(): Product[] | null {
+  const garde = readJson<Product[] | null>(STORAGE_KEYS.catalogueEnCache, null);
+  return Array.isArray(garde) && garde.length > 0 ? garde : null;
+}
+
 /** Charge le catalogue depuis la source de données active (local ou Supabase). */
 export function useProducts(includeDrafts = false) {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
+  const cache = includeDrafts ? null : lireCache();
+  const [products, setProducts] = useState<Product[]>(cache ?? []);
+  // Rien en cache : on annonce le chargement. Sinon on montre, et on vérifie.
+  const [loading, setLoading] = useState(cache === null);
   const [error, setError] = useState<string | null>(null);
 
   /**
-   * `silent` : relecture déclenchée par un changement enregistré ailleurs.
-   * On ne repasse pas en « chargement », sinon le catalogue clignoterait en
-   * squelettes à chaque enregistrement de l'admin.
+   * `silent` : relecture déclenchée par un changement enregistré ailleurs, ou
+   * vérification d'un catalogue déjà affiché depuis le cache. On ne repasse
+   * pas en « chargement », sinon le catalogue clignoterait en squelettes.
    */
   const load = useCallback(
     async (silent = false) => {
@@ -19,9 +47,18 @@ export function useProducts(includeDrafts = false) {
       setError(null);
       try {
         const all = await db.listProducts();
-        setProducts(includeDrafts ? all : all.filter((p) => p.status !== 'draft'));
+        const visibles = all.filter((p) => p.status !== 'draft');
+        setProducts(includeDrafts ? all : visibles);
+        // Seul le catalogue public est gardé : les brouillons n'ont rien à
+        // faire dans le navigateur d'une cliente.
+        if (!includeDrafts) writeJson(STORAGE_KEYS.catalogueEnCache, visibles);
       } catch (e) {
-        setError(e instanceof Error ? e.message : 'Chargement impossible.');
+        /*
+         * Une vérification qui échoue derrière un catalogue déjà affiché ne
+         * doit pas l'effacer au profit d'un message d'erreur : ce qui est à
+         * l'écran reste vrai jusqu'à preuve du contraire.
+         */
+        if (!silent) setError(e instanceof Error ? e.message : 'Chargement impossible.');
       } finally {
         setLoading(false);
       }
@@ -30,7 +67,11 @@ export function useProducts(includeDrafts = false) {
   );
 
   useEffect(() => {
-    void load();
+    // Un catalogue déjà à l'écran se vérifie en silence.
+    void load(cache !== null);
+    // `cache` est lu une seule fois, au montage : le relire ici relancerait
+    // la vérification à chaque rendu.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [load]);
 
   // L'admin enregistre : le catalogue affiché se met à jour tout seul.

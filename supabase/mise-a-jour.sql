@@ -39,7 +39,8 @@
 --       coffret de parfums et un bonnet de douche ;
 --   18. ouvre les rayons gel de douche, lait corporel et accessoires
 --       beauté ;
---   19. ajoute « Pink Champagne » aux parfums du gel douche.
+--   19. ajoute « Pink Champagne » aux parfums du gel douche ;
+--   20. ajoute quatre eaux de parfum, chacune sur sa propre fiche.
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- ── 1. Colonnes ajoutées après la première mise en place ──────────────
@@ -1926,3 +1927,78 @@ on conflict (id) do update set
 update products
    set variants = '[{"name": "Parfum", "options": ["Crème de pistache", "Grenade & framboise", "Fresh & Cozy", "Pink Champagne"]}]'::jsonb
  where id = 'gel-douche-eos';
+
+-- ── 20. Quatre eaux de parfum ────────────────────────────────────────
+-- Quatre flacons de 30 mL, quatre fiches. La boutique fixe le prix de
+-- chacune séparément : une fiche commune n'en afficherait qu'un seul,
+-- faux pour les trois autres.
+--
+-- En BROUILLON, comme le reste, jusqu'à ce que ces prix arrivent.
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'parfum-miel-bebe', 'parfum-miel-bebe', 'Eau de parfum Miel Bébé',
+  'Eau de parfum 30 mL. Un sillage de miel et d''agrumes, réchauffé de cannelle.',
+  0, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'parfum-cherry-blossom', 'parfum-cherry-blossom', 'Eau de parfum Cherry Blossom',
+  'Eau de parfum 30 mL. Un floral léger de fleur de cerisier, livré dans son étui.',
+  0, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'parfum-lait-de-coco', 'parfum-lait-de-coco', 'Eau de parfum Lait de Coco',
+  'Eau de parfum 30 mL. Coco crémeuse et cacao, adoucis de bois et de zeste de citron vert.',
+  0, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'parfum-creme-vanille', 'parfum-creme-vanille', 'Eau de parfum Crème Vanille',
+  'Eau de parfum 30 mL. Vanille gourmande sur un fond de beurre de karité.',
+  0, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;

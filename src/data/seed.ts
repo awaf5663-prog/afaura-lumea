@@ -58,6 +58,10 @@ import sacLeopardBrun from '@/src/assets/products/sac-leopard-brun.webp';
 import shortNuit from '@/src/assets/products/short-nuit.webp';
 import anticernesSheglam from '@/src/assets/products/anticernes-sheglam.webp';
 import gommageTreeHut from '@/src/assets/products/gommage-tree-hut.webp';
+import parfumCherryBlossom from '@/src/assets/products/parfum-cherry-blossom.webp';
+import parfumCremeVanille from '@/src/assets/products/parfum-creme-vanille.webp';
+import parfumLaitDeCoco from '@/src/assets/products/parfum-lait-de-coco.webp';
+import parfumMielBebe from '@/src/assets/products/parfum-miel-bebe.webp';
 import parfumVictoriaKey from '@/src/assets/products/parfum-victoria-key.webp';
 import glossNyx from '@/src/assets/products/gloss-nyx.webp';
 import glossOlibolla from '@/src/assets/products/gloss-olibolla.webp';
@@ -1588,6 +1592,77 @@ export const SEED_PRODUCTS: Product[] = [
     isNew: true,
     readyToShip: true,
     createdAt: '2026-09-08T16:32:00.000Z',
+  },
+  /*
+   * Quatre eaux de parfum de 30 mL, quatre fiches. La boutique fixera le prix
+   * de chacune séparément : une fiche commune n'en afficherait qu'un seul.
+   */
+  {
+    id: 'parfum-miel-bebe',
+    slug: 'parfum-miel-bebe',
+    name: 'Eau de parfum Miel Bébé',
+    description:
+      "Eau de parfum 30 mL. Un sillage de miel et d'agrumes, réchauffé de cannelle.",
+    /* Prix à fixer par la boutique : l'article reste invisible d'ici là. */
+    price: 0,
+    compareAtPrice: null,
+    category: 'parfum',
+    images: [parfumMielBebe],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T16:40:00.000Z',
+  },
+  {
+    id: 'parfum-cherry-blossom',
+    slug: 'parfum-cherry-blossom',
+    name: 'Eau de parfum Cherry Blossom',
+    description: 'Eau de parfum 30 mL. Un floral léger de fleur de cerisier, livré dans son étui.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'parfum',
+    images: [parfumCherryBlossom],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T16:41:00.000Z',
+  },
+  {
+    id: 'parfum-lait-de-coco',
+    slug: 'parfum-lait-de-coco',
+    name: 'Eau de parfum Lait de Coco',
+    description:
+      'Eau de parfum 30 mL. Coco crémeuse et cacao, adoucis de bois et de zeste de citron vert.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'parfum',
+    images: [parfumLaitDeCoco],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T16:42:00.000Z',
+  },
+  {
+    id: 'parfum-creme-vanille',
+    slug: 'parfum-creme-vanille',
+    name: 'Eau de parfum Crème Vanille',
+    description: 'Eau de parfum 30 mL. Vanille gourmande sur un fond de beurre de karité.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'parfum',
+    images: [parfumCremeVanille],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T16:43:00.000Z',
   },
   {
     id: 'parfum-victoria-key',

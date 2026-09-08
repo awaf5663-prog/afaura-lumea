@@ -58,6 +58,9 @@ import sacLeopardBrun from '@/src/assets/products/sac-leopard-brun.webp';
 import shortNuit from '@/src/assets/products/short-nuit.webp';
 import anticernesSheglam from '@/src/assets/products/anticernes-sheglam.webp';
 import gommageTreeHut from '@/src/assets/products/gommage-tree-hut.webp';
+import chocoMuskMarshmallow from '@/src/assets/products/choco-musk-marshmallow.webp';
+import chocoMuskOriginal from '@/src/assets/products/choco-musk-original.webp';
+import chocoMuskPistache from '@/src/assets/products/choco-musk-pistache.webp';
 import parfumCherryBlossom from '@/src/assets/products/parfum-cherry-blossom.webp';
 import parfumCremeVanille from '@/src/assets/products/parfum-creme-vanille.webp';
 import parfumLaitDeCoco from '@/src/assets/products/parfum-lait-de-coco.webp';
@@ -1592,6 +1595,30 @@ export const SEED_PRODUCTS: Product[] = [
     isNew: true,
     readyToShip: true,
     createdAt: '2026-09-08T16:32:00.000Z',
+  },
+  /*
+   * Choco Musk : une seule fiche pour les trois saveurs, contrairement aux
+   * quatre eaux de parfum plus bas. La règle n'a pas changé — c'est le prix
+   * qui décide. Ici il est le même pour les trois, donc une fiche suffit et
+   * la cliente choisit sa saveur comme elle choisit une teinte de gloss.
+   */
+  {
+    id: 'choco-musk',
+    slug: 'choco-musk',
+    name: 'Choco Musk',
+    description:
+      'Eau de parfum vaporisateur 50 mL, 80 % vol. Un musc chocolaté et vanillé, tenace et enveloppant. Trois saveurs au choix, au même prix.',
+    /* Prix à fixer par la boutique : l'article reste invisible d'ici là. */
+    price: 0,
+    compareAtPrice: null,
+    category: 'parfum',
+    images: [chocoMuskOriginal, chocoMuskMarshmallow, chocoMuskPistache],
+    variants: [{ name: 'Saveur', options: ['Original', 'Marshmallow', 'Pistache'] }],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T16:50:00.000Z',
   },
   /*
    * Quatre eaux de parfum de 30 mL, quatre fiches. La boutique fixera le prix

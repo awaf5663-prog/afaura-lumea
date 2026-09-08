@@ -40,7 +40,9 @@
 --   18. ouvre les rayons gel de douche, lait corporel et accessoires
 --       beauté ;
 --   19. ajoute « Pink Champagne » aux parfums du gel douche ;
---   20. ajoute quatre eaux de parfum, chacune sur sa propre fiche.
+--   20. ajoute quatre eaux de parfum, chacune sur sa propre fiche ;
+--   21. ajoute Choco Musk, dont les trois saveurs tiennent sur une fiche
+--       unique puisqu'elles sont au même prix.
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- ── 1. Colonnes ajoutées après la première mise en place ──────────────
@@ -2002,3 +2004,30 @@ on conflict (id) do update set
   slug = excluded.slug, name = excluded.name, description = excluded.description,
   category = excluded.category, is_new = excluded.is_new,
   ready_to_ship = excluded.ready_to_ship;
+
+-- ── 21. Choco Musk, trois saveurs sur une seule fiche ────────────────
+-- Contrairement aux quatre eaux de parfum de l'étape 20, celui-ci tient sur
+-- une fiche unique : ses trois saveurs sont au même prix. C'est le prix qui
+-- décide, pas le nombre de photos — une fiche par article dès que les prix
+-- diffèrent, une seule quand ils sont égaux.
+--
+-- En BROUILLON, comme le reste.
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'choco-musk', 'choco-musk', 'Choco Musk',
+  'Eau de parfum vaporisateur 50 mL, 80 % vol. Un musc chocolaté et vanillé, tenace et enveloppant. Trois saveurs au choix, au même prix.',
+  0, null, 'parfum',
+  '[]'::jsonb,
+  '[{"name": "Saveur", "options": ["Original", "Marshmallow", "Pistache"]}]'::jsonb,
+  '{}'::jsonb, null, 'draft',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, variants = excluded.variants,
+  is_new = excluded.is_new, ready_to_ship = excluded.ready_to_ship;

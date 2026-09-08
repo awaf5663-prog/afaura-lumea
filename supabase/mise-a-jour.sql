@@ -36,7 +36,9 @@
 --   16. complète le rayon avec trois pyjamas, un lot de shorts et un
 --       bonnet de nuit ;
 --   17. ouvre le rayon chaussures et celui des combinaisons, et ajoute un
---       coffret de parfums et un bonnet de douche.
+--       coffret de parfums et un bonnet de douche ;
+--   18. ouvre les rayons gel de douche, lait corporel et accessoires
+--       beauté.
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- ── 1. Colonnes ajoutées après la première mise en place ──────────────
@@ -1838,6 +1840,75 @@ insert into products (
   0, null, 'lingerie',
   '[]'::jsonb,
   '[{"name": "Coloris", "options": ["Blanc à nœuds bruns", "Rose poudré", "Beige", "Blanc bord brun"]}]'::jsonb,
+  '{}'::jsonb, null, 'draft',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, variants = excluded.variants,
+  is_new = excluded.is_new, ready_to_ship = excluded.ready_to_ship;
+
+-- ── 18. Gel douche, lait corporel et bandeau spa ─────────────────────
+-- Le gel de douche que la boutique attendait, et le lait corporel de la même
+-- gamme. Deux rayons plutôt qu'un « soins du corps » fourre-tout : on ne
+-- cherche pas un gel douche et un lait le même jour.
+--
+-- Les senteurs du lait viennent toutes des visuels de la boutique — les neuf
+-- de son affiche plus « Beach Waves ». Le gel n'en annonce que trois : celles
+-- dont la photo est arrivée. Un parfum ajouté de mémoire est un parfum qu'on
+-- ne pourra pas remettre.
+--
+-- Tout en BROUILLON.
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'gel-douche-eos', 'gel-douche-eos', 'Gel douche Cashmere',
+  'Gel douche au beurre de karité, 473 mL. Nettoie en douceur, pH équilibré, pensé pour les peaux sensibles.',
+  0, null, 'gel_douche',
+  '[]'::jsonb,
+  '[{"name": "Parfum", "options": ["Crème de pistache", "Grenade & framboise", "Fresh & Cozy"]}]'::jsonb,
+  '{}'::jsonb, null, 'draft',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, variants = excluded.variants,
+  is_new = excluded.is_new, ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'lait-corps-eos', 'lait-corps-eos', 'Lait corporel 24H',
+  'Lait hydratant au beurre de karité, 473 mL. Sept huiles et beurres nourrissants, hydratation 24 heures.',
+  0, null, 'lait_corps',
+  '[]'::jsonb,
+  '[{"name": "Senteur", "options": ["Vanilla Cashmere", "Pomegranate Raspberry", "Pink Champagne", "Jasmine Peach", "Strawberry Dream", "Crème Pistachio", "Fresh & Cozy", "Coconut Waters", "Beach Waves", "Sans parfum"]}]'::jsonb,
+  '{}'::jsonb, null, 'draft',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, variants = excluded.variants,
+  is_new = excluded.is_new, ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'bandeau-spa', 'bandeau-spa', 'Bandeau spa et manchettes',
+  'Bandeau matelassé et paire de manchettes en éponge, pour dégager le visage et garder les poignets au sec pendant le soin.',
+  0, null, 'accessoire_beaute',
+  '[]'::jsonb,
+  '[{"name": "Coloris", "options": ["Vache noir et blanc", "Léopard", "Chocolat", "Taupe", "Rose vif", "Beige"]}]'::jsonb,
   '{}'::jsonb, null, 'draft',
   true, false,
   false, true, null

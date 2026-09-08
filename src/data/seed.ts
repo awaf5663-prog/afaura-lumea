@@ -32,7 +32,13 @@ import robeBleuCiel from '@/src/assets/products/robe-bleu-ciel.webp';
 import glossLipOil from '@/src/assets/products/gloss-lip-oil.webp';
 import gommageBosuya from '@/src/assets/products/gommage-bosuya.webp';
 import gommageBosuyaOuvert from '@/src/assets/products/gommage-bosuya-ouvert.webp';
+import bandeauSpa from '@/src/assets/products/bandeau-spa.webp';
 import bonnetDouche from '@/src/assets/products/bonnet-douche.webp';
+import gelDoucheFreshCozy from '@/src/assets/products/gel-douche-fresh-cozy.webp';
+import gelDoucheGrenade from '@/src/assets/products/gel-douche-grenade.webp';
+import gelDouchePistache from '@/src/assets/products/gel-douche-pistache.webp';
+import lotionEos from '@/src/assets/products/lotion-eos.webp';
+import lotionEosBeachWaves from '@/src/assets/products/lotion-eos-beach-waves.webp';
 import bonnetSatin from '@/src/assets/products/bonnet-satin.webp';
 import coffretParfumsDignife from '@/src/assets/products/coffret-parfums-dignife.webp';
 import combinaisonRayee from '@/src/assets/products/combinaison-rayee.webp';
@@ -187,6 +193,18 @@ export const CATEGORIES: Category[] = [
    * l'une ne veut pas fouiller parmi les autres.
    */
   { id: 'combinaison', name: 'Combinaisons' },
+  /*
+   * Gels de douche et laits corporels : deux rayons plutôt qu'un « soins du
+   * corps » fourre-tout. On ne cherche pas un gel douche et un lait le même
+   * jour, et les gommages ont déjà leur rayon.
+   */
+  { id: 'gel_douche', name: 'Gels de douche', photo: 'carre' },
+  { id: 'lait_corps', name: 'Laits corporels', photo: 'carre' },
+  /*
+   * Accessoires de beauté : ce qui accompagne le soin sans être un soin —
+   * bandeaux, manchettes, et tout ce qui se pose avant de se démaquiller.
+   */
+  { id: 'accessoire_beaute', name: 'Accessoires beauté', photo: 'carre' },
 ];
 
 /**
@@ -1480,6 +1498,90 @@ export const SEED_PRODUCTS: Product[] = [
     isNew: true,
     readyToShip: true,
     createdAt: '2026-09-08T16:24:00.000Z',
+  },
+  {
+    id: 'gel-douche-eos',
+    slug: 'gel-douche-eos',
+    name: 'Gel douche Cashmere',
+    description:
+      'Gel douche au beurre de karité, 473 mL. Nettoie en douceur, pH équilibré, pensé pour les peaux sensibles.',
+    /* Prix à fixer par la boutique : l'article reste invisible d'ici là. */
+    price: 0,
+    compareAtPrice: null,
+    category: 'gel_douche',
+    images: [gelDouchePistache, gelDoucheGrenade, gelDoucheFreshCozy],
+    /*
+     * Trois parfums seulement : ce sont ceux dont la boutique a envoyé la
+     * photo. La gamme en compte peut-être davantage, mais un parfum ajouté
+     * de mémoire est un parfum qu'on ne pourra pas remettre.
+     */
+    variants: [
+      { name: 'Parfum', options: ['Crème de pistache', 'Grenade & framboise', 'Fresh & Cozy'] },
+    ],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T16:30:00.000Z',
+  },
+  {
+    id: 'lait-corps-eos',
+    slug: 'lait-corps-eos',
+    name: 'Lait corporel 24H',
+    description:
+      'Lait hydratant au beurre de karité, 473 mL. Sept huiles et beurres nourrissants, hydratation 24 heures.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'lait_corps',
+    images: [lotionEos, lotionEosBeachWaves],
+    /*
+     * Dix senteurs, toutes lues sur les visuels de la boutique : les neuf de
+     * son affiche, plus « Beach Waves » photographiée à part.
+     */
+    variants: [
+      {
+        name: 'Senteur',
+        options: [
+          'Vanilla Cashmere',
+          'Pomegranate Raspberry',
+          'Pink Champagne',
+          'Jasmine Peach',
+          'Strawberry Dream',
+          'Crème Pistachio',
+          'Fresh & Cozy',
+          'Coconut Waters',
+          'Beach Waves',
+          'Sans parfum',
+        ],
+      },
+    ],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T16:31:00.000Z',
+  },
+  {
+    id: 'bandeau-spa',
+    slug: 'bandeau-spa',
+    name: 'Bandeau spa et manchettes',
+    description:
+      'Bandeau matelassé et paire de manchettes en éponge, pour dégager le visage et garder les poignets au sec pendant le soin.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'accessoire_beaute',
+    images: [bandeauSpa],
+    variants: [
+      {
+        name: 'Coloris',
+        options: ['Vache noir et blanc', 'Léopard', 'Chocolat', 'Taupe', 'Rose vif', 'Beige'],
+      },
+    ],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T16:32:00.000Z',
   },
   {
     id: 'parfum-victoria-key',

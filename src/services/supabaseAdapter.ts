@@ -176,6 +176,9 @@ const toProduct = (r: Row): Product => ({
   isNew: r.is_new ?? false,
   isPopular: r.is_popular ?? false,
   otherColorsAvailable: r.other_colors_available ?? false,
+  // Colonne absente avant la mise à jour SQL : l'article reste « sur
+  // commande », ce qui était le cas de tout le catalogue jusque-là.
+  readyToShip: r.ready_to_ship === true,
   colorChartId: r.color_chart_id ?? null,
   // Colonne absente tant que la mise à jour SQL n'est pas passée : l'article
   // garde alors simplement son prix unique.
@@ -202,6 +205,7 @@ const fromProduct = (p: Product): Row => ({
   is_new: p.isNew ?? false,
   is_popular: p.isPopular ?? false,
   other_colors_available: p.otherColorsAvailable ?? false,
+  ready_to_ship: p.readyToShip ?? false,
   color_chart_id: p.colorChartId ?? null,
   option_prices: p.optionPrices ?? {},
   measurements: p.measurements ?? [],
@@ -439,6 +443,7 @@ export const supabaseAdapter: DataSource = {
     const rows = await enregistrerSansColonnesAbsentes(envoyer, corps, [
       { colonne: 'measurements', etiquette: 'les mesures de la pièce' },
       { colonne: 'option_prices', etiquette: 'les prix par option' },
+      { colonne: 'ready_to_ship', etiquette: 'la disponibilité immédiate' },
     ]);
     return toProduct(rows[0]);
   },

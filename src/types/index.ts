@@ -54,6 +54,15 @@ export interface Product {
   isNew?: boolean;
   isPopular?: boolean;
   /**
+   * Article déjà en boutique, remis tout de suite — sans attendre un groupage.
+   *
+   * Le site répète partout que « tout est sur commande » : c'est vrai des
+   * voiles et des robes, commandés pièce par pièce. Ça ne l'est pas des
+   * articles achetés en lot et gardés sur place. Le dire quand c'est vrai
+   * vend mieux qu'un délai ; le dire quand c'est faux se paie à la livraison.
+   */
+  readyToShip?: boolean;
+  /**
    * D'autres coloris existent hors des photos publiées : la cliente peut
    * préciser celui qu'elle cherche, et nous confirmons la disponibilité.
    */

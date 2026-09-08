@@ -25,7 +25,9 @@
 --       réglés dans Administration → Tarification, la même grille que pour
 --       les demandes SHEIN ;
 --   11. permet de réserver une offre aux commandes qui atteignent un montant
---       minimum d'articles.
+--       minimum d'articles ;
+--   12. ajoute les glosses et huiles à lèvres, disponibles tout de suite, et
+--       la marque « en stock » qui les distingue du reste du catalogue.
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- ── 1. Colonnes ajoutées après la première mise en place ──────────────
@@ -1282,3 +1284,153 @@ end;
 $$;
 
 grant execute on function create_shein_request(text, text, text, text, jsonb, boolean, text) to anon, authenticated;
+
+-- ── 12. Glosses et huiles à lèvres, disponibles tout de suite ────────
+-- Ces articles ne sont pas commandés pièce par pièce : ils sont achetés en
+-- lot et gardés en boutique. Le site le dit sur leur fiche, et ne fait donc
+-- plus attendre un groupage pour une commande qui peut être remise le jour
+-- même.
+--
+-- `ready_to_ship` vaut false partout ailleurs : le reste du catalogue garde
+-- exactement le comportement qu'il avait.
+
+alter table products add column if not exists ready_to_ship boolean not null default false;
+
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'gloss-romantic', 'gloss-romantic', 'Gloss Romantic',
+  'Gloss à lèvres brillant, texture légère et confortable. Applicateur mousse, flacon transparent à capuchon doré. Disponible tout de suite en boutique.',
+  1000, null, 'lips',
+  '[]'::jsonb, '[{"name": "Teinte", "options": ["Rose subtil", "Transparent", "Nude naturel", "Marron élégant"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  status = excluded.status,
+  is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'gloss-nyx', 'gloss-nyx', 'Gloss NYX Lip',
+  'Gloss à lèvres NYX, effet brillance naturelle et hydratation intense. Teintes subtiles qui se portent tous les jours. Disponible tout de suite en boutique.',
+  1000, null, 'lips',
+  '[]'::jsonb, '[{"name": "Teinte", "options": ["Transparent", "Rose subtil", "Marron élégant"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  status = excluded.status,
+  is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'gloss-olibolla', 'gloss-olibolla', 'Glossy Lip Balm Olibolla',
+  'Baume à lèvres brillant Olibolla : hydrate, nourrit et repulpe. Neuf teintes, du transparent au brun profond. Disponible tout de suite en boutique.',
+  1000, null, 'lips',
+  '[]'::jsonb, '[{"name": "Teinte", "options": ["01 Clear", "02 Milky", "03 Pink", "04 Rose", "05 Mauve", "06 Nude", "07 Red", "08 Berry", "09 Brown"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  status = excluded.status,
+  is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'gloss-lip-oil', 'gloss-lip-oil', 'Huile à lèvres teintée',
+  'Huile à lèvres teintée, enrichie en vitamines : hydratation intense et brillance naturelle. Six couleurs, de la plus discrète à la plus vive. Disponible tout de suite en boutique.',
+  1000, null, 'lips',
+  '[]'::jsonb, '[{"name": "Teinte", "options": ["01 Nude rosé", "02 Lilas", "03 Pêche", "04 Corail", "05 Rose bonbon", "06 Violet"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  status = excluded.status,
+  is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'gloss-victoria', 'gloss-victoria', 'Lip Oil soin',
+  'Huile à lèvres traitante Victoria''s Spirit : répare, protège et fait briller. Trois soins au choix, aux extraits naturels. Disponible tout de suite en boutique.',
+  1000, null, 'lips',
+  '[]'::jsonb, '[{"name": "Soin", "options": ["Cannabis Sativa Seed Oil", "Cocoa Butter", "Hydratant"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  status = excluded.status,
+  is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'box-gloss', 'box-gloss', 'Box gloss lips',
+  'Coffret de glosses à lèvres, teintes assorties. Idéal pour offrir ou pour varier selon l''humeur. Disponible tout de suite en boutique.',
+  2500, null, 'lips',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  status = excluded.status,
+  is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;

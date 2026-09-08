@@ -18,7 +18,7 @@ export function FeaturedProducts({
       <Reveal>
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="eyebrow">Sur commande</p>
+            <p className="eyebrow">La sélection</p>
             <h2 className="mt-3 text-[30px] sm:text-[38px]">La sélection du moment</h2>
           </div>
           <Link to="/boutique" className="link-underline hidden shrink-0 text-[13.5px] text-stone sm:block">

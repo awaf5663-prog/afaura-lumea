@@ -1200,3 +1200,10 @@ end;
 $$;
 
 revoke execute on function frais_boutique(integer, jsonb) from public;
+
+-- ── 12. Articles disponibles tout de suite ───────────────────────────
+-- La boutique commande la plupart de ses pièces au cas par cas, mais garde
+-- certains articles sur place — glosses, huiles à lèvres. Ceux-là se remettent
+-- sans attendre un groupage, et leur fiche le dit.
+
+alter table products add column if not exists ready_to_ship boolean not null default false;

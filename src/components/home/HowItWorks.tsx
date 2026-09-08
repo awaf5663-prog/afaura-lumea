@@ -3,7 +3,7 @@ import { Reveal } from '@/src/components/ui/Reveal';
 import { cn } from '@/src/lib/cn';
 
 const STORE_STEPS = [
-  { icon: ShoppingBag, title: 'Je choisis', text: 'Voiles, abayas, accessoires : tout est sur commande.' },
+  { icon: ShoppingBag, title: 'Je choisis', text: 'Voiles et abayas sur commande, glosses disponibles tout de suite.' },
   { icon: BadgeCheck, title: "J'ajoute au panier", text: 'Modèle, teinte, quantité — modifiables jusqu’à la validation.' },
   { icon: CreditCard, title: 'Je confirme', text: 'Nous confirmons le montant et le délai avant tout paiement.' },
   { icon: Truck, title: 'Je reçois', text: 'La pièce part au prochain groupage, puis livraison ou retrait.' },

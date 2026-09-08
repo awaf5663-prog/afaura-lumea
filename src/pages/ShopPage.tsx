@@ -36,7 +36,7 @@ export function ShopPage() {
   useSeo({
     title: 'Boutique — voiles, abayas et hijab tape',
     description:
-      'Jersey, modal, satin, dentelle, viscose et abayas, sur commande. Vous choisissez, nous commandons pour vous, la pièce part avec le prochain groupage. Prix en FCFA, livraison à Saint-Louis ou retrait.',
+      'Jersey, modal, satin, dentelle, viscose et abayas sur commande, glosses et huiles à lèvres disponibles tout de suite. Prix en FCFA, livraison à Saint-Louis ou retrait.',
   });
 
   // La catégorie reste synchronisée avec l'URL (liens du menu, partage de lien).
@@ -80,9 +80,11 @@ export function ShopPage() {
         <p className="eyebrow">Boutique</p>
         <h1 className="mt-3 text-[34px] sm:text-[44px]">Notre sélection</h1>
         <p className="mt-3 max-w-xl text-[15px] text-graphite">
-          Toutes les pièces sont <strong className="font-medium text-ink">sur commande</strong> :
+          La plupart des pièces sont <strong className="font-medium text-ink">sur commande</strong> :
           vous choisissez ici, nous commandons pour vous, et votre pièce part avec le prochain
-          groupage. Nous vous confirmons le délai sur WhatsApp avant tout paiement.
+          groupage. Nous vous confirmons le délai sur WhatsApp avant tout paiement. Les articles
+          marqués <strong className="font-medium text-ink">« en stock »</strong>, eux, sont déjà
+          en boutique et se remettent tout de suite.
         </p>
       </header>
 

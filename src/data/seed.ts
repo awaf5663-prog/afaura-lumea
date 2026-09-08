@@ -29,6 +29,11 @@ import pack8b2 from '@/src/assets/products/pack8b-2.webp';
 import pack8b3 from '@/src/assets/products/pack8b-3.webp';
 import robeBlanche from '@/src/assets/products/robe-blanche.webp';
 import robeBleuCiel from '@/src/assets/products/robe-bleu-ciel.webp';
+import glossLipOil from '@/src/assets/products/gloss-lip-oil.webp';
+import glossNyx from '@/src/assets/products/gloss-nyx.webp';
+import glossOlibolla from '@/src/assets/products/gloss-olibolla.webp';
+import glossRomantic from '@/src/assets/products/gloss-romantic.webp';
+import glossVictoria from '@/src/assets/products/gloss-victoria.webp';
 import robeBordeaux from '@/src/assets/products/robe-bordeaux.webp';
 import robeRayures from '@/src/assets/products/robe-rayures.webp';
 import robeRose from '@/src/assets/products/robe-rose.webp';
@@ -116,6 +121,14 @@ export const CATEGORIES: Category[] = [
    * quel — les photos sont déjà exactement à ce format, rien n'est rogné.
    */
   { id: 'robes', name: 'Robes' },
+  /*
+   * Glosses et huiles à lèvres, photographiés sur fond clair : cadre carré et
+   * photo entière, pour qu'un tube couché ne soit pas coupé en deux.
+   *
+   * Seule catégorie disponible tout de suite : ces articles sont achetés en
+   * lot et gardés sur place, ils ne partent pas avec un groupage.
+   */
+  { id: 'lips', name: 'Lips gloss', photo: 'carre' },
 ];
 
 /**
@@ -816,6 +829,139 @@ export const SEED_PRODUCTS: Product[] = [
     isNew: true,
     otherColorsAvailable: true,
     createdAt: '2026-09-02T11:04:00.000Z',
+  },
+  {
+    id: 'gloss-romantic',
+    slug: 'gloss-romantic',
+    name: 'Gloss Romantic',
+    description:
+      "Gloss à lèvres brillant, texture légère et confortable. Applicateur mousse, flacon transparent à capuchon doré. Disponible tout de suite en boutique.",
+    price: 1000,
+    compareAtPrice: null,
+    category: 'lips',
+    images: [glossRomantic],
+    variants: [
+      { name: 'Teinte', options: ['Rose subtil', 'Transparent', 'Nude naturel', 'Marron élégant'] },
+    ],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T13:00:00.000Z',
+  },
+  {
+    id: 'gloss-nyx',
+    slug: 'gloss-nyx',
+    name: 'Gloss NYX Lip',
+    description:
+      "Gloss à lèvres NYX, effet brillance naturelle et hydratation intense. Teintes subtiles qui se portent tous les jours. Disponible tout de suite en boutique.",
+    price: 1000,
+    compareAtPrice: null,
+    category: 'lips',
+    images: [glossNyx],
+    variants: [{ name: 'Teinte', options: ['Transparent', 'Rose subtil', 'Marron élégant'] }],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T13:01:00.000Z',
+  },
+  {
+    id: 'gloss-olibolla',
+    slug: 'gloss-olibolla',
+    name: 'Glossy Lip Balm Olibolla',
+    description:
+      "Baume à lèvres brillant Olibolla : hydrate, nourrit et repulpe. Neuf teintes, du transparent au brun profond. Disponible tout de suite en boutique.",
+    price: 1000,
+    compareAtPrice: null,
+    category: 'lips',
+    images: [glossOlibolla],
+    variants: [
+      {
+        name: 'Teinte',
+        options: [
+          '01 Clear',
+          '02 Milky',
+          '03 Pink',
+          '04 Rose',
+          '05 Mauve',
+          '06 Nude',
+          '07 Red',
+          '08 Berry',
+          '09 Brown',
+        ],
+      },
+    ],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T13:02:00.000Z',
+  },
+  {
+    id: 'gloss-lip-oil',
+    slug: 'gloss-lip-oil',
+    name: 'Huile à lèvres teintée',
+    description:
+      "Huile à lèvres teintée, enrichie en vitamines : hydratation intense et brillance naturelle. Six couleurs, de la plus discrète à la plus vive. Disponible tout de suite en boutique.",
+    price: 1000,
+    compareAtPrice: null,
+    category: 'lips',
+    images: [glossLipOil],
+    variants: [
+      {
+        name: 'Teinte',
+        options: [
+          '01 Nude rosé',
+          '02 Lilas',
+          '03 Pêche',
+          '04 Corail',
+          '05 Rose bonbon',
+          '06 Violet',
+        ],
+      },
+    ],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T13:03:00.000Z',
+  },
+  {
+    id: 'gloss-victoria',
+    slug: 'gloss-victoria',
+    name: 'Lip Oil soin',
+    description:
+      "Huile à lèvres traitante Victoria's Spirit : répare, protège et fait briller. Trois soins au choix, aux extraits naturels. Disponible tout de suite en boutique.",
+    price: 1000,
+    compareAtPrice: null,
+    category: 'lips',
+    images: [glossVictoria],
+    variants: [
+      { name: 'Soin', options: ['Cannabis Sativa Seed Oil', 'Cocoa Butter', 'Hydratant'] },
+    ],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T13:04:00.000Z',
+  },
+  {
+    id: 'box-gloss',
+    slug: 'box-gloss',
+    name: 'Box gloss lips',
+    description:
+      "Coffret de glosses à lèvres, teintes assorties. Idéal pour offrir ou pour varier selon l'humeur. Disponible tout de suite en boutique.",
+    price: 2500,
+    compareAtPrice: null,
+    category: 'lips',
+    images: [glossOlibolla],
+    variants: [],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T13:05:00.000Z',
   },
 ];
 

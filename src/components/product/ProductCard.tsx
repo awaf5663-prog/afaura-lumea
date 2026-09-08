@@ -53,6 +53,9 @@ export function ProductCard({ product, priority }: { product: Product; priority?
           <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1.5">
             {product.isNew && <Badge tone="new">Nouveau</Badge>}
             {product.isPopular && <Badge tone="popular">Populaire</Badge>}
+            {/* Ce qui attend en boutique se dit tout de suite : c'est
+                l'argument le plus fort face à un délai de groupage. */}
+            {product.readyToShip && <Badge tone="stock">En stock</Badge>}
           </div>
 
           {soldOut && (

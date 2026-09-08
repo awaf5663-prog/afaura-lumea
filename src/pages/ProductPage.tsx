@@ -222,9 +222,10 @@ export function ProductPage({ slug }: { slug: string }) {
           />
 
           {/*
-            Rien n'est en stock : tout est commandé pour la cliente. Un point vert
-            « Disponible » laisserait croire que la pièce part le jour même, et la
-            déception se paierait à la livraison.
+            La plupart des pièces sont commandées pour la cliente : annoncer
+            « Disponible » laisserait croire à un retrait le jour même, et la
+            déception se paierait à la livraison. Les articles gardés sur place
+            (Product.readyToShip) sont la seule exception, et ils le disent.
           */}
           {/* `flex` et non `inline-flex` : le prix juste au-dessus est un
               élément en ligne, et les deux se retrouvaient collés bout à bout
@@ -234,11 +235,22 @@ export function ProductPage({ slug }: { slug: string }) {
               <span className="text-[#8a2f2f]">Momentanément indisponible</span>
             ) : (
               <>
-                <Clock className="size-3.5 text-stone" aria-hidden />
-                <span className="text-graphite">
-                  Sur commande
-                  {product.stock !== null ? ` — ${product.stock} pièce(s) réservée(s)` : ''}
-                </span>
+                {product.readyToShip ? (
+                  <>
+                    <span aria-hidden className="size-2 rounded-full bg-[#3f6b41]" />
+                    <span className="text-graphite">
+                      Disponible tout de suite — remis à Saint-Louis, sans attendre un groupage
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Clock className="size-3.5 text-stone" aria-hidden />
+                    <span className="text-graphite">
+                      Sur commande
+                      {product.stock !== null ? ` — ${product.stock} pièce(s) réservée(s)` : ''}
+                    </span>
+                  </>
+                )}
               </>
             )}
           </p>
@@ -346,8 +358,9 @@ export function ProductPage({ slug }: { slug: string }) {
           <ul className="mt-8 space-y-2.5 border-t border-line pt-6 text-[13.5px] text-stone">
             <li className="flex items-start gap-2.5">
               <Clock className="mt-0.5 size-4 shrink-0" strokeWidth={1.6} />
-              Pièce commandée pour vous : elle part avec le prochain groupage. Le délai vous est
-              confirmé sur WhatsApp avant tout paiement.
+              {product.readyToShip
+                ? 'Article en boutique : il ne part pas avec un groupage, nous convenons de la remise sur WhatsApp.'
+                : "Pièce commandée pour vous : elle part avec le prochain groupage. Le délai vous est confirmé sur WhatsApp avant tout paiement."}
             </li>
             <li className="flex items-center gap-2.5">
               <Truck className="size-4" strokeWidth={1.6} />

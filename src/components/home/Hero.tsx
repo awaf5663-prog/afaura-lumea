@@ -60,7 +60,7 @@ export function Hero() {
             </li>
             <li className="inline-flex items-center gap-2">
               <Clock className="size-4" strokeWidth={1.6} />
-              Tout est sur commande, délai annoncé d'avance
+              Sur commande ou dispo tout de suite, c'est écrit sur la fiche
             </li>
             <li className="inline-flex items-center gap-2">
               <Truck className="size-4" strokeWidth={1.6} />

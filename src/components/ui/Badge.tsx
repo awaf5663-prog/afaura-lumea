@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/src/lib/cn';
 
-type Tone = 'new' | 'popular' | 'neutral' | 'soldout' | 'accent';
+type Tone = 'new' | 'popular' | 'neutral' | 'soldout' | 'accent' | 'stock';
 
 const TONES: Record<Tone, string> = {
   new: 'bg-ink text-ivory',
@@ -9,6 +9,8 @@ const TONES: Record<Tone, string> = {
   neutral: 'bg-cream text-stone',
   soldout: 'bg-graphite text-white',
   accent: 'bg-sand text-graphite',
+  /* Réservé aux articles réellement gardés sur place. Voir Product.readyToShip. */
+  stock: 'bg-[#e7f0e6] text-[#3f6b41]',
 };
 
 export function Badge({

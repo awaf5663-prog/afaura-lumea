@@ -9,7 +9,7 @@ import { useSeo } from '@/src/lib/seo';
 const FAQ = [
   {
     q: 'Les pièces de la boutique sont-elles en stock ?',
-    a: "Non, tout est sur commande. Vous choisissez sur le site, nous commandons la pièce pour vous, et elle arrive avec le prochain groupage. C'est ce qui nous permet de proposer ces prix. Le délai vous est confirmé sur WhatsApp avant tout paiement — nous préférons vous le dire d'avance plutôt que de vous faire attendre sans explication.",
+    a: "La plupart du temps non : vous choisissez sur le site, nous commandons la pièce pour vous, et elle arrive avec le prochain groupage. C'est ce qui nous permet de proposer ces prix. Le délai vous est confirmé sur WhatsApp avant tout paiement — nous préférons vous le dire d'avance plutôt que de vous faire attendre sans explication. Certains articles font exception : les glosses et huiles à lèvres sont gardés sur place, et leur fiche indique « disponible tout de suite ».",
   },
   {
     q: 'Êtes-vous SHEIN ?',

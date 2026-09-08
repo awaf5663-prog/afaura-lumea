@@ -29,7 +29,8 @@
 --   12. ajoute les glosses et huiles à lèvres, disponibles tout de suite, et
 --       la marque « en stock » qui les distingue du reste du catalogue ;
 --   13. ajoute les gommages et les parfums, en brouillon tant que leur prix
---       n'est pas fixé.
+--       n'est pas fixé ;
+--   14. ouvre le rayon maquillage, en brouillon lui aussi.
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- ── 1. Colonnes ajoutées après la première mise en place ──────────────
@@ -1508,5 +1509,30 @@ on conflict (id) do update set
   description = excluded.description,
   category = excluded.category,
   variants = excluded.variants,
+  is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+-- ── 14. Maquillage : la catégorie et son premier article ─────────────
+-- La boutique ouvre un rayon maquillage. Comme les soins, l'article arrive
+-- en BROUILLON : ni son prix ni la liste de ses quatorze teintes ne sont
+-- connus, et une teinte choisie à l'aveugle se paie au retrait.
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'anticernes-sheglam', 'anticernes-sheglam', 'Anti-cernes Hideaway',
+  'Anti-cernes fluide à applicateur mousse : couvre les cernes et unifie sans marquer. Quatorze teintes, du plus clair au plus foncé.',
+  0, null, 'maquillage',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  category = excluded.category,
   is_new = excluded.is_new,
   ready_to_ship = excluded.ready_to_ship;

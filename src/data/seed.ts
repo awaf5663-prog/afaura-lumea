@@ -32,6 +32,7 @@ import robeBleuCiel from '@/src/assets/products/robe-bleu-ciel.webp';
 import glossLipOil from '@/src/assets/products/gloss-lip-oil.webp';
 import gommageBosuya from '@/src/assets/products/gommage-bosuya.webp';
 import gommageBosuyaOuvert from '@/src/assets/products/gommage-bosuya-ouvert.webp';
+import anticernesSheglam from '@/src/assets/products/anticernes-sheglam.webp';
 import gommageTreeHut from '@/src/assets/products/gommage-tree-hut.webp';
 import parfumVictoriaKey from '@/src/assets/products/parfum-victoria-key.webp';
 import glossNyx from '@/src/assets/products/gloss-nyx.webp';
@@ -139,6 +140,12 @@ export const CATEGORIES: Category[] = [
    */
   { id: 'gommage', name: 'Gommages', photo: 'carre' },
   { id: 'parfum', name: 'Parfums', photo: 'carre' },
+  /*
+   * Maquillage : fonds de teint, anti-cernes et tout ce qui va avec. Même
+   * cadre carré — ce sont des flacons photographiés sur fond clair, et une
+   * teinte se juge mal sur une photo rognée.
+   */
+  { id: 'maquillage', name: 'Maquillage', photo: 'carre' },
 ];
 
 /**
@@ -1103,6 +1110,29 @@ export const SEED_PRODUCTS: Product[] = [
     isNew: true,
     readyToShip: true,
     createdAt: '2026-09-08T15:01:00.000Z',
+  },
+  {
+    id: 'anticernes-sheglam',
+    slug: 'anticernes-sheglam',
+    name: 'Anti-cernes Hideaway',
+    description:
+      'Anti-cernes fluide à applicateur mousse : couvre les cernes et unifie sans marquer. Quatorze teintes, du plus clair au plus foncé.',
+    /* Prix à fixer par la boutique : l'article reste invisible d'ici là. */
+    price: 0,
+    compareAtPrice: null,
+    category: 'maquillage',
+    images: [anticernesSheglam],
+    /*
+     * Quatorze teintes annoncées par la boutique, dont la liste n'est pas
+     * encore arrivée. Choisir une teinte de maquillage à l'aveugle se paie au
+     * retrait : tant que les noms exacts manquent, aucune n'est proposée.
+     */
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T15:30:00.000Z',
   },
   {
     id: 'parfum-victoria-key',

@@ -1418,9 +1418,9 @@ insert into products (
   other_colors_available, ready_to_ship, color_chart_id
 ) values (
   'box-gloss', 'box-gloss', 'Box gloss lips',
-  'Coffret de glosses à lèvres, teintes assorties. Idéal pour offrir ou pour varier selon l''humeur. Disponible tout de suite en boutique.',
-  2500, null, 'lips',
-  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  'Coffret de trois glosses, choisis un par un dans toute la gamme : baumes brillants, huiles teintées ou soins. 2 500 FCFA les trois, au lieu de 3 000 FCFA à l''unité. Disponible tout de suite en boutique.',
+  2500, 3000, 'lips',
+  '[]'::jsonb, '[{"name": "Gloss 1", "options": ["Romantic — Rose subtil", "Romantic — Transparent", "Romantic — Nude naturel", "Romantic — Marron élégant", "NYX — Transparent", "NYX — Rose subtil", "NYX — Marron élégant", "Olibolla — 01 Clear", "Olibolla — 02 Milky", "Olibolla — 03 Pink", "Olibolla — 04 Rose", "Olibolla — 05 Mauve", "Olibolla — 06 Nude", "Olibolla — 07 Red", "Olibolla — 08 Berry", "Olibolla — 09 Brown", "Huile teintée — 01 Nude rosé", "Huile teintée — 02 Lilas", "Huile teintée — 03 Pêche", "Huile teintée — 04 Corail", "Huile teintée — 05 Rose bonbon", "Huile teintée — 06 Violet", "Lip Oil soin — Cannabis Sativa Seed Oil", "Lip Oil soin — Cocoa Butter", "Lip Oil soin — Hydratant"]}, {"name": "Gloss 2", "options": ["Romantic — Rose subtil", "Romantic — Transparent", "Romantic — Nude naturel", "Romantic — Marron élégant", "NYX — Transparent", "NYX — Rose subtil", "NYX — Marron élégant", "Olibolla — 01 Clear", "Olibolla — 02 Milky", "Olibolla — 03 Pink", "Olibolla — 04 Rose", "Olibolla — 05 Mauve", "Olibolla — 06 Nude", "Olibolla — 07 Red", "Olibolla — 08 Berry", "Olibolla — 09 Brown", "Huile teintée — 01 Nude rosé", "Huile teintée — 02 Lilas", "Huile teintée — 03 Pêche", "Huile teintée — 04 Corail", "Huile teintée — 05 Rose bonbon", "Huile teintée — 06 Violet", "Lip Oil soin — Cannabis Sativa Seed Oil", "Lip Oil soin — Cocoa Butter", "Lip Oil soin — Hydratant"]}, {"name": "Gloss 3", "options": ["Romantic — Rose subtil", "Romantic — Transparent", "Romantic — Nude naturel", "Romantic — Marron élégant", "NYX — Transparent", "NYX — Rose subtil", "NYX — Marron élégant", "Olibolla — 01 Clear", "Olibolla — 02 Milky", "Olibolla — 03 Pink", "Olibolla — 04 Rose", "Olibolla — 05 Mauve", "Olibolla — 06 Nude", "Olibolla — 07 Red", "Olibolla — 08 Berry", "Olibolla — 09 Brown", "Huile teintée — 01 Nude rosé", "Huile teintée — 02 Lilas", "Huile teintée — 03 Pêche", "Huile teintée — 04 Corail", "Huile teintée — 05 Rose bonbon", "Huile teintée — 06 Violet", "Lip Oil soin — Cannabis Sativa Seed Oil", "Lip Oil soin — Cocoa Butter", "Lip Oil soin — Hydratant"]}]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   false, true, null
 )
@@ -1429,6 +1429,7 @@ on conflict (id) do update set
   name = excluded.name,
   description = excluded.description,
   price = excluded.price,
+  compare_at_price = excluded.compare_at_price,
   category = excluded.category,
   variants = excluded.variants,
   status = excluded.status,

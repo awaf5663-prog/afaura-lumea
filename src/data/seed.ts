@@ -30,6 +30,10 @@ import pack8b3 from '@/src/assets/products/pack8b-3.webp';
 import robeBlanche from '@/src/assets/products/robe-blanche.webp';
 import robeBleuCiel from '@/src/assets/products/robe-bleu-ciel.webp';
 import glossLipOil from '@/src/assets/products/gloss-lip-oil.webp';
+import gommageBosuya from '@/src/assets/products/gommage-bosuya.webp';
+import gommageBosuyaOuvert from '@/src/assets/products/gommage-bosuya-ouvert.webp';
+import gommageTreeHut from '@/src/assets/products/gommage-tree-hut.webp';
+import parfumVictoriaKey from '@/src/assets/products/parfum-victoria-key.webp';
 import glossNyx from '@/src/assets/products/gloss-nyx.webp';
 import glossOlibolla from '@/src/assets/products/gloss-olibolla.webp';
 import glossRomantic from '@/src/assets/products/gloss-romantic.webp';
@@ -129,6 +133,12 @@ export const CATEGORIES: Category[] = [
    * lot et gardés sur place, ils ne partent pas avec un groupage.
    */
   { id: 'lips', name: 'Lips gloss', photo: 'carre' },
+  /*
+   * Soins du corps et parfums, photographiés sur fond neutre : cadre carré et
+   * photo entière, comme les glosses. Achetés en lot et gardés sur place.
+   */
+  { id: 'gommage', name: 'Gommages', photo: 'carre' },
+  { id: 'parfum', name: 'Parfums', photo: 'carre' },
 ];
 
 /**
@@ -1054,6 +1064,62 @@ export const SEED_PRODUCTS: Product[] = [
     isNew: true,
     readyToShip: true,
     createdAt: '2026-09-08T13:05:00.000Z',
+  },
+  {
+    id: 'gommage-tree-hut',
+    slug: 'gommage-tree-hut',
+    name: 'Gommage Tree Hut',
+    description:
+      'Gommage au sucre et au karité, pot de 510 g. Exfolie en douceur et laisse la peau nourrie. Quatre parfums au choix.',
+    /* Prix à fixer par la boutique : l'article reste invisible d'ici là. */
+    price: 0,
+    compareAtPrice: null,
+    category: 'gommage',
+    images: [gommageTreeHut],
+    variants: [
+      { name: 'Parfum', options: ['Cotton Candy', 'Moroccan Rose', 'Pink Champagne', 'Watermelon'] },
+    ],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T15:00:00.000Z',
+  },
+  {
+    id: 'gommage-bosuya',
+    slug: 'gommage-bosuya',
+    name: 'Gommage Bosuya',
+    description:
+      'Gommage au sucre et sel de bain, pot de 350 g. Exfoliation délicate, extraits naturels hydratants. Six parfums au choix.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'gommage',
+    images: [gommageBosuya, gommageBosuyaOuvert],
+    variants: [
+      { name: 'Parfum', options: ['Pastèque', 'Riz', 'Rose', 'Café', 'Coco', 'Orange'] },
+    ],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T15:01:00.000Z',
+  },
+  {
+    id: 'parfum-victoria-key',
+    slug: 'parfum-victoria-key',
+    name: 'Coffret brumes Victoria\u2019s Key',
+    description:
+      'Coffret de quatre brumes parfumées Victoria\u2019s Key, en flacons vaporisateurs.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'parfum',
+    images: [parfumVictoriaKey],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T15:02:00.000Z',
   },
 ];
 

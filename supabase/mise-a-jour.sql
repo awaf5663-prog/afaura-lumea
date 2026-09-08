@@ -27,7 +27,9 @@
 --   11. permet de réserver une offre aux commandes qui atteignent un montant
 --       minimum d'articles ;
 --   12. ajoute les glosses et huiles à lèvres, disponibles tout de suite, et
---       la marque « en stock » qui les distingue du reste du catalogue.
+--       la marque « en stock » qui les distingue du reste du catalogue ;
+--   13. ajoute les gommages et les parfums, en brouillon tant que leur prix
+--       n'est pas fixé.
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- ── 1. Colonnes ajoutées après la première mise en place ──────────────
@@ -1433,5 +1435,78 @@ on conflict (id) do update set
   category = excluded.category,
   variants = excluded.variants,
   status = excluded.status,
+  is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+-- ── 13. Soins du corps : gommages et parfums ─────────────────────────
+-- Comme les glosses, ces articles sont gardés en boutique et se remettent
+-- tout de suite.
+--
+-- Ils arrivent en BROUILLON (`status = 'draft'`) : leur prix n'est pas encore
+-- fixé, et un article à 0 FCFA n'a rien à faire devant une cliente. Ils
+-- apparaîtront le jour où la boutique saisira leur prix depuis
+-- Administration → Produits, ou par une mise à jour de ce fichier.
+
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'gommage-tree-hut', 'gommage-tree-hut', 'Gommage Tree Hut',
+  'Gommage au sucre et au karité, pot de 510 g. Exfolie en douceur et laisse la peau nourrie. Quatre parfums au choix.',
+  0, null, 'gommage',
+  '[]'::jsonb, '[{"name": "Parfum", "options": ["Cotton Candy", "Moroccan Rose", "Pink Champagne", "Watermelon"]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  category = excluded.category,
+  variants = excluded.variants,
+  is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'gommage-bosuya', 'gommage-bosuya', 'Gommage Bosuya',
+  'Gommage au sucre et sel de bain, pot de 350 g. Exfoliation délicate, extraits naturels hydratants. Six parfums au choix.',
+  0, null, 'gommage',
+  '[]'::jsonb, '[{"name": "Parfum", "options": ["Pastèque", "Riz", "Rose", "Café", "Coco", "Orange"]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  category = excluded.category,
+  variants = excluded.variants,
+  is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'parfum-victoria-key', 'parfum-victoria-key', 'Coffret brumes Victoria’s Key',
+  'Coffret de quatre brumes parfumées Victoria’s Key, en flacons vaporisateurs.',
+  0, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  category = excluded.category,
+  variants = excluded.variants,
   is_new = excluded.is_new,
   ready_to_ship = excluded.ready_to_ship;

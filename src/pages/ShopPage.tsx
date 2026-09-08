@@ -67,6 +67,20 @@ export function ShopPage() {
     return sortProducts(list, sort);
   }, [products, query, category, effectiveMax, ceiling, sort]);
 
+  /*
+   * Une catégorie sans article visible ne s'affiche pas : cliquer dessus
+   * mènerait à « 0 article », ce qui donne l'impression d'une boutique vide
+   * plutôt que d'une catégorie en préparation. Elle réapparaît d'elle-même
+   * dès qu'un article y est publié.
+   */
+  const categoriesVisibles = useMemo(
+    () =>
+      CATEGORIES.filter((c) =>
+        products.some((product) => product.category === c.id && product.status !== 'draft'),
+      ),
+    [products],
+  );
+
   const updateCategory = (next: string) => {
     setCategory(next);
     navigate(next === 'all' ? '/boutique' : `/boutique?categorie=${next}`, { keepScroll: true });
@@ -132,7 +146,7 @@ export function ShopPage() {
           <Chip active={category === 'all'} onClick={() => updateCategory('all')}>
             Tout
           </Chip>
-          {CATEGORIES.map((c) => (
+          {categoriesVisibles.map((c) => (
             <Chip key={c.id} active={category === c.id} onClick={() => updateCategory(c.id)}>
               {c.name}
             </Chip>
@@ -216,7 +230,7 @@ export function ShopPage() {
               <Chip active={category === 'all'} onClick={() => updateCategory('all')}>
                 Tout
               </Chip>
-              {CATEGORIES.map((c) => (
+              {categoriesVisibles.map((c) => (
                 <Chip key={c.id} active={category === c.id} onClick={() => updateCategory(c.id)}>
                   {c.name}
                 </Chip>

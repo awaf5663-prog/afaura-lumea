@@ -34,7 +34,9 @@
 --   15. ouvre les rayons bougies, sacs et sous-vêtements — chaque sac
 --       gardant sa propre fiche, puisque leurs prix diffèrent ;
 --   16. complète le rayon avec trois pyjamas, un lot de shorts et un
---       bonnet de nuit.
+--       bonnet de nuit ;
+--   17. ouvre le rayon chaussures et celui des combinaisons, et ajoute un
+--       coffret de parfums et un bonnet de douche.
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- ── 1. Colonnes ajoutées après la première mise en place ──────────────
@@ -1736,6 +1738,106 @@ insert into products (
   0, null, 'lingerie',
   '[]'::jsonb,
   '[{"name": "Motif", "options": ["Noir à nœuds roses", "Rose à pois blancs", "Marine à pois roses"]}]'::jsonb,
+  '{}'::jsonb, null, 'draft',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, variants = excluded.variants,
+  is_new = excluded.is_new, ready_to_ship = excluded.ready_to_ship;
+
+-- ── 17. Chaussures, combinaison, coffret et bonnet de douche ─────────
+-- Le rayon chaussures s'ouvre enfin, avec sa première paire. Aucune pointure
+-- n'est proposée : la boutique n'a pas dit lesquelles elle prend, et une
+-- chaussure vendue sans pointure se retourne.
+--
+-- La combinaison a son propre rayon plutôt que d'aller chez les robes : une
+-- combinaison-pantalon n'est pas une robe.
+--
+-- Tout en BROUILLON.
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'sandales-leopard', 'sandales-leopard', 'Sandales plates à boucle',
+  'Sandales plates à bride croisée et boucle dorée, semelle rembourrée. Se portent en ville comme à la maison.',
+  0, null, 'chaussure',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, is_new = excluded.is_new,
+  other_colors_available = excluded.other_colors_available,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'combinaison-rayee', 'combinaison-rayee', 'Combinaison rayée bretelle nouée',
+  'Combinaison longue à rayures, bustier droit et fine bretelle à nouer derrière la nuque, jambes évasées. Maille imprimée effet crochet.',
+  0, null, 'combinaison',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, is_new = excluded.is_new,
+  other_colors_available = excluded.other_colors_available,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'shorts-lot-quatre', 'shorts-lot-quatre', 'Lot de quatre shorts',
+  'Quatre shorts courts à ceinture repliée : rayé rose, imprimé cerises, noir uni et rose à pois.',
+  0, null, 'lingerie',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, is_new = excluded.is_new,
+  other_colors_available = excluded.other_colors_available,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'coffret-parfums-dignife', 'coffret-parfums-dignife', 'Coffret trois parfums',
+  'Coffret de trois eaux de parfum de 30 mL, présentées dans un écrin noir. Trois flacons, trois senteurs.',
+  0, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'bonnet-douche', 'bonnet-douche', 'Bonnet de douche satin',
+  'Bonnet de douche doublé, bord élastique froncé, imprimé de petits nœuds. Garde les cheveux au sec.',
+  0, null, 'lingerie',
+  '[]'::jsonb,
+  '[{"name": "Coloris", "options": ["Blanc à nœuds bruns", "Rose poudré", "Beige", "Blanc bord brun"]}]'::jsonb,
   '{}'::jsonb, null, 'draft',
   true, false,
   false, true, null

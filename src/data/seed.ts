@@ -32,7 +32,12 @@ import robeBleuCiel from '@/src/assets/products/robe-bleu-ciel.webp';
 import glossLipOil from '@/src/assets/products/gloss-lip-oil.webp';
 import gommageBosuya from '@/src/assets/products/gommage-bosuya.webp';
 import gommageBosuyaOuvert from '@/src/assets/products/gommage-bosuya-ouvert.webp';
+import bonnetDouche from '@/src/assets/products/bonnet-douche.webp';
 import bonnetSatin from '@/src/assets/products/bonnet-satin.webp';
+import coffretParfumsDignife from '@/src/assets/products/coffret-parfums-dignife.webp';
+import combinaisonRayee from '@/src/assets/products/combinaison-rayee.webp';
+import sandalesLeopard from '@/src/assets/products/sandales-leopard.webp';
+import shortsLotQuatre from '@/src/assets/products/shorts-lot-quatre.webp';
 import bougiesLatte from '@/src/assets/products/bougies-latte.webp';
 import pyjamaNoirRose from '@/src/assets/products/pyjama-noir-rose.webp';
 import pyjamaPois from '@/src/assets/products/pyjama-pois.webp';
@@ -176,6 +181,12 @@ export const CATEGORIES: Category[] = [
    * n'est visible, elle ne s'affiche pas en boutique.
    */
   { id: 'chaussure', name: 'Chaussures', photo: 'carre' },
+  /*
+   * Combinaisons. Elles ont leur rayon plutôt que d'aller chez les robes :
+   * une combinaison-pantalon n'est pas une robe, et une cliente qui cherche
+   * l'une ne veut pas fouiller parmi les autres.
+   */
+  { id: 'combinaison', name: 'Combinaisons' },
 ];
 
 /**
@@ -1373,6 +1384,102 @@ export const SEED_PRODUCTS: Product[] = [
     isNew: true,
     readyToShip: true,
     createdAt: '2026-09-08T16:14:00.000Z',
+  },
+  {
+    id: 'sandales-leopard',
+    slug: 'sandales-leopard',
+    name: 'Sandales plates à boucle',
+    description:
+      'Sandales plates à bride croisée et boucle dorée, semelle rembourrée. Se portent en ville comme à la maison.',
+    /* Prix à fixer par la boutique : l'article reste invisible d'ici là. */
+    price: 0,
+    compareAtPrice: null,
+    category: 'chaussure',
+    images: [sandalesLeopard],
+    /*
+     * Aucune pointure n'est proposée : la boutique n'a pas encore dit
+     * lesquelles elle prend. Une chaussure vendue sans pointure se
+     * retourne — autant attendre la liste.
+     */
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-08T16:20:00.000Z',
+  },
+  {
+    id: 'combinaison-rayee',
+    slug: 'combinaison-rayee',
+    name: 'Combinaison rayée bretelle nouée',
+    description:
+      "Combinaison longue à rayures, bustier droit et fine bretelle à nouer derrière la nuque, jambes évasées. Maille imprimée effet crochet.",
+    price: 0,
+    compareAtPrice: null,
+    category: 'combinaison',
+    images: [combinaisonRayee],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-08T16:21:00.000Z',
+  },
+  {
+    id: 'shorts-lot-quatre',
+    slug: 'shorts-lot-quatre',
+    name: 'Lot de quatre shorts',
+    description:
+      'Quatre shorts courts à ceinture repliée : rayé rose, imprimé cerises, noir uni et rose à pois.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'lingerie',
+    images: [shortsLotQuatre],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-08T16:22:00.000Z',
+  },
+  {
+    id: 'coffret-parfums-dignife',
+    slug: 'coffret-parfums-dignife',
+    name: 'Coffret trois parfums',
+    description:
+      'Coffret de trois eaux de parfum de 30 mL, présentées dans un écrin noir. Trois flacons, trois senteurs.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'parfum',
+    images: [coffretParfumsDignife],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T16:23:00.000Z',
+  },
+  {
+    id: 'bonnet-douche',
+    slug: 'bonnet-douche',
+    name: 'Bonnet de douche satin',
+    description:
+      'Bonnet de douche doublé, bord élastique froncé, imprimé de petits nœuds. Garde les cheveux au sec.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'lingerie',
+    images: [bonnetDouche],
+    variants: [
+      { name: 'Coloris', options: ['Blanc à nœuds bruns', 'Rose poudré', 'Beige', 'Blanc bord brun'] },
+    ],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T16:24:00.000Z',
   },
   {
     id: 'parfum-victoria-key',

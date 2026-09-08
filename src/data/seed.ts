@@ -32,6 +32,11 @@ import robeBleuCiel from '@/src/assets/products/robe-bleu-ciel.webp';
 import glossLipOil from '@/src/assets/products/gloss-lip-oil.webp';
 import gommageBosuya from '@/src/assets/products/gommage-bosuya.webp';
 import gommageBosuyaOuvert from '@/src/assets/products/gommage-bosuya-ouvert.webp';
+import bougiesLatte from '@/src/assets/products/bougies-latte.webp';
+import sacBordeaux from '@/src/assets/products/sac-bordeaux.webp';
+import sacCabasBrun from '@/src/assets/products/sac-cabas-brun.webp';
+import sacLeopardBrun from '@/src/assets/products/sac-leopard-brun.webp';
+import shortNuit from '@/src/assets/products/short-nuit.webp';
 import anticernesSheglam from '@/src/assets/products/anticernes-sheglam.webp';
 import gommageTreeHut from '@/src/assets/products/gommage-tree-hut.webp';
 import parfumVictoriaKey from '@/src/assets/products/parfum-victoria-key.webp';
@@ -146,6 +151,26 @@ export const CATEGORIES: Category[] = [
    * teinte se juge mal sur une photo rognée.
    */
   { id: 'maquillage', name: 'Maquillage', photo: 'carre' },
+  /*
+   * Bougies parfumées, vendues à l'unité comme les soins.
+   */
+  { id: 'bougie', name: 'Bougies', photo: 'carre' },
+  /*
+   * Sacs. Chaque modèle est un article à part entière : les prix diffèrent
+   * d'un sac à l'autre, et les regrouper sous une seule fiche obligerait à
+   * afficher un prix unique — donc faux pour tous les autres.
+   */
+  { id: 'sac', name: 'Sacs', photo: 'carre' },
+  /*
+   * Sous-vêtements et pyjamas. Cadre carré : ces pièces sont photographiées
+   * à plat, et un cadre portrait leur couperait les côtés.
+   */
+  { id: 'lingerie', name: 'Sous-vêtements & pyjamas', photo: 'carre' },
+  /*
+   * Chaussures. La catégorie attend son premier article : tant qu'aucun
+   * n'est visible, elle ne s'affiche pas en boutique.
+   */
+  { id: 'chaussure', name: 'Chaussures', photo: 'carre' },
 ];
 
 /**
@@ -1133,6 +1158,119 @@ export const SEED_PRODUCTS: Product[] = [
     isNew: true,
     readyToShip: true,
     createdAt: '2026-09-08T15:30:00.000Z',
+  },
+  {
+    id: 'bougies-latte',
+    slug: 'bougies-latte',
+    name: 'Bougie parfumée Latte',
+    description:
+      "Bougie parfumée en verre, coulée en deux couches comme un café glacé. Huit parfums au choix.",
+    /* Prix à fixer par la boutique : l'article reste invisible d'ici là. */
+    price: 0,
+    compareAtPrice: null,
+    category: 'bougie',
+    images: [bougiesLatte],
+    variants: [
+      {
+        name: 'Parfum',
+        options: [
+          'Pink Coconut Matcha Latte',
+          'Matcha Latte',
+          'Lemon Matcha Latte',
+          'Sakura Latte',
+          'Lavender Latte',
+          'Taro Latte',
+          'Caramel Latte',
+          'The Iced Coffee',
+        ],
+      },
+    ],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T16:00:00.000Z',
+  },
+  /*
+   * Trois sacs, trois fiches. La boutique achète chaque modèle à un prix
+   * différent : les réunir sous un seul article afficherait un prix unique,
+   * faux pour deux d'entre eux.
+   *
+   * Les coloris ne sont pas listés : les pastilles de la boutique en montrent
+   * beaucoup, mais aucun nom n'est lisible. `otherColorsAvailable` dit
+   * honnêtement qu'il en existe d'autres, sans en inventer un seul.
+   */
+  {
+    id: 'sac-leopard-brun',
+    slug: 'sac-leopard-brun',
+    name: 'Sac cabas léopard',
+    description:
+      "Grand cabas souple en suédine imprimée léopard, ceinturé d'une lanière rose à boucle dorée. Anses longues, porté à l'épaule.",
+    price: 0,
+    compareAtPrice: null,
+    category: 'sac',
+    images: [sacLeopardBrun],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-08T16:01:00.000Z',
+  },
+  {
+    id: 'sac-bordeaux',
+    slug: 'sac-bordeaux',
+    name: 'Sac épaule bordeaux',
+    description:
+      "Petit sac d'épaule arrondi, cuir grainé, fermeture zippée et bandoulière réglable.",
+    price: 0,
+    compareAtPrice: null,
+    category: 'sac',
+    images: [sacBordeaux],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-08T16:02:00.000Z',
+  },
+  {
+    id: 'sac-cabas-brun',
+    slug: 'sac-cabas-brun',
+    name: 'Sac cabas brun',
+    description:
+      'Cabas en cuir grainé souple, plis latéraux et anses longues. Se porte à la main comme à l\u2019épaule.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'sac',
+    images: [sacCabasBrun],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-08T16:03:00.000Z',
+  },
+  {
+    id: 'short-nuit',
+    slug: 'short-nuit',
+    name: 'Short taille repliée',
+    description:
+      'Short court en coton doux, ceinture large à revers. Se porte pour dormir ou à la maison.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'lingerie',
+    images: [shortNuit],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-08T16:04:00.000Z',
   },
   {
     id: 'parfum-victoria-key',

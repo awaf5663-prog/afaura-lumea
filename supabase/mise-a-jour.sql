@@ -30,7 +30,9 @@
 --       la marque « en stock » qui les distingue du reste du catalogue ;
 --   13. ajoute les gommages et les parfums, en brouillon tant que leur prix
 --       n'est pas fixé ;
---   14. ouvre le rayon maquillage, en brouillon lui aussi.
+--   14. ouvre le rayon maquillage, en brouillon lui aussi ;
+--   15. ouvre les rayons bougies, sacs et sous-vêtements — chaque sac
+--       gardant sa propre fiche, puisque leurs prix diffèrent.
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- ── 1. Colonnes ajoutées après la première mise en place ──────────────
@@ -1535,4 +1537,107 @@ on conflict (id) do update set
   description = excluded.description,
   category = excluded.category,
   is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+-- ── 15. Bougies, sacs et sous-vêtements ──────────────────────────────
+-- Trois rayons de plus. Les sacs valent une remarque : chaque modèle est un
+-- article distinct, parce que la boutique les achète à des prix différents.
+-- Les réunir sous une seule fiche obligerait à afficher un prix unique, faux
+-- pour tous les autres.
+--
+-- Les coloris des sacs ne sont pas listés : la boutique en montre beaucoup,
+-- mais aucun nom n'est lisible sur ses visuels. `other_colors_available` le
+-- dit honnêtement plutôt que d'en inventer.
+--
+-- Tout arrive en BROUILLON : aucun prix n'est fixé.
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'bougies-latte', 'bougies-latte', 'Bougie parfumée Latte',
+  'Bougie parfumée en verre, coulée en deux couches comme un café glacé. Huit parfums au choix.',
+  0, null, 'bougie',
+  '[]'::jsonb,
+  '[{"name": "Parfum", "options": ["Pink Coconut Matcha Latte", "Matcha Latte", "Lemon Matcha Latte", "Sakura Latte", "Lavender Latte", "Taro Latte", "Caramel Latte", "The Iced Coffee"]}]'::jsonb,
+  '{}'::jsonb, null, 'draft',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, variants = excluded.variants,
+  is_new = excluded.is_new, ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'sac-leopard-brun', 'sac-leopard-brun', 'Sac cabas léopard',
+  'Grand cabas souple en suédine imprimée léopard, ceinturé d''une lanière rose à boucle dorée. Anses longues, porté à l''épaule.',
+  0, null, 'sac',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, is_new = excluded.is_new,
+  other_colors_available = excluded.other_colors_available,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'sac-bordeaux', 'sac-bordeaux', 'Sac épaule bordeaux',
+  'Petit sac d''épaule arrondi, cuir grainé, fermeture zippée et bandoulière réglable.',
+  0, null, 'sac',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, is_new = excluded.is_new,
+  other_colors_available = excluded.other_colors_available,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'sac-cabas-brun', 'sac-cabas-brun', 'Sac cabas brun',
+  'Cabas en cuir grainé souple, plis latéraux et anses longues. Se porte à la main comme à l''épaule.',
+  0, null, 'sac',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, is_new = excluded.is_new,
+  other_colors_available = excluded.other_colors_available,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'short-nuit', 'short-nuit', 'Short taille repliée',
+  'Short court en coton doux, ceinture large à revers. Se porte pour dormir ou à la maison.',
+  0, null, 'lingerie',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, is_new = excluded.is_new,
+  other_colors_available = excluded.other_colors_available,
   ready_to_ship = excluded.ready_to_ship;

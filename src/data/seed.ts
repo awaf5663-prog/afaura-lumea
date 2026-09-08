@@ -33,6 +33,10 @@ import glossLipOil from '@/src/assets/products/gloss-lip-oil.webp';
 import gommageBosuya from '@/src/assets/products/gommage-bosuya.webp';
 import gommageBosuyaOuvert from '@/src/assets/products/gommage-bosuya-ouvert.webp';
 import bandeauSpa from '@/src/assets/products/bandeau-spa.webp';
+import baumeCicaplast from '@/src/assets/products/baume-cicaplast.webp';
+import gommageBosuyaParfums from '@/src/assets/products/gommage-bosuya-parfums.webp';
+import nettoyantEffaclar from '@/src/assets/products/nettoyant-effaclar.webp';
+import solaireEucerin from '@/src/assets/products/solaire-eucerin.webp';
 import bonnetDouche from '@/src/assets/products/bonnet-douche.webp';
 import gelDoucheFreshCozy from '@/src/assets/products/gel-douche-fresh-cozy.webp';
 import gelDouchePinkChampagne from '@/src/assets/products/gel-douche-pink-champagne.webp';
@@ -224,6 +228,7 @@ export const CATEGORIES: Category[] = [
    * Accessoires de beauté : ce qui accompagne le soin sans être un soin —
    * bandeaux, manchettes, et tout ce qui se pose avant de se démaquiller.
    */
+  { id: 'soin_visage', name: 'Soins du visage', photo: 'carre' },
   { id: 'accessoire_beaute', name: 'Accessoires beauté', photo: 'carre' },
 ];
 
@@ -1179,7 +1184,7 @@ export const SEED_PRODUCTS: Product[] = [
     price: 7500,
     compareAtPrice: null,
     category: 'gommage',
-    images: [gommageBosuya, gommageBosuyaOuvert],
+    images: [gommageBosuya, gommageBosuyaOuvert, gommageBosuyaParfums],
     variants: [
       { name: 'Parfum', options: ['Pastèque', 'Riz', 'Rose', 'Café', 'Coco', 'Orange'] },
     ],
@@ -1586,6 +1591,63 @@ export const SEED_PRODUCTS: Product[] = [
     status: 'active',
     isNew: true,
     createdAt: '2026-09-08T16:32:00.000Z',
+  },
+  /*
+   * Soins du visage. La boutique fixera leur prix elle-même depuis
+   * l'administration : ils attendent ici, en brouillon, avec leurs
+   * contenances déjà posées.
+   *
+   * Deux d'entre eux existent en deux tailles, qui n'ont pas le même prix.
+   * Le champ « Variantes » de l'administration sait l'écrire — « 40 mL
+   * (12000), 15 mL (7000) » — et chaque taille porte alors le sien.
+   */
+  {
+    id: 'nettoyant-effaclar',
+    slug: 'nettoyant-effaclar',
+    name: 'Gel moussant purifiant Effaclar',
+    description:
+      'Gel nettoyant moussant pour le visage, tube de 200 mL. Pour les peaux grasses et sensibles.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'soin_visage',
+    images: [nettoyantEffaclar],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    createdAt: '2026-09-08T18:00:00.000Z',
+  },
+  {
+    id: 'baume-cicaplast',
+    slug: 'baume-cicaplast',
+    name: 'Baume réparateur Cicaplast B5+',
+    description:
+      'Baume apaisant pour le visage et le corps, texture légère et non collante. Deux contenances.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'soin_visage',
+    images: [baumeCicaplast],
+    variants: [{ name: 'Contenance', options: ['40 mL', '15 mL'] }],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    createdAt: '2026-09-08T18:01:00.000Z',
+  },
+  {
+    id: 'solaire-eucerin',
+    slug: 'solaire-eucerin',
+    name: 'Crème solaire visage SPF 50+',
+    description:
+      'Gel-crème solaire visage, fini sec et ultra léger, pour peaux grasses. Deux contenances.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'soin_visage',
+    images: [solaireEucerin],
+    variants: [{ name: 'Contenance', options: ['50 mL', '20 mL'] }],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    createdAt: '2026-09-08T18:02:00.000Z',
   },
   /*
    * Articles dont la boutique vient de donner le prix : ils entrent en ligne

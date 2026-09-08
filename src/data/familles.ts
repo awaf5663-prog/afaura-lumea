@@ -49,9 +49,14 @@ export const FAMILLES: Famille[] = [
   { id: 'sacs', name: 'Sacs', categories: ['sac'] },
   { id: 'chaussures', name: 'Chaussures', categories: ['chaussure'] },
   {
+    /*
+     * « Soins » et non « Soins du corps » : le rayon accueille désormais aussi
+     * des soins du visage, et un nom qui ment sur ce qu'il contient envoie la
+     * cliente chercher ailleurs.
+     */
     id: 'soins',
-    name: 'Soins du corps',
-    categories: ['gommage', 'gel_douche', 'lait_corps', 'accessoire_beaute'],
+    name: 'Soins',
+    categories: ['gommage', 'gel_douche', 'lait_corps', 'soin_visage', 'accessoire_beaute'],
   },
   { id: 'parfums', name: 'Parfums', categories: ['parfum', 'bougie'] },
   { id: 'maquillage', name: 'Maquillage', categories: ['maquillage', 'lips'] },

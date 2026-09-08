@@ -46,7 +46,8 @@
 --   22. donne leur prix à sept articles, qui entrent en ligne ;
 --   23. en met quinze de plus en vente, dont deux qui annoncent
 --       franchement ce qui reste à préciser ;
---   24. rend « en stock » aux seuls lips gloss.
+--   24. rend « en stock » aux seuls lips gloss ;
+--   25. ouvre le rayon des soins du visage, en brouillon.
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- ── 1. Colonnes ajoutées après la première mise en place ──────────────
@@ -2247,3 +2248,69 @@ update products
    set ready_to_ship = false
  where category <> 'lips'
    and ready_to_ship = true;
+
+-- ── 25. Soins du visage ──────────────────────────────────────────────
+-- Trois articles de plus, en BROUILLON : la boutique fixera leur prix
+-- elle-même depuis l'administration.
+--
+-- Deux existent en deux tailles, qui n'ont pas le même prix. Le champ
+-- « Variantes » de l'administration sait l'écrire — « 40 mL (12000), 15 mL
+-- (7000) » — et chaque taille porte alors le sien. Rien n'est deviné ici.
+--
+-- Aucun n'est marqué disponible tout de suite : comme le reste du catalogue,
+-- ils partent avec un groupage.
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'nettoyant-effaclar', 'nettoyant-effaclar', 'Gel moussant purifiant Effaclar',
+  'Gel nettoyant moussant pour le visage, tube de 200 mL. Pour les peaux grasses et sensibles.',
+  0, null, 'soin_visage',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'baume-cicaplast', 'baume-cicaplast', 'Baume réparateur Cicaplast B5+',
+  'Baume apaisant pour le visage et le corps, texture légère et non collante. Deux contenances.',
+  0, null, 'soin_visage',
+  '[]'::jsonb,
+  '[{"name": "Contenance", "options": ["40 mL", "15 mL"]}]'::jsonb,
+  '{}'::jsonb, null, 'draft',
+  true, false,
+  false, false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, variants = excluded.variants,
+  is_new = excluded.is_new, ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'solaire-eucerin', 'solaire-eucerin', 'Crème solaire visage SPF 50+',
+  'Gel-crème solaire visage, fini sec et ultra léger, pour peaux grasses. Deux contenances.',
+  0, null, 'soin_visage',
+  '[]'::jsonb,
+  '[{"name": "Contenance", "options": ["50 mL", "20 mL"]}]'::jsonb,
+  '{}'::jsonb, null, 'draft',
+  true, false,
+  false, false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, variants = excluded.variants,
+  is_new = excluded.is_new, ready_to_ship = excluded.ready_to_ship;

@@ -47,7 +47,13 @@ import coffretParfumsDignife from '@/src/assets/products/coffret-parfums-dignife
 import combinaisonRayee from '@/src/assets/products/combinaison-rayee.webp';
 import sandalesLeopard from '@/src/assets/products/sandales-leopard.webp';
 import shortsLotQuatre from '@/src/assets/products/shorts-lot-quatre.webp';
+import brumeAmberRose from '@/src/assets/products/brume-amber-rose.webp';
+import brumeClarkDoris from '@/src/assets/products/brume-clark-doris.webp';
 import bougiesLatte from '@/src/assets/products/bougies-latte.webp';
+import gommageDoveCoco from '@/src/assets/products/gommage-dove-coco.webp';
+import gommageDoveGrenade from '@/src/assets/products/gommage-dove-grenade.webp';
+import parfumFlatpea from '@/src/assets/products/parfum-flatpea-vanilla-blackberry.webp';
+import parfumVanilla from '@/src/assets/products/parfum-vanilla.webp';
 import pyjamaNoirRose from '@/src/assets/products/pyjama-noir-rose.webp';
 import pyjamaPois from '@/src/assets/products/pyjama-pois.webp';
 import pyjamaRayeRose from '@/src/assets/products/pyjama-raye-rose.webp';
@@ -1167,7 +1173,7 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Gommage Bosuya',
     description:
       'Gommage au sucre et sel de bain, pot de 350 g. Exfoliation délicate, extraits naturels hydratants. Six parfums au choix.',
-    price: 0,
+    price: 7500,
     compareAtPrice: null,
     category: 'gommage',
     images: [gommageBosuya, gommageBosuyaOuvert],
@@ -1175,7 +1181,7 @@ export const SEED_PRODUCTS: Product[] = [
       { name: 'Parfum', options: ['Pastèque', 'Riz', 'Rose', 'Café', 'Coco', 'Orange'] },
     ],
     stock: null,
-    status: 'draft',
+    status: 'active',
     isNew: true,
     readyToShip: true,
     createdAt: '2026-09-08T15:01:00.000Z',
@@ -1479,13 +1485,13 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Coffret trois parfums',
     description:
       'Coffret de trois eaux de parfum de 30 mL, présentées dans un écrin noir. Trois flacons, trois senteurs.',
-    price: 0,
+    price: 12500,
     compareAtPrice: null,
     category: 'parfum',
     images: [coffretParfumsDignife],
     variants: [],
     stock: null,
-    status: 'draft',
+    status: 'active',
     isNew: true,
     readyToShip: true,
     createdAt: '2026-09-08T16:23:00.000Z',
@@ -1595,6 +1601,100 @@ export const SEED_PRODUCTS: Product[] = [
     isNew: true,
     readyToShip: true,
     createdAt: '2026-09-08T16:32:00.000Z',
+  },
+  /*
+   * Articles dont la boutique vient de donner le prix : ils entrent en ligne
+   * directement, sans passer par le brouillon.
+   */
+  {
+    id: 'gommage-dove',
+    slug: 'gommage-dove',
+    name: 'Gommage Dove',
+    description:
+      'Gommage hydratant pour le corps, pot de 280 g. Exfolie en douceur et nourrit la peau. Trois parfums au choix, au même prix.',
+    price: 11500,
+    compareAtPrice: null,
+    category: 'gommage',
+    images: [gommageDoveGrenade, gommageDoveCoco],
+    variants: [
+      {
+        name: 'Parfum',
+        options: ['Grenade & lait', 'Coco & sucre brun', 'Citron vert & baies'],
+      },
+    ],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T17:00:00.000Z',
+  },
+  {
+    id: 'brume-vanilla',
+    slug: 'brume-vanilla',
+    name: 'Brume parfumée Vanilla',
+    description:
+      'Brume parfumée vaporisateur, 50 mL. Une vanille ambrée, douce et persistante.',
+    price: 7500,
+    compareAtPrice: null,
+    category: 'parfum',
+    images: [parfumVanilla],
+    variants: [],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T17:01:00.000Z',
+  },
+  {
+    id: 'brume-heritage',
+    slug: 'brume-heritage',
+    name: 'Heritage Fragrance Mist',
+    description:
+      'Brume parfumée pour le corps, 90 mL. Amber Rose : une rose ambrée, portée par un flacon noué de satin.',
+    price: 3500,
+    compareAtPrice: null,
+    category: 'parfum',
+    images: [brumeAmberRose],
+    variants: [],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T17:02:00.000Z',
+  },
+  {
+    id: 'brume-vanilla-blackberry',
+    slug: 'brume-vanilla-blackberry',
+    name: 'Brume parfumée Vanilla Blackberry',
+    description:
+      'Brume parfumée vaporisateur, 50 mL. Mûre et vanille, sur un fond de fleur blanche.',
+    price: 5000,
+    compareAtPrice: null,
+    category: 'parfum',
+    images: [parfumFlatpea],
+    variants: [],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T17:03:00.000Z',
+  },
+  {
+    id: 'body-splash',
+    slug: 'body-splash',
+    name: 'Body Splash',
+    description:
+      'Brume corporelle vaporisateur, 250 mL. Deux senteurs au choix, au même prix.',
+    price: 8000,
+    compareAtPrice: null,
+    category: 'parfum',
+    images: [brumeClarkDoris],
+    variants: [{ name: 'Senteur', options: ['Bare Vanilla', 'Lovely Sunny'] }],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T17:04:00.000Z',
   },
   /*
    * Choco Musk : une seule fiche pour les trois saveurs, contrairement aux

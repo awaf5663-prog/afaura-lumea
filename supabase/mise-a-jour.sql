@@ -42,7 +42,8 @@
 --   19. ajoute « Pink Champagne » aux parfums du gel douche ;
 --   20. ajoute quatre eaux de parfum, chacune sur sa propre fiche ;
 --   21. ajoute Choco Musk, dont les trois saveurs tiennent sur une fiche
---       unique puisqu'elles sont au même prix.
+--       unique puisqu'elles sont au même prix ;
+--   22. donne leur prix à sept articles, qui entrent en ligne.
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- ── 1. Colonnes ajoutées après la première mise en place ──────────────
@@ -2031,3 +2032,111 @@ on conflict (id) do update set
   slug = excluded.slug, name = excluded.name, description = excluded.description,
   category = excluded.category, variants = excluded.variants,
   is_new = excluded.is_new, ready_to_ship = excluded.ready_to_ship;
+
+-- ── 22. Premiers prix : sept articles entrent en ligne ───────────────
+-- La boutique a donné ses premiers prix. Ces sept articles cessent d'être en
+-- brouillon et deviennent visibles pour les clientes.
+--
+-- Deux existaient déjà et reçoivent leur prix ; cinq sont créés ici, à partir
+-- de visuels qui attendaient. Le gommage Dove et le Body Splash n'ont qu'une
+-- fiche chacun : leurs parfums sont au même prix.
+--
+-- Le reste du catalogue reste en brouillon : un prix manquant vaut mieux
+-- qu'un prix inventé.
+
+update products set price = 7500,  status = 'active' where id = 'gommage-bosuya';
+update products set price = 12500, status = 'active' where id = 'coffret-parfums-dignife';
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'gommage-dove', 'gommage-dove', 'Gommage Dove',
+  'Gommage hydratant pour le corps, pot de 280 g. Exfolie en douceur et nourrit la peau. Trois parfums au choix, au même prix.',
+  11500, null, 'gommage',
+  '[]'::jsonb,
+  '[{"name": "Parfum", "options": ["Grenade & lait", "Coco & sucre brun", "Citron vert & baies"]}]'::jsonb,
+  '{}'::jsonb, null, 'active',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  price = excluded.price, category = excluded.category, variants = excluded.variants,
+  status = excluded.status, is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'brume-vanilla', 'brume-vanilla', 'Brume parfumée Vanilla',
+  'Brume parfumée vaporisateur, 50 mL. Une vanille ambrée, douce et persistante.',
+  7500, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  price = excluded.price, category = excluded.category,
+  status = excluded.status, is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'brume-heritage', 'brume-heritage', 'Heritage Fragrance Mist',
+  'Brume parfumée pour le corps, 90 mL. Amber Rose : une rose ambrée, portée par un flacon noué de satin.',
+  3500, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  price = excluded.price, category = excluded.category,
+  status = excluded.status, is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'brume-vanilla-blackberry', 'brume-vanilla-blackberry', 'Brume parfumée Vanilla Blackberry',
+  'Brume parfumée vaporisateur, 50 mL. Mûre et vanille, sur un fond de fleur blanche.',
+  5000, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  price = excluded.price, category = excluded.category,
+  status = excluded.status, is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'body-splash', 'body-splash', 'Body Splash',
+  'Brume corporelle vaporisateur, 250 mL. Deux senteurs au choix, au même prix.',
+  8000, null, 'parfum',
+  '[]'::jsonb,
+  '[{"name": "Senteur", "options": ["Bare Vanilla", "Lovely Sunny"]}]'::jsonb,
+  '{}'::jsonb, null, 'active',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  price = excluded.price, category = excluded.category, variants = excluded.variants,
+  status = excluded.status, is_new = excluded.is_new,
+  ready_to_ship = excluded.ready_to_ship;

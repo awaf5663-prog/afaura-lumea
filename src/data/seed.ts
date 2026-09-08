@@ -1168,7 +1168,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'draft',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T15:00:00.000Z',
   },
   {
@@ -1187,7 +1186,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T15:01:00.000Z',
   },
   {
@@ -1211,7 +1209,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     otherColorsAvailable: true,
     createdAt: '2026-09-08T15:30:00.000Z',
   },
@@ -1244,7 +1241,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T16:00:00.000Z',
   },
   /*
@@ -1270,7 +1266,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     otherColorsAvailable: true,
     createdAt: '2026-09-08T16:01:00.000Z',
   },
@@ -1288,7 +1283,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     otherColorsAvailable: true,
     createdAt: '2026-09-08T16:02:00.000Z',
   },
@@ -1306,7 +1300,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     otherColorsAvailable: true,
     createdAt: '2026-09-08T16:03:00.000Z',
   },
@@ -1324,7 +1317,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'draft',
     isNew: true,
-    readyToShip: true,
     otherColorsAvailable: true,
     createdAt: '2026-09-08T16:04:00.000Z',
   },
@@ -1348,7 +1340,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     otherColorsAvailable: true,
     createdAt: '2026-09-08T16:10:00.000Z',
   },
@@ -1366,7 +1357,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     otherColorsAvailable: true,
     createdAt: '2026-09-08T16:11:00.000Z',
   },
@@ -1384,7 +1374,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     otherColorsAvailable: true,
     createdAt: '2026-09-08T16:12:00.000Z',
   },
@@ -1402,7 +1391,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     otherColorsAvailable: true,
     createdAt: '2026-09-08T16:13:00.000Z',
   },
@@ -1422,7 +1410,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'draft',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T16:14:00.000Z',
   },
   {
@@ -1445,7 +1432,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     otherColorsAvailable: true,
     createdAt: '2026-09-08T16:20:00.000Z',
   },
@@ -1463,7 +1449,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'draft',
     isNew: true,
-    readyToShip: true,
     otherColorsAvailable: true,
     createdAt: '2026-09-08T16:21:00.000Z',
   },
@@ -1481,7 +1466,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'draft',
     isNew: true,
-    readyToShip: true,
     otherColorsAvailable: true,
     createdAt: '2026-09-08T16:22:00.000Z',
   },
@@ -1499,7 +1483,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T16:23:00.000Z',
   },
   {
@@ -1518,7 +1501,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T16:24:00.000Z',
   },
   {
@@ -1546,7 +1528,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'draft',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T16:30:00.000Z',
   },
   {
@@ -1583,7 +1564,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'draft',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T16:31:00.000Z',
   },
   {
@@ -1605,7 +1585,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T16:32:00.000Z',
   },
   /*
@@ -1625,7 +1604,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T17:10:00.000Z',
   },
   {
@@ -1642,7 +1620,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T17:11:00.000Z',
   },
   {
@@ -1661,7 +1638,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T17:12:00.000Z',
   },
   {
@@ -1683,7 +1659,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T17:00:00.000Z',
   },
   {
@@ -1700,7 +1675,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T17:01:00.000Z',
   },
   {
@@ -1717,7 +1691,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T17:02:00.000Z',
   },
   {
@@ -1734,7 +1707,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T17:03:00.000Z',
   },
   {
@@ -1751,7 +1723,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T17:04:00.000Z',
   },
   /*
@@ -1775,7 +1746,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'draft',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T16:50:00.000Z',
   },
   /*
@@ -1797,7 +1767,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'draft',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T16:40:00.000Z',
   },
   {
@@ -1813,7 +1782,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'draft',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T16:41:00.000Z',
   },
   {
@@ -1830,7 +1798,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'draft',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T16:42:00.000Z',
   },
   {
@@ -1846,7 +1813,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'draft',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T16:43:00.000Z',
   },
   {
@@ -1863,7 +1829,6 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'draft',
     isNew: true,
-    readyToShip: true,
     createdAt: '2026-09-08T15:02:00.000Z',
   },
 ];

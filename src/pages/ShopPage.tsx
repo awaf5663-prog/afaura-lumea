@@ -5,7 +5,7 @@ import { Button } from '@/src/components/ui/Button';
 import { EmptyState } from '@/src/components/ui/EmptyState';
 import { ProductCardSkeleton } from '@/src/components/ui/Skeleton';
 import { Sheet } from '@/src/components/ui/Sheet';
-import { CATEGORIES } from '@/src/data/seed';
+import { famillesGarnies, familleDe } from '@/src/data/familles';
 import { useProducts } from '@/src/hooks/useProducts';
 import { cn } from '@/src/lib/cn';
 import { formatFcfa } from '@/src/lib/format';
@@ -14,6 +14,9 @@ import { useSeo } from '@/src/lib/seo';
 import type { Product } from '@/src/types';
 
 type Sort = 'nouveautes' | 'populaires' | 'prix-asc' | 'prix-desc';
+
+/* Le classement des rayons ne bouge pas : calculé une fois, pas à chaque rendu. */
+const FAMILLES_GARNIES = famillesGarnies();
 
 const SORTS: Array<{ id: Sort; label: string }> = [
   { id: 'nouveautes', label: 'Nouveautés' },
@@ -29,6 +32,14 @@ export function ShopPage() {
 
   const [query, setQuery] = useState(search.get('q') ?? '');
   const [category, setCategory] = useState(search.get('categorie') ?? 'all');
+  /*
+   * La famille ouverte. Elle se déduit de la catégorie quand on arrive par un
+   * lien direct (« /boutique?categorie=jersey » depuis le menu) : la cliente
+   * doit voir où elle se trouve, et pouvoir remonter d'un cran.
+   */
+  const [famille, setFamille] = useState(
+    () => search.get('famille') ?? familleDe(search.get('categorie') ?? '')?.id ?? 'all',
+  );
   const [sort, setSort] = useState<Sort>((search.get('tri') as Sort) ?? 'nouveautes');
   const [maxPrice, setMaxPrice] = useState<number | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -41,7 +52,9 @@ export function ShopPage() {
 
   // La catégorie reste synchronisée avec l'URL (liens du menu, partage de lien).
   useEffect(() => {
-    setCategory(search.get('categorie') ?? 'all');
+    const cat = search.get('categorie') ?? 'all';
+    setCategory(cat);
+    setFamille(search.get('famille') ?? familleDe(cat)?.id ?? 'all');
     if (search.get('focus') === 'recherche') searchInputRef.current?.focus();
   }, [search]);
 
@@ -57,6 +70,11 @@ export function ShopPage() {
     const list = products.filter((product) => {
       if (product.status === 'draft') return false;
       if (category !== 'all' && product.category !== category) return false;
+      // Une famille ouverte sans rubrique précise montre tout ce qu'elle contient.
+      if (category === 'all' && famille !== 'all') {
+        const f = FAMILLES_GARNIES.find((x) => x.id === famille);
+        if (f && !f.categories.includes(product.category)) return false;
+      }
       if (ceiling > 0 && product.price > effectiveMax) return false;
       if (!needle) return true;
       return (
@@ -65,7 +83,7 @@ export function ShopPage() {
       );
     });
     return sortProducts(list, sort);
-  }, [products, query, category, effectiveMax, ceiling, sort]);
+  }, [products, query, category, famille, effectiveMax, ceiling, sort]);
 
   /*
    * Une catégorie sans article visible ne s'affiche pas : cliquer dessus
@@ -75,18 +93,56 @@ export function ShopPage() {
    */
   const categoriesVisibles = useMemo(
     () =>
-      CATEGORIES.filter((c) =>
-        products.some((product) => product.category === c.id && product.status !== 'draft'),
+      new Set(
+        products.filter((product) => product.status !== 'draft').map((product) => product.category),
       ),
     [products],
   );
 
+  /*
+   * Une famille dont aucune rubrique n'a d'article ne s'affiche pas, et une
+   * rubrique vide non plus : appuyer dessus mènerait à « 0 article », ce qui
+   * donne l'impression d'une boutique vide plutôt que d'un rayon en
+   * préparation. Elles reviennent d'elles-mêmes dès qu'un article y paraît.
+   */
+  const famillesVisibles = useMemo(
+    () =>
+      FAMILLES_GARNIES.map((f) => ({
+        ...f,
+        rubriques: f.rubriques.filter((c) => categoriesVisibles.has(c.id)),
+      })).filter((f) => f.rubriques.length > 0),
+    [categoriesVisibles],
+  );
+
+  /*
+   * Les rubriques de la famille ouverte. On ne les propose qu'à partir de deux :
+   * un seul bouton sous « Sacs » ne ferait que répéter le titre au-dessus.
+   */
+  const rubriques = useMemo(() => {
+    const f = famillesVisibles.find((x) => x.id === famille);
+    return f && f.rubriques.length > 1 ? f.rubriques : [];
+  }, [famillesVisibles, famille]);
+
   const updateCategory = (next: string) => {
     setCategory(next);
-    navigate(next === 'all' ? '/boutique' : `/boutique?categorie=${next}`, { keepScroll: true });
+    const f = next === 'all' ? famille : (familleDe(next)?.id ?? 'all');
+    setFamille(f);
+    const params = new URLSearchParams();
+    if (f !== 'all') params.set('famille', f);
+    if (next !== 'all') params.set('categorie', next);
+    const q = params.toString();
+    navigate(q ? `/boutique?${q}` : '/boutique', { keepScroll: true });
   };
 
-  const activeFilters = (category !== 'all' ? 1 : 0) + (maxPrice !== null ? 1 : 0);
+  /** Ouvrir une famille remet la rubrique à zéro : on montre tout le rayon. */
+  const updateFamille = (next: string) => {
+    setFamille(next);
+    setCategory('all');
+    navigate(next === 'all' ? '/boutique' : `/boutique?famille=${next}`, { keepScroll: true });
+  };
+
+  const activeFilters =
+    (famille !== 'all' ? 1 : 0) + (category !== 'all' ? 1 : 0) + (maxPrice !== null ? 1 : 0);
 
   return (
     <div className="container-page pt-8">
@@ -142,17 +198,39 @@ export function ShopPage() {
           </button>
         </div>
 
+        {/*
+          Premier rang : les grandes familles. C'est tout ce qu'on voit tant
+          qu'on n'est entré nulle part — une dizaine de mots, pas vingt-deux.
+        */}
         <div className="no-scrollbar -mx-5 mt-3 flex gap-2 overflow-x-auto px-5 lg:mx-0 lg:flex-wrap lg:gap-y-2.5 lg:overflow-x-visible lg:px-0">
-          <Chip active={category === 'all'} onClick={() => updateCategory('all')}>
+          <Chip active={famille === 'all'} onClick={() => updateFamille('all')}>
             Tout
           </Chip>
-          {categoriesVisibles.map((c) => (
-            <Chip key={c.id} active={category === c.id} onClick={() => updateCategory(c.id)}>
-              {c.name}
+          {famillesVisibles.map((f) => (
+            <Chip key={f.id} active={famille === f.id} onClick={() => updateFamille(f.id)}>
+              {f.name}
             </Chip>
           ))}
-          <span className="w-px shrink-0 self-stretch bg-line lg:hidden" aria-hidden />
-          <span className="hidden w-full lg:block" aria-hidden />
+        </div>
+
+        {/*
+          Second rang : le détail du rayon ouvert. Il n'existe que là, et
+          disparaît dès qu'on ressort — c'est ce qui garde la barre lisible.
+        */}
+        {rubriques.length > 0 && (
+          <div className="no-scrollbar -mx-5 mt-2 flex gap-2 overflow-x-auto px-5 lg:mx-0 lg:flex-wrap lg:gap-y-2 lg:overflow-x-visible lg:px-0">
+            <Chip small active={category === 'all'} onClick={() => updateCategory('all')}>
+              Tout {famillesVisibles.find((f) => f.id === famille)?.name.toLowerCase()}
+            </Chip>
+            {rubriques.map((c) => (
+              <Chip key={c.id} small active={category === c.id} onClick={() => updateCategory(c.id)}>
+                {c.name}
+              </Chip>
+            ))}
+          </div>
+        )}
+
+        <div className="no-scrollbar -mx-5 mt-2 flex gap-2 overflow-x-auto px-5 lg:mx-0 lg:flex-wrap lg:gap-y-2.5 lg:overflow-x-visible lg:px-0">
           {SORTS.map((s) => (
             <Chip key={s.id} active={sort === s.id} onClick={() => setSort(s.id)}>
               {s.label}
@@ -224,16 +302,44 @@ export function ShopPage() {
         }
       >
         <div className="space-y-8 pb-2">
+          {/*
+            Le panneau montre tout, mais rangé : chaque rayon avec ses
+            rubriques en dessous. C'est la même carte que la barre du haut,
+            dépliée d'un coup — utile quand on cherche sans savoir où c'est.
+          */}
           <div>
-            <p className="eyebrow mb-3">Catégorie</p>
-            <div className="flex flex-wrap gap-2">
-              <Chip active={category === 'all'} onClick={() => updateCategory('all')}>
+            <p className="eyebrow mb-3">Rayon</p>
+            <div className="mb-4 flex flex-wrap gap-2">
+              <Chip
+                active={famille === 'all' && category === 'all'}
+                onClick={() => updateFamille('all')}
+              >
                 Tout
               </Chip>
-              {categoriesVisibles.map((c) => (
-                <Chip key={c.id} active={category === c.id} onClick={() => updateCategory(c.id)}>
-                  {c.name}
-                </Chip>
+            </div>
+            <div className="space-y-4">
+              {famillesVisibles.map((f) => (
+                <div key={f.id}>
+                  <div className="flex flex-wrap gap-2">
+                    <Chip
+                      active={famille === f.id && category === 'all'}
+                      onClick={() => updateFamille(f.id)}
+                    >
+                      {f.name}
+                    </Chip>
+                    {f.rubriques.length > 1 &&
+                      f.rubriques.map((c) => (
+                        <Chip
+                          key={c.id}
+                          small
+                          active={category === c.id}
+                          onClick={() => updateCategory(c.id)}
+                        >
+                          {c.name}
+                        </Chip>
+                      ))}
+                  </div>
+                </div>
               ))}
             </div>
           </div>
@@ -293,10 +399,14 @@ function Chip({
   active,
   onClick,
   children,
+  /* Le second rang est plus discret que le premier : c'est un détail de rayon,
+     pas un rayon. Même forme, moins de poids. */
+  small,
 }: {
   active: boolean;
   onClick: () => void;
   children: React.ReactNode;
+  small?: boolean;
 }) {
   return (
     <button
@@ -304,8 +414,13 @@ function Chip({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        'press shrink-0 whitespace-nowrap rounded-full border px-4 py-2 text-[13px] transition-colors',
-        active ? 'border-ink bg-ink text-ivory' : 'border-line bg-white text-graphite',
+        'press shrink-0 whitespace-nowrap rounded-full border transition-colors',
+        small ? 'px-3.5 py-1.5 text-[12.5px]' : 'px-4 py-2 text-[13px]',
+        active
+          ? small
+            ? 'border-mauve bg-blush/70 text-ink'
+            : 'border-ink bg-ink text-ivory'
+          : 'border-line bg-white text-graphite',
       )}
     >
       {children}

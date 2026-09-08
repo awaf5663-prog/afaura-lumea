@@ -45,7 +45,8 @@
 --       unique puisqu'elles sont au même prix ;
 --   22. donne leur prix à sept articles, qui entrent en ligne ;
 --   23. en met quinze de plus en vente, dont deux qui annoncent
---       franchement ce qui reste à préciser.
+--       franchement ce qui reste à préciser ;
+--   24. rend « en stock » aux seuls lips gloss.
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- ── 1. Colonnes ajoutées après la première mise en place ──────────────
@@ -2234,3 +2235,15 @@ on conflict (id) do update set
   price = excluded.price, category = excluded.category, variants = excluded.variants,
   status = excluded.status, is_new = excluded.is_new,
   ready_to_ship = excluded.ready_to_ship;
+
+-- ── 24. « En stock » : les lips gloss, et eux seuls ──────────────────
+-- Les articles arrivés depuis les gommages avaient été marqués disponibles
+-- tout de suite. C'est faux : la boutique ne garde sur place que les lips
+-- gloss. Tout le reste part avec un groupage, et l'annoncer disponible se
+-- paierait au moment de la remise — une cliente qui vient chercher son
+-- gommage le jour même repartirait les mains vides.
+
+update products
+   set ready_to_ship = false
+ where category <> 'lips'
+   and ready_to_ship = true;

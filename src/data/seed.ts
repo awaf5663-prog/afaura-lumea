@@ -32,7 +32,12 @@ import robeBleuCiel from '@/src/assets/products/robe-bleu-ciel.webp';
 import glossLipOil from '@/src/assets/products/gloss-lip-oil.webp';
 import gommageBosuya from '@/src/assets/products/gommage-bosuya.webp';
 import gommageBosuyaOuvert from '@/src/assets/products/gommage-bosuya-ouvert.webp';
+import bonnetSatin from '@/src/assets/products/bonnet-satin.webp';
 import bougiesLatte from '@/src/assets/products/bougies-latte.webp';
+import pyjamaNoirRose from '@/src/assets/products/pyjama-noir-rose.webp';
+import pyjamaPois from '@/src/assets/products/pyjama-pois.webp';
+import pyjamaRayeRose from '@/src/assets/products/pyjama-raye-rose.webp';
+import shortsLotTrois from '@/src/assets/products/shorts-lot-trois.webp';
 import sacBordeaux from '@/src/assets/products/sac-bordeaux.webp';
 import sacCabasBrun from '@/src/assets/products/sac-cabas-brun.webp';
 import sacLeopardBrun from '@/src/assets/products/sac-leopard-brun.webp';
@@ -1271,6 +1276,103 @@ export const SEED_PRODUCTS: Product[] = [
     readyToShip: true,
     otherColorsAvailable: true,
     createdAt: '2026-09-08T16:04:00.000Z',
+  },
+  /*
+   * Pyjamas : trois ensembles, trois fiches. Même raison que pour les sacs —
+   * un imprimé n'a pas forcément le prix d'un autre, et une fiche unique en
+   * afficherait un seul, faux pour les deux autres.
+   */
+  {
+    id: 'pyjama-noir-rose',
+    slug: 'pyjama-noir-rose',
+    name: 'Ensemble pyjama noir liseré rose',
+    description:
+      'Haut cache-cœur manches longues à nouer, liseré rose, et pantalon large à taille élastique et cordon. Deux pièces.',
+    /* Prix à fixer par la boutique : l'article reste invisible d'ici là. */
+    price: 0,
+    compareAtPrice: null,
+    category: 'lingerie',
+    images: [pyjamaNoirRose],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-08T16:10:00.000Z',
+  },
+  {
+    id: 'pyjama-pois',
+    slug: 'pyjama-pois',
+    name: 'Ensemble pyjama à pois',
+    description:
+      'Haut cache-cœur manches longues à pois blancs, taille froncée, et pantalon large assorti à ceinture rose. Deux pièces.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'lingerie',
+    images: [pyjamaPois],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-08T16:11:00.000Z',
+  },
+  {
+    id: 'pyjama-raye-rose',
+    slug: 'pyjama-raye-rose',
+    name: 'Ensemble pyjama rayé rose',
+    description:
+      'Haut manches longues à rayures roses, noué devant sur un débardeur blanc, et pantalon évasé assorti. Deux pièces.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'lingerie',
+    images: [pyjamaRayeRose],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-08T16:12:00.000Z',
+  },
+  {
+    id: 'shorts-lot-trois',
+    slug: 'shorts-lot-trois',
+    name: 'Lot de trois shorts',
+    description:
+      'Trois shorts courts à taille haute large : noir uni, gris chiné et imprimé léopard rose.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'lingerie',
+    images: [shortsLotTrois],
+    variants: [],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-08T16:13:00.000Z',
+  },
+  {
+    id: 'bonnet-satin',
+    slug: 'bonnet-satin',
+    name: 'Bonnet de nuit en satin',
+    description:
+      'Bonnet doublé satin à bord élastique, pour protéger les cheveux pendant la nuit. Trois motifs au choix.',
+    price: 0,
+    compareAtPrice: null,
+    category: 'lingerie',
+    images: [bonnetSatin],
+    variants: [
+      { name: 'Motif', options: ['Noir à nœuds roses', 'Rose à pois blancs', 'Marine à pois roses'] },
+    ],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    readyToShip: true,
+    createdAt: '2026-09-08T16:14:00.000Z',
   },
   {
     id: 'parfum-victoria-key',

@@ -32,7 +32,9 @@
 --       n'est pas fixé ;
 --   14. ouvre le rayon maquillage, en brouillon lui aussi ;
 --   15. ouvre les rayons bougies, sacs et sous-vêtements — chaque sac
---       gardant sa propre fiche, puisque leurs prix diffèrent.
+--       gardant sa propre fiche, puisque leurs prix diffèrent ;
+--   16. complète le rayon avec trois pyjamas, un lot de shorts et un
+--       bonnet de nuit.
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- ── 1. Colonnes ajoutées après la première mise en place ──────────────
@@ -1641,3 +1643,104 @@ on conflict (id) do update set
   category = excluded.category, is_new = excluded.is_new,
   other_colors_available = excluded.other_colors_available,
   ready_to_ship = excluded.ready_to_ship;
+
+-- ── 16. Pyjamas, shorts et bonnets de nuit ───────────────────────────
+-- Trois ensembles de pyjama, chacun sa fiche : un imprimé n'a pas forcément
+-- le prix d'un autre, et une fiche unique en afficherait un seul.
+--
+-- Le bonnet de nuit est rangé ici plutôt qu'avec les accessoires : il se
+-- porte pour dormir, comme le reste du rayon.
+--
+-- Tout en BROUILLON. Les coloris des ensembles ne sont pas listés — la
+-- boutique enverra ses photos.
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'pyjama-noir-rose', 'pyjama-noir-rose', 'Ensemble pyjama noir liseré rose',
+  'Haut cache-cœur manches longues à nouer, liseré rose, et pantalon large à taille élastique et cordon. Deux pièces.',
+  0, null, 'lingerie',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, is_new = excluded.is_new,
+  other_colors_available = excluded.other_colors_available,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'pyjama-pois', 'pyjama-pois', 'Ensemble pyjama à pois',
+  'Haut cache-cœur manches longues à pois blancs, taille froncée, et pantalon large assorti à ceinture rose. Deux pièces.',
+  0, null, 'lingerie',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, is_new = excluded.is_new,
+  other_colors_available = excluded.other_colors_available,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'pyjama-raye-rose', 'pyjama-raye-rose', 'Ensemble pyjama rayé rose',
+  'Haut manches longues à rayures roses, noué devant sur un débardeur blanc, et pantalon évasé assorti. Deux pièces.',
+  0, null, 'lingerie',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, is_new = excluded.is_new,
+  other_colors_available = excluded.other_colors_available,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'shorts-lot-trois', 'shorts-lot-trois', 'Lot de trois shorts',
+  'Trois shorts courts à taille haute large : noir uni, gris chiné et imprimé léopard rose.',
+  0, null, 'lingerie',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, is_new = excluded.is_new,
+  other_colors_available = excluded.other_colors_available,
+  ready_to_ship = excluded.ready_to_ship;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, ready_to_ship, color_chart_id
+) values (
+  'bonnet-satin', 'bonnet-satin', 'Bonnet de nuit en satin',
+  'Bonnet doublé satin à bord élastique, pour protéger les cheveux pendant la nuit. Trois motifs au choix.',
+  0, null, 'lingerie',
+  '[]'::jsonb,
+  '[{"name": "Motif", "options": ["Noir à nœuds roses", "Rose à pois blancs", "Marine à pois roses"]}]'::jsonb,
+  '{}'::jsonb, null, 'draft',
+  true, false,
+  false, true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug, name = excluded.name, description = excluded.description,
+  category = excluded.category, variants = excluded.variants,
+  is_new = excluded.is_new, ready_to_ship = excluded.ready_to_ship;

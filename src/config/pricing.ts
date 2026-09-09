@@ -67,7 +67,12 @@ export const DEFAULT_PRICING: PricingConfig = {
   conversionRates: {
     XOF: 1,
     EUR: 655.957,
-    USD: null,
+    /*
+     * Taux du dollar fixé par la boutique, et non relevé sur un marché : il
+     * couvre aussi les frais de transfert, que le cours brut ignore. Il se
+     * change depuis Administration → Tarification le jour où elle le décide.
+     */
+    USD: 600,
   },
 
   defaultCurrency: 'EUR',

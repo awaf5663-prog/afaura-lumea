@@ -47,7 +47,9 @@
 --   23. en met quinze de plus en vente, dont deux qui annoncent
 --       franchement ce qui reste à préciser ;
 --   24. rend « en stock » aux seuls lips gloss ;
---   25. ouvre le rayon des soins du visage, en brouillon.
+--   25. ouvre le rayon des soins du visage, en brouillon ;
+--   26. enregistre le taux du dollar fixé par la boutique, celui que le
+--       serveur applique pour recalculer une demande SHEIN.
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- ── 1. Colonnes ajoutées après la première mise en place ──────────────
@@ -2314,3 +2316,35 @@ on conflict (id) do update set
   slug = excluded.slug, name = excluded.name, description = excluded.description,
   category = excluded.category, variants = excluded.variants,
   is_new = excluded.is_new, ready_to_ship = excluded.ready_to_ship;
+
+-- ── 26. Le taux du dollar, fixé par la boutique ──────────────────────
+-- Jusqu'ici le dollar n'avait pas de taux : une demande SHEIN saisie en
+-- dollars ressortait sans sous-total, faute de savoir la convertir. La
+-- boutique a fixé le sien à 600 FCFA pour 1 $ — un taux qui couvre aussi les
+-- frais de transfert, que le cours brut du marché ignore.
+--
+-- Ce chiffre compte au-delà de l'affichage : c'est celui que `create_shein_request`
+-- applique côté serveur pour recalculer le montant d'une demande. Le laisser
+-- absent de la base et le corriger seulement dans le code aurait donné un site
+-- qui affiche un total et un serveur qui n'en calcule aucun.
+--
+-- Elle peut le changer à tout moment depuis Administration → Tarification.
+
+-- Deux `jsonb_set` imbriqués, et non un seul chemin : `jsonb_set` ne sait
+-- créer que le dernier niveau. Sur une tarification qui n'a pas encore de
+-- bloc `conversionRates` — une base fraîchement installée — un chemin direct
+-- ne fait rien du tout, sans rien signaler. Ici le bloc est créé s'il manque,
+-- et les autres devises déjà réglées sont conservées.
+update settings
+   set pricing = jsonb_set(
+         coalesce(pricing, '{}'::jsonb),
+         '{conversionRates}',
+         jsonb_set(
+           coalesce(pricing -> 'conversionRates', '{}'::jsonb),
+           '{USD}',
+           '600'::jsonb,
+           true
+         ),
+         true
+       )
+ where id = 1;

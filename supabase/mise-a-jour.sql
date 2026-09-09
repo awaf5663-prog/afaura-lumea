@@ -49,7 +49,9 @@
 --   24. rend « en stock » aux seuls lips gloss ;
 --   25. ouvre le rayon des soins du visage, en brouillon ;
 --   26. enregistre le taux du dollar fixé par la boutique, celui que le
---       serveur applique pour recalculer une demande SHEIN.
+--       serveur applique pour recalculer une demande SHEIN ;
+--   27. cesse de facturer des frais de traitement sur les articles déjà
+--       en boutique.
 -- ═══════════════════════════════════════════════════════════════════════
 
 -- ── 1. Colonnes ajoutées après la première mise en place ──────────────
@@ -2348,3 +2350,180 @@ update settings
          true
        )
  where id = 1;
+
+-- ── 27. Pas de frais de traitement sur ce qui est déjà en boutique ───
+-- Les frais paient un travail : commander la pièce sur SHEIN, la regrouper,
+-- la suivre jusqu'ici. Les lips gloss n'en demandent aucun — la boutique les
+-- achète en lot, les garde sur place, et convient de la livraison de vive
+-- voix. Les facturer revenait à faire payer un travail qui n'a pas lieu.
+--
+-- La règle porte sur `ready_to_ship`, relu dans la fiche : un panier qui ne
+-- contient que des articles gardés sur place n'a aucun frais, un panier mêlé
+-- ne paie que pour ce qui doit être commandé. Le jour où la boutique gardera
+-- autre chose sur place, la règle suivra sans qu'on y revienne.
+--
+-- La fonction entière est réécrite : c'est la seule façon de changer une
+-- ligne au milieu d'un corps plpgsql, et c'est celle qui décide du montant
+-- facturé — le navigateur, lui, n'envoie jamais de total.
+
+create or replace function create_order(
+  p_customer_name text,
+  p_phone text,
+  p_address text,
+  p_city text,
+  p_note text,
+  p_delivery_zone_id text,
+  p_payment_method text,
+  p_items jsonb,
+  p_promo_code text default '',
+  p_is_student boolean default false
+) returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_order_id uuid;
+  v_number text;
+  v_subtotal integer := 0;
+  v_articles integer := 0;
+  v_service integer := 0;
+  v_tiers jsonb;
+  v_fee integer;
+  v_item jsonb;
+  v_product products%rowtype;
+  v_quantity integer;
+  v_unit integer;
+  v_label text;
+  v_promotions jsonb;
+  v_promo jsonb;
+  v_promo_label text;
+  v_fee_before integer;
+  v_discount integer := 0;
+  v_today text := to_char(now(), 'YYYY-MM-DD');
+  v_code text := upper(btrim(coalesce(p_promo_code, '')));
+begin
+  if jsonb_array_length(coalesce(p_items, '[]'::jsonb)) = 0 then
+    raise exception 'Panier vide';
+  end if;
+
+  select (delivery_fees ->> p_delivery_zone_id)::integer,
+         coalesce(promotions, '[]'::jsonb),
+         coalesce(pricing -> 'tiers', '[]'::jsonb)
+    into v_fee, v_promotions, v_tiers
+    from settings where id = 1;
+  v_label := p_delivery_zone_id;
+  v_number := 'CMD-' || to_char(now(), 'YYYY') || '-' || lpad(nextval('order_seq')::text, 5, '0');
+
+  insert into orders (
+    order_number, customer_name, phone, address, city, note,
+    delivery_zone_id, delivery_label, delivery_fee, subtotal, total,
+    payment_method, payment_method_label, promo_code
+  ) values (
+    v_number, p_customer_name, p_phone, p_address, p_city, p_note,
+    p_delivery_zone_id, v_label, v_fee, 0, 0,
+    p_payment_method, p_payment_method, v_code
+  ) returning id into v_order_id;
+
+  for v_item in select * from jsonb_array_elements(p_items) loop
+    select * into v_product from products where id = v_item ->> 'product_id';
+    if not found or v_product.status <> 'active' then
+      raise exception 'Produit indisponible : %', v_item ->> 'product_id';
+    end if;
+
+    v_quantity := greatest(1, least(99, (v_item ->> 'quantity')::integer));
+    if v_product.stock is not null and v_quantity > v_product.stock then
+      raise exception 'Stock insuffisant pour %', v_product.name;
+    end if;
+
+    -- Prix unitaire : celui de l'option choisie s'il en a un, sinon celui de
+    -- l'article. Relu dans la table, jamais reçu du navigateur.
+    v_unit := prix_option(v_product, coalesce(v_item -> 'options', '{}'::jsonb));
+
+    insert into order_items (order_id, product_id, name, quantity, unit_price, options)
+    values (
+      v_order_id, v_product.id, v_product.name, v_quantity, v_unit,
+      coalesce(v_item -> 'options', '{}'::jsonb)
+    );
+
+    v_subtotal := v_subtotal + v_unit * v_quantity;
+    /*
+     * Les articles se comptent en unités, pas en lignes : douze cahiers font
+     * douze articles. Même règle que pour les demandes SHEIN.
+     *
+     * Sauf ceux déjà en boutique. Les frais de traitement paient un travail —
+     * commander la pièce, la regrouper, la suivre jusqu'ici ; un article gardé
+     * sur place n'en demande aucun, et la livraison se convient de vive voix.
+     * L'état est relu dans la fiche, jamais reçu du navigateur.
+     */
+    if not coalesce(v_product.ready_to_ship, false) then
+      v_articles := v_articles + v_quantity;
+    end if;
+
+    if v_product.stock is not null then
+      update products set stock = greatest(0, stock - v_quantity) where id = v_product.id;
+    end if;
+  end loop;
+
+  -- Frais de traitement, d'après la grille des réglages. Grille vide : aucun
+  -- frais. Calculé ici, jamais reçu du navigateur.
+  v_service := frais_boutique(v_articles, v_tiers);
+
+  -- Offres. Toutes les conditions renseignées doivent être remplies ; une liste
+  -- vide ne restreint rien. Vérifiées ici, jamais d'après le navigateur, qui ne
+  -- transmet qu'un code et une déclaration.
+  for v_promo in select * from jsonb_array_elements(v_promotions) loop
+    continue when not coalesce((v_promo ->> 'active')::boolean, false);
+    continue when coalesce(v_promo ->> 'scope', 'all') not in ('all', 'store');
+    continue when coalesce((v_promo ->> 'studentOnly')::boolean, false)
+                  and not coalesce(p_is_student, false);
+    continue when v_promo ->> 'startsAt' is not null and v_today < (v_promo ->> 'startsAt');
+    continue when v_promo ->> 'endsAt' is not null and v_today > (v_promo ->> 'endsAt');
+    continue when jsonb_array_length(coalesce(v_promo -> 'deliveryOptionIds', '[]'::jsonb)) > 0
+                  and not (coalesce(v_promo -> 'deliveryOptionIds', '[]'::jsonb)
+                           ? p_delivery_zone_id);
+    -- Montant minimum d'articles : le seuil porte sur le prix des articles
+    -- seuls, jamais sur les frais ni la livraison. Absent = aucun minimum.
+    continue when jsonb_typeof(v_promo -> 'minSubtotal') = 'number'
+                  and v_subtotal < (v_promo ->> 'minSubtotal')::numeric;
+    -- Une offre à code ne s'applique jamais toute seule.
+    continue when upper(btrim(coalesce(v_promo ->> 'code', ''))) <> v_code;
+
+    if coalesce(v_promo -> 'effect' ->> 'type', '') = 'free_delivery'
+       and v_fee is not null and v_fee > 0 then
+      v_fee_before := v_fee;
+      v_fee := 0;
+      v_promo_label := v_promo ->> 'label';
+      exit;
+    elsif coalesce(v_promo -> 'effect' ->> 'type', '') = 'discount_amount' then
+      -- Plafonnée au montant connu : une remise ne rend jamais d'argent.
+      v_discount := least(
+        greatest(0, coalesce((v_promo -> 'effect' ->> 'amount')::integer, 0)),
+        v_subtotal + v_service + coalesce(v_fee, 0)
+      );
+      if v_discount > 0 then
+        v_promo_label := v_promo ->> 'label';
+        exit;
+      end if;
+    end if;
+  end loop;
+
+  update orders
+     set subtotal = v_subtotal,
+         service_fee = v_service,
+         delivery_fee = v_fee,
+         delivery_fee_before_promotion = v_fee_before,
+         discount = v_discount,
+         promotion_label = v_promo_label,
+         total = v_subtotal + v_service + coalesce(v_fee, 0) - v_discount
+   where id = v_order_id;
+
+  return (
+    select to_jsonb(o) || jsonb_build_object(
+      'order_items', coalesce((select jsonb_agg(to_jsonb(i)) from order_items i where i.order_id = o.id), '[]'::jsonb)
+    )
+    from orders o where o.id = v_order_id
+  );
+end;
+$$;
+grant execute on function create_order(text, text, text, text, text, text, text, jsonb, text, boolean) to anon, authenticated;

@@ -8,10 +8,11 @@ import { Button } from '@/src/components/ui/Button';
 import { ErrorText, FormRow, Input, Label, Textarea } from '@/src/components/ui/Field';
 import { PAYMENT_METHODS } from '@/src/config/site';
 import { useCart } from '@/src/hooks/useCart';
+import { useProducts } from '@/src/hooks/useProducts';
 import { useSettings, useWhatsapp } from '@/src/hooks/useSettings';
 import { useToast } from '@/src/hooks/useToast';
 import { findPromotion, visiblePromotions } from '@/src/lib/pricing/promotions';
-import { fraisBoutique, nombreArticles } from '@/src/lib/pricing/storeFee';
+import { fraisBoutique, nombreArticlesFactures } from '@/src/lib/pricing/storeFee';
 import { cn } from '@/src/lib/cn';
 import { formatFcfa, isValidSenegalPhone, normalizePhone, prettyPhone } from '@/src/lib/format';
 import { useRouter } from '@/src/lib/router';
@@ -36,6 +37,12 @@ interface FormState {
 
 export function CheckoutPage() {
   const { items, subtotal, clear } = useCart();
+  /*
+   * Le catalogue sert à savoir lesquels de ces articles sont déjà en boutique :
+   * ceux-là ne portent pas de frais de traitement. Il est déjà en mémoire, la
+   * cliente venant de le parcourir.
+   */
+  const { products } = useProducts();
   const { zones, settings } = useSettings();
   const whatsapp = useWhatsapp();
   const { navigate } = useRouter();
@@ -103,7 +110,7 @@ export function CheckoutPage() {
    * données qui recalcule ce montant à l'enregistrement ; ce que la cliente
    * lit ici n'en est qu'un aperçu fidèle.
    */
-  const articles = nombreArticles(items);
+  const articles = nombreArticlesFactures(items, products);
   const serviceFee = fraisBoutique(articles, settings?.pricing?.tiers ?? []);
   const discount =
     promotion?.effect.type === 'discount_amount'

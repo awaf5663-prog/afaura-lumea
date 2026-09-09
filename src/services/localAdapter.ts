@@ -20,7 +20,7 @@ import { nextNumber, uid } from '@/src/lib/orderNumber';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
 import { aggregateVisits, type VisitEntry } from './visitStats';
 import { normalizePhone } from '@/src/lib/format';
-import { fraisBoutique, nombreArticles } from '@/src/lib/pricing/storeFee';
+import { fraisBoutique, nombreArticlesFactures } from '@/src/lib/pricing/storeFee';
 import { fromStoredImages, toStoredImages } from '@/src/lib/image';
 import type { Grouping, Order, Product, SheinRequest, StoreSettings } from '@/src/types';
 import type { AlertSettings, DataSource, OrderDraft, SheinDraft } from './types';
@@ -152,9 +152,15 @@ export const localAdapter: DataSource = {
     const method = PAYMENT_METHODS.find((m) => m.id === draft.paymentMethod) ?? PAYMENT_METHODS[0];
     const rawDeliveryFee = settings.deliveryFees[zone.id] ?? zone.fee;
     const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-    // Frais de traitement : relus dans la grille des réglages, jamais reçus
-    // du navigateur. Voir lib/pricing/storeFee.
-    const serviceFee = fraisBoutique(nombreArticles(items), settings.pricing?.tiers ?? []);
+    /*
+     * Frais de traitement : relus dans la grille des réglages, jamais reçus du
+     * navigateur. Les articles déjà en boutique n'en portent pas — ils ne sont
+     * pas commandés. Voir lib/pricing/storeFee.
+     */
+    const serviceFee = fraisBoutique(
+      nombreArticlesFactures(items, loadProducts()),
+      settings.pricing?.tiers ?? [],
+    );
 
     // Les offres sont appliquées ici, à partir des règles enregistrées : le
     // navigateur ne transmet qu'un code et une déclaration, jamais un montant.

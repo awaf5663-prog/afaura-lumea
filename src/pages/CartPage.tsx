@@ -6,7 +6,7 @@ import { useCart } from '@/src/hooks/useCart';
 import { useProducts } from '@/src/hooks/useProducts';
 import { useSettings } from '@/src/hooks/useSettings';
 import { formatFcfa } from '@/src/lib/format';
-import { fraisBoutique } from '@/src/lib/pricing/storeFee';
+import { fraisBoutique, nombreArticlesFactures } from '@/src/lib/pricing/storeFee';
 import { useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 
@@ -21,7 +21,10 @@ export function CartPage() {
    * dernière étape. La grille est celle de Tarification, et la base recalcule
    * tout à l'enregistrement : cet aperçu ne décide de rien.
    */
-  const serviceFee = fraisBoutique(count, settings?.pricing?.tiers ?? []);
+  const serviceFee = fraisBoutique(
+    nombreArticlesFactures(items, products),
+    settings?.pricing?.tiers ?? [],
+  );
 
   useSeo({
     title: 'Mon panier',

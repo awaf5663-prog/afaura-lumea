@@ -262,9 +262,18 @@ begin
     );
 
     v_subtotal := v_subtotal + v_unit * v_quantity;
-    -- Les articles se comptent en unités, pas en lignes : douze cahiers font
-    -- douze articles. Même règle que pour les demandes SHEIN.
-    v_articles := v_articles + v_quantity;
+    /*
+     * Les articles se comptent en unités, pas en lignes : douze cahiers font
+     * douze articles. Même règle que pour les demandes SHEIN.
+     *
+     * Sauf ceux déjà en boutique. Les frais de traitement paient un travail —
+     * commander la pièce, la regrouper, la suivre jusqu'ici ; un article gardé
+     * sur place n'en demande aucun, et la livraison se convient de vive voix.
+     * L'état est relu dans la fiche, jamais reçu du navigateur.
+     */
+    if not coalesce(v_product.ready_to_ship, false) then
+      v_articles := v_articles + v_quantity;
+    end if;
 
     if v_product.stock is not null then
       update products set stock = greatest(0, stock - v_quantity) where id = v_product.id;

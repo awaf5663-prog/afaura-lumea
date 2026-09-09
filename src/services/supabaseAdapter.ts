@@ -115,27 +115,78 @@ function alerteNonInstallee(error: unknown): Error {
   return error instanceof Error ? error : new Error(String(error));
 }
 
+/**
+ * Au-delà de ce délai, la requête est abandonnée.
+ *
+ * Sans lui, une requête qui se fige ne se termine JAMAIS : `fetch` n'a aucune
+ * limite de temps propre. Sur un téléphone qui passe du wifi à la 4G au
+ * mauvais moment, la connexion reste ouverte dans le vide, la boutique garde
+ * ses squelettes à l'écran, et rien ne se débloque à part une actualisation à
+ * la main. C'est le défaut le plus visible qu'ait connu ce site : « ça charge
+ * et ça ne vient jamais ».
+ *
+ * Douze secondes : assez pour une connexion lente honnête, trop peu pour
+ * laisser croire que ça va finir par arriver.
+ */
+const DELAI_MAX = 12_000;
+
+/** Une lecture figée mérite une seconde chance ; une écriture, jamais. */
+const LECTURE = /^(GET|HEAD)$/i;
+
+/** Réseau coupé, requête abandonnée : un message que la boutique peut lire. */
+function erreurReseau(cause: unknown): Error {
+  const abandon = cause instanceof Error && cause.name === 'AbortError';
+  const detail = cause instanceof Error ? `${cause.name} : ${cause.message}` : String(cause);
+  return new Error(
+    abandon
+      ? 'La base met trop de temps à répondre. Vérifiez votre connexion, puis réessayez.'
+      : `La base n'a pas pu être jointe. Vérifiez votre connexion, puis réessayez. (${detail})`,
+  );
+}
+
 async function rest<T>(path: string, init: RequestInit = {}): Promise<T> {
   const token = accessToken();
+  const lecture = LECTURE.test(init.method ?? 'GET');
   let res: Response;
+
+  const tenter = async (): Promise<Response> => {
+    const arret = new AbortController();
+    const minuterie = setTimeout(() => arret.abort(), DELAI_MAX);
+    try {
+      return await fetch(`${URL_BASE}/rest/v1/${path}`, {
+        ...init,
+        signal: arret.signal,
+        headers: {
+          apikey: ANON_KEY,
+          Authorization: `Bearer ${token ?? ANON_KEY}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=representation',
+          ...(init.headers ?? {}),
+        },
+      });
+    } finally {
+      clearTimeout(minuterie);
+    }
+  };
+
   try {
-    res = await fetch(`${URL_BASE}/rest/v1/${path}`, {
-      ...init,
-      headers: {
-        apikey: ANON_KEY,
-        Authorization: `Bearer ${token ?? ANON_KEY}`,
-        'Content-Type': 'application/json',
-        Prefer: 'return=representation',
-        ...(init.headers ?? {}),
-      },
-    });
+    res = await tenter();
   } catch (cause) {
-    // Réseau coupé, requête refusée par le navigateur : sans ce filtre, le
-    // message brut du navigateur arrivait tel quel devant la boutique.
-    const detail = cause instanceof Error ? `${cause.name} : ${cause.message}` : String(cause);
-    throw new Error(
-      `La base n'a pas pu être jointe. Vérifiez votre connexion, puis réessayez. (${detail})`,
-    );
+    /*
+     * Une lecture repart une fois. Un réseau mobile qui hoquette n'a pas à
+     * coûter une page vide, et relire deux fois le catalogue ne change rien à
+     * la base. Une écriture, elle, ne se rejoue pas : on ne sait pas si la
+     * première est passée, et une commande enregistrée deux fois se voit.
+     */
+    if (lecture) {
+      try {
+        res = await tenter();
+      } catch (secondCause) {
+        throw erreurReseau(secondCause);
+      }
+    } else {
+      throw erreurReseau(cause);
+    }
   }
   if (!res.ok) {
     const body = await res.text().catch(() => '');
@@ -421,7 +472,44 @@ export const supabaseAdapter: DataSource = {
   mode: 'supabase',
 
   async listProducts() {
-    const rows = await rest<Row[]>('products?select=*&order=created_at.desc');
+    /*
+     * On nomme les colonnes plutôt que de demander « tout ».
+     *
+     * `select=*` ramenait aussi celles que la boutique n'affiche jamais, et
+     * surtout : les photos téléversées depuis l'administration sont enregistrées
+     * dans la ligne elle-même, en clair. Chaque ouverture de la boutique
+     * retéléchargeait donc l'intégralité de ces photos à l'intérieur du JSON,
+     * avant qu'un seul article ne s'affiche.
+     *
+     * La liste ci-dessous est exactement ce que `toProduct` consomme. Une
+     * colonne ajoutée plus tard devra être ajoutée ici aussi — sinon elle
+     * arrivera vide, et la fiche le montrera tout de suite.
+     */
+    const rows = await rest<Row[]>(
+      'products?select=' +
+        [
+          'id',
+          'slug',
+          'name',
+          'description',
+          'price',
+          'compare_at_price',
+          'category',
+          'images',
+          'variants',
+          'option_prices',
+          'stock',
+          'status',
+          'is_new',
+          'is_popular',
+          'other_colors_available',
+          'ready_to_ship',
+          'color_chart_id',
+          'measurements',
+          'created_at',
+        ].join(',') +
+        '&order=created_at.desc',
+    );
     return rows.map(toProduct);
   },
 

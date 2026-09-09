@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
+import { STORAGE_KEYS, readJson } from '@/src/lib/storage';
 import { db, onDataChanged } from '@/src/services';
 import type { Product } from '@/src/types';
 
@@ -28,6 +28,35 @@ function lireCache(): Product[] | null {
   return Array.isArray(garde) && garde.length > 0 ? garde : null;
 }
 
+/**
+ * Range le catalogue pour la visite suivante, sans jamais faire échouer la
+ * page qui vient de s'afficher.
+ *
+ * Le navigateur alloue quelques mégaoctets par site, et les photos téléversées
+ * depuis l'administration sont enregistrées en clair dans la fiche : un
+ * catalogue bien fourni peut dépasser cette réserve. Refusé en bloc, le cache
+ * ne servirait alors plus jamais à rien, et personne ne le saurait.
+ *
+ * On réessaie donc sans ces photos-là. La cliente revoit sa boutique
+ * immédiatement, avec le cadre crème à la place de quelques photos, le temps
+ * que la base réponde — ce qui vaut mieux qu'une grille vide.
+ */
+function garderEnCache(produits: Product[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEYS.catalogueEnCache, JSON.stringify(produits));
+  } catch {
+    try {
+      const allege = produits.map((p) => ({
+        ...p,
+        images: p.images.filter((src) => !src.startsWith('data:')),
+      }));
+      localStorage.setItem(STORAGE_KEYS.catalogueEnCache, JSON.stringify(allege));
+    } catch {
+      // Toujours trop gros : tant pis, la visite suivante repassera par la base.
+    }
+  }
+}
+
 /** Charge le catalogue depuis la source de données active (local ou Supabase). */
 export function useProducts(includeDrafts = false) {
   const cache = includeDrafts ? null : lireCache();
@@ -51,7 +80,7 @@ export function useProducts(includeDrafts = false) {
         setProducts(includeDrafts ? all : visibles);
         // Seul le catalogue public est gardé : les brouillons n'ont rien à
         // faire dans le navigateur d'une cliente.
-        if (!includeDrafts) writeJson(STORAGE_KEYS.catalogueEnCache, visibles);
+        if (!includeDrafts) garderEnCache(visibles);
       } catch (e) {
         /*
          * Une vérification qui échoue derrière un catalogue déjà affiché ne

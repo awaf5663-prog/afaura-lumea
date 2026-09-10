@@ -1,4 +1,4 @@
-import { ArrowLeft, Check, Clock, Loader2, Palette, Ruler, ShieldCheck, Truck } from 'lucide-react';
+import { ArrowLeft, Check, Clock, Heart, Loader2, Palette, Ruler, ShieldCheck, Truck } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { WhatsAppLink } from '@/src/components/whatsapp/WhatsAppLink';
 import { Gallery } from '@/src/components/product/Gallery';
@@ -17,9 +17,11 @@ import { findColorChart } from '@/src/config/colorCharts';
 import { ColorChartPicker } from '@/src/components/product/ColorChartPicker';
 import { ReviewCard, usePublishedReviews } from '@/src/components/home/Reviews';
 import { useCart } from '@/src/hooks/useCart';
+import { useFavoris } from '@/src/hooks/useFavoris';
 import { useProducts } from '@/src/hooks/useProducts';
 import { useToast } from '@/src/hooks/useToast';
 import { formatFcfa } from '@/src/lib/format';
+import { cn } from '@/src/lib/cn';
 import { cadragePhoto, prixUnitaire } from '@/src/lib/optionPrice';
 import { Link, useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
@@ -29,10 +31,12 @@ import { buildProductMessage } from '@/src/lib/whatsapp';
 export function ProductPage({ slug }: { slug: string }) {
   const { products, loading } = useProducts();
   const { add } = useCart();
+  const { estFavori, basculer: basculerFavori } = useFavoris();
   const { notify } = useToast();
   const { navigate } = useRouter();
 
   const product = products.find((p) => p.slug === slug || p.id === slug);
+  const favori = product ? estFavori(product.id) : false;
 
   const [options, setOptions] = useState<Record<string, string>>({});
   const [colorWish, setColorWish] = useState('');
@@ -213,7 +217,24 @@ export function ProductPage({ slug }: { slug: string }) {
             </Badge>
           </div>
 
-          <h1 className="mt-3 text-[32px] sm:text-[40px]">{product.name}</h1>
+          <div className="mt-3 flex items-start justify-between gap-4">
+            <h1 className="text-[32px] sm:text-[40px]">{product.name}</h1>
+            {/* Mettre de côté sans engager : la liste vit dans ce navigateur. */}
+            <button
+              type="button"
+              aria-pressed={favori}
+              aria-label={
+                favori ? `Retirer ${product.name} des favoris` : `Mettre ${product.name} de côté`
+              }
+              onClick={() => {
+                const ajoute = basculerFavori(product.id);
+                notify(ajoute ? `${product.name} mis de côté` : `${product.name} retiré des favoris`);
+              }}
+              className="press mt-1 grid size-11 shrink-0 place-items-center rounded-full border border-line bg-white text-ink"
+            >
+              <Heart className={cn('size-5', favori && 'fill-brand text-brand')} strokeWidth={1.7} />
+            </button>
+          </div>
 
           <Price
             amount={prixAffiche}

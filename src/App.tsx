@@ -1,4 +1,5 @@
 import { Suspense, lazy, useState } from 'react';
+import { EcranEntree } from '@/src/components/brand/EcranEntree';
 import { CartDrawer } from '@/src/components/cart/CartDrawer';
 import { ErrorBoundary } from '@/src/components/ErrorBoundary';
 import { BottomNav } from '@/src/components/layout/BottomNav';
@@ -7,6 +8,7 @@ import { Header } from '@/src/components/layout/Header';
 import { WhatsAppFab } from '@/src/components/layout/WhatsAppFab';
 import { AdminAuthProvider } from '@/src/hooks/useAdminAuth';
 import { CartProvider } from '@/src/hooks/useCart';
+import { FavorisProvider } from '@/src/hooks/useFavoris';
 import { SettingsProvider } from '@/src/hooks/useSettings';
 import { ToastProvider } from '@/src/hooks/useToast';
 import { RouterProvider, matchPath, useRouter } from '@/src/lib/router';
@@ -57,6 +59,9 @@ const SheinConfirmationPage = lazy(() =>
 const ConfirmationPage = lazy(() =>
   import('@/src/pages/ConfirmationPage').then((m) => ({ default: m.ConfirmationPage })),
 );
+const FavorisPage = lazy(() =>
+  import('@/src/pages/FavorisPage').then((m) => ({ default: m.FavorisPage })),
+);
 const NotFoundPage = lazy(() =>
   import('@/src/pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
 );
@@ -83,6 +88,8 @@ function Routes() {
       return <HomePage />;
     case '/boutique':
       return <ShopPage />;
+    case '/favoris':
+      return <FavorisPage />;
     case '/panier':
       return <CartPage />;
     case '/commander':
@@ -120,6 +127,9 @@ function Shell() {
 
   return (
     <div className="flex min-h-dvh flex-col">
+      {/* Le rideau d'entrée se pose par-dessus la page, qui se charge dessous. */}
+      {!isAdmin && <EcranEntree />}
+
       {nouvelleVersion && (
         <div className="animate-fade sticky top-0 z-[90] flex flex-wrap items-center justify-center gap-3 bg-ink px-4 py-2.5 text-center text-[12.5px] text-ivory">
           Une version plus récente du site est en ligne.
@@ -182,7 +192,9 @@ export default function App() {
         <SettingsProvider>
           <AdminAuthProvider>
             <CartProvider>
-              <Shell />
+              <FavorisProvider>
+                <Shell />
+              </FavorisProvider>
             </CartProvider>
           </AdminAuthProvider>
         </SettingsProvider>

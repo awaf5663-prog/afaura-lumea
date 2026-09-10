@@ -20,6 +20,11 @@
   --color-cream: #f8edf3; /* surfaces, cartes */
   --color-blush: #e5cedb; /* rose clair — c'est la couleur de ses visuels */
 
+  /* Rose crème — fond des photos d'articles : le rose de la marque
+     réchauffé de beige, pour que le blanc des packshots disparaisse
+     dedans plutôt que de former un carré blanc au milieu de la page. */
+  --color-rosecreme: #f9efe8;
+
   /* Beiges — conservés, en contrepoint chaud */
   --color-sand: #e9d9cb;
   --color-clay: #dac6b4;
@@ -40,6 +45,8 @@
 
   --font-display: 'Fraunces', 'Times New Roman', serif;
   --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Lettres rondes et pleines de l'écran d'entrée, à l'image du logo. */
+  --font-entree: 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
 
   --radius-xs: 6px;
   --radius-sm: 10px;
@@ -242,6 +249,40 @@
 
 .animate-pop {
   animation: lumea-pop 0.35s ease both;
+}
+
+/*
+ * ÉCRAN D'ENTRÉE
+ *
+ * Le nom s'écrit lettre après lettre, puis le rideau se lève sur la boutique.
+ * Tout est en CSS et dure moins d'une seconde et demie : le site se charge
+ * dessous pendant ce temps-là, l'écran ne retarde donc rien.
+ */
+@keyframes lumea-lettre {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes lumea-rideau {
+  to {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
+.entree-lettre {
+  display: inline-block;
+  animation: lumea-lettre 0.42s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.entree-sortie {
+  animation: lumea-rideau 0.42s ease-in both;
 }
 
 /*

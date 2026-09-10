@@ -120,14 +120,19 @@ export function Gallery({
             */
             className={cn(
               'w-full shrink-0 snap-center max-h-[56vh] sm:max-h-none lg:max-h-[min(68vh,600px)]',
-              cadrage === 'carre' ? 'aspect-square' : 'aspect-[4/5]',
+              // Fond rose crème et fondu du blanc pour les packshots : même
+              // traitement que sur les vignettes de la boutique.
+              cadrage === 'carre' ? 'isolate aspect-square bg-rosecreme' : 'aspect-[4/5]',
             )}
           >
               {image ? (
                 <img
                   src={image}
                   alt={labels?.[index] ? `${alt} — ${labels[index]}` : alt}
-                  className={cn('size-full', cadrage === 'carre' ? 'object-contain p-3' : 'object-cover')}
+                  className={cn(
+                    'size-full',
+                    cadrage === 'carre' ? 'object-contain p-3 mix-blend-multiply' : 'object-cover',
+                  )}
                   loading={index === 0 ? 'eager' : 'lazy'}
                   decoding="async"
                   draggable={false}
@@ -180,7 +185,10 @@ export function Gallery({
                 <img
                   src={image}
                   alt=""
-                  className={cn('size-full', cadrage === 'carre' ? 'object-contain' : 'object-cover')}
+                  className={cn(
+                    'size-full',
+                    cadrage === 'carre' ? 'bg-rosecreme object-contain' : 'object-cover',
+                  )}
                   loading="lazy"
                 />
               </button>

@@ -1,9 +1,10 @@
-import { Lock, Menu, Search, ShoppingBag, X } from 'lucide-react';
+import { Heart, Lock, Menu, Search, ShoppingBag, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import symbole from '@/src/assets/brand/symbole-sombre.webp';
 import { AnnouncementTicker } from '@/src/components/layout/AnnouncementTicker';
 import { BRAND } from '@/src/config/site';
 import { useCart } from '@/src/hooks/useCart';
+import { useFavoris } from '@/src/hooks/useFavoris';
 import { useSettings } from '@/src/hooks/useSettings';
 import { Link, useIsActive, useRouter } from '@/src/lib/router';
 import { cn } from '@/src/lib/cn';
@@ -15,6 +16,7 @@ const NAV = [
   { to: '/shein', label: 'Commande SHEIN' },
   { to: '/comment-ca-marche', label: 'Comment ça marche' },
   { to: '/guide-des-tailles', label: 'Guide des tailles' },
+  { to: '/favoris', label: 'Mes favoris' },
   { to: '/suivi', label: 'Suivi' },
   { to: '/faq', label: 'FAQ' },
   { to: '/a-propos', label: 'À propos' },
@@ -37,6 +39,7 @@ function NavLink({ to, label, exact }: { to: string; label: string; exact?: bool
 
 export function Header({ onOpenCart }: { onOpenCart: () => void }) {
   const { count, pulse } = useCart();
+  const { count: favoris } = useFavoris();
   const { settings } = useSettings();
   const { navigate } = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -110,6 +113,18 @@ export function Header({ onOpenCart }: { onOpenCart: () => void }) {
             >
               <Search className="size-5" />
             </button>
+            <Link
+              to="/favoris"
+              className="press relative grid size-10 place-items-center rounded-full text-ink"
+              aria-label={`Mes favoris, ${favoris} article${favoris > 1 ? 's' : ''}`}
+            >
+              <Heart className="size-5" strokeWidth={1.7} />
+              {favoris > 0 && (
+                <span className="absolute -right-0.5 -top-0.5 grid size-[18px] place-items-center rounded-full bg-brand text-[10px] font-semibold text-white">
+                  {favoris > 99 ? '99+' : favoris}
+                </span>
+              )}
+            </Link>
             <button
               type="button"
               onClick={onOpenCart}

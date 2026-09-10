@@ -148,7 +148,16 @@ export function Header({ onOpenCart }: { onOpenCart: () => void }) {
       {menuOpen && (
         <div className="fixed inset-0 z-[85] xl:hidden" role="dialog" aria-modal="true" aria-label="Menu">
           <div className="animate-fade absolute inset-0 bg-ink/35" onClick={() => setMenuOpen(false)} />
-          <nav className="animate-sheet absolute inset-x-0 top-0 rounded-b-[--radius-xl] bg-ivory px-6 pb-8 pt-5">
+          {/*
+            Le menu défile.
+
+            Il compte une dizaine d'entrées, et « Espace boutique » ferme la
+            marche. Sur un écran de 640 px, le panneau mesurait 796 px : le
+            lien de l'administration tombait sous le bord de l'écran, sans
+            aucun moyen d'y accéder depuis un téléphone. La hauteur est donc
+            bornée à l'écran, et ce qui dépasse se fait défiler.
+          */}
+          <nav className="animate-sheet absolute inset-x-0 top-0 max-h-[92dvh] overflow-y-auto overscroll-contain rounded-b-[--radius-xl] bg-ivory px-6 pb-8 pt-5">
             <div className="mb-6 flex items-center justify-between">
               <span className="flex items-center gap-2.5">
                 <img src={symbole} alt="" className="size-8 object-contain" />

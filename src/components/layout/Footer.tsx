@@ -103,15 +103,28 @@ export function Footer() {
                 </a>
               </li>
             )}
+          </ul>
+
+          {/*
+            Les réseaux, en gros et côte à côte.
+
+            Ils vivaient en fin de liste, en petits caractères, entre l'e-mail
+            et les mentions : personne ne les voyait — la boutique elle-même
+            croyait son TikTok disparu. Une rangée de boutons ronds, au pouce,
+            se remarque et se touche.
+          */}
+          <p className="eyebrow mb-3 mt-7">Suivez-nous</p>
+          <ul className="flex flex-wrap items-center gap-2.5">
             {INSTAGRAM_HANDLE && (
               <li>
                 <a
                   href={`https://www.instagram.com/${INSTAGRAM_HANDLE}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="link-underline inline-flex items-center gap-2"
+                  aria-label={`Instagram @${INSTAGRAM_HANDLE}`}
+                  className="press grid size-11 place-items-center rounded-full border border-line bg-white text-graphite transition-colors hover:bg-cream"
                 >
-                  <Instagram className="size-4" /> @{INSTAGRAM_HANDLE}
+                  <Instagram className="size-[19px]" strokeWidth={1.7} />
                 </a>
               </li>
             )}
@@ -125,9 +138,10 @@ export function Footer() {
                   href={`https://www.tiktok.com/@${TIKTOK_HANDLE}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="link-underline inline-flex items-center gap-2"
+                  aria-label={`TikTok @${TIKTOK_HANDLE}`}
+                  className="press grid size-11 place-items-center rounded-full border border-line bg-white text-graphite transition-colors hover:bg-cream"
                 >
-                  <TikTokIcon className="size-4" /> @{TIKTOK_HANDLE}
+                  <TikTokIcon className="size-[19px]" />
                 </a>
               </li>
             )}
@@ -137,13 +151,20 @@ export function Footer() {
                   href={PINTEREST_URL}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="link-underline inline-flex items-center gap-2"
+                  aria-label="Pinterest"
+                  className="press grid size-11 place-items-center rounded-full border border-line bg-white text-graphite transition-colors hover:bg-cream"
                 >
-                  <PinterestIcon className="size-4" /> Pinterest
+                  <PinterestIcon className="size-[19px]" />
                 </a>
               </li>
             )}
           </ul>
+
+          <p className="mt-3 text-[12.5px] text-stone">
+            {[INSTAGRAM_HANDLE && `@${INSTAGRAM_HANDLE}`, TIKTOK_HANDLE && `@${TIKTOK_HANDLE}`]
+              .filter(Boolean)
+              .join(' · ')}
+          </p>
         </div>
       </div>
 

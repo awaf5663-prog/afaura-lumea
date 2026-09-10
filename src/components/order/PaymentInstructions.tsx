@@ -1,4 +1,5 @@
 import { ArrowUpRight, Copy } from 'lucide-react';
+import { MoyenPaiementIcone } from '@/src/components/order/MoyenPaiementIcone';
 import { PAYMENT_METHODS } from '@/src/config/site';
 import { useSettings } from '@/src/hooks/useSettings';
 import { useToast } from '@/src/hooks/useToast';
@@ -45,7 +46,10 @@ export function PaymentInstructions({
 
   return (
     <div className="rounded-[--radius-md] border border-line bg-cream/60 p-4 text-[13px] leading-relaxed text-graphite">
-      <p className="font-medium">Comment payer en {method.label}</p>
+      <p className="flex items-center gap-2.5 font-medium">
+        <MoyenPaiementIcone id={method.id} />
+        Comment payer en {method.label}
+      </p>
 
       {lien ? (
         <>

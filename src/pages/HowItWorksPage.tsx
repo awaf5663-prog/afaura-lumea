@@ -1,5 +1,6 @@
 import { GroupingSection } from '@/src/components/home/GroupingSection';
 import { HowItWorks } from '@/src/components/home/HowItWorks';
+import { MoyenPaiementIcone } from '@/src/components/order/MoyenPaiementIcone';
 import { Button } from '@/src/components/ui/Button';
 import { Reveal } from '@/src/components/ui/Reveal';
 import { PAYMENT_METHODS } from '@/src/config/site';
@@ -93,6 +94,7 @@ export function HowItWorksPage() {
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
             {PAYMENT_METHODS.map((method) => (
               <div key={method.id} className="rounded-[--radius-lg] border border-line bg-white p-5">
+                <MoyenPaiementIcone id={method.id} className="mb-3" />
                 <p className="font-display text-[20px]">{method.label}</p>
                 {payoutNumber(method.id) && (
                   <p className="mt-1 text-[14px] font-medium tabular-nums">

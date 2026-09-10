@@ -7,6 +7,7 @@ import { PromotionNotice } from '@/src/components/shein/PromotionNotice';
 import { Button } from '@/src/components/ui/Button';
 import { ErrorText, FormRow, Input, Label, Textarea } from '@/src/components/ui/Field';
 import { PAYMENT_METHODS } from '@/src/config/site';
+import { MoyenPaiementIcone } from '@/src/components/order/MoyenPaiementIcone';
 import { useCart } from '@/src/hooks/useCart';
 import { useProducts } from '@/src/hooks/useProducts';
 import { useSettings, useWhatsapp } from '@/src/hooks/useSettings';
@@ -413,6 +414,7 @@ export function CheckoutPage() {
                     onChange={() => set('paymentMethod', m.id)}
                     className="mt-1 accent-[#8e2961]"
                   />
+                  <MoyenPaiementIcone id={m.id} className="mt-0.5" />
                   <span>
                     <span className="block text-[15px] font-medium">{m.label}</span>
                     <span className="mt-1 block text-[12.5px] text-stone">{m.description}</span>

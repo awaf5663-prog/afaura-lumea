@@ -1,0 +1,33 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "build": {
+    "env": {
+      "VITE_BASE_PATH": "/",
+      "VITE_SITE_URL": "https://afauralumea.shop",
+      "VITE_SUPABASE_URL": "https://mhutsbfnzoiuqsoxkdji.supabase.co",
+      "VITE_SUPABASE_ANON_KEY": "sb_publishable_lMzrL8g6JkaE0jWdabLD-Q_-8TQ5i9h"
+    }
+  },
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "headers": [
+    {
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/version.json",
+      "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }]
+    },
+    {
+      "source": "/index.html",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
+      "source": "/manifest.webmanifest",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    }
+  ]
+}

@@ -284,6 +284,42 @@ automatiquement pour un projet Vite.
 Le routeur détecte tout seul le sous-dossier où le site est servi : aucun réglage à prévoir si
 l'hébergement n'est pas à la racine du domaine.
 
+Le site est publié sur **GitHub Pages** (`.github/workflows/pages.yml`, à chaque envoi sur `main`
+ou sur la branche de travail) et la configuration **Vercel** est prête dans `vercel.json` : les
+deux peuvent coexister, c'est le DNS du domaine qui décide lequel répond.
+
+### Passer sur Vercel
+
+`vercel.json` contient déjà tout ce dont Vercel a besoin — commande de construction, dossier de
+sortie, variables d'environnement, réécriture SPA et en-têtes de cache. Rien à régler dans
+l'interface :
+
+1. Créer un compte sur vercel.com avec le compte GitHub du dépôt, puis **Add New → Project** et
+   importer `afaura-lumea`. Laisser tous les réglages proposés tels quels et déployer.
+2. Vérifier le site sur l'adresse `…vercel.app` fournie : boutique, fiche produit, panier.
+3. **Project → Settings → Domains**, ajouter `afauralumea.shop` et `www.afauralumea.shop`.
+4. Chez le bureau d'enregistrement du domaine, remplacer les enregistrements DNS qui pointent
+   aujourd'hui vers GitHub Pages par **ceux que Vercel affiche à cet écran** (un `A` sur l'apex,
+   un `CNAME` sur `www`). Ce sont les valeurs de Vercel qui font foi, pas celles d'un tutoriel.
+5. Attendre la propagation (quelques minutes à quelques heures). Le certificat HTTPS est délivré
+   tout seul une fois le DNS en place.
+
+Tant que le DNS n'a pas basculé, GitHub Pages continue de servir le domaine : la bascule est
+réversible, il suffit de remettre les anciens enregistrements. Une fois Vercel en service, le
+workflow Pages peut rester (il republie dans le vide) ou être désactivé — `public/CNAME` ne sert
+qu'à Pages et ne gêne pas Vercel.
+
+Les variables inscrites dans `vercel.json` sont les mêmes que dans le workflow Pages : chemin de
+base, adresse du site, adresse Supabase et **clé publique** Supabase. Cette clé part de toute façon
+dans le JavaScript du site ; ce qui protège les données, ce sont les règles RLS de
+`supabase/schema.sql`. La clé `service_role`, elle, n'a rien à faire dans ce dépôt.
+
+Les en-têtes de cache sont déclarés explicitement : un an sur `/assets/` (les noms de fichiers
+portent une empreinte, ils ne changent jamais sans changer de nom), et aucun cache sur
+`version.json`, que le site relit pour savoir qu'une nouvelle version est en ligne. Un
+`version.json` servi depuis le cache ferait croire au site qu'il est périmé alors qu'il ne l'est
+pas — c'est exactement ce qui provoquait la boucle de rechargement de la boutique.
+
 **Aperçu partageable** : `npm run preview:build` produit `preview/apercu.html`, une page unique
 contenant le CSS, le JavaScript et les images en data URI (~0,9 Mo). Elle navigue au fragment (#)
 pour rester valable quel que soit l'endroit où on la dépose. Pratique pour montrer le site sans

@@ -5,6 +5,7 @@ import { Reveal } from '@/src/components/ui/Reveal';
 import { PAYMENT_METHODS } from '@/src/config/site';
 import { useSettings } from '@/src/hooks/useSettings';
 import { formatFcfa, prettyPhone } from '@/src/lib/format';
+import { lienPaiement } from '@/src/lib/paiement';
 import { useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 
@@ -12,8 +13,19 @@ export function HowItWorksPage() {
   const { navigate } = useRouter();
   const { zones, settings } = useSettings();
 
+  /*
+   * Le numéro n'est écrit sur cette page que tant qu'aucun lien de paiement
+   * n'est renseigné. Dès qu'il y en a un, la cliente passe par le bouton au
+   * moment de payer : inutile d'afficher le numéro à tout venant.
+   */
   const payoutNumber = (id: string) =>
-    id === 'wave' ? settings?.waveNumber ?? '' : id === 'orange_money' ? settings?.orangeMoneyNumber ?? '' : '';
+    lienPaiement(settings, id)
+      ? ''
+      : id === 'wave'
+        ? settings?.waveNumber ?? ''
+        : id === 'orange_money'
+          ? settings?.orangeMoneyNumber ?? ''
+          : '';
 
   useSeo({
     title: 'Comment ça marche',

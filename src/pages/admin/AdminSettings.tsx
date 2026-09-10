@@ -9,6 +9,7 @@ import { useToast } from '@/src/hooks/useToast';
 import { AlertEditor } from '@/src/components/admin/AlertEditor';
 import { ReviewEditor } from '@/src/components/admin/ReviewEditor';
 import { normalizePhone } from '@/src/lib/format';
+import { lienSur } from '@/src/lib/paiement';
 
 /** Convertit une date ISO en valeur pour <input type="datetime-local">. */
 const toLocalInput = (iso: string) => {
@@ -208,6 +209,49 @@ export function AdminSettings() {
               onChange={(e) => setDraft({ ...draft, orangeMoneyNumber: e.target.value })}
             />
           </FormRow>
+        </div>
+
+        <div className="mt-5 rounded-[--radius-md] border border-line bg-cream/50 p-4">
+          <p className="text-[13px] font-medium">Liens de paiement</p>
+          <p className="mt-1 text-[12.5px] leading-relaxed text-stone">
+            Collez ici le lien de paiement donné par Wave et par Orange Money. La cliente touche un
+            bouton, l'application s'ouvre avec votre compte déjà rempli : elle saisit le montant et
+            valide. Tant qu'un lien est renseigné, le numéro correspondant n'est plus écrit en clair
+            sur le site. Laissez vide pour revenir au numéro à recopier. Seuls les liens en
+            <span className="tabular-nums"> https:// </span> sont acceptés.
+          </p>
+          <div className="mt-4 grid gap-x-4 sm:grid-cols-2">
+            <FormRow>
+              <Label htmlFor="s-wave-lien">Lien de paiement Wave</Label>
+              <Input
+                id="s-wave-lien"
+                inputMode="url"
+                placeholder="https://…"
+                value={draft.waveLink}
+                onChange={(e) => setDraft({ ...draft, waveLink: e.target.value })}
+              />
+              {draft.waveLink.trim() && !lienSur(draft.waveLink) && (
+                <p className="mt-1 text-[12px] text-[#8a2f2f]">
+                  Ce lien n'est pas reconnu : il doit commencer par https://
+                </p>
+              )}
+            </FormRow>
+            <FormRow>
+              <Label htmlFor="s-om-lien">Lien de paiement Orange Money</Label>
+              <Input
+                id="s-om-lien"
+                inputMode="url"
+                placeholder="https://…"
+                value={draft.orangeMoneyLink}
+                onChange={(e) => setDraft({ ...draft, orangeMoneyLink: e.target.value })}
+              />
+              {draft.orangeMoneyLink.trim() && !lienSur(draft.orangeMoneyLink) && (
+                <p className="mt-1 text-[12px] text-[#8a2f2f]">
+                  Ce lien n'est pas reconnu : il doit commencer par https://
+                </p>
+              )}
+            </FormRow>
+          </div>
         </div>
       </section>
 

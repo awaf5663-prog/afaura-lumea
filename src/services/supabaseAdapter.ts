@@ -720,6 +720,10 @@ export const supabaseAdapter: DataSource = {
       nextGroupingDate: r.next_grouping_date ?? '',
       waveNumber: r.wave_number?.trim() || WAVE_NUMBER,
       orangeMoneyNumber: r.orange_money_number?.trim() || ORANGE_MONEY_NUMBER,
+      // Aucun repli : un lien de paiement ne s'invente pas. Colonne absente
+      // ou champ vide = le site affiche le numéro à recopier, comme avant.
+      waveLink: r.wave_link?.trim() ?? '',
+      orangeMoneyLink: r.orange_money_link?.trim() ?? '',
       // Pas de repli ici : le montant de la livraison est appliqué par la
       // fonction serveur à partir de cette même colonne. Inventer une valeur
       // côté navigateur ferait afficher des frais que la commande ne compte
@@ -756,6 +760,8 @@ export const supabaseAdapter: DataSource = {
       next_grouping_date: settings.nextGroupingDate || null,
       wave_number: settings.waveNumber,
       orange_money_number: settings.orangeMoneyNumber,
+      wave_link: settings.waveLink,
+      orange_money_link: settings.orangeMoneyLink,
       delivery_fees: settings.deliveryFees,
       announcement: settings.announcement,
       pricing: settings.pricing,
@@ -774,6 +780,8 @@ export const supabaseAdapter: DataSource = {
     await enregistrerSansColonnesAbsentes(envoyer, colonnes, [
       { colonne: 'reviews', etiquette: 'les avis clientes' },
       { colonne: 'next_grouping_opening', etiquette: "la date d'ouverture des inscriptions" },
+      { colonne: 'wave_link', etiquette: 'le lien de paiement Wave' },
+      { colonne: 'orange_money_link', etiquette: 'le lien de paiement Orange Money' },
     ]);
     return settings;
   },

@@ -2527,3 +2527,24 @@ begin
 end;
 $$;
 grant execute on function create_order(text, text, text, text, text, text, text, jsonb, text, boolean) to anon, authenticated;
+
+-- ── 28. Liens de paiement Wave et Orange Money ───────────────────────
+--
+-- Jusqu'ici, les numéros Wave et Orange Money étaient écrits en clair sur
+-- le site. Ces deux colonnes accueillent les LIENS de paiement fournis par
+-- Wave et par Orange Money : la cliente touche un bouton, son application
+-- s'ouvre avec le compte de la boutique déjà rempli, elle saisit le montant
+-- et valide.
+--
+-- Les liens eux-mêmes se collent depuis /admin → Réglages → Paiement mobile.
+-- Ils ne sont pas écrits ici : ils appartiennent à la boutique, pas au code.
+-- Tant qu'ils restent vides, le site affiche le numéro à recopier, comme
+-- avant — rien ne change tant que rien n'est renseigné.
+
+alter table settings add column if not exists wave_link text default '';
+alter table settings add column if not exists orange_money_link text default '';
+
+-- Vérification : les deux colonnes existent et sont vides.
+select coalesce(wave_link, '') as lien_wave,
+       coalesce(orange_money_link, '') as lien_orange_money
+  from settings where id = 1;

@@ -41,6 +41,9 @@ function defaultSettings(): StoreSettings {
     nextGroupingDate: NEXT_GROUPING_DATE,
     waveNumber: WAVE_NUMBER,
     orangeMoneyNumber: ORANGE_MONEY_NUMBER,
+    // Les liens de paiement viennent de la boutique : aucun repli possible.
+    waveLink: '',
+    orangeMoneyLink: '',
     deliveryFees: Object.fromEntries(DELIVERY_ZONES.map((z) => [z.id, z.fee])),
     announcement: '',
     pricing: DEFAULT_PRICING,

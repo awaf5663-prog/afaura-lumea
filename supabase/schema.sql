@@ -164,6 +164,11 @@ alter table orders add column if not exists deleted_at timestamptz;
 alter table shein_requests add column if not exists deleted_at timestamptz;
 alter table groupings add column if not exists opening_date timestamptz;
 alter table settings add column if not exists next_grouping_opening timestamptz;
+-- Liens de paiement Wave et Orange Money : la cliente touche un bouton et son
+-- application s'ouvre avec le compte de la boutique déjà rempli. Vides, le
+-- site revient au numéro à recopier.
+alter table settings add column if not exists wave_link text default '';
+alter table settings add column if not exists orange_money_link text default '';
 
 insert into settings (id) values (1) on conflict (id) do nothing;
 

@@ -419,6 +419,19 @@ export interface StoreSettings {
   nextGroupingDate: string;
   waveNumber: string;
   orangeMoneyNumber: string;
+  /**
+   * Liens de paiement fournis par Wave et Orange Money.
+   *
+   * Renseignés, ils remplacent l'affichage du numéro : la cliente touche
+   * un bouton, son application s'ouvre avec le destinataire déjà rempli,
+   * et elle n'a plus qu'à saisir le montant. Le numéro cesse alors d'être
+   * écrit en clair sur les pages du site.
+   *
+   * Vides, le site revient au numéro à recopier. Rien n'est inventé ici :
+   * ces deux liens viennent de la boutique.
+   */
+  waveLink: string;
+  orangeMoneyLink: string;
   /** Frais par zone, surchargent DELIVERY_ZONES. null = à confirmer. */
   deliveryFees: Record<string, number | null>;
   /** Message court affiché en bandeau haut de page. Vide = pas de bandeau. */

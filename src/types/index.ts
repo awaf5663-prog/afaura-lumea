@@ -47,6 +47,18 @@ export interface Product {
   compareAtPrice?: number | null;
   category: string;
   images: string[];
+  /**
+   * Aperçus légers des photos téléversées, dans le même ordre qu'`images`.
+   *
+   * Une photo de fiche pèse entre 170 et 300 Ko ; son aperçu de 480 px en
+   * pèse 26 à 47. La boutique n'a besoin que des aperçus — une vignette
+   * fait 167 px de large sur un téléphone —, et ne télécharge donc plus
+   * les grandes photos pour remplir sa grille.
+   *
+   * Vide pour les pièces livrées avec le site : leurs photos ont déjà un
+   * aperçu à côté d'elles (voir lib/apercu).
+   */
+  thumbnails?: string[];
   variants: ProductVariantGroup[];
   /** null = stock non suivi (article réapprovisionné à la demande). */
   stock: number | null;

@@ -94,7 +94,17 @@ export interface VisitStats {
 export interface DataSource {
   mode: 'local' | 'supabase';
 
-  listProducts(): Promise<Product[]>;
+  /**
+   * Le catalogue.
+   *
+   * `completes` ramène les grandes photos : c'est ce qu'il faut à
+   * l'administration pour modifier une fiche. La boutique, elle, s'en
+   * passe — elle reçoit les aperçus, six fois plus légers, et va chercher
+   * la grande photo au moment où une fiche s'ouvre.
+   */
+  listProducts(options?: { completes?: boolean }): Promise<Product[]>;
+  /** Les grandes photos d'une seule fiche, à l'ouverture de celle-ci. */
+  getProductImages(productId: string): Promise<string[]>;
   saveProduct(product: Product): Promise<Product>;
   deleteProduct(id: string): Promise<void>;
 

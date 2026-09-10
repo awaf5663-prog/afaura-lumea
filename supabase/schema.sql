@@ -167,6 +167,14 @@ alter table settings add column if not exists next_grouping_opening timestamptz;
 -- Liens de paiement Wave et Orange Money : la cliente touche un bouton et son
 -- application s'ouvre avec le compte de la boutique déjà rempli. Vides, le
 -- site revient au numéro à recopier.
+-- Aperçus légers des photos : ce que la boutique affiche dans sa grille.
+-- `images_count` est calculée par la base ; elle permet de savoir qu'une fiche
+-- a des photos sans avoir à les télécharger.
+alter table products add column if not exists thumbnails jsonb not null default '[]'::jsonb;
+alter table products add column if not exists images_count integer
+  generated always as (
+    case when jsonb_typeof(images) = 'array' then jsonb_array_length(images) else 0 end
+  ) stored;
 alter table settings add column if not exists wave_link text default '';
 alter table settings add column if not exists orange_money_link text default '';
 

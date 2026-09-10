@@ -1,4 +1,4 @@
-import { Crop, ImagePlus, Pencil, Plus, Trash2, X } from 'lucide-react';
+import { Crop, ImagePlus, Images, Pencil, Plus, Trash2, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Badge } from '@/src/components/ui/Badge';
 import { Button } from '@/src/components/ui/Button';
@@ -24,7 +24,7 @@ const MESURES_ABAYA = [
 import { CATEGORIES } from '@/src/data/seed';
 import { useToast } from '@/src/hooks/useToast';
 import { formatFcfa } from '@/src/lib/format';
-import { compressImage, rognerCapture } from '@/src/lib/image';
+import { apercusDePhotos, compressImage, rognerCapture } from '@/src/lib/image';
 import { uid } from '@/src/lib/orderNumber';
 import { findPhotoGroup, photoOptionsOf } from '@/src/lib/variants';
 import { ecrireVariantes, lireVariantes } from '@/src/lib/variantText';
@@ -127,12 +127,20 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
 
     setSaving(true);
     try {
+      /*
+       * Les aperçus sont recalculés à chaque enregistrement, à partir des
+       * photos telles qu'elles sont à cet instant. C'est plus simple —
+       * et surtout plus sûr — que de les suivre à chaque ajout, retrait ou
+       * recadrage : ils ne peuvent pas se désaligner des photos.
+       */
+      const thumbnails = await apercusDePhotos(editing.images);
       await db.saveProduct({
         ...editing,
         name: editing.name.trim(),
         slug: editing.slug.trim() || slugify(editing.name),
         variants,
         optionPrices,
+        thumbnails,
       });
       await reload();
       setEditing(null);
@@ -192,6 +200,48 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
     }
   };
 
+  /*
+   * ─────────────────────────────────────────────────────────────
+   *  RATTRAPAGE DES APERÇUS
+   * ─────────────────────────────────────────────────────────────
+   *  Les fiches enregistrées avant cette mise à jour n'ont que leur
+   *  grande photo. Tant qu'un aperçu leur manque, la boutique doit aller
+   *  chercher la photo entière pour remplir sa vignette : 300 Ko au lieu
+   *  de 40.
+   *
+   *  Ce bouton les reprend une par une, sans rien re-téléverser : la
+   *  photo est déjà là, elle est simplement réduite puis enregistrée à
+   *  côté. À faire une fois ; ensuite chaque enregistrement s'en occupe.
+   */
+  const sansApercu = products.filter(
+    (p) =>
+      p.images.some((src) => src.startsWith('data:')) &&
+      (p.thumbnails ?? []).length !== p.images.length,
+  );
+  const [rattrapage, setRattrapage] = useState<{ fait: number; total: number } | null>(null);
+  const genererLesApercus = async () => {
+    if (sansApercu.length === 0) return;
+    setRattrapage({ fait: 0, total: sansApercu.length });
+    let echecs = 0;
+    for (const [index, produit] of sansApercu.entries()) {
+      try {
+        const thumbnails = await apercusDePhotos(produit.images);
+        await db.saveProduct({ ...produit, thumbnails });
+      } catch {
+        echecs += 1;
+      }
+      setRattrapage({ fait: index + 1, total: sansApercu.length });
+    }
+    await reload();
+    setRattrapage(null);
+    notify(
+      echecs === 0
+        ? `${sansApercu.length} fiche${sansApercu.length > 1 ? 's' : ''} allégée${sansApercu.length > 1 ? 's' : ''}.`
+        : `${sansApercu.length - echecs} sur ${sansApercu.length} — ${echecs} n'ont pas abouti.`,
+      echecs === 0 ? undefined : 'error',
+    );
+  };
+
   return (
     <div>
       <div className="flex items-center justify-between gap-4">
@@ -200,6 +250,31 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
           Ajouter
         </Button>
       </div>
+
+      {sansApercu.length > 0 && (
+        <div className="mt-5 rounded-[--radius-md] border border-line bg-cream/60 p-4">
+          <p className="text-[13.5px] font-medium">
+            {sansApercu.length} fiche{sansApercu.length > 1 ? 's' : ''} ralentissent la boutique
+          </p>
+          <p className="mt-1 text-[12.5px] leading-relaxed text-stone">
+            Leurs photos sont envoyées en taille réelle pour remplir une vignette de 167 px. En
+            générant leurs aperçus, la boutique n'en télécharge plus qu'un dixième — et rien n'est
+            perdu : la grande photo reste sur la fiche.
+          </p>
+          <Button
+            size="sm"
+            variant="secondary"
+            className="mt-3"
+            icon={<Images className="size-4" />}
+            disabled={rattrapage !== null}
+            onClick={() => void genererLesApercus()}
+          >
+            {rattrapage
+              ? `Génération… ${rattrapage.fait} / ${rattrapage.total}`
+              : 'Générer les aperçus'}
+          </Button>
+        </div>
+      )}
 
       <ul className="mt-6 divide-y divide-line rounded-[--radius-lg] border border-line bg-white">
         {products.map((product) => (

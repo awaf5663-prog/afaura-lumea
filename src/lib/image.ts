@@ -91,6 +91,48 @@ export async function rognerCapture(src: string, maxSize = 720, quality = 0.72):
   }
 }
 
+/**
+ * ─────────────────────────────────────────────────────────────
+ *  APERÇUS DES PHOTOS TÉLÉVERSÉES
+ * ─────────────────────────────────────────────────────────────
+ *  Une photo de fiche pèse entre 170 et 300 Ko ; à 480 px, elle en pèse
+ *  26 à 47. C'est cet aperçu que la boutique affiche dans sa grille —
+ *  une vignette fait 167 px de large sur un téléphone.
+ *
+ *  Le tableau rendu suit exactement celui reçu, place pour place : la
+ *  troisième photo a le troisième aperçu. Ce qui ne vient pas d'un
+ *  téléversement — une photo livrée avec le site, un repère « seed:… » —
+ *  est rendu tel quel : ces photos-là ont déjà leur aperçu à côté
+ *  d'elles (voir lib/apercu), et l'alignement est préservé.
+ */
+export async function apercusDePhotos(
+  images: string[],
+  maxSize = 480,
+  quality = 0.68,
+): Promise<string[]> {
+  return Promise.all(
+    images.map(async (src) => {
+      if (!src.startsWith('data:')) return src;
+      try {
+        const image = await charger(src);
+        // Déjà petite : la réduire à nouveau ne ferait que la salir.
+        if (Math.max(image.width, image.height) <= maxSize) return src;
+        const canvas = document.createElement('canvas');
+        const echelle = maxSize / Math.max(image.width, image.height);
+        canvas.width = Math.max(1, Math.round(image.width * echelle));
+        canvas.height = Math.max(1, Math.round(image.height * echelle));
+        const context = canvas.getContext('2d');
+        if (!context) return src;
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
+        return canvas.toDataURL('image/jpeg', quality);
+      } catch {
+        // Image illisible : mieux vaut la grande photo qu'une case vide.
+        return src;
+      }
+    }),
+  );
+}
+
 /* ─────────────────────────────────────────────────────────────
    Bandes d'une capture d'écran
    ───────────────────────────────────────────────────────────── */
@@ -226,14 +268,10 @@ export function toStoredImages(
     .filter((src): src is string => src !== null);
 }
 
-/** Ce qui revient de la base : repères retraduits, adresses mortes écartées. */
-export function fromStoredImages(
-  stored: unknown,
-  productId: string,
-  seed: string[] | undefined,
-): string[] {
+/** Traduction commune : repères résolus, adresses mortes écartées. */
+function resoudre(stored: unknown, productId: string, seed: string[] | undefined): string[] {
   const liste = Array.isArray(stored) ? (stored as string[]) : [];
-  const resolues = liste
+  return liste
     .map((src) => {
       if (typeof src !== 'string') return null;
       if (isUploadedImage(src)) return src;
@@ -242,8 +280,33 @@ export function fromStoredImages(
       return null;
     })
     .filter((src): src is string => Boolean(src));
+}
 
+/** Ce qui revient de la base : repères retraduits, adresses mortes écartées. */
+export function fromStoredImages(
+  stored: unknown,
+  productId: string,
+  seed: string[] | undefined,
+): string[] {
+  const resolues = resoudre(stored, productId, seed);
   // Aucune photo exploitable : on reprend celles livrées avec le site plutôt
   // que d'afficher une fiche vide.
   return resolues.length ? resolues : (seed ?? []);
+}
+
+/**
+ * Les aperçus, eux, ne se replient PAS sur les photos du site.
+ *
+ * Une fiche dont la boutique a téléversé ses propres photos n'a rien à voir
+ * avec la pièce livrée sous le même identifiant : lui prêter les photos du
+ * site afficherait une autre pièce que celle qu'on vend. Sans aperçu, on
+ * renvoie donc une liste vide — la boutique ira chercher la vraie photo,
+ * et l'administration saura qu'il reste un aperçu à générer.
+ */
+export function fromStoredThumbnails(
+  stored: unknown,
+  productId: string,
+  seed: string[] | undefined,
+): string[] {
+  return resoudre(stored, productId, seed);
 }

@@ -26,6 +26,12 @@ export function ProductCard({ product, priority }: { product: Product; priority?
   /** Nombre de modèles proposés, quand la fiche en regroupe plusieurs. */
   const choiceCount = product.variants[0]?.options.length ?? 0;
   const carre = cadragePhoto(product) === 'carre';
+  /*
+   * La vignette prend l'aperçu quand il existe : 40 Ko au lieu de 300, pour
+   * une case de 167 px de large. `apercuDe` fait le même travail pour les
+   * photos livrées avec le site.
+   */
+  const vignette = apercuDe(product.thumbnails?.[0] ?? product.images[0]);
   // « dès 550 FCFA » quand le prix dépend du conditionnement choisi.
   const aPlusieursPrix = plusieursPrix(product);
   // Tailles ou couleurs visibles sans ouvrir la fiche.
@@ -48,10 +54,10 @@ export function ProductCard({ product, priority }: { product: Product; priority?
             carre ? 'isolate aspect-square bg-rosecreme' : 'aspect-[3/4] bg-cream',
           )}
         >
-          {product.images[0] ? (
+          {vignette ? (
             <img
               /* Une vignette n'a pas besoin de la grande photo. Voir lib/apercu. */
-              src={apercuDe(product.images[0])}
+              src={vignette}
               alt={product.name}
               loading={priority ? 'eager' : 'lazy'}
               decoding="async"

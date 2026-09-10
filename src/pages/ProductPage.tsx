@@ -27,6 +27,7 @@ import { Link, useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 import { findPhotoGroup, photoOfOption, photoOptionsOf } from '@/src/lib/variants';
 import { buildProductMessage } from '@/src/lib/whatsapp';
+import { db } from '@/src/services';
 
 export function ProductPage({ slug }: { slug: string }) {
   const { products, loading } = useProducts();
@@ -37,6 +38,42 @@ export function ProductPage({ slug }: { slug: string }) {
 
   const product = products.find((p) => p.slug === slug || p.id === slug);
   const favori = product ? estFavori(product.id) : false;
+
+  /*
+   * ─────────────────────────────────────────────────────────────
+   *  LA GRANDE PHOTO ARRIVE ICI, ET NULLE PART AILLEURS
+   * ─────────────────────────────────────────────────────────────
+   *  La boutique ne télécharge que les aperçus : c'est ce qui lui permet
+   *  d'afficher sa grille tout de suite. La fiche, elle, est le seul
+   *  endroit où l'on regarde vraiment un tissu — elle demande donc les
+   *  vraies photos à l'ouverture.
+   *
+   *  L'aperçu reste affiché pendant ce temps : jamais de case vide, et la
+   *  photo se précise en place quelques instants plus tard.
+   */
+  const [grandesPhotos, setGrandesPhotos] = useState<string[] | null>(null);
+  const idProduit = product?.id;
+  const manqueLesPhotos = Boolean(product && product.images.length === 0 && product.thumbnails?.length);
+  useEffect(() => {
+    if (!idProduit || !manqueLesPhotos) return;
+    let vivant = true;
+    void db
+      .getProductImages(idProduit)
+      .then((photos) => {
+        if (vivant && photos.length > 0) setGrandesPhotos(photos);
+      })
+      .catch(() => {
+        // Tant pis : l'aperçu reste à l'écran, ce qui vaut mieux qu'une erreur.
+      });
+    return () => {
+      vivant = false;
+      setGrandesPhotos(null);
+    };
+  }, [idProduit, manqueLesPhotos]);
+
+  /** Ce que la galerie montre : les vraies photos dès qu'elles sont là. */
+  const photos =
+    grandesPhotos ?? (product ? (product.images.length ? product.images : product.thumbnails ?? []) : []);
 
   const [options, setOptions] = useState<Record<string, string>>({});
   const [colorWish, setColorWish] = useState('');
@@ -200,7 +237,7 @@ export function ProductPage({ slug }: { slug: string }) {
 
       <div className="mt-4 grid gap-8 lg:grid-cols-2 lg:gap-14">
         <Gallery
-          images={product.images}
+          images={photos}
           alt={product.name}
           labels={photoGroup && photoOptionsOf(photoGroup)}
           activeIndex={photoIndex}

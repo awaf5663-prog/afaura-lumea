@@ -2548,3 +2548,38 @@ alter table settings add column if not exists orange_money_link text default '';
 select coalesce(wave_link, '') as lien_wave,
        coalesce(orange_money_link, '') as lien_orange_money
   from settings where id = 1;
+
+-- ── 29. Aperçus des photos : la boutique cesse de tout télécharger ───
+--
+-- Les photos téléversées depuis l'administration sont enregistrées dans la
+-- ligne du produit, en clair. Une seule pèse entre 170 et 300 Ko : trente
+-- articles, et la grille de la boutique attendait plusieurs mégaoctets avant
+-- d'afficher sa première vignette. C'est ce qui la faisait traîner.
+--
+-- `thumbnails` accueille un aperçu de 480 px par photo — 26 à 47 Ko. La
+-- boutique ne demande plus que ceux-là ; la grande photo n'est téléchargée
+-- qu'à l'ouverture d'une fiche, là où on regarde vraiment un tissu.
+--
+-- `images_count` est calculée par la base elle-même : elle dit combien de
+-- photos porte une fiche, sans avoir à les envoyer. Le site s'en sert pour
+-- repérer les fiches pas encore pourvues d'aperçu et n'aller chercher que
+-- celles-là.
+--
+-- APRÈS CETTE ÉTAPE : ouvrir /admin → Produits et cliquer sur
+-- « Générer les aperçus ». Les fiches déjà en ligne sont reprises une par
+-- une, sans rien re-téléverser. Tant que ce n'est pas fait, la boutique
+-- fonctionne exactement comme avant — simplement sans le gain de vitesse.
+
+alter table products add column if not exists thumbnails jsonb not null default '[]'::jsonb;
+
+alter table products add column if not exists images_count integer
+  generated always as (
+    case when jsonb_typeof(images) = 'array' then jsonb_array_length(images) else 0 end
+  ) stored;
+
+-- Vérification : combien de fiches portent des photos, et combien ont déjà
+-- leurs aperçus. La seconde colonne doit rejoindre la première après le
+-- passage du bouton « Générer les aperçus ».
+select count(*) filter (where images_count > 0)              as fiches_avec_photos,
+       count(*) filter (where jsonb_array_length(thumbnails) > 0) as fiches_avec_apercus
+  from products;

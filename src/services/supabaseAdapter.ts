@@ -9,7 +9,7 @@ import {
 import { DEFAULT_PROMOTIONS } from '@/src/config/pricing';
 import { SEED_IMAGES } from '@/src/data/seed';
 import { normalizePhone } from '@/src/lib/format';
-import { fromStoredImages, toStoredImages } from '@/src/lib/image';
+import { fromStoredImages, fromStoredThumbnails, toStoredImages } from '@/src/lib/image';
 import type { Grouping, Order, Product, SheinRequest, StoreSettings } from '@/src/types';
 import { normalizeAlertThresholds, normalizePricing, normalizePromotions } from './settingsShape';
 import type {
@@ -221,6 +221,16 @@ const toProduct = (r: Row): Product => ({
   // Les repères « seed:… » sont retraduits, les photos de la boutique gardées,
   // et les adresses d'anciennes publications écartées. Voir lib/image.
   images: fromStoredImages(r.images, r.id, SEED_IMAGES[r.id]),
+  /*
+   * Aperçus légers : ce que la boutique affiche dans sa grille. Ils suivent
+   * exactement les photos, place pour place, et passent par les mêmes
+   * repères — une pièce livrée avec le site garde ainsi son propre aperçu
+   * (voir lib/apercu) au lieu d'en stocker un second en base.
+   *
+   * Colonne absente avant la mise à jour SQL : la vignette retombe alors
+   * sur la grande photo, comme avant.
+   */
+  thumbnails: fromStoredThumbnails(r.thumbnails, r.id, SEED_IMAGES[r.id]),
   variants: r.variants ?? [],
   stock: r.stock,
   status: r.status,
@@ -250,6 +260,8 @@ const fromProduct = (p: Product): Row => ({
   // On n'enregistre jamais l'adresse d'une photo livrée avec le site : elle
   // change à chaque publication, et les fiches se retrouveraient sans photo.
   images: toStoredImages(p.images, p.id, SEED_IMAGES[p.id]),
+  // Mêmes repères que les photos : voir toStoredImages.
+  thumbnails: toStoredImages(p.thumbnails ?? [], p.id, SEED_IMAGES[p.id]),
   variants: p.variants,
   stock: p.stock,
   status: p.status,
@@ -289,6 +301,18 @@ const paiementLabel = (id: string, stocke?: string): string =>
 interface ColonneRecente {
   colonne: string;
   etiquette: string;
+}
+
+/**
+ * La base a-t-elle refusé la requête parce qu'une de ces colonnes n'existe
+ * pas encore ? PostgREST répond alors « 400 … column products.x does not
+ * exist ». Tout le reste — réseau coupé, base muette — n'est pas de cet
+ * ordre et doit remonter tel quel.
+ */
+function colonneAbsente(erreur: unknown, ...colonnes: string[]): boolean {
+  const message = (erreur instanceof Error ? erreur.message : String(erreur)).toLowerCase();
+  if (!message.includes('does not exist') && !message.includes('42703')) return false;
+  return colonnes.some((c) => message.includes(c));
 }
 
 const aDuContenu = (valeur: unknown): boolean =>
@@ -471,46 +495,115 @@ const SHEIN_SELECT = '*,shein_items(*)';
 export const supabaseAdapter: DataSource = {
   mode: 'supabase',
 
-  async listProducts() {
+  async listProducts(options) {
     /*
-     * On nomme les colonnes plutôt que de demander « tout ».
+     * ─────────────────────────────────────────────────────────────
+     *  LA BOUTIQUE NE TÉLÉCHARGE PLUS LES GRANDES PHOTOS
+     * ─────────────────────────────────────────────────────────────
+     *  Les photos téléversées depuis l'administration sont enregistrées
+     *  dans la ligne du produit, en clair. Une seule pèse entre 170 et
+     *  300 Ko : trente articles, et la grille de la boutique attendait
+     *  plusieurs mégaoctets avant d'afficher sa première vignette.
      *
-     * `select=*` ramenait aussi celles que la boutique n'affiche jamais, et
-     * surtout : les photos téléversées depuis l'administration sont enregistrées
-     * dans la ligne elle-même, en clair. Chaque ouverture de la boutique
-     * retéléchargeait donc l'intégralité de ces photos à l'intérieur du JSON,
-     * avant qu'un seul article ne s'affiche.
+     *  On demande donc les aperçus (26 à 47 Ko) et pas les photos. La
+     *  grande arrive plus tard, à l'ouverture d'une fiche seulement —
+     *  voir getProductImages.
      *
-     * La liste ci-dessous est exactement ce que `toProduct` consomme. Une
-     * colonne ajoutée plus tard devra être ajoutée ici aussi — sinon elle
-     * arrivera vide, et la fiche le montrera tout de suite.
+     *  `completes` : l'administration, elle, a besoin des vraies photos
+     *  pour modifier une fiche. Elle les demande explicitement.
+     *
+     *  La liste ci-dessous est exactement ce que `toProduct` consomme. Une
+     *  colonne ajoutée plus tard devra être ajoutée ici aussi — sinon elle
+     *  arrivera vide, et la fiche le montrera tout de suite.
      */
-    const rows = await rest<Row[]>(
-      'products?select=' +
-        [
-          'id',
-          'slug',
-          'name',
-          'description',
-          'price',
-          'compare_at_price',
-          'category',
-          'images',
-          'variants',
-          'option_prices',
-          'stock',
-          'status',
-          'is_new',
-          'is_popular',
-          'other_colors_available',
-          'ready_to_ship',
-          'color_chart_id',
-          'measurements',
-          'created_at',
-        ].join(',') +
-        '&order=created_at.desc',
+    const communes = [
+      'id',
+      'slug',
+      'name',
+      'description',
+      'price',
+      'compare_at_price',
+      'category',
+      'variants',
+      'option_prices',
+      'stock',
+      'status',
+      'is_new',
+      'is_popular',
+      'other_colors_available',
+      'ready_to_ship',
+      'color_chart_id',
+      'measurements',
+      'created_at',
+    ];
+    const demander = (colonnes: string[]) =>
+      rest<Row[]>(
+        'products?select=' + colonnes.join(',') + '&order=created_at.desc',
+      );
+
+    if (options?.completes) return (await demander([...communes, 'images', 'thumbnails'])).map(toProduct);
+
+    let rows: Row[];
+    try {
+      rows = await demander([...communes, 'thumbnails', 'images_count']);
+    } catch (erreur) {
+      /*
+       * Colonnes absentes tant que la mise à jour SQL n'est pas passée :
+       * PostgREST refuse alors la requête entière. On retombe sur
+       * l'ancienne façon de faire — plus lourde, mais la boutique
+       * s'affiche, ce qui compte davantage.
+       *
+       * Une panne de réseau, en revanche, se propage telle quelle : la
+       * réessayer avec d'autres colonnes ne la réparerait pas et ne ferait
+       * que doubler l'attente avant que la cliente soit prévenue.
+       */
+      if (!colonneAbsente(erreur, 'thumbnails', 'images_count')) throw erreur;
+      return (await demander([...communes, 'images'])).map(toProduct);
+    }
+
+    /*
+     * Une fiche qui n'a pas encore d'aperçu (photo téléversée avant cette
+     * mise à jour) n'aurait aucune image à montrer. On va chercher les
+     * siennes, et elles seules. Le bouton « Générer les aperçus » de
+     * l'administration fait disparaître ce rattrapage pour de bon.
+     */
+    const aCompleter = rows.filter(
+      (r) =>
+        (r.images_count ?? 0) > 0 && !(Array.isArray(r.thumbnails) && r.thumbnails.length > 0),
     );
-    return rows.map(toProduct);
+    if (aCompleter.length > 0) {
+      const ids = aCompleter.map((r) => encodeURIComponent(String(r.id))).join(',');
+      const photos = await rest<Row[]>(`products?select=id,images&id=in.(${ids})`);
+      const parId = new Map(photos.map((p) => [p.id, p.images]));
+      for (const r of aCompleter) r.images = parId.get(r.id) ?? [];
+    }
+
+    return rows.map((r) => {
+      const produit = toProduct(r);
+      /*
+       * Cette fiche a des photos, mais on ne les a pas demandées : elle a
+       * déjà ses aperçus. Il ne faut surtout PAS lui prêter les photos
+       * livrées avec le site — ce serait montrer une autre pièce que celle
+       * que la boutique vend. On laisse la liste vide : la fiche ira
+       * chercher les vraies à son ouverture.
+       */
+      const allegee = r.images === undefined && (r.images_count ?? 0) > 0;
+      return allegee ? { ...produit, images: [] } : produit;
+    });
+  },
+
+  /*
+   * Les grandes photos d'une fiche, demandées quand la cliente l'ouvre.
+   *
+   * C'est le seul moment où ces centaines de kilo-octets ont une raison de
+   * traverser le réseau : on regarde vraiment un tissu.
+   */
+  async getProductImages(productId) {
+    const rows = await rest<Row[]>(
+      `products?select=id,images&id=eq.${encodeURIComponent(productId)}&limit=1`,
+    );
+    const row = rows[0];
+    return row ? fromStoredImages(row.images, String(row.id), SEED_IMAGES[String(row.id)]) : [];
   },
 
   async saveProduct(product) {
@@ -532,6 +625,7 @@ export const supabaseAdapter: DataSource = {
       { colonne: 'measurements', etiquette: 'les mesures de la pièce' },
       { colonne: 'option_prices', etiquette: 'les prix par option' },
       { colonne: 'ready_to_ship', etiquette: 'la disponibilité immédiate' },
+      { colonne: 'thumbnails', etiquette: 'les aperçus des photos' },
     ]);
     return toProduct(rows[0]);
   },

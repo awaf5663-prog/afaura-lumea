@@ -50,8 +50,13 @@ function pickImage(product: Product, options: Record<string, string>): string {
   if (group) {
     const index = photoOfOption(group, options[group.name] ?? '');
     if (index >= 0 && product.images[index]) return product.images[index];
+    if (index >= 0 && product.thumbnails?.[index]) return product.thumbnails[index];
   }
-  return product.images[0] ?? '';
+  /*
+   * L'aperçu plutôt que la grande photo : la ligne du panier fait 64 px, et
+   * ce qu'on écrit là reste dans le navigateur de la cliente.
+   */
+  return product.images[0] ?? product.thumbnails?.[0] ?? '';
 }
 
 export function CartProvider({ children }: { children: ReactNode }) {

@@ -95,6 +95,15 @@ export const localAdapter: DataSource = {
     );
   },
 
+  /*
+   * En local, tout est déjà dans le navigateur : la grande photo n'a
+   * jamais à traverser le réseau. On la rend telle quelle.
+   */
+  async getProductImages(productId) {
+    const p = loadProducts().find((item) => item.id === productId);
+    return p ? fromStoredImages(p.images, p.id, SEED_IMAGES[p.id]) : [];
+  },
+
   async saveProduct(product) {
     const products = loadProducts();
     // L'adresse d'une photo livrée avec le site change à chaque publication :

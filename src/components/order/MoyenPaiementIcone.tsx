@@ -1,58 +1,48 @@
 import { Banknote } from 'lucide-react';
+import orangeMoney from '@/src/assets/paiement/orange-money.webp';
+import wave from '@/src/assets/paiement/wave.webp';
 import { cn } from '@/src/lib/cn';
 
 /**
  * ─────────────────────────────────────────────────────────────
- *  PASTILLES DES MOYENS DE PAIEMENT
+ *  LOGOS DES MOYENS DE PAIEMENT
  * ─────────────────────────────────────────────────────────────
- *  Une cliente repère Wave et Orange Money à leur couleur avant de lire
- *  leur nom. La pastille sert exactement à ça : reconnaître le moyen de
- *  paiement d'un coup d'œil, dans la liste comme sur la confirmation.
+ *  Une cliente reconnaît Wave et Orange Money à leur logo avant de lire
+ *  leur nom. Ce sont les vrais visuels, fournis par la boutique, utilisés
+ *  pour ce qu'ils sont : indiquer par quel service on règle.
  *
- *  Ce ne sont PAS les logos officiels de Wave ni d'Orange — ces marques
- *  ne nous appartiennent pas et leurs fichiers ne sont pas dans le
- *  dépôt. Ce sont des repères dessinés à la main, aux couleurs de
- *  chaque service. Le jour où la boutique obtient les vrais visuels,
- *  ils remplacent ces tracés sans rien changer ailleurs.
+ *  Pour en changer : remplacer le fichier dans src/assets/paiement.
  */
+const LOGOS: Record<string, { src: string; nom: string }> = {
+  wave: { src: wave, nom: 'Wave' },
+  orange_money: { src: orangeMoney, nom: 'Orange Money' },
+};
+
 export function MoyenPaiementIcone({ id, className }: { id: string; className?: string }) {
-  const base = cn('grid size-9 shrink-0 place-items-center rounded-[10px]', className);
+  const logo = LOGOS[id];
 
-  if (id === 'wave') {
+  if (logo) {
     return (
-      <span className={cn(base, 'bg-[#1dc4f2]')} aria-hidden="true">
-        {/* Une vague : deux ondulations blanches sur le bleu de Wave. */}
-        <svg viewBox="0 0 24 24" className="size-[22px]" fill="none">
-          <path
-            d="M2 9c2.2-3 4.4-3 6.6 0s4.4 3 6.6 0 4.4-3 6.6 0"
-            stroke="#fff"
-            strokeWidth="2.1"
-            strokeLinecap="round"
-          />
-          <path
-            d="M2 15c2.2-3 4.4-3 6.6 0s4.4 3 6.6 0 4.4-3 6.6 0"
-            stroke="#fff"
-            strokeWidth="2.1"
-            strokeLinecap="round"
-            opacity="0.75"
-          />
-        </svg>
-      </span>
-    );
-  }
-
-  if (id === 'orange_money') {
-    return (
-      <span className={cn(base, 'bg-[#ff7900]')} aria-hidden="true">
-        {/* Le carré orange, marque de fabrique de l'opérateur, et ses initiales. */}
-        <span className="text-[12px] font-bold leading-none tracking-tight text-white">OM</span>
-      </span>
+      <img
+        src={logo.src}
+        // Le nom du moyen de paiement est déjà écrit juste à côté : le
+        // répéter ferait dire deux fois la même chose à un lecteur d'écran.
+        alt=""
+        width={36}
+        height={36}
+        loading="lazy"
+        decoding="async"
+        className={cn('size-9 shrink-0 rounded-[10px] object-cover', className)}
+      />
     );
   }
 
   // Paiement à la livraison : des billets, rien de plus.
   return (
-    <span className={cn(base, 'bg-cream text-graphite')} aria-hidden="true">
+    <span
+      className={cn('grid size-9 shrink-0 place-items-center rounded-[10px] bg-cream text-graphite', className)}
+      aria-hidden="true"
+    >
       <Banknote className="size-[19px]" strokeWidth={1.7} />
     </span>
   );

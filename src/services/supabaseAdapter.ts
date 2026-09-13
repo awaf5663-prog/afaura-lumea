@@ -36,8 +36,16 @@ import type {
  *  - lecture/écriture de l'espace admin réservée aux utilisateurs authentifiés.
  */
 
-const URL_BASE = import.meta.env.VITE_SUPABASE_URL ?? '';
-const ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY ?? '';
+/*
+ * `?? ''` ne suffit pas : une variable d'environnement DÉFINIE mais vide —
+ * ce qui arrive vite dans un tableau de bord d'hébergement — passerait comme
+ * une valeur. On coupe les espaces et on traite le vide comme une absence.
+ */
+const lireEnv = (valeur: unknown): string =>
+  typeof valeur === 'string' ? valeur.trim() : '';
+
+const URL_BASE = lireEnv(import.meta.env.VITE_SUPABASE_URL);
+const ANON_KEY = lireEnv(import.meta.env.VITE_SUPABASE_ANON_KEY);
 const TOKEN_KEY = 'lumea.sb.token';
 
 export function isSupabaseConfigured(): boolean {
@@ -74,13 +82,76 @@ export function hasSupabaseSession(): boolean {
   return accessToken() !== null;
 }
 
+/**
+ * ─────────────────────────────────────────────────────────────
+ *  POURQUOI LA CONNEXION EST REFUSÉE
+ * ─────────────────────────────────────────────────────────────
+ *  « Identifiants refusés » était la seule réponse possible, quelle que
+ *  soit la cause. Or trois choses très différentes produisent le même
+ *  refus, et elles ne se réparent pas au même endroit :
+ *
+ *    · le mot de passe est faux            → se corrige ici ;
+ *    · la clé publique n'est plus acceptée → se corrige chez l'hébergeur ;
+ *    · le projet est en pause ou muet      → se corrige chez Supabase.
+ *
+ *  Les deux dernières n'ont rien à voir avec ce qu'on tape dans le
+ *  formulaire : laisser croire à un mauvais mot de passe fait ressaisir
+ *  dix fois le bon. On nomme donc la vraie cause.
+ */
+function diagnostic(statut: number, corps: string): string {
+  const texte = corps.toLowerCase();
+
+  if (/invalid api key|no api key|api key found|legacy api keys|jwt/i.test(texte)) {
+    return (
+      "La clé publique du site n'est plus acceptée par le projet Supabase. " +
+      'Reprenez la clé « publishable » (Settings → API), remettez-la dans les ' +
+      "variables de l'hébergeur, puis republiez. Jamais la clé « service_role »."
+    );
+  }
+  if (/paused|project is (not )?(active|paused)|inactive/i.test(texte) || statut === 503 || statut === 502) {
+    return (
+      'Le projet Supabase ne répond pas : il est probablement en pause. ' +
+      'Ouvrez supabase.com → votre projet, et relancez-le (« Restore » ou ' +
+      '« Resume »). Un projet mis en pause coupe la boutique ET cette connexion.'
+    );
+  }
+  if (statut === 404) {
+    return (
+      "L'adresse du projet Supabase ne mène à rien. Vérifiez VITE_SUPABASE_URL " +
+      "chez l'hébergeur : elle doit désigner le projet de la boutique."
+    );
+  }
+  if (/email not confirmed/i.test(texte)) {
+    return "Ce compte n'a pas confirmé son e-mail. Confirmez-le depuis Supabase → Authentication → Users.";
+  }
+  if (statut === 429) {
+    return 'Trop de tentatives de suite. Patientez une minute, puis réessayez.';
+  }
+  if (/invalid login credentials|invalid_grant|invalid_credentials/i.test(texte)) {
+    return 'E-mail ou mot de passe incorrect.';
+  }
+  return `La base a refusé la connexion (erreur ${statut}). ${corps.slice(0, 160)}`;
+}
+
 export async function supabaseSignIn(email: string, password: string): Promise<void> {
-  const res = await fetch(`${URL_BASE}/auth/v1/token?grant_type=password`, {
-    method: 'POST',
-    headers: { apikey: ANON_KEY, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
-  });
-  if (!res.ok) throw new Error('Identifiants refusés.');
+  let res: Response;
+  try {
+    res = await fetch(`${URL_BASE}/auth/v1/token?grant_type=password`, {
+      method: 'POST',
+      headers: { apikey: ANON_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+  } catch (cause) {
+    throw new Error(
+      "Le site n'arrive pas à joindre le projet Supabase. Vérifiez votre " +
+        'connexion, et que le projet est bien actif (il peut avoir été mis en pause). ' +
+        `(${cause instanceof Error ? cause.message : String(cause)})`,
+    );
+  }
+  if (!res.ok) {
+    const corps = await res.text().catch(() => '');
+    throw new Error(diagnostic(res.status, corps));
+  }
   const data = (await res.json()) as { access_token?: string };
   // Sans jeton exploitable, se déclarer connectée ne servirait qu'à faire
   // échouer le premier enregistrement.
@@ -89,6 +160,32 @@ export async function supabaseSignIn(email: string, password: string): Promise<v
     throw new Error("La base n'a pas renvoyé de session utilisable. Réessayez.");
   }
   localStorage.setItem(TOKEN_KEY, token);
+}
+
+/**
+ * L'état du projet, vu depuis l'écran de connexion.
+ *
+ * Une lecture minuscule — une ligne de réglages, une colonne — qui répond à
+ * la seule question utile avant de taper un mot de passe : la base est-elle
+ * joignable, et accepte-t-elle encore la clé du site ? Rend `null` quand
+ * tout va bien, sinon la phrase à afficher.
+ */
+export async function verifierBase(): Promise<string | null> {
+  if (!isSupabaseConfigured()) return null;
+  let res: Response;
+  try {
+    res = await fetch(`${URL_BASE}/rest/v1/settings?select=id&limit=1`, {
+      headers: { apikey: ANON_KEY, Authorization: `Bearer ${ANON_KEY}` },
+    });
+  } catch (cause) {
+    return (
+      "Le site n'arrive pas à joindre le projet Supabase. Vérifiez votre connexion, " +
+      'et que le projet est bien actif — un projet mis en pause ne répond plus. ' +
+      `(${cause instanceof Error ? cause.message : String(cause)})`
+    );
+  }
+  if (res.ok) return null;
+  return diagnostic(res.status, await res.text().catch(() => ''));
 }
 
 export function supabaseSignOut(): void {

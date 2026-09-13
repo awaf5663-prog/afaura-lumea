@@ -14,13 +14,30 @@
 const env = import.meta.env;
 
 /**
+ * Lecture d'une variable d'environnement.
+ *
+ * `env.X ?? defaut` a un défaut discret et coûteux : il ne retient le
+ * repli que si la variable est ABSENTE. Une variable définie mais vide —
+ * ce qui arrive en deux clics dans le tableau de bord d'un hébergeur, ou
+ * en copiant un groupe de variables d'un autre projet — passait alors
+ * comme une vraie valeur, et le lien Instagram, le TikTok ou le numéro
+ * WhatsApp disparaissaient du site sans que rien ne l'explique.
+ *
+ * Ici, une valeur vide ou faite d'espaces vaut « non renseignée ».
+ */
+function reglage(valeur: unknown, defaut: string): string {
+  const texte = typeof valeur === 'string' ? valeur.trim() : '';
+  return texte === '' ? defaut : texte;
+}
+
+/**
  * Numéro WhatsApp au format international SANS "+" ni espaces. Ex : 221771234567
  *
  * C'est LA valeur qui permet de pré-remplir automatiquement les messages
  * (récapitulatif de commande, demande SHEIN). Sans elle, le site bascule sur
  * WHATSAPP_LINK ci-dessous et propose à la cliente de copier le message.
  */
-export const WHATSAPP_NUMBER: string = env.VITE_WHATSAPP_NUMBER ?? '221781071604';
+export const WHATSAPP_NUMBER: string = reglage(env.VITE_WHATSAPP_NUMBER, '221781071604');
 
 /**
  * Lien court WhatsApp Business (wa.me/message/XXXX) — solution de repli.
@@ -28,37 +45,41 @@ export const WHATSAPP_NUMBER: string = env.VITE_WHATSAPP_NUMBER ?? '221781071604
  * pré-rempli : ce format ne le prévoit pas. Le site copie alors le message
  * dans le presse-papier avant d'ouvrir WhatsApp.
  */
-export const WHATSAPP_LINK: string =
-  env.VITE_WHATSAPP_LINK ?? 'https://wa.me/message/A4C6VTCHWW4QH1';
+export const WHATSAPP_LINK: string = reglage(
+  env.VITE_WHATSAPP_LINK,
+  'https://wa.me/message/A4C6VTCHWW4QH1',
+);
 
 /** Date/heure de clôture du prochain groupage (ISO 8601). Vide = aucun groupage annoncé. */
-export const NEXT_GROUPING_DATE: string = env.VITE_NEXT_GROUPING_DATE ?? '';
+export const NEXT_GROUPING_DATE: string = reglage(env.VITE_NEXT_GROUPING_DATE, '');
 
 /** Numéros marchands pour le paiement mobile. Vides = instructions envoyées sur WhatsApp. */
-export const WAVE_NUMBER: string = env.VITE_WAVE_NUMBER ?? '221765614578';
-export const ORANGE_MONEY_NUMBER: string = env.VITE_ORANGE_MONEY_NUMBER ?? '221781071604';
+export const WAVE_NUMBER: string = reglage(env.VITE_WAVE_NUMBER, '221765614578');
+export const ORANGE_MONEY_NUMBER: string = reglage(env.VITE_ORANGE_MONEY_NUMBER, '221781071604');
 
 /** Adresse e-mail de contact (facultative). */
-export const CONTACT_EMAIL: string = env.VITE_CONTACT_EMAIL ?? '';
+export const CONTACT_EMAIL: string = reglage(env.VITE_CONTACT_EMAIL, '');
 
 /** Compte Instagram (sans @). Vide = le lien n'est pas affiché. */
-export const INSTAGRAM_HANDLE: string = env.VITE_INSTAGRAM_HANDLE ?? 'afau.ra';
+export const INSTAGRAM_HANDLE: string = reglage(env.VITE_INSTAGRAM_HANDLE, 'afau.ra');
 
 /**
  * Compte TikTok (sans @). Vide tant que la boutique ne l'a pas communiqué :
  * le lien n'apparaît pas, plutôt que de pointer vers un compte inventé.
  */
-export const TIKTOK_HANDLE: string = env.VITE_TIKTOK_HANDLE ?? 'mrs_shiinee';
+export const TIKTOK_HANDLE: string = reglage(env.VITE_TIKTOK_HANDLE, 'mrs_shiinee');
 
 /**
  * Tableau Pinterest de la boutique. Adresse complète : Pinterest ne se déduit
  * pas d'un identifiant comme Instagram ou TikTok.
  */
-export const PINTEREST_URL: string = env.VITE_PINTEREST_URL ?? 'https://pin.it/1PkUIqPuv';
+export const PINTEREST_URL: string = reglage(env.VITE_PINTEREST_URL, 'https://pin.it/1PkUIqPuv');
 
 /** URL publique du site, utilisée pour les balises SEO / Open Graph. */
-export const SITE_URL: string =
-  env.VITE_SITE_URL ?? (typeof window !== 'undefined' ? window.location.origin : '');
+export const SITE_URL: string = reglage(
+  env.VITE_SITE_URL,
+  typeof window !== 'undefined' ? window.location.origin : '',
+);
 
 export const BRAND = {
   name: 'Afaura Luméa',
@@ -157,4 +178,4 @@ export const PAYMENT_METHODS: PaymentMethod[] = [
 ];
 
 /** Passe d'accès à l'espace admin en mode local (voir README : sécurité réelle = Supabase Auth). */
-export const ADMIN_PASSCODE: string = env.VITE_ADMIN_PASSCODE ?? 'lumea-admin';
+export const ADMIN_PASSCODE: string = reglage(env.VITE_ADMIN_PASSCODE, 'lumea-admin');

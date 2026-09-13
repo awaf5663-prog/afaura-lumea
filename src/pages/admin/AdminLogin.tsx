@@ -1,9 +1,10 @@
-import { ArrowLeft, ShieldAlert } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowLeft, ShieldAlert, TriangleAlert } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { Button } from '@/src/components/ui/Button';
 import { ErrorText, FormRow, Input, Label } from '@/src/components/ui/Field';
 import { useAdminAuth } from '@/src/hooks/useAdminAuth';
 import { useRouter } from '@/src/lib/router';
+import { verifierBase } from '@/src/services/supabaseAdapter';
 
 export function AdminLogin() {
   const { signIn, mode } = useAdminAuth();
@@ -12,6 +13,30 @@ export function AdminLogin() {
   const [secret, setSecret] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  /*
+   * L'état du projet, vérifié avant même qu'on tape quoi que ce soit.
+   *
+   * Quand la base est en pause ou que sa clé a changé, le formulaire refuse
+   * la connexion quoi qu'on saisisse. Le dire ici évite de chercher un mot
+   * de passe qui n'a jamais été en cause.
+   */
+  const [panne, setPanne] = useState<string | null>(null);
+  useEffect(() => {
+    if (mode !== 'supabase') return;
+    let vivant = true;
+    void verifierBase().then(
+      (message) => {
+        if (vivant) setPanne(message);
+      },
+      () => {
+        /* la vérification elle-même a échoué : le formulaire le dira */
+      },
+    );
+    return () => {
+      vivant = false;
+    };
+  }, [mode]);
 
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -31,6 +56,20 @@ export function AdminLogin() {
       <form onSubmit={submit} className="w-full max-w-sm rounded-[--radius-lg] border border-line bg-white p-7">
         <p className="eyebrow">Espace administrateur</p>
         <h1 className="mt-2 text-[28px]">Connexion</h1>
+
+        {panne && (
+          <p className="mt-5 flex gap-2 rounded-[--radius-sm] bg-[#f6e9e9] px-4 py-3 text-[12.5px] leading-relaxed text-[#6d2626]">
+            <TriangleAlert className="mt-0.5 size-4 shrink-0" />
+            <span>
+              <strong className="font-medium">La base ne répond pas normalement.</strong>
+              <span className="mt-1 block">{panne}</span>
+              <span className="mt-1 block">
+                Tant que ce point n'est pas réglé, aucun mot de passe ne sera accepté — et la
+                boutique n'affiche ni les dates de groupage, ni les nouveautés.
+              </span>
+            </span>
+          </p>
+        )}
 
         {mode === 'supabase' ? (
           <>

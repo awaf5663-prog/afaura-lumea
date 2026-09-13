@@ -91,6 +91,28 @@ tout le monde sur les fonctions d'administration. Il peut être passé plusieurs
 La table `groupings` est en lecture publique (le compteur s'affiche sur le site) : elle ne contient
 que capacité et remplissage — jamais de donnée cliente, jamais de coût ni de marge.
 
+### Quand la base ne répond plus
+
+Les symptômes arrivent ensemble et ne se ressemblent pas : l'administration refuse la connexion,
+les dates de groupage disparaissent, les nouveautés ne remontent plus — pendant que la boutique,
+elle, continue de s'afficher (elle sert son dernier catalogue gardé en cache). C'est le signe que
+le site n'atteint plus son projet Supabase, pas qu'il est cassé.
+
+L'écran de connexion de `/admin` fait la vérification tout seul, avant même qu'on tape quoi que ce
+soit, et nomme la cause. Les trois qui reviennent :
+
+| Ce qui est arrivé | Où ça se répare |
+|---|---|
+| **Projet en pause.** L'offre gratuite de Supabase limite le nombre de projets actifs par organisation : en créer un autre peut mettre le premier en pause. | supabase.com → le projet → « Restore » / « Resume ». |
+| **Clé publique changée** (rotation, ou anciennes clés désactivées au profit des clés `publishable`). | Settings → API, copier la clé publique, la remettre dans les variables de l'hébergeur, republier. Jamais la clé `service_role`. |
+| **Compte admin absent** du projet visé (typiquement : l'adresse pointe vers un autre projet). | Authentication → Users, dans le projet de la boutique. |
+
+Une quatrième cause ne vient pas de Supabase du tout : **une variable d'environnement définie mais
+vide** chez l'hébergeur. `VITE_INSTAGRAM_HANDLE=""` fait disparaître le lien Instagram du pied de
+page sans aucune erreur. Le code traite désormais une valeur vide comme une absence (voir
+`reglage()` dans `src/config/site.ts`), donc le repli s'applique — mais une variable vide qui
+écrase une vraie valeur reste à supprimer chez l'hébergeur.
+
 ---
 
 ## Ce qui est volontairement honnête

@@ -171,6 +171,11 @@ alter table settings add column if not exists next_grouping_opening timestamptz;
 -- `images_count` est calculée par la base ; elle permet de savoir qu'une fiche
 -- a des photos sans avoir à les télécharger.
 alter table products add column if not exists thumbnails jsonb not null default '[]'::jsonb;
+-- Premier aperçu : la seule image dont la grille de la boutique a besoin.
+alter table products add column if not exists thumbnail jsonb
+  generated always as (
+    case when jsonb_typeof(thumbnails) = 'array' then thumbnails -> 0 else null end
+  ) stored;
 alter table products add column if not exists images_count integer
   generated always as (
     case when jsonb_typeof(images) = 'array' then jsonb_array_length(images) else 0 end

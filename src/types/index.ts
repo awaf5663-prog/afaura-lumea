@@ -50,8 +50,8 @@ export interface Product {
   /**
    * Aperçus légers des photos téléversées, dans le même ordre qu'`images`.
    *
-   * Une photo de fiche pèse entre 170 et 300 Ko ; son aperçu de 480 px en
-   * pèse 26 à 47. La boutique n'a besoin que des aperçus — une vignette
+   * Une photo de fiche pèse entre 170 et 300 Ko ; son aperçu de 420 px en
+   * pèse 30 à 34. La boutique n'a besoin que des aperçus — une vignette
    * fait 167 px de large sur un téléphone —, et ne télécharge donc plus
    * les grandes photos pour remplir sa grille.
    *

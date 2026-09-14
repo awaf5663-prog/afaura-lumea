@@ -95,9 +95,11 @@ export async function rognerCapture(src: string, maxSize = 720, quality = 0.72):
  * ─────────────────────────────────────────────────────────────
  *  APERÇUS DES PHOTOS TÉLÉVERSÉES
  * ─────────────────────────────────────────────────────────────
- *  Une photo de fiche pèse entre 170 et 300 Ko ; à 480 px, elle en pèse
- *  26 à 47. C'est cet aperçu que la boutique affiche dans sa grille —
- *  une vignette fait 167 px de large sur un téléphone.
+ *  Une photo de fiche pèse entre 170 et 300 Ko ; à 420 px, elle en pèse
+ *  30 à 34. C'est cet aperçu que la boutique affiche dans sa grille — une
+ *  vignette fait 167 px de large sur un téléphone, soit 334 px sur un écran
+ *  à double densité : 420 les couvre, et chaque kilo-octet économisé ici
+ *  est un kilo-octet que la base n'a pas à servir.
  *
  *  Le tableau rendu suit exactement celui reçu, place pour place : la
  *  troisième photo a le troisième aperçu. Ce qui ne vient pas d'un
@@ -107,8 +109,8 @@ export async function rognerCapture(src: string, maxSize = 720, quality = 0.72):
  */
 export async function apercusDePhotos(
   images: string[],
-  maxSize = 480,
-  quality = 0.68,
+  maxSize = 420,
+  quality = 0.62,
 ): Promise<string[]> {
   return Promise.all(
     images.map(async (src) => {

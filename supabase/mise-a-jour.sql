@@ -2556,7 +2556,7 @@ select coalesce(wave_link, '') as lien_wave,
 -- articles, et la grille de la boutique attendait plusieurs mégaoctets avant
 -- d'afficher sa première vignette. C'est ce qui la faisait traîner.
 --
--- `thumbnails` accueille un aperçu de 480 px par photo — 26 à 47 Ko. La
+-- `thumbnails` accueille un aperçu de 420 px par photo — 30 à 34 Ko. La
 -- boutique ne demande plus que ceux-là ; la grande photo n'est téléchargée
 -- qu'à l'ouverture d'une fiche, là où on regarde vraiment un tissu.
 --
@@ -2582,4 +2582,33 @@ alter table products add column if not exists images_count integer
 -- passage du bouton « Générer les aperçus ».
 select count(*) filter (where images_count > 0)              as fiches_avec_photos,
        count(*) filter (where jsonb_array_length(thumbnails) > 0) as fiches_avec_apercus
+  from products;
+
+-- ── 30. Une seule vignette par fiche pour la boutique ────────────────
+--
+-- Le quota mensuel de l'organisation Supabase a été épuisé, et tous les
+-- projets ont cessé de répondre : plus de boutique à jour, plus d'accès à
+-- l'administration. La cause : tout ce que la base servait à chaque page.
+--
+-- L'étape 29 a déjà remplacé les grandes photos par des aperçus. Mais une
+-- fiche qui a quatre photos envoyait ses quatre aperçus, alors que la grille
+-- n'en montre qu'un — le premier.
+--
+-- `thumbnail`, au singulier, est ce premier aperçu, calculé par la base à
+-- partir de `thumbnails`. C'est la seule image que la boutique demande
+-- désormais. Les autres ne voyagent plus que sur la fiche, à son ouverture,
+-- et en pleine qualité.
+--
+-- Rien à faire après cette étape : la colonne se remplit toute seule, et se
+-- met à jour quand les aperçus changent.
+
+alter table products add column if not exists thumbnail jsonb
+  generated always as (
+    case when jsonb_typeof(thumbnails) = 'array' then thumbnails -> 0 else null end
+  ) stored;
+
+-- Vérification : autant de premières vignettes que de fiches pourvues
+-- d'aperçus. Les deux nombres doivent être égaux.
+select count(*) filter (where jsonb_array_length(thumbnails) > 0) as fiches_avec_apercus,
+       count(*) filter (where thumbnail is not null)              as premieres_vignettes
   from products;

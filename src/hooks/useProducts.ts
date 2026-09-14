@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { STORAGE_KEYS, readJson } from '@/src/lib/storage';
+import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
 import { db, onDataChanged } from '@/src/services';
 import type { Product } from '@/src/types';
 
@@ -22,11 +22,44 @@ import type { Product } from '@/src/types';
  *  la base, jamais de ce que le navigateur affiche.
  */
 
-/** Le cache ne sert qu'au catalogue public : l'administration lit toujours la base. */
-function lireCache(): Product[] | null {
-  const garde = readJson<Product[] | null>(STORAGE_KEYS.catalogueEnCache, null);
-  return Array.isArray(garde) && garde.length > 0 ? garde : null;
+/**
+ * Le cache ne sert qu'au catalogue public : l'administration lit toujours la base.
+ *
+ * Il porte l'heure de sa dernière lecture, pour savoir s'il est encore frais
+ * (voir FRAICHEUR). L'ancien format, un simple tableau, reste accepté : une
+ * cliente qui revient avec l'ancien cache ne doit pas retrouver une grille vide.
+ */
+interface Cache {
+  produits: Product[];
+  lu: number;
 }
+
+function lireCache(): Cache | null {
+  const garde = readJson<Cache | Product[] | null>(STORAGE_KEYS.catalogueEnCache, null);
+  if (Array.isArray(garde)) return garde.length > 0 ? { produits: garde, lu: 0 } : null;
+  if (garde && Array.isArray(garde.produits) && garde.produits.length > 0) return garde;
+  return null;
+}
+
+/**
+ * ─────────────────────────────────────────────────────────────
+ *  À QUELLE FRÉQUENCE RELIRE LE CATALOGUE
+ * ─────────────────────────────────────────────────────────────
+ *  Le catalogue était relu à CHAQUE ouverture de page. Une cliente qui
+ *  regarde six articles le téléchargeait six fois — et les photos voyagent
+ *  dedans. C'est ce trafic qui a fini par épuiser le quota mensuel de la
+ *  base, et avec lui la boutique entière.
+ *
+ *  Un catalogue lu il y a moins de cinq minutes est donc réutilisé tel
+ *  quel. Passé ce délai, il est revérifié en silence, derrière la grille
+ *  déjà affichée.
+ *
+ *  Ce n'est pas un pari sur les prix : aucun montant affiché ne devient un
+ *  montant encaissé. Les totaux d'une commande sont recalculés par la base
+ *  à l'enregistrement, à partir des prix qu'elle détient à cet instant.
+ *  Et l'administration, elle, ne passe jamais par ce cache.
+ */
+const FRAICHEUR = 5 * 60 * 1000;
 
 /**
  * Range le catalogue pour la visite suivante, sans jamais faire échouer la
@@ -42,25 +75,47 @@ function lireCache(): Product[] | null {
  * que la base réponde — ce qui vaut mieux qu'une grille vide.
  */
 function garderEnCache(produits: Product[]): void {
+  const ecrire = (liste: Product[]) =>
+    localStorage.setItem(
+      STORAGE_KEYS.catalogueEnCache,
+      JSON.stringify({ produits: liste, lu: Date.now() } satisfies Cache),
+    );
   try {
-    localStorage.setItem(STORAGE_KEYS.catalogueEnCache, JSON.stringify(produits));
+    ecrire(produits);
   } catch {
     try {
-      const allege = produits.map((p) => ({
-        ...p,
-        images: p.images.filter((src) => !src.startsWith('data:')),
-      }));
-      localStorage.setItem(STORAGE_KEYS.catalogueEnCache, JSON.stringify(allege));
+      ecrire(
+        produits.map((p) => ({
+          ...p,
+          images: p.images.filter((src) => !src.startsWith('data:')),
+        })),
+      );
     } catch {
       // Toujours trop gros : tant pis, la visite suivante repassera par la base.
     }
   }
 }
 
+/*
+ * Un enregistrement périme le catalogue gardé, tout de suite.
+ *
+ * Sans cela, la boutique modifiée depuis l'administration continuerait
+ * d'afficher l'ancienne version jusqu'à cinq minutes — y compris à la
+ * personne qui vient de la modifier, qui croirait son changement perdu.
+ *
+ * L'abonnement est pris au chargement du module, donc dans l'onglet de
+ * l'administration comme dans celui de la boutique.
+ */
+onDataChanged(() => {
+  const cache = lireCache();
+  if (cache) writeJson(STORAGE_KEYS.catalogueEnCache, { produits: cache.produits, lu: 0 });
+});
+
 /** Charge le catalogue depuis la source de données active (local ou Supabase). */
 export function useProducts(includeDrafts = false) {
   const cache = includeDrafts ? null : lireCache();
-  const [products, setProducts] = useState<Product[]>(cache ?? []);
+  const frais = cache !== null && Date.now() - cache.lu < FRAICHEUR;
+  const [products, setProducts] = useState<Product[]>(cache?.produits ?? []);
   // Rien en cache : on annonce le chargement. Sinon on montre, et on vérifie.
   const [loading, setLoading] = useState(cache === null);
   const [error, setError] = useState<string | null>(null);
@@ -101,10 +156,13 @@ export function useProducts(includeDrafts = false) {
   );
 
   useEffect(() => {
-    // Un catalogue déjà à l'écran se vérifie en silence.
+    // Un catalogue lu il y a moins de cinq minutes est déjà à l'écran et n'a
+    // pas à être redemandé : c'est autant de trafic que la base n'aura pas à
+    // servir. Au-delà, il se vérifie en silence, sans écran d'attente.
+    if (frais) return;
     void load(cache !== null);
-    // `cache` est lu une seule fois, au montage : le relire ici relancerait
-    // la vérification à chaque rendu.
+    // `cache` et `frais` sont lus une seule fois, au montage : les relire ici
+    // relancerait la vérification à chaque rendu.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [load]);
 

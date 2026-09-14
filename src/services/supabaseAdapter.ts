@@ -642,7 +642,12 @@ export const supabaseAdapter: DataSource = {
 
     let rows: Row[];
     try {
-      rows = await demander([...communes, 'thumbnails', 'images_count']);
+      /*
+       * `thumbnail` — au singulier — est le PREMIER aperçu, calculé par la
+       * base. C'est le seul que la grille affiche : demander les autres
+       * ferait voyager quatre images pour une fiche qui en montre une.
+       */
+      rows = await demander([...communes, 'thumbnail', 'images_count']);
     } catch (erreur) {
       /*
        * Colonnes absentes tant que la mise à jour SQL n'est pas passée :
@@ -654,8 +659,14 @@ export const supabaseAdapter: DataSource = {
        * réessayer avec d'autres colonnes ne la réparerait pas et ne ferait
        * que doubler l'attente avant que la cliente soit prévenue.
        */
-      if (!colonneAbsente(erreur, 'thumbnails', 'images_count')) throw erreur;
-      return (await demander([...communes, 'images'])).map(toProduct);
+      if (!colonneAbsente(erreur, 'thumbnail', 'thumbnails', 'images_count')) throw erreur;
+      // Mise à jour 30 pas encore passée : on retente avec la 29, puis sans rien.
+      try {
+        rows = await demander([...communes, 'thumbnails', 'images_count']);
+      } catch (secondeErreur) {
+        if (!colonneAbsente(secondeErreur, 'thumbnails', 'images_count')) throw secondeErreur;
+        return (await demander([...communes, 'images'])).map(toProduct);
+      }
     }
 
     /*
@@ -664,9 +675,16 @@ export const supabaseAdapter: DataSource = {
      * siennes, et elles seules. Le bouton « Générer les aperçus » de
      * l'administration fait disparaître ce rattrapage pour de bon.
      */
+    // Une ligne porte soit `thumbnail` (le premier aperçu, mise à jour 30),
+    // soit `thumbnails` (la liste complète, mise à jour 29).
+    const apercus = (r: Row): string[] => {
+      if (typeof r.thumbnail === 'string') return [r.thumbnail];
+      return Array.isArray(r.thumbnails) ? (r.thumbnails as string[]) : [];
+    };
+    for (const r of rows) r.thumbnails = apercus(r);
+
     const aCompleter = rows.filter(
-      (r) =>
-        (r.images_count ?? 0) > 0 && !(Array.isArray(r.thumbnails) && r.thumbnails.length > 0),
+      (r) => (r.images_count ?? 0) > 0 && (r.thumbnails as string[]).length === 0,
     );
     if (aCompleter.length > 0) {
       const ids = aCompleter.map((r) => encodeURIComponent(String(r.id))).join(',');

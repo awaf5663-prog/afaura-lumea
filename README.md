@@ -107,6 +107,14 @@ soit, et nomme la cause. Les trois qui reviennent :
 | **Clé publique changée** (rotation, ou anciennes clés désactivées au profit des clés `publishable`). | Settings → API, copier la clé publique, la remettre dans les variables de l'hébergeur, republier. Jamais la clé `service_role`. |
 | **Compte admin absent** du projet visé (typiquement : l'adresse pointe vers un autre projet). | Authentication → Users, dans le projet de la boutique. |
 
+**Quota de l'organisation épuisé.** Le bandeau « Services restricted — your organization has used
+up its quota » n'est pas une panne : c'est la consommation du mois qui a atteint la limite de
+l'offre, et tous les projets de l'organisation cessent de servir des requêtes jusqu'au
+renouvellement. Le poste qui compte ici, c'est le trafic sortant : les photos téléversées vivent
+dans les lignes des produits, donc chaque lecture du catalogue les fait voyager. Trois réglages du
+site en tiennent compte — l'aperçu au lieu de la photo (étape 29), une seule vignette par fiche
+(étape 30), et un catalogue relu au plus toutes les cinq minutes au lieu d'une fois par page.
+
 Une quatrième cause ne vient pas de Supabase du tout : **une variable d'environnement définie mais
 vide** chez l'hébergeur. `VITE_INSTAGRAM_HANDLE=""` fait disparaître le lien Instagram du pied de
 page sans aucune erreur. Le code traite désormais une valeur vide comme une absence (voir

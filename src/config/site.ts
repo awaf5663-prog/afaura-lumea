@@ -85,9 +85,16 @@ export const BRAND = {
   name: 'Afaura Luméa',
   shortName: 'Luméa',
   tagline: 'Tes envies, notre organisation.',
-  /** Une phrase = tout le concept. Affichée dans le hero. */
+  /**
+   * Une phrase = tout le concept. Affichée dans le hero.
+   *
+   * Elle ne parle plus seulement de voiles et de SHEIN : la boutique vend
+   * aussi des parfums, des soins, des sacs, des chaussures, du maquillage
+   * et des tenues de nuit. Annoncer moins que ce qu'on a en rayon fait
+   * repartir une visiteuse qui aurait trouvé son bonheur.
+   */
   pitch:
-    "Voiles, abayas et commandes SHEIN, commandés pour toi et regroupés jusqu'à Saint-Louis. Un prix clair en FCFA, confirmé avant que tu paies.",
+    "Voiles et abayas, parfums, soins, sacs, chaussures, maquillage — et tout ce que tu repères sur SHEIN. Commandé pour toi et regroupé jusqu'à Saint-Louis, à un prix clair en FCFA confirmé avant que tu paies.",
   city: 'Saint-Louis, Sénégal',
   currency: 'FCFA',
 } as const;

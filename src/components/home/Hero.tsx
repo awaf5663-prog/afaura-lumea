@@ -34,7 +34,7 @@ export function Hero() {
             className="h-24 w-auto object-contain drop-shadow-[0_12px_26px_rgba(23,17,15,0.20)] sm:h-32"
           />
 
-          <p className="eyebrow mt-6">Saint-Louis · Voiles & commandes SHEIN</p>
+          <p className="eyebrow mt-6">Saint-Louis · Mode, beauté & commandes groupées</p>
 
           <h1 className="mt-4 text-[33px] leading-[1.07] sm:text-[48px] lg:text-[58px]">
             Commande ce qui te plaît.

@@ -50,9 +50,9 @@ export function ShopPage() {
   const [filtersOpen, setFiltersOpen] = useState(false);
 
   useSeo({
-    title: 'Boutique — voiles, abayas et hijab tape',
+    title: 'Boutique — voiles, beauté, sacs, chaussures et plus',
     description:
-      'Jersey, modal, satin, dentelle, viscose et abayas sur commande, glosses et huiles à lèvres disponibles tout de suite. Prix en FCFA, livraison à Saint-Louis ou retrait.',
+      'Voiles et abayas, parfums et soins du corps, sacs, chaussures, maquillage, tenues de nuit et fournitures de rentrée. Sur commande, ou disponible tout de suite quand la fiche le dit. Prix en FCFA, livraison à Saint-Louis ou retrait.',
   });
 
   // La catégorie reste synchronisée avec l'URL (liens du menu, partage de lien).

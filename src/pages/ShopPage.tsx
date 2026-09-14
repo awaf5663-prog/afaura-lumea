@@ -1,6 +1,7 @@
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ProductCard } from '@/src/components/product/ProductCard';
+import { WhatsAppLink } from '@/src/components/whatsapp/WhatsAppLink';
 import { Button } from '@/src/components/ui/Button';
 import { EmptyState } from '@/src/components/ui/EmptyState';
 import { ProductCardSkeleton } from '@/src/components/ui/Skeleton';
@@ -24,6 +25,10 @@ const SORTS: Array<{ id: Sort; label: string }> = [
   { id: 'prix-asc', label: 'Prix croissant' },
   { id: 'prix-desc', label: 'Prix décroissant' },
 ];
+
+/** Ce que la cliente envoie quand la boutique ne peut rien afficher. */
+const MESSAGE_PANNE =
+  "Bonjour ! Le site n'affiche pas les articles en ce moment. Pouvez-vous m'envoyer ce que vous avez, avec les prix ?";
 
 export function ShopPage() {
   const { products, loading, error, reload } = useProducts();
@@ -244,10 +249,25 @@ export function ShopPage() {
       </p>
 
       {error ? (
+        /*
+         * La boutique ne peut pas montrer ses articles.
+         *
+         * Le détail technique n'apprend rien à une cliente et l'inquiète ;
+         * ce qui lui sert, c'est de pouvoir commander quand même. On garde
+         * donc « Réessayer » et on ouvre WhatsApp juste à côté : une panne
+         * de la base ne doit pas devenir une vente perdue.
+         */
         <EmptyState
-          title="Le catalogue n'a pas pu être chargé"
-          description={error}
-          action={<Button onClick={() => void reload()}>Réessayer</Button>}
+          title="La boutique est momentanément indisponible"
+          description="Nos articles ne s'affichent pas en ce moment. Écrivez-nous sur WhatsApp : nous vous envoyons les photos, les prix et le délai directement."
+          action={
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <WhatsAppLink message={MESSAGE_PANNE}>Nous écrire sur WhatsApp</WhatsAppLink>
+              <Button variant="secondary" onClick={() => void reload()}>
+                Réessayer
+              </Button>
+            </div>
+          }
         />
       ) : (
         <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-9 lg:grid-cols-4 lg:gap-6">

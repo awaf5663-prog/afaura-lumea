@@ -1,5 +1,10 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { DELIVERY_ZONES, type DeliveryZone } from '@/src/config/site';
+import {
+  DELIVERY_ZONES,
+  WHATSAPP_LINK,
+  WHATSAPP_NUMBER,
+  type DeliveryZone,
+} from '@/src/config/site';
 import { db, onDataChanged } from '@/src/services';
 import { buildChatUrl, canPrefill } from '@/src/lib/whatsapp';
 import type { StoreSettings } from '@/src/types';
@@ -86,10 +91,22 @@ export function useSettings(): SettingsValue {
  */
 export function useWhatsapp() {
   const { settings } = useSettings();
-  const target = {
-    number: settings?.whatsappNumber ?? '',
-    link: settings?.whatsappLink ?? '',
-  };
+  /*
+   * Base injoignable : on reprend le contact livré avec le site.
+   *
+   * Sans ce repli, `settings` restait nul et TOUS les boutons WhatsApp
+   * disparaissaient — le bouton flottant, le pied de page, la sortie de
+   * secours de la boutique — précisément le jour où ils servent le plus.
+   * Ce ne sont pas des coordonnées inventées : ce sont celles que la base
+   * renvoie d'ordinaire, et qu'elle-même complète depuis cette
+   * configuration quand sa colonne est vide.
+   *
+   * Des réglages BIEN chargés font autorité, même vides : la boutique a
+   * alors voulu retirer son numéro.
+   */
+  const target = settings
+    ? { number: settings.whatsappNumber, link: settings.whatsappLink }
+    : { number: WHATSAPP_NUMBER, link: WHATSAPP_LINK };
   const prefill = canPrefill(target);
   const url = (message?: string) => buildChatUrl(target, message);
 

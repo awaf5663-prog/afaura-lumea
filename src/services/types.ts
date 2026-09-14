@@ -95,14 +95,13 @@ export interface DataSource {
   mode: 'local' | 'supabase';
 
   /**
-   * Le catalogue.
+   * Le catalogue, sans les grandes photos.
    *
-   * `completes` ramène les grandes photos : c'est ce qu'il faut à
-   * l'administration pour modifier une fiche. La boutique, elle, s'en
-   * passe — elle reçoit les aperçus, six fois plus légers, et va chercher
-   * la grande photo au moment où une fiche s'ouvre.
+   * Ni la boutique ni l'administration n'en ont besoin pour afficher une
+   * liste : les aperçus suffisent, et ils sont six fois plus légers. Les
+   * vraies photos se demandent fiche par fiche — voir getProductImages.
    */
-  listProducts(options?: { completes?: boolean }): Promise<Product[]>;
+  listProducts(): Promise<Product[]>;
   /** Les grandes photos d'une seule fiche, à l'ouverture de celle-ci. */
   getProductImages(productId: string): Promise<string[]>;
   saveProduct(product: Product): Promise<Product>;

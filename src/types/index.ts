@@ -59,6 +59,13 @@ export interface Product {
    * aperçu à côté d'elles (voir lib/apercu).
    */
   thumbnails?: string[];
+  /**
+   * Nombre de photos que la fiche porte en base, compté par la base
+   * elle-même. Il permet de savoir qu'une fiche a des photos sans les
+   * faire voyager — c'est ce qui distingue une fiche sans aperçu d'une
+   * fiche sans photo du tout.
+   */
+  imagesCount?: number;
   variants: ProductVariantGroup[];
   /** null = stock non suivi (article réapprovisionné à la demande). */
   stock: number | null;

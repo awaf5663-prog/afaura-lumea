@@ -131,11 +131,11 @@ export function useProducts(includeDrafts = false) {
       setError(null);
       try {
         /*
-         * L'administration reçoit les grandes photos : elle doit pouvoir les
-         * modifier. La boutique se contente des aperçus — six fois plus
-         * légers — et va chercher la grande à l'ouverture d'une fiche.
+         * Jamais les grandes photos dans une liste — ni pour la boutique,
+         * ni pour l'administration. Elles ne sont demandées que pour la
+         * fiche qu'on ouvre (voir getProductImages).
          */
-        const all = await db.listProducts({ completes: includeDrafts });
+        const all = await db.listProducts();
         const visibles = all.filter((p) => p.status !== 'draft');
         setProducts(includeDrafts ? all : visibles);
         // Seul le catalogue public est gardé : les brouillons n'ont rien à

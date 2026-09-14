@@ -65,9 +65,39 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
   const [saving, setSaving] = useState(false);
   const [variantText, setVariantText] = useState('');
 
-  const openEditor = (product: Product) => {
-    setEditing({ ...product });
-    setVariantText(ecrireVariantes(product.variants, product.optionPrices));
+  /*
+   * ─────────────────────────────────────────────────────────────
+   *  LES GRANDES PHOTOS N'ARRIVENT QU'À L'OUVERTURE D'UNE FICHE
+   * ─────────────────────────────────────────────────────────────
+   *  Cette liste chargeait les soixante-dix fiches AVEC leurs photos en
+   *  taille réelle, à chaque ouverture de l'administration. C'est ce qui a
+   *  consommé l'essentiel du quota mensuel de la base — la boutique compte
+   *  trois utilisatrices, et l'une d'elles est la vendeuse elle-même.
+   *
+   *  La liste se contente donc des aperçus, comme la boutique. Les vraies
+   *  photos sont demandées pour LA fiche qu'on ouvre, et pour elle seule.
+   *
+   *  Elles sont attendues avant d'ouvrir l'éditeur : une fiche modifiée
+   *  sans ses photos serait enregistrée sans elles, et les effacerait.
+   */
+  const [ouverture, setOuverture] = useState<string | null>(null);
+  const openEditor = async (product: Product) => {
+    const neuf = product.images.length === 0 && (product.thumbnails ?? []).length === 0;
+    if (neuf) {
+      setEditing({ ...product });
+      setVariantText(ecrireVariantes(product.variants, product.optionPrices));
+      return;
+    }
+    setOuverture(product.id);
+    try {
+      const images = product.images.length > 0 ? product.images : await db.getProductImages(product.id);
+      setEditing({ ...product, images });
+      setVariantText(ecrireVariantes(product.variants, product.optionPrices));
+    } catch {
+      notify("Les photos de cette fiche n'ont pas pu être chargées. Réessayez.", 'error');
+    } finally {
+      setOuverture(null);
+    }
   };
 
   /*
@@ -213,10 +243,13 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
    *  photo est déjà là, elle est simplement réduite puis enregistrée à
    *  côté. À faire une fois ; ensuite chaque enregistrement s'en occupe.
    */
+  /*
+   * Les fiches sans aperçu. La liste ne portant plus les photos, on les
+   * reconnaît à ce que la base en dit : elle a des photos (`imagesCount`)
+   * mais pas d'aperçu.
+   */
   const sansApercu = products.filter(
-    (p) =>
-      p.images.some((src) => src.startsWith('data:')) &&
-      (p.thumbnails ?? []).length !== p.images.length,
+    (p) => (p.imagesCount ?? p.images.length) > 0 && (p.thumbnails ?? []).length === 0,
   );
   const [rattrapage, setRattrapage] = useState<{ fait: number; total: number } | null>(null);
   const genererLesApercus = async () => {
@@ -225,8 +258,11 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
     let echecs = 0;
     for (const [index, produit] of sansApercu.entries()) {
       try {
-        const thumbnails = await apercusDePhotos(produit.images);
-        await db.saveProduct({ ...produit, thumbnails });
+        // Les photos ne sont plus dans la liste : on va chercher celles de
+        // cette fiche, on en tire l'aperçu, et on les réenregistre telles quelles.
+        const images = produit.images.length > 0 ? produit.images : await db.getProductImages(produit.id);
+        const thumbnails = await apercusDePhotos(images);
+        await db.saveProduct({ ...produit, images, thumbnails });
       } catch {
         echecs += 1;
       }
@@ -246,7 +282,7 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
     <div>
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-[24px]">Produits ({products.length})</h2>
-        <Button size="sm" icon={<Plus className="size-4" />} onClick={() => openEditor(blank())}>
+        <Button size="sm" icon={<Plus className="size-4" />} onClick={() => void openEditor(blank())}>
           Ajouter
         </Button>
       </div>
@@ -280,8 +316,13 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
         {products.map((product) => (
           <li key={product.id} className="flex items-center gap-4 p-4">
             <div className="size-14 shrink-0 overflow-hidden rounded-[--radius-xs] bg-cream">
-              {product.images[0] && (
-                <img src={product.images[0]} alt="" className="size-full object-cover" loading="lazy" />
+              {(product.thumbnails?.[0] ?? product.images[0]) && (
+                <img
+                  src={product.thumbnails?.[0] ?? product.images[0]}
+                  alt=""
+                  className="size-full object-cover"
+                  loading="lazy"
+                />
               )}
             </div>
             <div className="min-w-0 flex-1">
@@ -300,9 +341,10 @@ export function AdminProducts({ products, reload }: { products: Product[]; reloa
             <div className="flex shrink-0 gap-1">
               <button
                 type="button"
-                onClick={() => openEditor(product)}
+                onClick={() => void openEditor(product)}
+                disabled={ouverture !== null}
                 aria-label={`Modifier ${product.name}`}
-                className="press grid size-9 place-items-center rounded-full bg-cream"
+                className="press grid size-9 place-items-center rounded-full bg-cream disabled:opacity-50"
               >
                 <Pencil className="size-4" />
               </button>

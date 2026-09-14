@@ -101,6 +101,16 @@ export function hasSupabaseSession(): boolean {
 function diagnostic(statut: number, corps: string): string {
   const texte = corps.toLowerCase();
 
+  if (statut === 402 || /quota|egress|fair use/i.test(texte)) {
+    return (
+      'Le quota mensuel de votre organisation Supabase est dépassé : le projet ' +
+      'refuse toutes les requêtes jusqu\'au renouvellement de la période de ' +
+      'facturation (la date est indiquée dans Supabase → Usage). Deux issues : ' +
+      'attendre ce renouvellement, ou passer à un plan supérieur pour rouvrir ' +
+      'le service tout de suite.'
+    );
+  }
+
   if (/invalid api key|no api key|api key found|legacy api keys|jwt/i.test(texte)) {
     return (
       "La clé publique du site n'est plus acceptée par le projet Supabase. " +
@@ -328,6 +338,8 @@ const toProduct = (r: Row): Product => ({
    * sur la grande photo, comme avant.
    */
   thumbnails: fromStoredThumbnails(r.thumbnails, r.id, SEED_IMAGES[r.id]),
+  // Compté par la base : voir Product.imagesCount.
+  imagesCount: typeof r.images_count === 'number' ? r.images_count : undefined,
   variants: r.variants ?? [],
   stock: r.stock,
   status: r.status,
@@ -592,7 +604,7 @@ const SHEIN_SELECT = '*,shein_items(*)';
 export const supabaseAdapter: DataSource = {
   mode: 'supabase',
 
-  async listProducts(options) {
+  async listProducts() {
     /*
      * ─────────────────────────────────────────────────────────────
      *  LA BOUTIQUE NE TÉLÉCHARGE PLUS LES GRANDES PHOTOS
@@ -605,9 +617,6 @@ export const supabaseAdapter: DataSource = {
      *  On demande donc les aperçus (26 à 47 Ko) et pas les photos. La
      *  grande arrive plus tard, à l'ouverture d'une fiche seulement —
      *  voir getProductImages.
-     *
-     *  `completes` : l'administration, elle, a besoin des vraies photos
-     *  pour modifier une fiche. Elle les demande explicitement.
      *
      *  La liste ci-dessous est exactement ce que `toProduct` consomme. Une
      *  colonne ajoutée plus tard devra être ajoutée ici aussi — sinon elle
@@ -637,8 +646,6 @@ export const supabaseAdapter: DataSource = {
       rest<Row[]>(
         'products?select=' + colonnes.join(',') + '&order=created_at.desc',
       );
-
-    if (options?.completes) return (await demander([...communes, 'images', 'thumbnails'])).map(toProduct);
 
     let rows: Row[];
     try {

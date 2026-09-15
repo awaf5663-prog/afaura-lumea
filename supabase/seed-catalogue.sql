@@ -9,7 +9,7 @@
 --  et les photos déjà téléversées depuis l'admin ne sont jamais écrasées.
 -- ═══════════════════════════════════════════════════════════════════
 
--- Catégories du catalogue : Abaya, Pièce unique, Viscose premium, Voile MJ, Modal imprimé, Modal simple, Satin imprimé, Dentelle, Jersey, Jersey frisé, Hijab tape, Rentrée, Packs, Robes
+-- Catégories du catalogue : Abaya, Pièce unique, Viscose premium, Voile MJ, Modal imprimé, Modal simple, Satin imprimé, Dentelle, Jersey, Jersey frisé, Hijab tape, Voile rayures, Modal fulani, Modal nayra, Silk imprimé, Organza dégradé, Rentrée, Packs, Robes, Lips gloss, Gommages, Parfums, Maquillage, Bougies, Sacs, Sous-vêtements & pyjamas, Chaussures, Combinaisons, Gels de douche, Laits corporels, Soins du visage, Accessoires beauté
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
@@ -159,6 +159,121 @@ insert into products (
   '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, 'dentelle12'
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'voile-rayures', 'voile-rayures', 'Voile rayures', 'Un voile teint en rayures fondues : deux ou trois teintes qui se répondent sur toute la longueur. Faites défiler les photos pour voir les coloris portés, puis choisissez le vôtre. D''autres teintes existent hors des photos : dites-nous celle que vous cherchez, nous confirmons avant paiement.',
+  0, null, 'voile_rayures',
+  '[]'::jsonb, '[{"name":"Coloris","options":["Bleu marine","Bleu canard & rouille","Gris & rose","Kaki & vert olive","Anthracite","Bleu & bleu ciel","Lilas","Orange & violet"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'modal-fulani', 'modal-fulani', 'Modal fulani', 'Modal au grain froissé, teint en nuances fondues : le relief reste visible dans le tissu et le dessin change d''un numéro à l''autre. Doux et mat. Choisissez votre numéro de teinte ci-dessus — le nuancier du fournisseur en compte davantage que ce que nos photos nomment, demandez-nous celui qui vous manque.',
+  0, null, 'modal_fulani',
+  '[]'::jsonb, '[{"name":"Teinte","options":["#2 Charcoal black","#3 Navy","#6 Olive grass","#7 Brown","#10 Purple","#11 Sand"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'modal-nayra', 'modal-nayra', 'Modal nayra', 'Un modal dégradé : la couleur part soutenue à un bout et s''éclaircit jusqu''à l''autre, si bien que le drapé change de teinte selon la façon dont vous le posez. Tombé souple, fini mat. Faites défiler les photos pour voir les dégradés, puis choisissez le vôtre.',
+  0, null, 'modal_nayra',
+  '[]'::jsonb, '[{"name":"Dégradé","options":["Gris-bleu & sable","Bordeaux & rose","Violet & crème","Orange & brun"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'silk-imprime', 'silk-imprime', 'Silk imprimé', 'Voile satiné à imprimé marbré : la lumière y accroche et le motif se déplie sur toute la longueur, comme une peinture. Pour les tenues où l''on veut être vue. Faites défiler les photos pour voir les imprimés ; il en existe d''autres que ceux montrés, demandez-nous.',
+  0, null, 'silk_imprime',
+  '[]'::jsonb, '[{"name":"Imprimé","options":["Marbré bordeaux","Léopard brun","Marbré doré"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'organza-degrade', 'organza-degrade', 'Organza dégradé', 'Organza léger et légèrement brillant, teint en dégradé. Plus transparent que nos modals : il se porte volontiers en deuxième voile, sur une sous-cagoule ou un hijab uni, pour les cérémonies. Faites défiler les photos pour voir les dégradés, puis choisissez le vôtre.',
+  0, null, 'organza_degrade',
+  '[]'::jsonb, '[{"name":"Dégradé","options":["Rose & nude","Gris & noir","Prune","Brun","Rouge & noir"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, null
 )
 on conflict (id) do update set
   slug = excluded.slug,
@@ -765,6 +880,1018 @@ Choisissez le trio ci-dessus. Pour un modèle absent des photos, dites-le nous :
   '[]'::jsonb, '[{"name":"Trio","options":["NY Varsity","Legendary 01","Vintage Sport","Athletic Chic","Retro Racing"]}]'::jsonb, '{}'::jsonb, null, 'draft',
   true, false,
   true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'gloss-romantic', 'gloss-romantic', 'Gloss Romantic', 'Gloss à lèvres brillant, texture légère et confortable. Applicateur mousse, flacon transparent à capuchon doré. Disponible tout de suite en boutique.',
+  1000, null, 'lips',
+  '[]'::jsonb, '[{"name":"Teinte","options":["Rose subtil","Transparent","Nude naturel","Marron élégant"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'gloss-nyx', 'gloss-nyx', 'Gloss NYX Lip', 'Gloss à lèvres NYX, effet brillance naturelle et hydratation intense. Teintes subtiles qui se portent tous les jours. Disponible tout de suite en boutique.',
+  1000, null, 'lips',
+  '[]'::jsonb, '[{"name":"Teinte","options":["Transparent","Rose subtil","Marron élégant"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'gloss-olibolla', 'gloss-olibolla', 'Glossy Lip Balm Olibolla', 'Baume à lèvres brillant Olibolla : hydrate, nourrit et repulpe. Neuf teintes, du transparent au brun profond. Disponible tout de suite en boutique.',
+  1000, null, 'lips',
+  '[]'::jsonb, '[{"name":"Teinte","options":["01 Clear","02 Milky","03 Pink","04 Rose","05 Mauve","06 Nude","07 Red","08 Berry","09 Brown"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'gloss-lip-oil', 'gloss-lip-oil', 'Huile à lèvres teintée', 'Huile à lèvres teintée, enrichie en vitamines : hydratation intense et brillance naturelle. Six couleurs, de la plus discrète à la plus vive. Disponible tout de suite en boutique.',
+  1000, null, 'lips',
+  '[]'::jsonb, '[{"name":"Teinte","options":["01 Nude rosé","02 Lilas","03 Pêche","04 Corail","05 Rose bonbon","06 Violet"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'gloss-victoria', 'gloss-victoria', 'Lip Oil soin', 'Huile à lèvres traitante Victoria''s Spirit : répare, protège et fait briller. Trois soins au choix, aux extraits naturels. Disponible tout de suite en boutique.',
+  1000, null, 'lips',
+  '[]'::jsonb, '[{"name":"Soin","options":["Cannabis Sativa Seed Oil","Cocoa Butter","Hydratant"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'box-gloss', 'box-gloss', 'Box gloss lips', 'Coffret de trois glosses, choisis un par un dans toute la gamme : baumes brillants, huiles teintées ou soins. 2 500 FCFA les trois, au lieu de 3 000 FCFA à l''unité. Disponible tout de suite en boutique.',
+  2500, 3000, 'lips',
+  '[]'::jsonb, '[{"name":"Gloss 1","options":["Romantic — Rose subtil","Romantic — Transparent","Romantic — Nude naturel","Romantic — Marron élégant","NYX — Transparent","NYX — Rose subtil","NYX — Marron élégant","Olibolla — 01 Clear","Olibolla — 02 Milky","Olibolla — 03 Pink","Olibolla — 04 Rose","Olibolla — 05 Mauve","Olibolla — 06 Nude","Olibolla — 07 Red","Olibolla — 08 Berry","Olibolla — 09 Brown","Huile teintée — 01 Nude rosé","Huile teintée — 02 Lilas","Huile teintée — 03 Pêche","Huile teintée — 04 Corail","Huile teintée — 05 Rose bonbon","Huile teintée — 06 Violet","Lip Oil soin — Cannabis Sativa Seed Oil","Lip Oil soin — Cocoa Butter","Lip Oil soin — Hydratant"]},{"name":"Gloss 2","options":["Romantic — Rose subtil","Romantic — Transparent","Romantic — Nude naturel","Romantic — Marron élégant","NYX — Transparent","NYX — Rose subtil","NYX — Marron élégant","Olibolla — 01 Clear","Olibolla — 02 Milky","Olibolla — 03 Pink","Olibolla — 04 Rose","Olibolla — 05 Mauve","Olibolla — 06 Nude","Olibolla — 07 Red","Olibolla — 08 Berry","Olibolla — 09 Brown","Huile teintée — 01 Nude rosé","Huile teintée — 02 Lilas","Huile teintée — 03 Pêche","Huile teintée — 04 Corail","Huile teintée — 05 Rose bonbon","Huile teintée — 06 Violet","Lip Oil soin — Cannabis Sativa Seed Oil","Lip Oil soin — Cocoa Butter","Lip Oil soin — Hydratant"]},{"name":"Gloss 3","options":["Romantic — Rose subtil","Romantic — Transparent","Romantic — Nude naturel","Romantic — Marron élégant","NYX — Transparent","NYX — Rose subtil","NYX — Marron élégant","Olibolla — 01 Clear","Olibolla — 02 Milky","Olibolla — 03 Pink","Olibolla — 04 Rose","Olibolla — 05 Mauve","Olibolla — 06 Nude","Olibolla — 07 Red","Olibolla — 08 Berry","Olibolla — 09 Brown","Huile teintée — 01 Nude rosé","Huile teintée — 02 Lilas","Huile teintée — 03 Pêche","Huile teintée — 04 Corail","Huile teintée — 05 Rose bonbon","Huile teintée — 06 Violet","Lip Oil soin — Cannabis Sativa Seed Oil","Lip Oil soin — Cocoa Butter","Lip Oil soin — Hydratant"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'gommage-tree-hut', 'gommage-tree-hut', 'Gommage Tree Hut', 'Gommage au sucre et au karité, pot de 510 g. Exfolie en douceur et laisse la peau nourrie. Quatre parfums au choix.',
+  0, null, 'gommage',
+  '[]'::jsonb, '[{"name":"Parfum","options":["Cotton Candy","Moroccan Rose","Pink Champagne","Watermelon"]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'gommage-bosuya', 'gommage-bosuya', 'Gommage Bosuya', 'Gommage au sucre et sel de bain, pot de 350 g. Exfoliation délicate, extraits naturels hydratants. Six parfums au choix.',
+  7500, null, 'gommage',
+  '[]'::jsonb, '[{"name":"Parfum","options":["Pastèque","Riz","Rose","Café","Coco","Orange"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'anticernes-sheglam', 'anticernes-sheglam', 'Anti-cernes Hideaway', 'Anti-cernes fluide à applicateur mousse : couvre les cernes et unifie sans marquer. Quatorze teintes, du plus clair au plus foncé.',
+  6000, null, 'maquillage',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'bougies-latte', 'bougies-latte', 'Bougie parfumée Latte', 'Bougie parfumée en verre, coulée en deux couches comme un café glacé. Huit parfums au choix.',
+  1500, null, 'bougie',
+  '[]'::jsonb, '[{"name":"Parfum","options":["Pink Coconut Matcha Latte","Matcha Latte","Lemon Matcha Latte","Sakura Latte","Lavender Latte","Taro Latte","Caramel Latte","The Iced Coffee"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'sac-leopard-brun', 'sac-leopard-brun', 'Sac cabas léopard', 'Grand cabas souple en suédine imprimée léopard, ceinturé d''une lanière rose à boucle dorée. Anses longues, porté à l''épaule.',
+  14000, null, 'sac',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'sac-bordeaux', 'sac-bordeaux', 'Sac épaule bordeaux', 'Petit sac d''épaule arrondi, cuir grainé, fermeture zippée et bandoulière réglable.',
+  16000, null, 'sac',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'sac-cabas-brun', 'sac-cabas-brun', 'Sac cabas brun', 'Cabas en cuir grainé souple, plis latéraux et anses longues. Se porte à la main comme à l’épaule.',
+  15500, null, 'sac',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'short-nuit', 'short-nuit', 'Short taille repliée', 'Short court en coton doux, ceinture large à revers. Se porte pour dormir ou à la maison.',
+  0, null, 'lingerie',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'pyjama-noir-rose', 'pyjama-noir-rose', 'Ensemble pyjama noir liseré rose', 'Haut cache-cœur manches longues à nouer, liseré rose, et pantalon large à taille élastique et cordon. Deux pièces.',
+  16000, null, 'lingerie',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'pyjama-pois', 'pyjama-pois', 'Ensemble pyjama à pois', 'Haut cache-cœur manches longues à pois blancs, taille froncée, et pantalon large assorti à ceinture rose. Deux pièces.',
+  16000, null, 'lingerie',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'pyjama-raye-rose', 'pyjama-raye-rose', 'Ensemble pyjama rayé rose', 'Haut manches longues à rayures roses, noué devant sur un débardeur blanc, et pantalon évasé assorti. Deux pièces.',
+  16000, null, 'lingerie',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'shorts-lot-trois', 'shorts-lot-trois', 'Lot de trois shorts', 'Trois shorts courts à taille haute large : noir uni, gris chiné et imprimé léopard rose.',
+  11500, null, 'lingerie',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'bonnet-satin', 'bonnet-satin', 'Bonnet de nuit en satin', 'Bonnet doublé satin à bord élastique, pour protéger les cheveux pendant la nuit. Trois motifs au choix.',
+  0, null, 'lingerie',
+  '[]'::jsonb, '[{"name":"Motif","options":["Noir à nœuds roses","Rose à pois blancs","Marine à pois roses"]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'sandales-leopard', 'sandales-leopard', 'Sandales plates à boucle', 'Sandales plates à bride croisée et boucle dorée, semelle rembourrée. Précisez votre pointure à la commande : nous confirmons sa disponibilité avant tout paiement.',
+  14000, null, 'chaussure',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'combinaison-rayee', 'combinaison-rayee', 'Combinaison rayée bretelle nouée', 'Combinaison longue à rayures, bustier droit et fine bretelle à nouer derrière la nuque, jambes évasées. Maille imprimée effet crochet.',
+  0, null, 'combinaison',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'shorts-lot-quatre', 'shorts-lot-quatre', 'Lot de quatre shorts', 'Quatre shorts courts à ceinture repliée : rayé rose, imprimé cerises, noir uni et rose à pois.',
+  0, null, 'lingerie',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'coffret-parfums-dignife', 'coffret-parfums-dignife', 'Coffret trois parfums', 'Coffret de trois eaux de parfum de 30 mL, présentées dans un écrin noir. Trois flacons, trois senteurs.',
+  12500, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'bonnet-douche', 'bonnet-douche', 'Bonnets de douche satin — lot de deux', 'Deux bonnets de douche doublés, bord élastique froncé, imprimés de petits nœuds. Gardent les cheveux au sec.',
+  3000, null, 'lingerie',
+  '[]'::jsonb, '[{"name":"Coloris","options":["Blanc à nœuds bruns","Rose poudré","Beige","Blanc bord brun"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'gel-douche-eos', 'gel-douche-eos', 'Gel douche Cashmere', 'Gel douche au beurre de karité, 473 mL. Nettoie en douceur, pH équilibré, pensé pour les peaux sensibles.',
+  0, null, 'gel_douche',
+  '[]'::jsonb, '[{"name":"Parfum","options":["Crème de pistache","Grenade & framboise","Fresh & Cozy","Pink Champagne"]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'lait-corps-eos', 'lait-corps-eos', 'Lait corporel 24H', 'Lait hydratant au beurre de karité, 473 mL. Sept huiles et beurres nourrissants, hydratation 24 heures.',
+  0, null, 'lait_corps',
+  '[]'::jsonb, '[{"name":"Senteur","options":["Vanilla Cashmere","Pomegranate Raspberry","Pink Champagne","Jasmine Peach","Strawberry Dream","Crème Pistachio","Fresh & Cozy","Coconut Waters","Beach Waves","Sans parfum"]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'bandeau-spa', 'bandeau-spa', 'Bandeau spa et manchettes', 'Bandeau matelassé et paire de manchettes en éponge, pour dégager le visage et garder les poignets au sec pendant le soin.',
+  5000, null, 'accessoire_beaute',
+  '[]'::jsonb, '[{"name":"Coloris","options":["Vache noir et blanc","Léopard","Chocolat","Taupe","Rose vif","Beige"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'nettoyant-effaclar', 'nettoyant-effaclar', 'Gel moussant purifiant Effaclar', 'Gel nettoyant moussant pour le visage, tube de 200 mL. Pour les peaux grasses et sensibles.',
+  0, null, 'soin_visage',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'baume-cicaplast', 'baume-cicaplast', 'Baume réparateur Cicaplast B5+', 'Baume apaisant pour le visage et le corps, texture légère et non collante. Deux contenances.',
+  0, null, 'soin_visage',
+  '[]'::jsonb, '[{"name":"Contenance","options":["40 mL","15 mL"]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'solaire-eucerin', 'solaire-eucerin', 'Crème solaire visage SPF 50+', 'Gel-crème solaire visage, fini sec et ultra léger, pour peaux grasses. Deux contenances.',
+  0, null, 'soin_visage',
+  '[]'::jsonb, '[{"name":"Contenance","options":["50 mL","20 mL"]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'parfum-miss-milk', 'parfum-miss-milk', 'Parfum Miss Milk', 'Eau de parfum 50 mL. Un lacté vanillé, doux et poudré, dans un flacon à bouchon ciselé.',
+  6000, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'coffret-mini-parfums', 'coffret-mini-parfums', 'Coffret mini parfums', 'Trois flacons vaporisateurs dans un écrin noué, chacun sa senteur. Prêt à offrir.',
+  12000, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'bougie-fruitee', 'bougie-fruitee', 'Petite bougie fruitée', 'Bougie parfumée coulée en forme de fruit, dans sa boîte dorée à couvercle. Quatre parfums au choix, au même prix.',
+  1500, null, 'bougie',
+  '[]'::jsonb, '[{"name":"Parfum","options":["Framboise","Mandarine","Myrtille","Fleur violette"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'gommage-dove', 'gommage-dove', 'Gommage Dove', 'Gommage hydratant pour le corps, pot de 280 g. Exfolie en douceur et nourrit la peau. Trois parfums au choix, au même prix.',
+  11500, null, 'gommage',
+  '[]'::jsonb, '[{"name":"Parfum","options":["Grenade & lait","Coco & sucre brun","Citron vert & baies"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'brume-vanilla', 'brume-vanilla', 'Brume parfumée Vanilla', 'Brume parfumée vaporisateur, 50 mL. Une vanille ambrée, douce et persistante.',
+  7500, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'brume-heritage', 'brume-heritage', 'Heritage Fragrance Mist', 'Brume parfumée pour le corps, 90 mL. Amber Rose : une rose ambrée, portée par un flacon noué de satin.',
+  3500, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'brume-vanilla-blackberry', 'brume-vanilla-blackberry', 'Brume parfumée Vanilla Blackberry', 'Brume parfumée vaporisateur, 50 mL. Mûre et vanille, sur un fond de fleur blanche.',
+  5000, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'body-splash', 'body-splash', 'Body Splash', 'Brume corporelle vaporisateur, 250 mL. Deux senteurs au choix, au même prix.',
+  8000, null, 'parfum',
+  '[]'::jsonb, '[{"name":"Senteur","options":["Bare Vanilla","Lovely Sunny"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'choco-musk', 'choco-musk', 'Choco Musk', 'Eau de parfum vaporisateur 50 mL, 80 % vol. Un musc chocolaté et vanillé, tenace et enveloppant. Trois saveurs au choix, au même prix.',
+  0, null, 'parfum',
+  '[]'::jsonb, '[{"name":"Saveur","options":["Original","Marshmallow","Pistache"]}]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'parfum-miel-bebe', 'parfum-miel-bebe', 'Eau de parfum Miel Bébé', 'Eau de parfum 30 mL. Un sillage de miel et d''agrumes, réchauffé de cannelle.',
+  0, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'parfum-cherry-blossom', 'parfum-cherry-blossom', 'Eau de parfum Cherry Blossom', 'Eau de parfum 30 mL. Un floral léger de fleur de cerisier, livré dans son étui.',
+  0, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'parfum-lait-de-coco', 'parfum-lait-de-coco', 'Eau de parfum Lait de Coco', 'Eau de parfum 30 mL. Coco crémeuse et cacao, adoucis de bois et de zeste de citron vert.',
+  0, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'parfum-creme-vanille', 'parfum-creme-vanille', 'Eau de parfum Crème Vanille', 'Eau de parfum 30 mL. Vanille gourmande sur un fond de beurre de karité.',
+  0, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'parfum-victoria-key', 'parfum-victoria-key', 'Coffret brumes Victoria’s Key', 'Coffret de quatre brumes parfumées Victoria’s Key, en flacons vaporisateurs.',
+  0, null, 'parfum',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
+  true, false,
+  false, null
 )
 on conflict (id) do update set
   slug = excluded.slug,

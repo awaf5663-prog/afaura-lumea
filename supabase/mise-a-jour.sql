@@ -2612,3 +2612,63 @@ alter table products add column if not exists thumbnail jsonb
 select count(*) filter (where jsonb_array_length(thumbnails) > 0) as fiches_avec_apercus,
        count(*) filter (where thumbnail is not null)              as premieres_vignettes
   from products;
+
+-- ── 31. Les cinq étoffes de septembre 2026 ───────────────────────────
+--
+-- Voile rayures, Modal fulani, Modal nayra, Silk imprimé et Organza
+-- dégradé : cinq matières nouvelles, avec leurs photos livrées dans le
+-- site (rien à téléverser, rien qui pèse sur le quota de la base).
+--
+-- Elles arrivent en BROUILLON, c'est-à-dire invisibles pour les clientes.
+-- La raison tient en une ligne : leur prix n'est pas encore fixé, et une
+-- fiche publiée à 0 FCFA vaut moins que pas de fiche du tout.
+--
+-- Pour les mettre en vente, après cette étape :
+--   /admin → Produits → ouvrir la fiche → saisir le prix → « En ligne ».
+--
+-- `do nothing` et non `do update` : si vous relancez ce fichier plus tard,
+-- il ne doit surtout pas remettre à 0 le prix que vous aurez saisi, ni
+-- refaire passer en brouillon un article que vous avez publié.
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values
+  ('voile-rayures', 'voile-rayures', 'Voile rayures',
+   'Un voile teint en rayures fondues : deux ou trois teintes qui se répondent sur toute la longueur. Faites défiler les photos pour voir les coloris portés, puis choisissez le vôtre. D''autres teintes existent hors des photos : dites-nous celle que vous cherchez, nous confirmons avant paiement.',
+   0, null, 'voile_rayures', '[]'::jsonb,
+   '[{"name":"Coloris","options":["Bleu marine","Bleu canard & rouille","Gris & rose","Kaki & vert olive","Anthracite","Bleu & bleu ciel","Lilas","Orange & violet"],"soldOutOptions":[]}]'::jsonb,
+   '{}'::jsonb, null, 'draft', true, false, true, null),
+
+  ('modal-fulani', 'modal-fulani', 'Modal fulani',
+   'Modal au grain froissé, teint en nuances fondues : le relief reste visible dans le tissu et le dessin change d''un numéro à l''autre. Doux et mat. Choisissez votre numéro de teinte ci-dessus — le nuancier du fournisseur en compte davantage que ce que nos photos nomment, demandez-nous celui qui vous manque.',
+   0, null, 'modal_fulani', '[]'::jsonb,
+   '[{"name":"Teinte","options":["#2 Charcoal black","#3 Navy","#6 Olive grass","#7 Brown","#10 Purple","#11 Sand"],"soldOutOptions":[]}]'::jsonb,
+   '{}'::jsonb, null, 'draft', true, false, true, null),
+
+  ('modal-nayra', 'modal-nayra', 'Modal nayra',
+   'Un modal dégradé : la couleur part soutenue à un bout et s''éclaircit jusqu''à l''autre, si bien que le drapé change de teinte selon la façon dont vous le posez. Tombé souple, fini mat. Faites défiler les photos pour voir les dégradés, puis choisissez le vôtre.',
+   0, null, 'modal_nayra', '[]'::jsonb,
+   '[{"name":"Dégradé","options":["Gris-bleu & sable","Bordeaux & rose","Violet & crème","Orange & brun"],"soldOutOptions":[]}]'::jsonb,
+   '{}'::jsonb, null, 'draft', true, false, true, null),
+
+  ('silk-imprime', 'silk-imprime', 'Silk imprimé',
+   'Voile satiné à imprimé marbré : la lumière y accroche et le motif se déplie sur toute la longueur, comme une peinture. Pour les tenues où l''on veut être vue. Faites défiler les photos pour voir les imprimés ; il en existe d''autres que ceux montrés, demandez-nous.',
+   0, null, 'silk_imprime', '[]'::jsonb,
+   '[{"name":"Imprimé","options":["Marbré bordeaux","Léopard brun","Marbré doré"],"soldOutOptions":[]}]'::jsonb,
+   '{}'::jsonb, null, 'draft', true, false, true, null),
+
+  ('organza-degrade', 'organza-degrade', 'Organza dégradé',
+   'Organza léger et légèrement brillant, teint en dégradé. Plus transparent que nos modals : il se porte volontiers en deuxième voile, sur une sous-cagoule ou un hijab uni, pour les cérémonies. Faites défiler les photos pour voir les dégradés, puis choisissez le vôtre.',
+   0, null, 'organza_degrade', '[]'::jsonb,
+   '[{"name":"Dégradé","options":["Rose & nude","Gris & noir","Prune","Brun","Rouge & noir"],"soldOutOptions":[]}]'::jsonb,
+   '{}'::jsonb, null, 'draft', true, false, true, null)
+on conflict (id) do nothing;
+
+-- Vérification : les cinq fiches doivent apparaître. Tant que la colonne
+-- « prix » vaut 0, la fiche reste en brouillon — c'est normal.
+select id, name, price, status
+  from products
+ where id in ('voile-rayures', 'modal-fulani', 'modal-nayra', 'silk-imprime', 'organza-degrade')
+ order by name;

@@ -136,6 +136,27 @@ import satinDegradeVertRouille from '@/src/assets/products/satin-degrade-vert-ro
 import satinNoirPaillete from '@/src/assets/products/satin-noir-paillete.webp';
 import satinSablePaillete from '@/src/assets/products/satin-sable-paillete.webp';
 import satinVertEau from '@/src/assets/products/satin-vert-eau.webp';
+import fulaniDrape from '@/src/assets/products/fulani-drape.webp';
+import fulaniMarbreBleu from '@/src/assets/products/fulani-marbre-bleu.webp';
+import fulaniNuancier from '@/src/assets/products/fulani-nuancier.webp';
+import fulaniPlies from '@/src/assets/products/fulani-plies.webp';
+import nayraBordeaux from '@/src/assets/products/nayra-bordeaux.webp';
+import nayraDuo from '@/src/assets/products/nayra-duo.webp';
+import nayraOrange from '@/src/assets/products/nayra-orange.webp';
+import nayraViolet from '@/src/assets/products/nayra-violet.webp';
+import organzaBrun from '@/src/assets/products/organza-brun.webp';
+import organzaNoir from '@/src/assets/products/organza-noir.webp';
+import organzaPile from '@/src/assets/products/organza-pile.webp';
+import organzaRose from '@/src/assets/products/organza-rose.webp';
+import rayuresColoris from '@/src/assets/products/rayures-coloris.webp';
+import rayuresEtoffes from '@/src/assets/products/rayures-etoffes.webp';
+import rayuresKakiOlive from '@/src/assets/products/rayures-kaki-olive.webp';
+import rayuresLilas from '@/src/assets/products/rayures-lilas.webp';
+import rayuresOrangeViolet from '@/src/assets/products/rayures-orange-violet.webp';
+import silkBordeaux from '@/src/assets/products/silk-bordeaux.webp';
+import silkEtoffes from '@/src/assets/products/silk-etoffes.webp';
+import silkLeopard from '@/src/assets/products/silk-leopard.webp';
+import silkMarbre from '@/src/assets/products/silk-marbre.webp';
 import viscoseBordeaux from '@/src/assets/products/viscose-bordeaux.webp';
 import viscoseEcru from '@/src/assets/products/viscose-ecru.webp';
 import viscoseKhaki from '@/src/assets/products/viscose-khaki.webp';
@@ -153,6 +174,17 @@ export const CATEGORIES: Category[] = [
   { id: 'jersey', name: 'Jersey' },
   { id: 'jersey_frise', name: 'Jersey frisé' },
   { id: 'hijab_tape', name: 'Hijab tape' },
+  /*
+   * Les cinq étoffes arrivées en septembre 2026. Chacune est une matière à
+   * part — un voile rayures ne se porte pas comme un organza —, et une
+   * cliente qui cherche « le modal nayra » veut son rayon, pas un filtre
+   * « Modal » qui mélangerait tout.
+   */
+  { id: 'voile_rayures', name: 'Voile rayures' },
+  { id: 'modal_fulani', name: 'Modal fulani' },
+  { id: 'modal_nayra', name: 'Modal nayra' },
+  { id: 'silk_imprime', name: 'Silk imprimé' },
+  { id: 'organza_degrade', name: 'Organza dégradé' },
   /*
    * Cadre portrait, comme les voiles. On a essayé le carré « photo entière » :
    * les photos de la boutique sont des captures d'écran bordées de bandes
@@ -375,6 +407,172 @@ export const SEED_PRODUCTS: Product[] = [
     status: 'active',
     colorChartId: 'dentelle12',
     createdAt: '2026-01-05T10:20:00.000Z',
+  },
+  /*
+   * ─────────────────────────────────────────────────────────────
+   *  LES CINQ ÉTOFFES DE SEPTEMBRE 2026
+   * ─────────────────────────────────────────────────────────────
+   *  Elles arrivent en brouillon, et c'est volontaire : la boutique n'a pas
+   *  encore fixé leur prix. Une fiche publiée sans prix juste afficherait un
+   *  montant inventé — on préfère qu'elle n'apparaisse pas du tout le temps
+   *  que le tarif soit saisi depuis /admin → Produits, puis passée en
+   *  « En ligne » d'un clic.
+   *
+   *  Les coloris listés sont UNIQUEMENT ceux qu'on lit sur les photos du
+   *  fournisseur. Les autres existent — les nuanciers en montrent plus que
+   *  ce que les étiquettes nomment —, mais les nommer de mémoire ferait
+   *  commander une teinte pour une autre. D'où `otherColorsAvailable`.
+   */
+  {
+    id: 'voile-rayures',
+    slug: 'voile-rayures',
+    name: 'Voile rayures',
+    description:
+      "Un voile teint en rayures fondues : deux ou trois teintes qui se répondent sur toute la longueur. Faites défiler les photos pour voir les coloris portés, puis choisissez le vôtre. D'autres teintes existent hors des photos : dites-nous celle que vous cherchez, nous confirmons avant paiement.",
+    price: 0,
+    compareAtPrice: null,
+    category: 'voile_rayures',
+    images: [rayuresColoris, rayuresLilas, rayuresKakiOlive, rayuresOrangeViolet, rayuresEtoffes],
+    variants: [
+      {
+        name: 'Coloris',
+        // Les huit noms lisibles sur les étiquettes du fournisseur.
+        options: [
+          'Bleu marine',
+          'Bleu canard & rouille',
+          'Gris & rose',
+          'Kaki & vert olive',
+          'Anthracite',
+          'Bleu & bleu ciel',
+          'Lilas',
+          'Orange & violet',
+        ],
+        soldOutOptions: [],
+      },
+    ],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-15T18:00:00.000Z',
+  },
+  {
+    id: 'modal-fulani',
+    slug: 'modal-fulani',
+    name: 'Modal fulani',
+    description:
+      "Modal au grain froissé, teint en nuances fondues : le relief reste visible dans le tissu et le dessin change d'un numéro à l'autre. Doux et mat. Choisissez votre numéro de teinte ci-dessus — le nuancier du fournisseur en compte davantage que ce que nos photos nomment, demandez-nous celui qui vous manque.",
+    price: 0,
+    compareAtPrice: null,
+    category: 'modal_fulani',
+    images: [fulaniDrape, fulaniNuancier, fulaniPlies, fulaniMarbreBleu],
+    variants: [
+      {
+        name: 'Teinte',
+        /*
+         * Seuls les numéros qui se lisent sur la photo du nuancier. Les
+         * autres étiquettes sont coupées ou floues : les compléter de tête
+         * ferait partir une teinte pour une autre.
+         */
+        options: [
+          '#2 Charcoal black',
+          '#3 Navy',
+          '#6 Olive grass',
+          '#7 Brown',
+          '#10 Purple',
+          '#11 Sand',
+        ],
+        soldOutOptions: [],
+      },
+    ],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-15T18:05:00.000Z',
+  },
+  {
+    id: 'modal-nayra',
+    slug: 'modal-nayra',
+    name: 'Modal nayra',
+    description:
+      "Un modal dégradé : la couleur part soutenue à un bout et s'éclaircit jusqu'à l'autre, si bien que le drapé change de teinte selon la façon dont vous le posez. Tombé souple, fini mat. Faites défiler les photos pour voir les dégradés, puis choisissez le vôtre.",
+    price: 0,
+    compareAtPrice: null,
+    category: 'modal_nayra',
+    images: [nayraDuo, nayraBordeaux, nayraViolet, nayraOrange],
+    variants: [
+      {
+        name: 'Dégradé',
+        // Décrits d'après les photos : le fournisseur ne les nomme pas.
+        options: [
+          'Gris-bleu & sable',
+          'Bordeaux & rose',
+          'Violet & crème',
+          'Orange & brun',
+        ],
+        soldOutOptions: [],
+      },
+    ],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-15T18:10:00.000Z',
+  },
+  {
+    id: 'silk-imprime',
+    slug: 'silk-imprime',
+    name: 'Silk imprimé',
+    description:
+      "Voile satiné à imprimé marbré : la lumière y accroche et le motif se déplie sur toute la longueur, comme une peinture. Pour les tenues où l'on veut être vue. Faites défiler les photos pour voir les imprimés ; il en existe d'autres que ceux montrés, demandez-nous.",
+    price: 0,
+    compareAtPrice: null,
+    category: 'silk_imprime',
+    images: [silkBordeaux, silkLeopard, silkMarbre, silkEtoffes],
+    variants: [
+      {
+        name: 'Imprimé',
+        // Décrits d'après les photos : le fournisseur ne les nomme pas.
+        options: ['Marbré bordeaux', 'Léopard brun', 'Marbré doré'],
+        soldOutOptions: [],
+      },
+    ],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-15T18:15:00.000Z',
+  },
+  {
+    id: 'organza-degrade',
+    slug: 'organza-degrade',
+    name: 'Organza dégradé',
+    description:
+      "Organza léger et légèrement brillant, teint en dégradé. Plus transparent que nos modals : il se porte volontiers en deuxième voile, sur une sous-cagoule ou un hijab uni, pour les cérémonies. Faites défiler les photos pour voir les dégradés, puis choisissez le vôtre.",
+    price: 0,
+    compareAtPrice: null,
+    category: 'organza_degrade',
+    images: [organzaRose, organzaNoir, organzaBrun, organzaPile],
+    variants: [
+      {
+        name: 'Dégradé',
+        // Décrits d'après les photos : le fournisseur ne les nomme pas.
+        options: [
+          'Rose & nude',
+          'Gris & noir',
+          'Prune',
+          'Brun',
+          'Rouge & noir',
+        ],
+        soldOutOptions: [],
+      },
+    ],
+    stock: null,
+    status: 'draft',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-15T18:20:00.000Z',
   },
   {
     id: 'piece-unique',

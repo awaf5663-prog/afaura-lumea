@@ -138,7 +138,11 @@ export function Gallery({
                   draggable={false}
                 />
               ) : (
-                <div className="grid size-full place-items-center text-sm text-stone">Photo à venir</div>
+                /* Même principe que sur la vignette : on ne s'excuse pas en
+                   petit gris, on tient la place proprement. */
+                <div className="grid size-full place-items-center bg-rosecreme px-6 text-center">
+                  <span className="font-display text-[20px] leading-tight text-mauve">{alt}</span>
+                </div>
               )}
             </div>
           ))}

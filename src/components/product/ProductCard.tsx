@@ -75,7 +75,17 @@ export function ProductCard({ product, priority }: { product: Product; priority?
               )}
             />
           ) : (
-            <div className="grid size-full place-items-center text-xs text-stone">Photo à venir</div>
+            /*
+              Un article sans photo garde tout de même une vignette digne :
+              son nom, sur le fond de la boutique. « Photo à venir » écrit en
+              petit gris fait négligé — et c'est la première chose qu'une
+              cliente voit de cet article.
+            */
+            <div className="grid size-full place-items-center px-3 text-center">
+              <span className="font-display text-[15px] leading-tight text-mauve">
+                {product.name}
+              </span>
+            </div>
           )}
 
           <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1.5">

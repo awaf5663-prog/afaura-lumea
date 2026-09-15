@@ -8,6 +8,7 @@ import { Button } from '@/src/components/ui/Button';
 import { ErrorText, FormRow, Input, Label, Textarea } from '@/src/components/ui/Field';
 import { PAYMENT_METHODS } from '@/src/config/site';
 import { MoyenPaiementIcone } from '@/src/components/order/MoyenPaiementIcone';
+import { WhatsAppLink } from '@/src/components/whatsapp/WhatsAppLink';
 import { useCart } from '@/src/hooks/useCart';
 import { useProducts } from '@/src/hooks/useProducts';
 import { useSettings, useWhatsapp } from '@/src/hooks/useSettings';
@@ -211,6 +212,36 @@ export function CheckoutPage() {
       // derrière le panneau, où la cliente peut corriger.
       setRelecture(false);
     }
+  };
+
+  /**
+   * La commande telle qu'elle est dans le formulaire, rédigée pour WhatsApp.
+   *
+   * Sert quand la base n'a pas pu l'enregistrer. Aucun numéro de commande —
+   * il n'y en a pas — et aucun total présenté comme définitif : c'est la
+   * boutique qui confirme le montant, comme d'habitude.
+   */
+  const messageDeSecours = (): string => {
+    const lignes = [
+      'Bonjour, je voudrais passer cette commande (le site ne l’a pas enregistrée).',
+      '',
+      `Nom : ${form.firstName.trim()} ${form.lastName.trim()}`.trim(),
+      `Téléphone : ${prettyPhone(form.phone)}`,
+      `Livraison : ${[zone?.label, form.address.trim(), form.city.trim()].filter(Boolean).join(' — ')}`,
+      `Paiement : ${method.label}`,
+      '',
+      'Articles :',
+      ...items.map((item) => {
+        const options = Object.entries(item.options)
+          .map(([nom, valeur]) => `${nom} : ${valeur}`)
+          .join(', ');
+        return `· ${item.name}${options ? ` (${options})` : ''} × ${item.quantity}`;
+      }),
+      '',
+      'Merci de me confirmer le montant total.',
+    ];
+    if (form.note.trim()) lignes.push('', `Note : ${form.note.trim()}`);
+    return lignes.filter((l) => l !== undefined).join('\n');
   };
 
   const recapitulatif: LigneRecap[] = [
@@ -525,10 +556,25 @@ export function CheckoutPage() {
             </dl>
 
             {submitError && (
-              <p className="mt-4 flex gap-2 rounded-[--radius-sm] bg-[#f6e9e9] px-4 py-3 text-[12.5px] text-[#8a2f2f]">
-                <AlertCircle className="mt-0.5 size-4 shrink-0" />
-                {submitError}
-              </p>
+              <div className="mt-4 rounded-[--radius-sm] bg-[#f6e9e9] px-4 py-3 text-[12.5px] text-[#8a2f2f]">
+                <p className="flex gap-2">
+                  <AlertCircle className="mt-0.5 size-4 shrink-0" />
+                  {submitError}
+                </p>
+                {/*
+                  L'enregistrement a échoué — base injoignable, quota dépassé.
+                  La commande, elle, existe : elle est dans ce formulaire. On
+                  ne renvoie pas la cliente à zéro, on l'envoie sur WhatsApp
+                  avec sa demande déjà rédigée.
+                */}
+                <p className="mt-2">
+                  Votre commande n'est pas perdue : envoyez-la-nous sur WhatsApp, nous la
+                  reprenons à la main.
+                </p>
+                <WhatsAppLink message={messageDeSecours()} className="mt-3">
+                  Envoyer ma commande sur WhatsApp
+                </WhatsAppLink>
+              </div>
             )}
 
             <div className="mt-6">

@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
 import { db, onDataChanged } from '@/src/services';
+import { SEED_PRODUCTS } from '@/src/data/seed';
 import type { Product } from '@/src/types';
 
 /**
@@ -119,6 +120,14 @@ export function useProducts(includeDrafts = false) {
   // Rien en cache : on annonce le chargement. Sinon on montre, et on vérifie.
   const [loading, setLoading] = useState(cache === null);
   const [error, setError] = useState<string | null>(null);
+  /** Le catalogue affiché vient du site lui-même, la base n'ayant pas répondu. */
+  const [deSecours, setDeSecours] = useState(false);
+  /*
+   * Y a-t-il déjà quelque chose à l'écran ? `products` lu dans le `catch`
+   * serait celui de la fermeture, figé au premier rendu — une référence,
+   * elle, dit la vérité au moment où la lecture échoue.
+   */
+  const aDesProduits = useRef(cache !== null);
 
   /**
    * `silent` : relecture déclenchée par un changement enregistré ailleurs, ou
@@ -138,16 +147,49 @@ export function useProducts(includeDrafts = false) {
         const all = await db.listProducts();
         const visibles = all.filter((p) => p.status !== 'draft');
         setProducts(includeDrafts ? all : visibles);
+        aDesProduits.current = (includeDrafts ? all : visibles).length > 0;
+        setDeSecours(false);
         // Seul le catalogue public est gardé : les brouillons n'ont rien à
         // faire dans le navigateur d'une cliente.
         if (!includeDrafts) garderEnCache(visibles);
       } catch (e) {
         /*
-         * Une vérification qui échoue derrière un catalogue déjà affiché ne
-         * doit pas l'effacer au profit d'un message d'erreur : ce qui est à
-         * l'écran reste vrai jusqu'à preuve du contraire.
+         * ─────────────────────────────────────────────────────────────
+         *  LA BOUTIQUE NE RESTE JAMAIS VIDE
+         * ─────────────────────────────────────────────────────────────
+         *  Base injoignable et rien en cache : la cliente tombait sur une
+         *  page vide. Une boutique vide, c'est une boutique fermée — et le
+         *  jour où la base ne répond pas est justement celui où il faut
+         *  pouvoir montrer ce qu'on vend.
+         *
+         *  Le site embarque son propre catalogue : ce sont les fiches et les
+         *  photos livrées avec lui, celles-là mêmes qui ont servi à remplir
+         *  la base. On les affiche, en le disant, et la commande passe par
+         *  WhatsApp — où le prix et la disponibilité sont de toute façon
+         *  confirmés avant tout paiement.
+         *
+         *  Jamais dans l'administration : elle doit voir la panne, pas un
+         *  catalogue de secours qu'elle ne pourrait pas modifier.
          */
-        if (!silent) setError(e instanceof Error ? e.message : 'Chargement impossible.');
+        const message = e instanceof Error ? e.message : 'Chargement impossible.';
+        if (!includeDrafts && !aDesProduits.current) {
+          const secours = SEED_PRODUCTS.filter((p) => p.status !== 'draft');
+          if (secours.length > 0) {
+            setProducts(secours);
+            aDesProduits.current = true;
+            setDeSecours(true);
+            setError(null);
+            return;
+          }
+        }
+        /*
+         * Un message d'erreur ne remplace JAMAIS un catalogue déjà à
+         * l'écran — qu'il vienne du cache ou du site lui-même. Sans cette
+         * condition, une seconde tentative (le bouton « Réessayer », ou
+         * simplement le double montage de React) effaçait la boutique de
+         * secours qu'on venait d'afficher.
+         */
+        if (!silent && !aDesProduits.current) setError(message);
       } finally {
         setLoading(false);
       }
@@ -169,5 +211,5 @@ export function useProducts(includeDrafts = false) {
   // L'admin enregistre : le catalogue affiché se met à jour tout seul.
   useEffect(() => onDataChanged(() => void load(true)), [load]);
 
-  return { products, loading, error, reload: () => load() };
+  return { products, loading, error, deSecours, reload: () => load() };
 }

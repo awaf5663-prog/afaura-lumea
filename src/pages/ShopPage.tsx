@@ -26,12 +26,16 @@ const SORTS: Array<{ id: Sort; label: string }> = [
   { id: 'prix-desc', label: 'Prix décroissant' },
 ];
 
+/** Ce que la cliente envoie quand la commande en ligne est suspendue. */
+const MESSAGE_SECOURS =
+  'Bonjour ! Je regarde votre boutique en ligne. Pouvez-vous me confirmer le prix et la disponibilité de ce qui m’intéresse ?';
+
 /** Ce que la cliente envoie quand la boutique ne peut rien afficher. */
 const MESSAGE_PANNE =
   "Bonjour ! Le site n'affiche pas les articles en ce moment. Pouvez-vous m'envoyer ce que vous avez, avec les prix ?";
 
 export function ShopPage() {
-  const { products, loading, error, reload } = useProducts();
+  const { products, loading, error, deSecours, reload } = useProducts();
   const { search, navigate } = useRouter();
   const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -243,6 +247,24 @@ export function ShopPage() {
           ))}
         </div>
       </div>
+
+      {/*
+        Le catalogue vient du site, la base n'ayant pas répondu. On le dit,
+        et on ouvre WhatsApp : le prix et la disponibilité sont de toute
+        façon confirmés là avant tout paiement.
+      */}
+      {deSecours && (
+        <div className="mt-6 flex flex-col gap-3 rounded-[--radius-md] border border-line bg-cream/70 px-4 py-3.5 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-[13px] leading-relaxed text-graphite">
+            <strong className="font-medium text-ink">Commande en ligne suspendue.</strong> Vous
+            pouvez parcourir la boutique, mais les prix et la disponibilité sont à confirmer avec
+            nous. Écrivez-nous, on vous répond tout de suite.
+          </p>
+          <WhatsAppLink message={MESSAGE_SECOURS} className="shrink-0">
+            Commander sur WhatsApp
+          </WhatsAppLink>
+        </div>
+      )}
 
       <p className="mt-4 text-[12.5px] text-stone" aria-live="polite">
         {loading ? 'Chargement…' : `${filtered.length} article${filtered.length > 1 ? 's' : ''}`}

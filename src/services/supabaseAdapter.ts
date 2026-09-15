@@ -695,9 +695,21 @@ export const supabaseAdapter: DataSource = {
     );
     if (aCompleter.length > 0) {
       const ids = aCompleter.map((r) => encodeURIComponent(String(r.id))).join(',');
-      const photos = await rest<Row[]>(`products?select=id,images&id=in.(${ids})`);
-      const parId = new Map(photos.map((p) => [p.id, p.images]));
-      for (const r of aCompleter) r.images = parId.get(r.id) ?? [];
+      try {
+        const photos = await rest<Row[]>(`products?select=id,images&id=in.(${ids})`);
+        const parId = new Map(photos.map((p) => [p.id, p.images]));
+        for (const r of aCompleter) r.images = parId.get(r.id) ?? [];
+      } catch {
+        /*
+         * Ce rattrapage est un SUPPLÉMENT : il va chercher les photos des
+         * fiches qui n'ont pas encore d'aperçu. Son échec ne doit pas
+         * emporter le catalogue entier — c'est pourtant ce qui se passait,
+         * et la boutique se retrouvait vide alors que les articles étaient
+         * arrivés. On garde ce qu'on a : les pièces livrées avec le site
+         * gardent leur photo, les autres s'afficheront sous leur nom.
+         */
+        for (const r of aCompleter) r.images = [];
+      }
     }
 
     return rows.map((r) => {
@@ -708,6 +720,11 @@ export const supabaseAdapter: DataSource = {
        * livrées avec le site — ce serait montrer une autre pièce que celle
        * que la boutique vend. On laisse la liste vide : la fiche ira
        * chercher les vraies à son ouverture.
+       *
+       * Le jour où la base refuse ce supplément, le rattrapage ci-dessus
+       * pose une liste vide plutôt que de laisser la colonne absente : la
+       * fiche retombe alors sur la photo livrée avec le site, et la
+       * boutique garde ses vignettes.
        */
       const allegee = r.images === undefined && (r.images_count ?? 0) > 0;
       return allegee ? { ...produit, images: [] } : produit;

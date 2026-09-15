@@ -48,5 +48,12 @@ export const STORAGE_KEYS = {
    * Dernier catalogue reçu, gardé pour l'affichage immédiat de la visite
    * suivante. Ce n'est pas la source de vérité — voir hooks/useProducts.
    */
-  catalogueEnCache: 'lumea.catalogue.cache.v1',
+  /*
+   * Le numéro de version compte : un catalogue mal formé — écrit par une
+   * version précédente, ou par une lecture partielle pendant une panne —
+   * resterait affiché tant qu'il est jugé frais. Le changer fait repartir
+   * tous les navigateurs sur une lecture propre, sans que personne ait à
+   * vider quoi que ce soit.
+   */
+  catalogueEnCache: 'lumea.catalogue.cache.v2',
 } as const;

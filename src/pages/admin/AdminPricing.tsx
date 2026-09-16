@@ -10,6 +10,7 @@ import { DraftStatus } from '@/src/components/admin/DraftStatus';
 import { useToast } from '@/src/hooks/useToast';
 import { formatFcfa } from '@/src/lib/format';
 import { uid } from '@/src/lib/orderNumber';
+import { CATEGORIES } from '@/src/data/seed';
 import { SERVICE_FEE_STRATEGIES, computeQuoteFromInput, describeStrategy } from '@/src/lib/pricing';
 import type { Grouping, PricingConfig } from '@/src/types';
 
@@ -36,6 +37,9 @@ export function AdminPricing({ groupings = [] }: { groupings?: Grouping[] }) {
   }, [settings]);
 
   const pricing = draft?.pricing;
+  /* Réglage arrivé après coup : une boutique installée avant lui n'a pas la
+     clé, et `undefined` casserait les cases à cocher. */
+  const exemptes = pricing?.feeExemptCategories ?? [];
 
   // L'aperçu utilise le brouillon : on teste AVANT de publier les tarifs.
   const preview = useMemo(
@@ -220,6 +224,54 @@ export function AdminPricing({ groupings = [] }: { groupings?: Grouping[] }) {
               commandes de la boutique. Les articles se comptent en unités, pas en lignes — douze
               cahiers font douze articles. Une tranche laissée à « devis manuel » ne facture rien
               sur une commande de la boutique, qui part sans passage par un devis.
+            </p>
+          </section>
+
+          {/* ── Rayons sans frais ─────────────────────────────── */}
+          <section className="mt-5 rounded-[--radius-lg] border border-line bg-white p-5">
+            <h3 className="text-[18px]">Rayons sans frais de traitement</h3>
+            <p className="mt-1 text-[13px] leading-relaxed text-stone">
+              Les frais paient une commande : trouver la pièce, la regrouper, la suivre
+              jusqu'ici. Ce qui est acheté par lots et gardé sur place ne demande rien de
+              tout cela. Cochez ces rayons : une cliente qui n'achète que ça ne paiera
+              aucun frais.
+            </p>
+
+            <ul className="mt-4 grid gap-x-4 gap-y-1 sm:grid-cols-2">
+              {CATEGORIES.map((rayon) => {
+                const coche = exemptes.includes(rayon.id);
+                return (
+                  <li key={rayon.id}>
+                    <label className="flex cursor-pointer items-center gap-2.5 py-1.5 text-[13.5px]">
+                      <input
+                        type="checkbox"
+                        checked={coche}
+                        onChange={() =>
+                          setPricing({
+                            feeExemptCategories: coche
+                              ? exemptes.filter((id) => id !== rayon.id)
+                              : [...exemptes, rayon.id],
+                          })
+                        }
+                        className="size-4 accent-[--color-brand]"
+                      />
+                      <span>{rayon.name}</span>
+                    </label>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <p className="mt-4 flex gap-2 rounded-[--radius-sm] bg-cream/70 px-3.5 py-3 text-[12px] leading-relaxed text-graphite">
+              <Info className="mt-0.5 size-3.5 shrink-0" />
+              {exemptes.length === 0
+                ? 'Aucun rayon dispensé : tous les articles commandés portent des frais.'
+                : `${exemptes.length} rayon${exemptes.length > 1 ? 's' : ''} dispensé${
+                    exemptes.length > 1 ? 's' : ''
+                  }.`}{' '}
+              Ne vaut que pour la boutique : une demande SHEIN reste facturée, le travail
+              de commande y étant réel. Les articles marqués « déjà en boutique » sont
+              dispensés de leur côté, quel que soit leur rayon.
             </p>
           </section>
 

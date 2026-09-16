@@ -43,6 +43,21 @@ export function normalizePricing(raw: unknown): PricingConfig {
     deliveryOptions: filled(p.deliveryOptions, DEFAULT_PRICING.deliveryOptions),
     conversionRates: filled(p.conversionRates, DEFAULT_PRICING.conversionRates),
     defaultCurrency: filled(p.defaultCurrency, DEFAULT_PRICING.defaultCurrency),
+    /*
+     * Rayons dispensés de frais : la seule liste où le VIDE est un choix.
+     *
+     * `filled` remplace un tableau vide par la valeur par défaut, ce qui est
+     * la bonne règle partout ailleurs — une grille de tranches vide est un
+     * accident. Ici non : une boutique qui décoche tous les rayons veut
+     * facturer tout le monde, et lui réinstaller les quinze rayons du
+     * fichier de départ annulerait sa décision en silence.
+     *
+     * Absent, en revanche, veut bien dire absent : les réglages enregistrés
+     * avant l'arrivée de ce champ reprennent la liste de départ.
+     */
+    feeExemptCategories: Array.isArray(p.feeExemptCategories)
+      ? (p.feeExemptCategories as string[])
+      : (DEFAULT_PRICING.feeExemptCategories ?? []),
   };
 }
 

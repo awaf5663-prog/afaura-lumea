@@ -76,6 +76,39 @@ export const DEFAULT_PRICING: PricingConfig = {
   },
 
   defaultCurrency: 'EUR',
+
+  /**
+   * Rayons dispensés de frais de traitement en boutique.
+   *
+   * Les voiles et les glosses sont achetés par lots, pour la boutique, et
+   * gardés sur place : choisir un voile ne déclenche aucune commande, donc
+   * aucun travail à facturer. Les autres rayons — et TOUTES les demandes
+   * SHEIN — restent soumis à la grille.
+   *
+   * Cette liste se modifie depuis Administration → Tarification. Elle est
+   * donnée par rayon et non par famille : une famille est un regroupement
+   * d'affichage, elle peut être remaniée sans qu'on y pense, et les frais
+   * suivraient alors en silence.
+   */
+  feeExemptCategories: [
+    // Voiles
+    'voile_viscose',
+    'voile_mj',
+    'modal_imprime',
+    'modal_simple',
+    'satin_imprime',
+    'dentelle',
+    'jersey',
+    'jersey_frise',
+    'hijab_tape',
+    'voile_rayures',
+    'modal_fulani',
+    'modal_nayra',
+    'silk_imprime',
+    'organza_degrade',
+    // Glosses et huiles à lèvres
+    'lips',
+  ],
 };
 
 /** Valeurs de départ d'un nouveau groupage, modifiables à la création. */

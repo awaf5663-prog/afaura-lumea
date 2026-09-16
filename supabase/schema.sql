@@ -222,6 +222,8 @@ declare
   v_articles integer := 0;
   v_service integer := 0;
   v_tiers jsonb;
+  -- Rayons dispensés de frais de traitement, relus dans les réglages.
+  v_sans_frais jsonb;
   v_fee integer;
   v_item jsonb;
   v_product products%rowtype;
@@ -242,8 +244,9 @@ begin
 
   select (delivery_fees ->> p_delivery_zone_id)::integer,
          coalesce(promotions, '[]'::jsonb),
-         coalesce(pricing -> 'tiers', '[]'::jsonb)
-    into v_fee, v_promotions, v_tiers
+         coalesce(pricing -> 'tiers', '[]'::jsonb),
+         coalesce(pricing -> 'feeExemptCategories', '[]'::jsonb)
+    into v_fee, v_promotions, v_tiers, v_sans_frais
     from settings where id = 1;
   v_label := p_delivery_zone_id;
   v_number := 'CMD-' || to_char(now(), 'YYYY') || '-' || lpad(nextval('order_seq')::text, 5, '0');
@@ -284,12 +287,21 @@ begin
      * Les articles se comptent en unités, pas en lignes : douze cahiers font
      * douze articles. Même règle que pour les demandes SHEIN.
      *
-     * Sauf ceux déjà en boutique. Les frais de traitement paient un travail —
-     * commander la pièce, la regrouper, la suivre jusqu'ici ; un article gardé
-     * sur place n'en demande aucun, et la livraison se convient de vive voix.
-     * L'état est relu dans la fiche, jamais reçu du navigateur.
+     * Deux exceptions, pour la même raison de fond — le travail n'a pas lieu.
+     * Les frais paient une commande : trouver la pièce, la regrouper, la
+     * suivre jusqu'ici.
+     *
+     *   • l'article est DÉJÀ EN BOUTIQUE : il est là, on le remet, et la
+     *     livraison se convient de vive voix ;
+     *   • son RAYON est dispensé par les réglages (Tarification → rayons sans
+     *     frais) : la boutique achète ces articles par lots, pour elle.
+     *
+     * Le rayon et l'état sont RELUS DANS LA FICHE, jamais reçus du navigateur :
+     * c'est ce qui empêche un panier bricolé de réclamer une exemption. La
+     * liste des rayons vient des réglages, pas du navigateur non plus.
      */
-    if not coalesce(v_product.ready_to_ship, false) then
+    if not coalesce(v_product.ready_to_ship, false)
+       and not (v_sans_frais ? v_product.category) then
       v_articles := v_articles + v_quantity;
     end if;
 

@@ -167,10 +167,15 @@ export const localAdapter: DataSource = {
     /*
      * Frais de traitement : relus dans la grille des réglages, jamais reçus du
      * navigateur. Les articles déjà en boutique n'en portent pas — ils ne sont
-     * pas commandés. Voir lib/pricing/storeFee.
+     * pas commandés —, ni ceux des rayons dispensés par les réglages.
+     * Voir lib/pricing/storeFee.
      */
     const serviceFee = fraisBoutique(
-      nombreArticlesFactures(items, loadProducts()),
+      nombreArticlesFactures(
+        items,
+        loadProducts(),
+        settings.pricing?.feeExemptCategories ?? [],
+      ),
       settings.pricing?.tiers ?? [],
     );
 

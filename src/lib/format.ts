@@ -48,3 +48,14 @@ export function isValidSenegalPhone(input: string): boolean {
   const n = normalizePhone(input);
   return /^221(7[0-8])\d{7}$/.test(n) || (n.length >= 8 && n.length <= 15 && !n.startsWith('221'));
 }
+
+/**
+ * Une énumération qui se lit : « les voiles », « les voiles et les glosses »,
+ * « A, B et C ». Le « et » final évite la liste télégraphique, qui donne
+ * l'impression d'un champ de base de données recopié tel quel.
+ */
+export function listeLisible(elements: string[]): string {
+  if (elements.length === 0) return '';
+  if (elements.length === 1) return elements[0];
+  return `${elements.slice(0, -1).join(', ')} et ${elements[elements.length - 1]}`;
+}

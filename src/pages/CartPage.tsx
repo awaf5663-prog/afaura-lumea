@@ -5,8 +5,9 @@ import { EmptyState } from '@/src/components/ui/EmptyState';
 import { useCart } from '@/src/hooks/useCart';
 import { useProducts } from '@/src/hooks/useProducts';
 import { useSettings } from '@/src/hooks/useSettings';
-import { formatFcfa } from '@/src/lib/format';
-import { fraisBoutique, nombreArticlesFactures } from '@/src/lib/pricing/storeFee';
+import { CATEGORIES } from '@/src/data/seed';
+import { formatFcfa, listeLisible } from '@/src/lib/format';
+import { fraisBoutique, nombreArticlesFactures, rayonsSansFrais } from '@/src/lib/pricing/storeFee';
 import { useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 
@@ -22,9 +23,25 @@ export function CartPage() {
    * tout à l'enregistrement : cet aperçu ne décide de rien.
    */
   const serviceFee = fraisBoutique(
-    nombreArticlesFactures(items, products),
+    nombreArticlesFactures(items, products, settings?.pricing?.feeExemptCategories ?? []),
     settings?.pricing?.tiers ?? [],
   );
+  /*
+   * Une ligne de frais qui disparaît ne dit rien. Quand le panier contient
+   * un rayon dispensé, on l'écrit — c'est un avantage réel, et la cliente
+   * n'a aucun moyen de le deviner d'un total.
+   *
+   * Les noms viennent du catalogue des rayons, jamais d'une liste écrite
+   * ici : le jour où la boutique dispense un rayon de plus depuis
+   * Tarification, la phrase suit toute seule.
+   */
+  const dispenses = rayonsSansFrais(
+    items,
+    products,
+    settings?.pricing?.feeExemptCategories ?? [],
+  )
+    .map((id) => CATEGORIES.find((c) => c.id === id)?.name)
+    .filter((nom): nom is string => Boolean(nom));
 
   useSeo({
     title: 'Mon panier',
@@ -87,6 +104,14 @@ export function CartPage() {
                 <div className="flex justify-between">
                   <dt className="text-stone">Frais de traitement</dt>
                   <dd className="tabular-nums">{formatFcfa(serviceFee)}</dd>
+                </div>
+              )}
+              {dispenses.length > 0 && (
+                <div className="flex justify-between gap-3">
+                  <dt className="text-stone">Frais de traitement</dt>
+                  <dd className="text-right text-[12.5px] leading-snug text-mauve">
+                    Aucun sur {listeLisible(dispenses)}
+                  </dd>
                 </div>
               )}
               <div className="flex justify-between">

@@ -35,25 +35,69 @@ export function nombreArticles(items: Array<{ quantity: number }>): number {
  * Nombre d'articles qui déclenchent des frais de traitement.
  *
  * Les frais paient un travail : commander la pièce, la regrouper, la suivre
- * jusqu'ici. Un article déjà en boutique n'a rien de tout cela — il est là, on
- * le remet, et la livraison se convient de vive voix. Le facturer reviendrait
- * à faire payer un travail qui n'a pas lieu.
+ * jusqu'ici. Deux cas y échappent, pour la même raison de fond — le travail
+ * n'a pas lieu :
  *
- * Un panier qui ne contient que des articles en boutique n'a donc aucun frais.
- * Un panier mêlé ne paie que pour ce qui doit être commandé.
+ *   • l'article est DÉJÀ EN BOUTIQUE (`readyToShip`). Il est là, on le
+ *     remet, et la livraison se convient de vive voix ;
+ *   • son RAYON est dispensé de frais (`categoriesExemptes`). La boutique
+ *     achète ses voiles et ses glosses par lots, pour elle : la cliente ne
+ *     déclenche aucune commande en les choisissant.
  *
- * L'état vient du catalogue et non du panier : une fiche qui passe en boutique
- * — ou qui en sort — vaut aussitôt pour les paniers déjà remplis, sans qu'il
- * faille les vider. Un article introuvable au catalogue est compté : mieux
- * vaut facturer un article disparu que d'offrir un travail réel.
+ * Un panier qui n'en contient que de ceux-là n'a donc aucun frais. Un panier
+ * mêlé ne paie que pour ce qui doit être commandé.
+ *
+ * L'état vient du catalogue et non du panier : une fiche qui passe en
+ * boutique — ou qui change de rayon — vaut aussitôt pour les paniers déjà
+ * remplis, sans qu'il faille les vider. Un article introuvable au catalogue
+ * est compté : mieux vaut facturer un article disparu que d'offrir un
+ * travail réel.
+ *
+ * ⚠️ Ce calcul sert à ANNONCER le montant. Celui qui est facturé est
+ * recalculé par la base, à partir des mêmes réglages et du même catalogue
+ * (voir create_order dans supabase/schema.sql). Le navigateur ne décide
+ * jamais qu'un article est exempté.
  */
 export function nombreArticlesFactures(
   items: Array<{ productId: string; quantity: number }>,
-  catalogue: Array<{ id: string; readyToShip?: boolean }>,
+  catalogue: Array<{ id: string; category?: string; readyToShip?: boolean }>,
+  categoriesExemptes: string[] = [],
 ): number {
-  const enBoutique = new Set(catalogue.filter((p) => p.readyToShip).map((p) => p.id));
+  const exemptes = new Set(categoriesExemptes);
+  const dispenses = new Set(
+    catalogue
+      .filter((p) => p.readyToShip || (p.category !== undefined && exemptes.has(p.category)))
+      .map((p) => p.id),
+  );
   return items.reduce(
-    (somme, item) => somme + (enBoutique.has(item.productId) ? 0 : Math.max(1, item.quantity)),
+    (somme, item) => somme + (dispenses.has(item.productId) ? 0 : Math.max(1, item.quantity)),
     0,
   );
+}
+
+/**
+ * Rayons du panier qui échappent aux frais, pour le dire à la cliente.
+ *
+ * Une ligne de frais qui disparaît est muette : la cliente ne sait pas
+ * qu'elle y a gagné quelque chose. Cette liste sert à l'écrire — « aucun
+ * frais sur les voiles » — à partir de ce que le panier contient vraiment.
+ *
+ * Elle ne nomme QUE les rayons dispensés par les réglages. Un article
+ * « déjà en boutique » ne paie pas non plus, mais c'est une propriété de
+ * la fiche, pas du rayon : l'annoncer comme un rayon entier serait faux
+ * pour les autres articles du même rayon.
+ */
+export function rayonsSansFrais(
+  items: Array<{ productId: string }>,
+  catalogue: Array<{ id: string; category?: string }>,
+  categoriesExemptes: string[],
+): string[] {
+  const exemptes = new Set(categoriesExemptes);
+  const parId = new Map(catalogue.map((p) => [p.id, p.category]));
+  const presents = new Set<string>();
+  for (const item of items) {
+    const rayon = parId.get(item.productId);
+    if (rayon !== undefined && exemptes.has(rayon)) presents.add(rayon);
+  }
+  return [...presents];
 }

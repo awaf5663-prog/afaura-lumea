@@ -351,6 +351,22 @@ export interface PricingConfig {
   conversionRates: Record<string, number | null>;
   /** Devise proposée par défaut dans le formulaire. */
   defaultCurrency: string;
+  /**
+   * Rayons dispensés de frais de traitement en boutique.
+   *
+   * Les frais paient un travail : commander la pièce, la regrouper, la
+   * suivre. La boutique achète ses voiles et ses glosses par lots, pour
+   * elle, et les garde sur place : ce travail-là n'a pas lieu, et le
+   * facturer reviendrait à faire payer un service qui n'est pas rendu.
+   *
+   * La liste est un réglage, pas une règle écrite dans le code : elle se
+   * modifie depuis Administration → Tarification le jour où la boutique
+   * change d'avis, sans nouvelle mise en ligne.
+   *
+   * Ne concerne QUE la boutique. Une demande SHEIN reste facturée : là, le
+   * travail de commande et de regroupement existe bel et bien.
+   */
+  feeExemptCategories?: string[];
 }
 
 /** Détail d'une estimation, ligne par ligne. */

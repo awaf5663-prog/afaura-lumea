@@ -14,9 +14,21 @@ import { useProducts } from '@/src/hooks/useProducts';
 import { useSettings, useWhatsapp } from '@/src/hooks/useSettings';
 import { useToast } from '@/src/hooks/useToast';
 import { findPromotion, visiblePromotions } from '@/src/lib/pricing/promotions';
-import { fraisBoutique, nombreArticlesFactures } from '@/src/lib/pricing/storeFee';
+import {
+  fraisBoutique,
+  nombreArticles,
+  nombreArticlesFactures,
+  rayonsSansFrais,
+} from '@/src/lib/pricing/storeFee';
 import { cn } from '@/src/lib/cn';
-import { formatFcfa, isValidSenegalPhone, normalizePhone, prettyPhone } from '@/src/lib/format';
+import { CATEGORIES } from '@/src/data/seed';
+import {
+  formatFcfa,
+  isValidSenegalPhone,
+  listeLisible,
+  normalizePhone,
+  prettyPhone,
+} from '@/src/lib/format';
 import { useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
@@ -112,8 +124,27 @@ export function CheckoutPage() {
    * données qui recalcule ce montant à l'enregistrement ; ce que la cliente
    * lit ici n'en est qu'un aperçu fidèle.
    */
-  const articles = nombreArticlesFactures(items, products);
+  const articles = nombreArticlesFactures(
+    items,
+    products,
+    settings?.pricing?.feeExemptCategories ?? [],
+  );
   const serviceFee = fraisBoutique(articles, settings?.pricing?.tiers ?? []);
+  /*
+   * Deux comptes, et ils ne disent pas la même chose : `articles` est ce qui
+   * est FACTURÉ, `articlesCommandes` ce que la cliente a mis dans son panier.
+   * Depuis que des rayons entiers sont dispensés de frais, le premier tombe
+   * souvent à zéro — un récapitulatif annonçant « 0 article » pour trois
+   * voiles serait absurde.
+   */
+  const articlesCommandes = nombreArticles(items);
+  const dispenses = rayonsSansFrais(
+    items,
+    products,
+    settings?.pricing?.feeExemptCategories ?? [],
+  )
+    .map((id) => CATEGORIES.find((c) => c.id === id)?.name)
+    .filter((nom): nom is string => Boolean(nom));
   const discount =
     promotion?.effect.type === 'discount_amount'
       ? Math.min(Math.max(0, promotion.effect.amount), subtotal + serviceFee + (rawDeliveryFee ?? 0))
@@ -254,7 +285,7 @@ export function CheckoutPage() {
     { label: 'Paiement', value: method.label },
     {
       label: 'Articles',
-      value: `${articles} article${articles > 1 ? 's' : ''}`,
+      value: `${articlesCommandes} article${articlesCommandes > 1 ? 's' : ''}`,
     },
     {
       label: 'Total',
@@ -517,11 +548,20 @@ export function CheckoutPage() {
                 <dt className="text-stone">Sous-total</dt>
                 <dd className="tabular-nums">{formatFcfa(subtotal)}</dd>
               </div>
-              {serviceFee > 0 && (
+              {serviceFee > 0 ? (
                 <div className="flex justify-between">
                   <dt className="text-stone">Frais de traitement</dt>
                   <dd className="tabular-nums">{formatFcfa(serviceFee)}</dd>
                 </div>
+              ) : (
+                dispenses.length > 0 && (
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-stone">Frais de traitement</dt>
+                    <dd className="text-right text-[12.5px] leading-snug text-mauve">
+                      Aucun sur {listeLisible(dispenses)}
+                    </dd>
+                  </div>
+                )
               )}
               <div className="flex justify-between">
                 <dt className="text-stone">{zone?.label}</dt>

@@ -3379,3 +3379,67 @@ select name as article, price as prix, status as statut
               'voile-rayures', 'organza-degrade', 'voile-mj', 'dentelle', 'modal-imprime',
               'modal-nayra', 'modal-fulani', 'silk-imprime')
  order by price, name;
+
+-- ── 38. Fin de la rentrée, et le voile MJ devient Jersey liquide ─────
+--
+-- Trois choses, toutes demandées par la boutique.
+--
+-- 1. Les prix. Deux changent par rapport à l'étape 37 :
+--      • Voile rayures  5 500 → 5 000
+--      • Hijab tape     1 000 → 2 000
+--    Les autres sont rappelés pour que cette étape suffise à elle seule.
+--
+-- 2. « Voile MJ » s'appelle désormais « Jersey liquide ». Seul le NOM
+--    change : le `slug` reste `voile-mj`, donc les liens déjà partagés sur
+--    Instagram et WhatsApp continuent d'ouvrir la fiche. Un lien mort coûte
+--    plus cher qu'une adresse qui ne dit plus tout à fait le nom.
+--
+-- 3. Le rayon Rentrée quitte la boutique. Les fiches passent EN BROUILLON,
+--    elles ne sont PAS supprimées : la rentrée revient chaque année, et les
+--    photos, les prix et les descriptions sont du travail déjà fait. Elles
+--    restent dans /admin → Produits, invisibles pour les clientes, et se
+--    republient d'un clic — ou d'une ligne :
+--      update products set status = 'active' where category = 'rentree';
+--
+--    Le rayon disparaît alors tout seul de la boutique et de l'accueil : un
+--    rayon sans article en vente ne s'affiche pas.
+
+-- 1. Les prix.
+update products as p
+   set price = g.prix
+  from (values
+    ('hijab-tape',      2000),
+    ('jersey',          2500),
+    ('jersey-frise',    3500),
+    ('satin-imprime',   3500),
+    ('voile-rayures',   5000),
+    ('voile-viscose',   5000),
+    ('modal-simple',    5500),
+    ('organza-degrade', 5500),
+    ('voile-mj',        6000),
+    ('dentelle',        6000),
+    ('modal-imprime',   6000),
+    ('modal-nayra',     6000),
+    ('modal-fulani',    6500),
+    ('silk-imprime',    7000)
+  ) as g(id, prix)
+ where p.id = g.id;
+
+-- 2. Le nouveau nom. Le slug n'est pas touché.
+update products set name = 'Jersey liquide' where id = 'voile-mj';
+
+-- 3. La rentrée quitte la boutique, sans rien perdre.
+update products set status = 'draft'
+ where category = 'rentree' and status = 'active';
+
+-- Vérification : la grille des voiles, puis ce qui reste de la rentrée.
+select name as article, price as prix, status as statut
+  from products
+ where id in ('hijab-tape', 'jersey', 'jersey-frise', 'satin-imprime', 'voile-rayures',
+              'voile-viscose', 'modal-simple', 'organza-degrade', 'voile-mj', 'dentelle',
+              'modal-imprime', 'modal-nayra', 'modal-fulani', 'silk-imprime')
+ order by price, name;
+
+select count(*) filter (where status = 'active') as rentree_en_ligne,
+       count(*) filter (where status = 'draft')  as rentree_en_brouillon
+  from products where category = 'rentree';

@@ -52,7 +52,7 @@ const ENGAGEMENTS = [
 const VITRINE = [
   { src: satinSable, alt: 'Voile en satin sable pailleté, porté' },
   { src: viscoseEcru, alt: 'Voile en viscose écru, porté' },
-  { src: mjRose, alt: 'Voile MJ rose poudré, porté' },
+  { src: mjRose, alt: 'Jersey liquide rose poudré, porté' },
 ];
 
 /** Les critères de sélection, tels que la boutique les applique. */

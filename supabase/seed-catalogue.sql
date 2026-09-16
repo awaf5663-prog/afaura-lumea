@@ -9,7 +9,7 @@
 --  et les photos déjà téléversées depuis l'admin ne sont jamais écrasées.
 -- ═══════════════════════════════════════════════════════════════════
 
--- Catégories du catalogue : Abaya, Pièce unique, Viscose premium, Voile MJ, Modal imprimé, Modal simple, Satin imprimé, Dentelle, Jersey, Jersey frisé, Hijab tape, Voile rayures, Modal fulani, Modal nayra, Silk imprimé, Organza dégradé, Rentrée, Packs, Robes, Lips gloss, Gommages, Parfums, Maquillage, Bougies, Sacs, Sous-vêtements & pyjamas, Chaussures, Combinaisons, Gels de douche, Laits corporels, Soins du visage, Accessoires beauté
+-- Catégories du catalogue : Abaya, Pièce unique, Viscose premium, Jersey liquide, Modal imprimé, Modal simple, Satin imprimé, Dentelle, Jersey, Jersey frisé, Hijab tape, Voile rayures, Modal fulani, Modal nayra, Silk imprimé, Organza dégradé, Rentrée, Packs, Robes, Lips gloss, Gommages, Parfums, Maquillage, Bougies, Sacs, Sous-vêtements & pyjamas, Chaussures, Combinaisons, Gels de douche, Laits corporels, Soins du visage, Accessoires beauté
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
@@ -85,7 +85,7 @@ insert into products (
   images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
-  'voile-mj', 'voile-mj', 'Voile MJ', 'Notre voile le plus fluide : un mélange de modal et de jersey. Il a la douceur et le tombé du modal, avec le maintien du jersey — il ne glisse pas et ne demande pas d''épingle. 170 × 60 cm. Faites défiler les photos pour voir le tombé, puis choisissez votre numéro de teinte dans le nuancier ci-dessous.',
+  'voile-mj', 'voile-mj', 'Jersey liquide', 'Notre voile le plus fluide : un mélange de modal et de jersey. Il a la douceur et le tombé du modal, avec le maintien du jersey — il ne glisse pas et ne demande pas d''épingle. 170 × 60 cm. Faites défiler les photos pour voir le tombé, puis choisissez votre numéro de teinte dans le nuancier ci-dessous.',
   6000, null, 'voile_mj',
   '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
@@ -178,7 +178,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'voile-rayures', 'voile-rayures', 'Voile rayures', 'Un voile teint en rayures fondues : deux ou trois teintes qui se répondent sur toute la longueur. Faites défiler les photos pour voir les coloris portés, puis choisissez le vôtre. D''autres teintes existent hors des photos : dites-nous celle que vous cherchez, nous confirmons avant paiement.',
-  5500, null, 'voile_rayures',
+  5000, null, 'voile_rayures',
   '[]'::jsonb, '[{"name":"Coloris","options":["Bleu marine","Bleu canard & rouille","Gris & rose","Kaki & vert olive","Anthracite","Bleu & bleu ciel","Lilas","Orange & violet"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   true, null
@@ -362,7 +362,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'hijab-tape', 'hijab-tape', 'Hijab tape', 'Les bandes adhésives double face qui remplacent les épingles : on colle, le voile reste en place toute la journée, et rien ne marque ni n''abîme le tissu. Un sachet contient plusieurs bandes.',
-  1000, null, 'hijab_tape',
+  2000, null, 'hijab_tape',
   '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, null
@@ -390,7 +390,7 @@ insert into products (
 • Bic rouge, à l''unité — le même, en rouge.
 Les bics se commandent à la pièce : la photo montre la boîte de 6, mais vous n''en prenez qu''un si vous voulez.',
   550, null, 'rentree',
-  '[]'::jsonb, '[{"name":"Modèle","options":["Lot de 6 stylos et souligneurs","Bic bleu","Bic rouge"]}]'::jsonb, '{"Modèle":{"Lot de 6 stylos et souligneurs":550,"Bic bleu":100,"Bic rouge":100}}'::jsonb, null, 'active',
+  '[]'::jsonb, '[{"name":"Modèle","options":["Lot de 6 stylos et souligneurs","Bic bleu","Bic rouge"]}]'::jsonb, '{"Modèle":{"Lot de 6 stylos et souligneurs":550,"Bic bleu":100,"Bic rouge":100}}'::jsonb, null, 'draft',
   true, false,
   false, null
 )
@@ -417,7 +417,7 @@ insert into products (
 • 3 gommes dégradées, plus des recharges de gomme pour les crayons.
 La boîte se commande entière.',
   1000, null, 'rentree',
-  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
   true, false,
   false, null
 )
@@ -440,7 +440,7 @@ insert into products (
 ) values (
   'classeur', 'classeur', 'Classeur à soufflets', 'Classeur à compartiments pour trier cours, feuilles et documents, coloris rose. Planche d''étiquettes de couleur fournie.',
   1000, null, 'rentree',
-  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
   true, false,
   false, null
 )
@@ -463,7 +463,7 @@ insert into products (
 ) values (
   'protec-ordinateur', 'protec-ordinateur', 'Protection de clavier', 'Film souple à poser sur le clavier de l’ordinateur, coloris rose translucide, contre la poussière et les éclaboussures. Précisez le modèle de votre ordinateur au moment de commander.',
   1000, null, 'rentree',
-  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
   true, false,
   false, null
 )
@@ -486,7 +486,7 @@ insert into products (
 ) values (
   'coque-telephone', 'coque-telephone', 'Coque de téléphone', 'Coque transparente, motif squelette et fleurs. Choisissez le modèle de votre téléphone ci-dessous — nous confirmons la disponibilité avant paiement. Si le vôtre n''est pas dans la liste, prenez « Autre modèle » et dites-le nous sur WhatsApp.',
   1500, null, 'rentree',
-  '[]'::jsonb, '[{"name":"Modèle de téléphone","options":["iPhone 11","iPhone 11 Pro Max","iPhone 12","iPhone 12 Pro Max","iPhone 13","iPhone 13 Pro Max","iPhone 14","iPhone 14 Pro Max","iPhone 15","iPhone 15 Pro Max","iPhone 16","iPhone 16 Pro Max","Samsung Galaxy A","Tecno","Infinix","Xiaomi / Redmi","Autre modèle"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  '[]'::jsonb, '[{"name":"Modèle de téléphone","options":["iPhone 11","iPhone 11 Pro Max","iPhone 12","iPhone 12 Pro Max","iPhone 13","iPhone 13 Pro Max","iPhone 14","iPhone 14 Pro Max","iPhone 15","iPhone 15 Pro Max","iPhone 16","iPhone 16 Pro Max","Samsung Galaxy A","Tecno","Infinix","Xiaomi / Redmi","Autre modèle"]}]'::jsonb, '{}'::jsonb, null, 'draft',
   true, false,
   false, null
 )
@@ -509,7 +509,7 @@ insert into products (
 ) values (
   'adaptateur-usb', 'adaptateur-usb', 'Adaptateur USB', 'Adaptateur pour brancher une clé USB ou un disque sur téléphone et tablette, coloris lilas. Précisez le type de prise de votre appareil au moment de commander.',
   3000, null, 'rentree',
-  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
   true, false,
   false, null
 )
@@ -532,7 +532,7 @@ insert into products (
 ) values (
   'gourde', 'gourde', 'Gourde', 'Gourde isotherme pour la journée de cours. Plusieurs coloris : précisez celui que vous souhaitez, nous confirmons la disponibilité.',
   3500, null, 'rentree',
-  '[]'::jsonb, '[{"name":"Couleur","options":["Rose","Blanc","Noir"]}]'::jsonb, '{}'::jsonb, null, 'active',
+  '[]'::jsonb, '[{"name":"Couleur","options":["Rose","Blanc","Noir"]}]'::jsonb, '{}'::jsonb, null, 'draft',
   true, false,
   true, null
 )
@@ -555,7 +555,7 @@ insert into products (
 ) values (
   'bloc-note', 'bloc-note', 'Bloc-notes', 'Carnet à spirale, couverture rigide gravée, coloris rose. Pour les cours, les listes ou le planning de la semaine.',
   4000, null, 'rentree',
-  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
   true, false,
   false, null
 )
@@ -578,7 +578,7 @@ insert into products (
 ) values (
   'miroir', 'miroir', 'Miroir', 'Petit miroir à poser, cadre ondulé, coloris rose poudré. Pour le bureau, la chambre ou la table de chevet.',
   400, null, 'rentree',
-  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'draft',
   true, false,
   false, null
 )

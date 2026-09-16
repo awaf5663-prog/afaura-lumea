@@ -2725,3 +2725,62 @@ select name as article, price as prix, status as statut
               'modal-imprime', 'dentelle', 'voile-viscose', 'voile-rayures',
               'modal-fulani', 'modal-nayra', 'silk-imprime', 'organza-degrade')
  order by price, name;
+
+-- ── 33. Grille des prix unitaires — voiles ───────────────────────────
+--
+-- La boutique a réajusté ses prix après l'étape 32, en comparant le tarif
+-- de son fournisseur à celui de SHEIN. Seule la colonne « prix Afaura »
+-- de sa grille est reprise ici : le prix d'achat et l'estimation SHEIN
+-- restent hors du site — ce sont des chiffres de gestion, pas des prix de
+-- vente, et une cliente n'a rien à y voir.
+--
+-- Ce qui change par rapport à l'étape 32 :
+--   Jersey            2 500 → 5 500      Modal fulani     6 500 → 6 000
+--   Jersey frisé      3 000 → 7 000      Modal nayra      7 000 → 6 000
+--   Voile MJ          4 500 → 7 000      Organza dégradé  6 000 → 5 500
+--   Modal simple      4 500 → 5 500
+--   Dentelle          5 000 → 6 000
+--
+-- Modal imprimé (6 000), Voile rayures (5 500) et Silk imprimé (7 000) ne
+-- bougent pas. Satin imprimé, Viscose premium et Hijab tape ne figurent pas
+-- dans la grille : ils gardent le prix qu'ils avaient.
+--
+-- Le tableau ci-dessous porte la grille ENTIÈRE, pas seulement les lignes
+-- qui changent : ainsi cette étape donne le bon résultat que l'étape 32 ait
+-- été passée ou non.
+--
+-- ⚠️ Comme l'étape 32, celle-ci écrase le prix existant. Si vous avez
+-- retouché un prix depuis /admin, retirez sa ligne avant de lancer.
+
+update products as p
+   set price = g.prix,
+       -- Les cinq étoffes de l'étape 31 s'ouvrent à la vente si elles sont
+       -- encore en brouillon. Une fiche retirée exprès n'est jamais
+       -- rouverte de force.
+       status = case when p.status = 'draft' and g.publier then 'active' else p.status end
+  from (values
+    ('hijab-tape',      1000, false),
+    ('satin-imprime',   3500, false),
+    ('voile-viscose',   5000, false),
+    ('jersey',          5500, false),
+    ('modal-simple',    5500, false),
+    ('voile-rayures',   5500, true),
+    ('organza-degrade', 5500, true),
+    ('modal-imprime',   6000, false),
+    ('dentelle',        6000, false),
+    ('modal-fulani',    6000, true),
+    ('modal-nayra',     6000, true),
+    ('jersey-frise',    7000, false),
+    ('voile-mj',        7000, false),
+    ('silk-imprime',    7000, true)
+  ) as g(id, prix, publier)
+ where p.id = g.id;
+
+-- Vérification : la grille telle qu'une cliente la verra. Quatorze lignes,
+-- aucune à 0 F, aucune en brouillon.
+select name as article, price as prix, status as statut
+  from products
+ where id in ('hijab-tape', 'satin-imprime', 'voile-viscose', 'jersey', 'modal-simple',
+              'voile-rayures', 'organza-degrade', 'modal-imprime', 'dentelle',
+              'modal-fulani', 'modal-nayra', 'jersey-frise', 'voile-mj', 'silk-imprime')
+ order by price, name;

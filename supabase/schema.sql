@@ -235,6 +235,15 @@ declare
   v_promo_label text;
   v_fee_before integer;
   v_discount integer := 0;
+  -- Assiette d'une offre par quantité : les unités et le prix des seuls
+  -- rayons concernés. Remplies pendant la boucle des articles, car il faut
+  -- le rayon de chaque fiche, qui n'est connu qu'ici.
+  v_pack_rayons jsonb;
+  v_pack_unites integer := 0;
+  v_pack_montant integer := 0;
+  v_pack_percent integer;
+  v_pack_seuil integer;
+  v_palier jsonb;
   v_today text := to_char(now(), 'YYYY-MM-DD');
   v_code text := upper(btrim(coalesce(p_promo_code, '')));
 begin
@@ -248,6 +257,22 @@ begin
          coalesce(pricing -> 'feeExemptCategories', '[]'::jsonb)
     into v_fee, v_promotions, v_tiers, v_sans_frais
     from settings where id = 1;
+
+  /*
+   * Rayons de la PREMIÈRE offre par quantité active. On les repère avant la
+   * boucle : le prix et les unités de l'assiette s'accumulent article par
+   * article, et il serait absurde de reparcourir le panier ensuite.
+   *
+   * Une liste vide vaut « tout le panier », comme partout ailleurs dans les
+   * promotions.
+   */
+  select coalesce(promo -> 'effect' -> 'categories', '[]'::jsonb)
+    into v_pack_rayons
+    from jsonb_array_elements(v_promotions) as promo
+   where coalesce((promo ->> 'active')::boolean, false)
+     and coalesce(promo -> 'effect' ->> 'type', '') = 'percent_by_quantity'
+   limit 1;
+
   v_label := p_delivery_zone_id;
   v_number := 'CMD-' || to_char(now(), 'YYYY') || '-' || lpad(nextval('order_seq')::text, 5, '0');
 
@@ -305,6 +330,17 @@ begin
       v_articles := v_articles + v_quantity;
     end if;
 
+    /*
+     * Assiette de l'offre par quantité. Le rayon vient de la FICHE, jamais du
+     * panier : c'est ce qui empêche un article de se réclamer d'un rayon
+     * remisé. Liste de rayons vide = tout le panier compte.
+     */
+    if v_pack_rayons is not null
+       and (jsonb_array_length(v_pack_rayons) = 0 or v_pack_rayons ? v_product.category) then
+      v_pack_unites := v_pack_unites + v_quantity;
+      v_pack_montant := v_pack_montant + v_unit * v_quantity;
+    end if;
+
     if v_product.stock is not null then
       update products set stock = greatest(0, stock - v_quantity) where id = v_product.id;
     end if;
@@ -349,6 +385,40 @@ begin
       if v_discount > 0 then
         v_promo_label := v_promo ->> 'label';
         exit;
+      end if;
+    elsif coalesce(v_promo -> 'effect' ->> 'type', '') = 'percent_by_quantity' then
+      /*
+       * Remise par quantité : « 3 voiles −5 %, 4 à 5 −6 %, 6 et plus −7 % ».
+       *
+       * Le palier retenu est le PLUS ÉLEVÉ dont le seuil est atteint, et non
+       * le premier rencontré : une cliente qui dépasse le dernier palier
+       * garde son pourcentage. Sans cette règle, passer de dix à onze voiles
+       * ferait monter la facture.
+       */
+      v_pack_percent := 0;
+      v_pack_seuil := -1;
+      for v_palier in
+        select * from jsonb_array_elements(coalesce(v_promo -> 'effect' -> 'tiers', '[]'::jsonb))
+      loop
+        continue when coalesce((v_palier ->> 'minQuantity')::integer, 0) > v_pack_unites;
+        continue when coalesce((v_palier ->> 'percent')::integer, 0) <= 0;
+        if coalesce((v_palier ->> 'minQuantity')::integer, 0) > v_pack_seuil then
+          v_pack_seuil := (v_palier ->> 'minQuantity')::integer;
+          v_pack_percent := (v_palier ->> 'percent')::integer;
+        end if;
+      end loop;
+
+      if v_pack_percent > 0 and v_pack_montant > 0 then
+        -- Arrondi à l'entier : le franc CFA n'a pas de centimes. Plafonnée au
+        -- montant connu, comme toute remise.
+        v_discount := least(
+          round(v_pack_montant::numeric * v_pack_percent / 100)::integer,
+          v_subtotal + v_service + coalesce(v_fee, 0)
+        );
+        if v_discount > 0 then
+          v_promo_label := v_promo ->> 'label';
+          exit;
+        end if;
       end if;
     end if;
   end loop;

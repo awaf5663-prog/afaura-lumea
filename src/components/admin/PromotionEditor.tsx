@@ -1,8 +1,14 @@
 import { Plus, Trash2 } from 'lucide-react';
 import { ErrorText, FormRow, Input, Label, Select, Textarea } from '@/src/components/ui/Field';
+import { CATEGORIES } from '@/src/data/seed';
 import { describeEffect } from '@/src/lib/pricing/promotions';
 import { cn } from '@/src/lib/cn';
-import type { Grouping, Promotion, SheinDeliveryOption } from '@/src/types';
+import type {
+  Grouping,
+  Promotion,
+  PromotionQuantityTier,
+  SheinDeliveryOption,
+} from '@/src/types';
 
 /**
  * Éditeur des offres.
@@ -135,20 +141,24 @@ export function PromotionEditor({
                   value={promotion.effect.type}
                   onChange={(e) => {
                     const type = e.target.value as Promotion['effect']['type'];
-                    patch(index, {
-                      effect:
-                        type === 'discount_amount'
-                          ? { type, amount: 1000 }
-                          : { type },
-                    });
+                    patch(index, { effect: effetVierge(type) });
                   }}
                 >
                   <option value="free_delivery">Livraison offerte</option>
                   <option value="free_service_fee">Frais de traitement offerts</option>
                   <option value="discount_amount">Remise en FCFA</option>
+                  <option value="percent_by_quantity">Remise par quantité (pack)</option>
                 </Select>
               </FormRow>
             </div>
+
+            {promotion.effect.type === 'percent_by_quantity' && (
+              <PaliersDuPack
+                effect={promotion.effect}
+                onChange={(effect) => patch(index, { effect })}
+                index={index}
+              />
+            )}
 
             {promotion.effect.type === 'discount_amount' && (
               <FormRow>
@@ -344,5 +354,155 @@ function Chip({
     >
       {children}
     </button>
+  );
+}
+
+/**
+ * Un effet tout neuf, avec des valeurs de départ qui tiennent debout.
+ *
+ * Changer de type d'effet ne doit jamais laisser une offre à moitié remplie :
+ * une remise par quantité sans palier ne remise rien, et une remise en FCFA
+ * sans montant non plus. Chaque type part donc de quelque chose d'utilisable,
+ * que la boutique ajuste ensuite.
+ */
+function effetVierge(type: Promotion['effect']['type']): Promotion['effect'] {
+  switch (type) {
+    case 'discount_amount':
+      return { type, amount: 1000 };
+    case 'percent_by_quantity':
+      return { type, categories: [], tiers: [{ minQuantity: 3, percent: 5 }] };
+    default:
+      return { type };
+  }
+}
+
+/**
+ * Les paliers d'une offre par quantité, et les rayons sur lesquels elle porte.
+ *
+ * Deux règles s'affichent ici plutôt que de rester dans le code :
+ *   • le palier retenu est le plus élevé atteint, donc dépasser le dernier ne
+ *     fait jamais perdre la remise ;
+ *   • sans rayon coché, l'offre porte sur tout le panier.
+ */
+function PaliersDuPack({
+  effect,
+  onChange,
+  index,
+}: {
+  effect: Extract<Promotion['effect'], { type: 'percent_by_quantity' }>;
+  onChange: (effect: Promotion['effect']) => void;
+  index: number;
+}) {
+  const setPaliers = (tiers: PromotionQuantityTier[]) => onChange({ ...effect, tiers });
+
+  return (
+    <div className="rounded-[--radius-md] border border-line bg-cream/40 p-4">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-[13.5px] font-medium">Paliers de remise</p>
+        <button
+          type="button"
+          onClick={() =>
+            setPaliers([
+              ...effect.tiers,
+              {
+                minQuantity: Math.max(1, ...effect.tiers.map((t) => t.minQuantity + 1)),
+                percent: 5,
+              },
+            ])
+          }
+          className="press flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[12.5px]"
+        >
+          <Plus className="size-3.5" /> Palier
+        </button>
+      </div>
+
+      <ul className="mt-3 space-y-2">
+        {effect.tiers.map((palier, i) => (
+          <li key={i} className="grid grid-cols-[1fr_1fr_auto] items-end gap-2">
+            <FormRow>
+              <Label htmlFor={`pack-min-${index}-${i}`}>À partir de</Label>
+              <Input
+                id={`pack-min-${index}-${i}`}
+                type="number"
+                min={1}
+                step={1}
+                value={palier.minQuantity}
+                onChange={(e) =>
+                  setPaliers(
+                    effect.tiers.map((t, j) =>
+                      j === i ? { ...t, minQuantity: Math.max(1, Number(e.target.value)) } : t,
+                    ),
+                  )
+                }
+              />
+            </FormRow>
+            <FormRow>
+              <Label htmlFor={`pack-pct-${index}-${i}`}>Remise (%)</Label>
+              <Input
+                id={`pack-pct-${index}-${i}`}
+                type="number"
+                min={0}
+                max={100}
+                step={1}
+                value={palier.percent}
+                onChange={(e) =>
+                  setPaliers(
+                    effect.tiers.map((t, j) =>
+                      j === i
+                        ? { ...t, percent: Math.min(100, Math.max(0, Number(e.target.value))) }
+                        : t,
+                    ),
+                  )
+                }
+              />
+            </FormRow>
+            <button
+              type="button"
+              aria-label={`Supprimer le palier ${i + 1}`}
+              onClick={() => setPaliers(effect.tiers.filter((_, j) => j !== i))}
+              className="press mb-1 grid size-10 place-items-center rounded-full bg-white text-[#8a2f2f]"
+            >
+              <Trash2 className="size-4" />
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <p className="mt-2 text-[12px] leading-relaxed text-stone">
+        La cliente obtient le palier le plus élevé qu'elle atteint. En prendre plus ne fait
+        donc jamais perdre la remise.
+      </p>
+
+      <p className="mt-4 text-[13.5px] font-medium">Rayons concernés</p>
+      <p className="mt-1 text-[12px] leading-relaxed text-stone">
+        Seuls ces rayons comptent — pour atteindre un palier comme pour calculer la remise.
+        Aucun coché : l'offre porte sur tout le panier.
+      </p>
+      <ul className="mt-2 grid gap-x-4 gap-y-1 sm:grid-cols-2">
+        {CATEGORIES.map((rayon) => {
+          const coche = effect.categories.includes(rayon.id);
+          return (
+            <li key={rayon.id}>
+              <label className="flex cursor-pointer items-center gap-2.5 py-1 text-[13px]">
+                <input
+                  type="checkbox"
+                  checked={coche}
+                  onChange={() =>
+                    onChange({
+                      ...effect,
+                      categories: coche
+                        ? effect.categories.filter((id) => id !== rayon.id)
+                        : [...effect.categories, rayon.id],
+                    })
+                  }
+                  className="size-4 accent-[--color-brand]"
+                />
+                <span>{rayon.name}</span>
+              </label>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
   );
 }

@@ -3005,3 +3005,314 @@ select category as rayon, count(*) as articles
    and (select pricing -> 'feeExemptCategories' from settings where id = 1) ? category
  group by category
  order by category;
+
+-- ── 35. Pack Afaura : la remise grandit avec le nombre de voiles ─────
+--
+-- « Compose ton pack » : 3 voiles −5 %, 4 à 5 −6 %, 6 et plus −7 %.
+--
+-- Trois décisions, écrites ici parce qu'elles décident de ce qui est facturé :
+--
+--   1. le palier retenu est le PLUS ÉLEVÉ dont le seuil est atteint. L'affiche
+--      s'arrête à « 6 à 10 », mais le taux reste à 7 % au-delà : passer de dix
+--      à onze voiles ne doit jamais faire monter la facture ;
+--
+--   2. la remise porte sur les VOILES SEULS. Les rayons listés dans
+--      `categories` décident du palier ET du montant — un sac dans le même
+--      panier ne fait pas monter la remise et n'en profite pas ;
+--
+--   3. le rayon de chaque article est relu DANS SA FICHE au moment
+--      d'enregistrer, jamais reçu du navigateur. Un panier bricolé ne peut
+--      donc pas réclamer la remise sur autre chose que des voiles.
+--
+-- L'offre est automatique : ni code à saisir, ni case à cocher. Elle n'a pas
+-- de date de fin — la boutique l'arrête depuis /admin → Tarification, en la
+-- désactivant ou en lui donnant une date.
+--
+-- Deux morceaux : l'offre elle-même, puis create_order qui sait la calculer.
+
+-- 1. L'offre. Les autres offres déjà enregistrées sont conservées ; seule une
+--    « pack-afaura » existante est remplacée, pour que relancer cette étape
+--    ne crée pas de doublon.
+update settings
+   set promotions = coalesce(
+         (select jsonb_agg(offre)
+            from jsonb_array_elements(coalesce(promotions, '[]'::jsonb)) as offre
+           where offre ->> 'id' <> 'pack-afaura'),
+         '[]'::jsonb
+       ) || jsonb_build_array(jsonb_build_object(
+         'id', 'pack-afaura',
+         'label', 'Pack Afaura',
+         'description', 'Composez votre pack : à partir de 3 voiles, la remise s''applique toute seule — et elle grandit avec le nombre de voiles choisis.',
+         'active', true,
+         'scope', 'store',
+         'code', '',
+         'studentOnly', false,
+         'startsAt', null,
+         'endsAt', null,
+         'minSubtotal', null,
+         'groupingIds', '[]'::jsonb,
+         'deliveryOptionIds', '[]'::jsonb,
+         'effect', jsonb_build_object(
+           'type', 'percent_by_quantity',
+           'categories', '["voile_viscose","voile_mj","modal_imprime","modal_simple",
+                           "satin_imprime","dentelle","jersey","jersey_frise","hijab_tape",
+                           "voile_rayures","modal_fulani","modal_nayra","silk_imprime",
+                           "organza_degrade"]'::jsonb,
+           'tiers', '[{"minQuantity":3,"percent":5},
+                      {"minQuantity":4,"percent":6},
+                      {"minQuantity":6,"percent":7}]'::jsonb
+         )
+       ))
+ where id = 1;
+
+-- 2. La commande sait calculer une remise par quantité.
+create or replace function create_order(
+  p_customer_name text,
+  p_phone text,
+  p_address text,
+  p_city text,
+  p_note text,
+  p_delivery_zone_id text,
+  p_payment_method text,
+  p_items jsonb,
+  p_promo_code text default '',
+  p_is_student boolean default false
+) returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_order_id uuid;
+  v_number text;
+  v_subtotal integer := 0;
+  v_articles integer := 0;
+  v_service integer := 0;
+  v_tiers jsonb;
+  -- Rayons dispensés de frais de traitement, relus dans les réglages.
+  v_sans_frais jsonb;
+  v_fee integer;
+  v_item jsonb;
+  v_product products%rowtype;
+  v_quantity integer;
+  v_unit integer;
+  v_label text;
+  v_promotions jsonb;
+  v_promo jsonb;
+  v_promo_label text;
+  v_fee_before integer;
+  v_discount integer := 0;
+  -- Assiette d'une offre par quantité : les unités et le prix des seuls
+  -- rayons concernés. Remplies pendant la boucle des articles, car il faut
+  -- le rayon de chaque fiche, qui n'est connu qu'ici.
+  v_pack_rayons jsonb;
+  v_pack_unites integer := 0;
+  v_pack_montant integer := 0;
+  v_pack_percent integer;
+  v_pack_seuil integer;
+  v_palier jsonb;
+  v_today text := to_char(now(), 'YYYY-MM-DD');
+  v_code text := upper(btrim(coalesce(p_promo_code, '')));
+begin
+  if jsonb_array_length(coalesce(p_items, '[]'::jsonb)) = 0 then
+    raise exception 'Panier vide';
+  end if;
+
+  select (delivery_fees ->> p_delivery_zone_id)::integer,
+         coalesce(promotions, '[]'::jsonb),
+         coalesce(pricing -> 'tiers', '[]'::jsonb),
+         coalesce(pricing -> 'feeExemptCategories', '[]'::jsonb)
+    into v_fee, v_promotions, v_tiers, v_sans_frais
+    from settings where id = 1;
+
+  /*
+   * Rayons de la PREMIÈRE offre par quantité active. On les repère avant la
+   * boucle : le prix et les unités de l'assiette s'accumulent article par
+   * article, et il serait absurde de reparcourir le panier ensuite.
+   *
+   * Une liste vide vaut « tout le panier », comme partout ailleurs dans les
+   * promotions.
+   */
+  select coalesce(promo -> 'effect' -> 'categories', '[]'::jsonb)
+    into v_pack_rayons
+    from jsonb_array_elements(v_promotions) as promo
+   where coalesce((promo ->> 'active')::boolean, false)
+     and coalesce(promo -> 'effect' ->> 'type', '') = 'percent_by_quantity'
+   limit 1;
+
+  v_label := p_delivery_zone_id;
+  v_number := 'CMD-' || to_char(now(), 'YYYY') || '-' || lpad(nextval('order_seq')::text, 5, '0');
+
+  insert into orders (
+    order_number, customer_name, phone, address, city, note,
+    delivery_zone_id, delivery_label, delivery_fee, subtotal, total,
+    payment_method, payment_method_label, promo_code
+  ) values (
+    v_number, p_customer_name, p_phone, p_address, p_city, p_note,
+    p_delivery_zone_id, v_label, v_fee, 0, 0,
+    p_payment_method, p_payment_method, v_code
+  ) returning id into v_order_id;
+
+  for v_item in select * from jsonb_array_elements(p_items) loop
+    select * into v_product from products where id = v_item ->> 'product_id';
+    if not found or v_product.status <> 'active' then
+      raise exception 'Produit indisponible : %', v_item ->> 'product_id';
+    end if;
+
+    v_quantity := greatest(1, least(99, (v_item ->> 'quantity')::integer));
+    if v_product.stock is not null and v_quantity > v_product.stock then
+      raise exception 'Stock insuffisant pour %', v_product.name;
+    end if;
+
+    -- Prix unitaire : celui de l'option choisie s'il en a un, sinon celui de
+    -- l'article. Relu dans la table, jamais reçu du navigateur.
+    v_unit := prix_option(v_product, coalesce(v_item -> 'options', '{}'::jsonb));
+
+    insert into order_items (order_id, product_id, name, quantity, unit_price, options)
+    values (
+      v_order_id, v_product.id, v_product.name, v_quantity, v_unit,
+      coalesce(v_item -> 'options', '{}'::jsonb)
+    );
+
+    v_subtotal := v_subtotal + v_unit * v_quantity;
+    /*
+     * Les articles se comptent en unités, pas en lignes : douze cahiers font
+     * douze articles. Même règle que pour les demandes SHEIN.
+     *
+     * Deux exceptions, pour la même raison de fond — le travail n'a pas lieu.
+     * Les frais paient une commande : trouver la pièce, la regrouper, la
+     * suivre jusqu'ici.
+     *
+     *   • l'article est DÉJÀ EN BOUTIQUE : il est là, on le remet, et la
+     *     livraison se convient de vive voix ;
+     *   • son RAYON est dispensé par les réglages (Tarification → rayons sans
+     *     frais) : la boutique achète ces articles par lots, pour elle.
+     *
+     * Le rayon et l'état sont RELUS DANS LA FICHE, jamais reçus du navigateur :
+     * c'est ce qui empêche un panier bricolé de réclamer une exemption. La
+     * liste des rayons vient des réglages, pas du navigateur non plus.
+     */
+    if not coalesce(v_product.ready_to_ship, false)
+       and not (v_sans_frais ? v_product.category) then
+      v_articles := v_articles + v_quantity;
+    end if;
+
+    /*
+     * Assiette de l'offre par quantité. Le rayon vient de la FICHE, jamais du
+     * panier : c'est ce qui empêche un article de se réclamer d'un rayon
+     * remisé. Liste de rayons vide = tout le panier compte.
+     */
+    if v_pack_rayons is not null
+       and (jsonb_array_length(v_pack_rayons) = 0 or v_pack_rayons ? v_product.category) then
+      v_pack_unites := v_pack_unites + v_quantity;
+      v_pack_montant := v_pack_montant + v_unit * v_quantity;
+    end if;
+
+    if v_product.stock is not null then
+      update products set stock = greatest(0, stock - v_quantity) where id = v_product.id;
+    end if;
+  end loop;
+
+  -- Frais de traitement, d'après la grille des réglages. Grille vide : aucun
+  -- frais. Calculé ici, jamais reçu du navigateur.
+  v_service := frais_boutique(v_articles, v_tiers);
+
+  -- Offres. Toutes les conditions renseignées doivent être remplies ; une liste
+  -- vide ne restreint rien. Vérifiées ici, jamais d'après le navigateur, qui ne
+  -- transmet qu'un code et une déclaration.
+  for v_promo in select * from jsonb_array_elements(v_promotions) loop
+    continue when not coalesce((v_promo ->> 'active')::boolean, false);
+    continue when coalesce(v_promo ->> 'scope', 'all') not in ('all', 'store');
+    continue when coalesce((v_promo ->> 'studentOnly')::boolean, false)
+                  and not coalesce(p_is_student, false);
+    continue when v_promo ->> 'startsAt' is not null and v_today < (v_promo ->> 'startsAt');
+    continue when v_promo ->> 'endsAt' is not null and v_today > (v_promo ->> 'endsAt');
+    continue when jsonb_array_length(coalesce(v_promo -> 'deliveryOptionIds', '[]'::jsonb)) > 0
+                  and not (coalesce(v_promo -> 'deliveryOptionIds', '[]'::jsonb)
+                           ? p_delivery_zone_id);
+    -- Montant minimum d'articles : le seuil porte sur le prix des articles
+    -- seuls, jamais sur les frais ni la livraison. Absent = aucun minimum.
+    continue when jsonb_typeof(v_promo -> 'minSubtotal') = 'number'
+                  and v_subtotal < (v_promo ->> 'minSubtotal')::numeric;
+    -- Une offre à code ne s'applique jamais toute seule.
+    continue when upper(btrim(coalesce(v_promo ->> 'code', ''))) <> v_code;
+
+    if coalesce(v_promo -> 'effect' ->> 'type', '') = 'free_delivery'
+       and v_fee is not null and v_fee > 0 then
+      v_fee_before := v_fee;
+      v_fee := 0;
+      v_promo_label := v_promo ->> 'label';
+      exit;
+    elsif coalesce(v_promo -> 'effect' ->> 'type', '') = 'discount_amount' then
+      -- Plafonnée au montant connu : une remise ne rend jamais d'argent.
+      v_discount := least(
+        greatest(0, coalesce((v_promo -> 'effect' ->> 'amount')::integer, 0)),
+        v_subtotal + v_service + coalesce(v_fee, 0)
+      );
+      if v_discount > 0 then
+        v_promo_label := v_promo ->> 'label';
+        exit;
+      end if;
+    elsif coalesce(v_promo -> 'effect' ->> 'type', '') = 'percent_by_quantity' then
+      /*
+       * Remise par quantité : « 3 voiles −5 %, 4 à 5 −6 %, 6 et plus −7 % ».
+       *
+       * Le palier retenu est le PLUS ÉLEVÉ dont le seuil est atteint, et non
+       * le premier rencontré : une cliente qui dépasse le dernier palier
+       * garde son pourcentage. Sans cette règle, passer de dix à onze voiles
+       * ferait monter la facture.
+       */
+      v_pack_percent := 0;
+      v_pack_seuil := -1;
+      for v_palier in
+        select * from jsonb_array_elements(coalesce(v_promo -> 'effect' -> 'tiers', '[]'::jsonb))
+      loop
+        continue when coalesce((v_palier ->> 'minQuantity')::integer, 0) > v_pack_unites;
+        continue when coalesce((v_palier ->> 'percent')::integer, 0) <= 0;
+        if coalesce((v_palier ->> 'minQuantity')::integer, 0) > v_pack_seuil then
+          v_pack_seuil := (v_palier ->> 'minQuantity')::integer;
+          v_pack_percent := (v_palier ->> 'percent')::integer;
+        end if;
+      end loop;
+
+      if v_pack_percent > 0 and v_pack_montant > 0 then
+        -- Arrondi à l'entier : le franc CFA n'a pas de centimes. Plafonnée au
+        -- montant connu, comme toute remise.
+        v_discount := least(
+          round(v_pack_montant::numeric * v_pack_percent / 100)::integer,
+          v_subtotal + v_service + coalesce(v_fee, 0)
+        );
+        if v_discount > 0 then
+          v_promo_label := v_promo ->> 'label';
+          exit;
+        end if;
+      end if;
+    end if;
+  end loop;
+
+  update orders
+     set subtotal = v_subtotal,
+         service_fee = v_service,
+         delivery_fee = v_fee,
+         delivery_fee_before_promotion = v_fee_before,
+         discount = v_discount,
+         promotion_label = v_promo_label,
+         total = v_subtotal + v_service + coalesce(v_fee, 0) - v_discount
+   where id = v_order_id;
+
+  return (
+    select to_jsonb(o) || jsonb_build_object(
+      'order_items', coalesce((select jsonb_agg(to_jsonb(i)) from order_items i where i.order_id = o.id), '[]'::jsonb)
+    )
+    from orders o where o.id = v_order_id
+  );
+end;
+$$;
+
+-- Vérification : l'offre est enregistrée, active, avec ses trois paliers.
+select p ->> 'label'                                   as offre,
+       (p ->> 'active')::boolean                       as active,
+       jsonb_array_length(p -> 'effect' -> 'tiers')    as paliers,
+       jsonb_array_length(p -> 'effect' -> 'categories') as rayons
+  from settings s, jsonb_array_elements(s.promotions) as p
+ where s.id = 1 and p ->> 'id' = 'pack-afaura';

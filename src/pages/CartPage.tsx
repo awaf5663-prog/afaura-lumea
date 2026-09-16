@@ -6,6 +6,7 @@ import { useCart } from '@/src/hooks/useCart';
 import { useProducts } from '@/src/hooks/useProducts';
 import { useSettings } from '@/src/hooks/useSettings';
 import { CATEGORIES } from '@/src/data/seed';
+import { offreDuPanier, prochainPalier, remiseDuPack } from '@/src/lib/pricing/packVoiles';
 import { formatFcfa, listeLisible } from '@/src/lib/format';
 import { fraisBoutique, nombreArticlesFactures, rayonsSansFrais } from '@/src/lib/pricing/storeFee';
 import { useRouter } from '@/src/lib/router';
@@ -35,6 +36,15 @@ export function CartPage() {
    * ici : le jour où la boutique dispense un rayon de plus depuis
    * Tarification, la phrase suit toute seule.
    */
+  /*
+   * L'offre « pack » s'applique d'elle-même, sans code : la cliente doit donc
+   * la voir ici, pas seulement à la validation. Seules les offres qui ne
+   * dépendent ni de la livraison ni d'un code sont annoncées — promettre puis
+   * retirer vaut moins que se taire. Voir offreDuPanier.
+   */
+  const offrePack = offreDuPanier(settings?.promotions ?? [], subtotal);
+  const remisePack = offrePack ? remiseDuPack(offrePack, items, products) : 0;
+  const palierSuivant = offrePack ? prochainPalier(offrePack, items, products) : null;
   const dispenses = rayonsSansFrais(
     items,
     products,
@@ -114,15 +124,32 @@ export function CartPage() {
                   </dd>
                 </div>
               )}
+              {remisePack > 0 && offrePack && (
+                <div className="flex justify-between gap-3">
+                  <dt className="text-brand">{offrePack.label}</dt>
+                  <dd className="tabular-nums text-brand">−{formatFcfa(remisePack)}</dd>
+                </div>
+              )}
               <div className="flex justify-between">
                 <dt className="text-stone">Livraison</dt>
                 <dd className="text-stone">Choisie à l'étape suivante</dd>
               </div>
               <div className="hairline flex justify-between pt-3 text-[17px]">
                 <dt>Total</dt>
-                <dd className="font-medium tabular-nums">{formatFcfa(subtotal + serviceFee)}</dd>
+                <dd className="font-medium tabular-nums">
+                  {formatFcfa(subtotal + serviceFee - remisePack)}
+                </dd>
               </div>
             </dl>
+
+            {palierSuivant && (
+              /* Dire ce qu'il manque vaut mieux que laisser la cliente le
+                 découvrir après coup : c'est une information, pas une relance. */
+              <p className="mt-4 rounded-[--radius-sm] bg-rosecreme px-3.5 py-3 text-[12.5px] leading-relaxed text-brand">
+                Encore {palierSuivant.manque} article{palierSuivant.manque > 1 ? 's' : ''} pour
+                passer à −{palierSuivant.percent} %.
+              </p>
+            )}
 
             <Button
               full

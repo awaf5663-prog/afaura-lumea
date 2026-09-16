@@ -22,6 +22,7 @@ import {
 } from '@/src/lib/pricing/storeFee';
 import { cn } from '@/src/lib/cn';
 import { CATEGORIES } from '@/src/data/seed';
+import { prochainPalier, remiseDuPack } from '@/src/lib/pricing/packVoiles';
 import {
   formatFcfa,
   isValidSenegalPhone,
@@ -145,10 +146,27 @@ export function CheckoutPage() {
   )
     .map((id) => CATEGORIES.find((c) => c.id === id)?.name)
     .filter((nom): nom is string => Boolean(nom));
+  /*
+   * Deux formes de remise, et un seul montant affiché.
+   *
+   * La remise par quantité — « 3 voiles −5 % » — ne porte que sur les rayons
+   * de l'offre : un sac dans le même panier reste à plein tarif. La remise en
+   * FCFA, elle, s'impute sur l'ensemble.
+   *
+   * Dans les deux cas la base recalcule, et c'est elle qui facture.
+   */
   const discount =
     promotion?.effect.type === 'discount_amount'
       ? Math.min(Math.max(0, promotion.effect.amount), subtotal + serviceFee + (rawDeliveryFee ?? 0))
-      : 0;
+      : promotion?.effect.type === 'percent_by_quantity'
+        ? remiseDuPack(promotion, items, products)
+        : 0;
+  // « Encore 1 voile pour −6 % » : une cliente à un article du palier suivant
+  // mérite qu'on le lui dise plutôt qu'elle le découvre après coup.
+  const palierSuivant =
+    promotion?.effect.type === 'percent_by_quantity'
+      ? prochainPalier(promotion, items, products)
+      : null;
   const total = subtotal + serviceFee + (deliveryFee ?? 0) - discount;
 
   const asksStudent = visiblePromotions(settings?.promotions ?? [], 'store').some(
@@ -585,6 +603,14 @@ export function CheckoutPage() {
                   <dt className="text-mauve">{promotion?.label ?? 'Remise'}</dt>
                   <dd className="tabular-nums text-mauve">− {formatFcfa(discount)}</dd>
                 </div>
+              )}
+              {palierSuivant && (
+                /* Une cliente à un article du palier suivant doit pouvoir y
+                   retourner : le dire ici, c'est encore le bon moment. */
+                <p className="text-[12.5px] leading-relaxed text-brand">
+                  Encore {palierSuivant.manque} article{palierSuivant.manque > 1 ? 's' : ''} pour
+                  passer à −{palierSuivant.percent} %.
+                </p>
               )}
               <div className="flex justify-between border-t border-line pt-3 text-[18px]">
                 <dt>Total</dt>

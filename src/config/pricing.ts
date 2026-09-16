@@ -150,4 +150,61 @@ export const DEFAULT_PROMOTIONS: Promotion[] = [
     deliveryOptionIds: ['local'],
     effect: { type: 'free_delivery' },
   },
+  {
+    /*
+     * « Compose ton pack Afaura » : plus la cliente prend de voiles, plus la
+     * remise est forte. Offre automatique — pas de code à retenir, pas de
+     * case à cocher : elle s'applique dès le troisième voile.
+     *
+     * Les paliers sont ceux de l'affiche de la boutique : 3 → −5 %, 4 à 5 →
+     * −6 %, 6 et plus → −7 %. L'affiche s'arrête à « 6 à 10 » ; au-delà le
+     * taux reste à 7 %, car passer de dix à onze voiles ne doit jamais faire
+     * monter la facture.
+     *
+     * `categories` : tous les rayons de voiles. Ils décident du palier ET de
+     * l'assiette — un sac dans le même panier ne fait pas monter la remise et
+     * n'en profite pas. L'affiche dit « Pack Afaura », c'est un pack de
+     * voiles.
+     *
+     * Dates ouvertes : la boutique met fin à l'offre depuis /admin →
+     * Tarification, en la désactivant ou en lui donnant une date de fin.
+     */
+    id: 'pack-afaura',
+    label: 'Pack Afaura',
+    description:
+      'Composez votre pack : à partir de 3 voiles, la remise s’applique toute seule — et elle grandit avec le nombre de voiles choisis.',
+    active: true,
+    scope: 'store',
+    code: '',
+    studentOnly: false,
+    startsAt: null,
+    endsAt: null,
+    minSubtotal: null,
+    groupingIds: [],
+    deliveryOptionIds: [],
+    effect: {
+      type: 'percent_by_quantity',
+      categories: [
+        'voile_viscose',
+        'voile_mj',
+        'modal_imprime',
+        'modal_simple',
+        'satin_imprime',
+        'dentelle',
+        'jersey',
+        'jersey_frise',
+        'hijab_tape',
+        'voile_rayures',
+        'modal_fulani',
+        'modal_nayra',
+        'silk_imprime',
+        'organza_degrade',
+      ],
+      tiers: [
+        { minQuantity: 3, percent: 5 },
+        { minQuantity: 4, percent: 6 },
+        { minQuantity: 6, percent: 7 },
+      ],
+    },
+  },
 ];

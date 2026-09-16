@@ -20,6 +20,7 @@ import { nextNumber, uid } from '@/src/lib/orderNumber';
 import { STORAGE_KEYS, readJson, writeJson } from '@/src/lib/storage';
 import { aggregateVisits, type VisitEntry } from './visitStats';
 import { normalizePhone } from '@/src/lib/format';
+import { remiseDuPack } from '@/src/lib/pricing/packVoiles';
 import { fraisBoutique, nombreArticlesFactures } from '@/src/lib/pricing/storeFee';
 import { fromStoredImages, toStoredImages } from '@/src/lib/image';
 import type { Grouping, Order, Product, SheinRequest, StoreSettings } from '@/src/types';
@@ -202,6 +203,17 @@ export const localAdapter: DataSource = {
         // Plafonnée au montant connu : une remise ne rend jamais d'argent.
         discount = Math.min(
           Math.max(0, promotion.effect.amount),
+          subtotal + serviceFee + (rawDeliveryFee ?? 0),
+        );
+      } else if (promotion.effect.type === 'percent_by_quantity') {
+        /*
+         * Remise par quantité. Le palier ET le montant se calculent sur les
+         * seuls rayons de l'offre, d'après le CATALOGUE relu ici : le panier
+         * envoyé par le navigateur ne dit pas à quel rayon appartient un
+         * article, et ne pourrait donc pas s'en réclamer.
+         */
+        discount = Math.min(
+          remiseDuPack(promotion, items, loadProducts()),
           subtotal + serviceFee + (rawDeliveryFee ?? 0),
         );
       }

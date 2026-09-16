@@ -72,6 +72,18 @@ function applyPromotion(
       if (discount === 0) return untouched;
       return { ...untouched, discount, label: promotion.label };
     }
+    case 'percent_by_quantity':
+      /*
+       * Sans effet sur un devis SHEIN, et c'est volontaire. Cette offre porte
+       * sur des RAYONS de la boutique ; une demande SHEIN, elle, est faite de
+       * liens et de titres saisis à la main, sans rayon ni fiche. Rien ne
+       * permettrait d'y compter « les voiles ».
+       *
+       * Une offre de ce type devrait porter `scope: 'store'`. Si elle est
+       * laissée sur « toutes », mieux vaut ne rien remiser que de remiser au
+       * hasard : le devis reste intact.
+       */
+      return untouched;
   }
 }
 

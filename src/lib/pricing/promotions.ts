@@ -74,6 +74,16 @@ export function describeEffect(effect: Promotion['effect']): string {
       return 'Frais de traitement offerts';
     case 'discount_amount':
       return `Remise de ${effect.amount.toLocaleString('fr-FR')} FCFA`;
+    case 'percent_by_quantity': {
+      const paliers = [...effect.tiers]
+        .filter((p) => p.percent > 0)
+        .sort((a, b) => a.minQuantity - b.minQuantity);
+      if (paliers.length === 0) return 'Remise par quantité (aucun palier)';
+      // « dès 3 : −5 %, dès 4 : −6 %, dès 6 : −7 % »
+      return `Remise par quantité — ${paliers
+        .map((p) => `dès ${p.minQuantity} : −${p.percent} %`)
+        .join(', ')}`;
+    }
   }
 }
 

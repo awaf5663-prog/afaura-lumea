@@ -498,7 +498,34 @@ export type PromotionEffect =
   /** Les frais de traitement du service SHEIN passent à 0. */
   | { type: 'free_service_fee' }
   /** Remise en FCFA sur le total, plafonnée au total pour ne jamais passer sous zéro. */
-  | { type: 'discount_amount'; amount: number };
+  | { type: 'discount_amount'; amount: number }
+  /**
+   * Remise en pourcentage qui grandit avec la quantité : « 3 voiles −5 %,
+   * 4 à 5 −6 %, 6 et plus −7 % ».
+   *
+   * Deux précisions qui décident du montant, et qu'il vaut mieux écrire que
+   * deviner :
+   *
+   *   • `categories` dit sur QUOI porte la remise. Vide = tout le panier.
+   *     Rempli, seuls ces rayons comptent — pour atteindre un palier comme
+   *     pour calculer la remise. Un sac glissé dans un panier de voiles ne
+   *     fait donc ni monter le palier ni baisser son propre prix ;
+   *
+   *   • le palier retenu est le PLUS ÉLEVÉ dont le seuil est atteint. Une
+   *     cliente qui dépasse le dernier palier garde son pourcentage : passer
+   *     de dix à onze voiles ne doit jamais faire monter la facture.
+   */
+  | {
+      type: 'percent_by_quantity';
+      categories: string[];
+      tiers: PromotionQuantityTier[];
+    };
+
+/** Un palier : « à partir de 4 articles, −6 % ». */
+export interface PromotionQuantityTier {
+  minQuantity: number;
+  percent: number;
+}
 
 /**
  * Une offre et ses conditions.

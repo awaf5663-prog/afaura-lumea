@@ -2672,3 +2672,56 @@ select id, name, price, status
   from products
  where id in ('voile-rayures', 'modal-fulani', 'modal-nayra', 'silk-imprime', 'organza-degrade')
  order by name;
+
+-- ── 32. Grille tarifaire des voiles, septembre 2026 ──────────────────
+--
+-- La boutique a revu ses prix et fixé ceux des cinq étoffes arrivées à
+-- l'étape 31. Les voici, tels qu'elle les a donnés.
+--
+-- Ce que ça change :
+--   • Jersey             1 500 → 2 500 F
+--   • Jersey frisé       2 000 → 3 000 F
+--   • Modal imprimé      5 500 → 6 000 F
+--   • Viscose premium    6 500 → 5 000 F   (baisse)
+--   • les cinq nouvelles étoffes passent de brouillon à EN LIGNE.
+--
+-- Satin imprimé, Voile MJ, Modal simple et Dentelle ne bougent pas ; le
+-- Hijab tape n'est pas dans la grille et reste à son prix.
+--
+-- ⚠️ À PASSER UNE SEULE FOIS. Contrairement à l'étape 31, celle-ci écrase
+-- le prix existant — c'est tout son objet. Si vous avez déjà retouché un
+-- prix depuis /admin, il sera remplacé par celui d'ici. Dans ce cas,
+-- retirez sa ligne du tableau ci-dessous avant de lancer.
+
+update products as p
+   set price = g.prix,
+       -- Les cinq étoffes de l'étape 31 s'ouvrent à la vente ; les fiches
+       -- déjà en ligne gardent leur statut, et une fiche que la boutique
+       -- aurait retirée exprès n'est pas rouverte de force.
+       status = case when p.status = 'draft' and g.publier then 'active' else p.status end
+  from (values
+    ('jersey',          2500, false),
+    ('jersey-frise',    3000, false),
+    ('satin-imprime',   3500, false),
+    ('voile-mj',        4500, false),
+    ('modal-simple',    4500, false),
+    ('modal-imprime',   6000, false),
+    ('dentelle',        5000, false),
+    ('voile-viscose',   5000, false),
+    ('voile-rayures',   5500, true),
+    ('modal-fulani',    6500, true),
+    ('modal-nayra',     7000, true),
+    ('silk-imprime',    7000, true),
+    ('organza-degrade', 6000, true)
+  ) as g(id, prix, publier)
+ where p.id = g.id;
+
+-- Vérification : la grille telle qu'une cliente la verra. Les treize lignes
+-- doivent correspondre à la grille tarifaire de la boutique, et aucune ne
+-- doit rester à 0 F ni en brouillon.
+select name as article, price as prix, status as statut
+  from products
+ where id in ('jersey', 'jersey-frise', 'satin-imprime', 'voile-mj', 'modal-simple',
+              'modal-imprime', 'dentelle', 'voile-viscose', 'voile-rayures',
+              'modal-fulani', 'modal-nayra', 'silk-imprime', 'organza-degrade')
+ order by price, name;

@@ -293,7 +293,7 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Jersey frisé',
     description:
       "Jersey à bord frisé : la maille est terminée par des volants qui tiennent la forme et habillent le visage sans épingle. Faites défiler les photos pour voir le tombé et le détail du frisé, puis choisissez votre numéro de teinte dans le nuancier ci-dessous.",
-    price: 7000,
+    price: 3500,
     compareAtPrice: null,
     category: 'jersey_frise',
     images: [jerseyFriseColoris, jerseyFriseVolants],

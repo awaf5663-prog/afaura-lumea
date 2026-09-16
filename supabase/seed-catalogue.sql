@@ -40,7 +40,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'jersey-frise', 'jersey-frise', 'Jersey frisé', 'Jersey à bord frisé : la maille est terminée par des volants qui tiennent la forme et habillent le visage sans épingle. Faites défiler les photos pour voir le tombé et le détail du frisé, puis choisissez votre numéro de teinte dans le nuancier ci-dessous.',
-  7000, null, 'jersey_frise',
+  3500, null, 'jersey_frise',
   '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, 'frise36'

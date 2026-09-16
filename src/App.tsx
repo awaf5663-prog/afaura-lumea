@@ -119,6 +119,18 @@ function Shell() {
   const { path } = useRouter();
   const [cartOpen, setCartOpen] = useState(false);
   const isAdmin = path.startsWith('/admin');
+  /*
+   * Le bouton WhatsApp flotte au-dessus de la page, à hauteur fixe. Sur le
+   * panier et la commande, il tombait pile sur le récapitulatif et masquait
+   * un montant — la remise, le total. Un chiffre à moitié caché sur un écran
+   * de paiement fait douter du reste.
+   *
+   * On le retire donc de ces deux pages. La cliente n'y perd rien : le pied
+   * de page porte le numéro WhatsApp sur TOUTES les pages, et l'écran de
+   * commande le répète sous le bouton d'envoi. Le bouton flottant reste
+   * partout ailleurs, où il n'a rien d'important à recouvrir.
+   */
+  const pageDeMontants = path === '/panier' || path === '/commander';
   // Une version plus récente est en ligne : on recharge sur les pages
   // tranquilles, on propose sur celles où quelqu'un est en train de saisir.
   const { nouvelleVersion, recharger } = useVersionCheck(path);
@@ -176,7 +188,7 @@ function Shell() {
       {!isAdmin && (
         <>
           <Footer />
-          <WhatsAppFab />
+          {!pageDeMontants && <WhatsAppFab />}
           <BottomNav />
           <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
         </>

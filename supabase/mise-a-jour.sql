@@ -3316,3 +3316,17 @@ select p ->> 'label'                                   as offre,
        jsonb_array_length(p -> 'effect' -> 'categories') as rayons
   from settings s, jsonb_array_elements(s.promotions) as p
  where s.id = 1 and p ->> 'id' = 'pack-afaura';
+
+-- ── 36. Jersey frisé : 3 500 FCFA ────────────────────────────────────
+--
+-- La grille du 16 septembre le plaçait à 7 000 FCFA. La boutique l'a
+-- redescendu à 3 500 après vérification de son prix d'achat.
+--
+-- Une seule ligne, un seul article : les autres prix ne sont pas touchés.
+-- Relancer cette étape ne fait que réécrire la même valeur.
+
+update products set price = 3500 where id = 'jersey-frise';
+
+-- Vérification : la ligne doit afficher 3 500 et rester en ligne.
+select name as article, price as prix, status as statut
+  from products where id = 'jersey-frise';

@@ -277,7 +277,7 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Jersey',
     description:
       "Le hijab du quotidien. Maille jersey souple, tombé net, aucune épingle nécessaire. Choisissez votre teinte dans le nuancier ci-dessous.",
-    price: 5500,
+    price: 2500,
     compareAtPrice: null,
     category: 'jersey',
     images: [jerseyNoir, jerseyVertCanard, jerseyNude, jerseyBrun, jerseyNoirTotal],
@@ -343,7 +343,7 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Voile MJ',
     description:
       "Notre voile le plus fluide : un mélange de modal et de jersey. Il a la douceur et le tombé du modal, avec le maintien du jersey — il ne glisse pas et ne demande pas d'épingle. 170 × 60 cm. Faites défiler les photos pour voir le tombé, puis choisissez votre numéro de teinte dans le nuancier ci-dessous.",
-    price: 7000,
+    price: 6000,
     compareAtPrice: null,
     category: 'voile_mj',
     images: [mjNoir, mjBlanc, mjRosePoudre, mjBrunCafe, mjDimensions],
@@ -462,7 +462,7 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Modal fulani',
     description:
       "Modal au grain froissé, teint en nuances fondues : le relief reste visible dans le tissu et le dessin change d'un numéro à l'autre. Doux et mat. Choisissez votre numéro de teinte ci-dessus — le nuancier du fournisseur en compte davantage que ce que nos photos nomment, demandez-nous celui qui vous manque.",
-    price: 6000,
+    price: 6500,
     compareAtPrice: null,
     category: 'modal_fulani',
     images: [fulaniDrape, fulaniNuancier, fulaniPlies, fulaniMarbreBleu],

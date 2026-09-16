@@ -3330,3 +3330,52 @@ update products set price = 3500 where id = 'jersey-frise';
 -- Vérification : la ligne doit afficher 3 500 et rester en ligne.
 select name as article, price as prix, status as statut
   from products where id = 'jersey-frise';
+
+-- ── 37. Prix Afaura définitifs — voiles ──────────────────────────────
+--
+-- La boutique a repris son carnet, colonne par colonne : prix fournisseur,
+-- prix SHEIN, prix Afaura. Seule la troisième entre ici. Les deux autres
+-- sont des chiffres de gestion et n'ont rien à faire dans un site que les
+-- clientes lisent.
+--
+-- Trois prix changent par rapport à l'étape 33 :
+--   • Jersey        5 500 → 2 500   (prix d'achat 1 000)
+--   • Voile MJ      7 000 → 6 000   (« jersey liquide » au carnet)
+--   • Modal fulani  6 000 → 6 500
+--
+-- Les huit autres voiles du carnet étaient déjà au bon prix. Viscose premium
+-- et Hijab tape n'y figurent pas : ils gardent le leur.
+--
+-- Le tableau porte la grille ENTIÈRE : cette étape donne le bon résultat
+-- quelles que soient les étapes déjà passées.
+--
+-- ⚠️ Elle écrase le prix existant. Si vous avez retouché un prix depuis
+-- /admin, retirez sa ligne avant de lancer.
+
+update products as p
+   set price = g.prix
+  from (values
+    ('hijab-tape',      1000),
+    ('jersey',          2500),
+    ('jersey-frise',    3500),
+    ('satin-imprime',   3500),
+    ('voile-viscose',   5000),
+    ('voile-rayures',   5500),
+    ('organza-degrade', 5500),
+    ('voile-mj',        6000),
+    ('dentelle',        6000),
+    ('modal-imprime',   6000),
+    ('modal-nayra',     6000),
+    ('modal-fulani',    6500),
+    ('silk-imprime',    7000)
+  ) as g(id, prix)
+ where p.id = g.id;
+
+-- Vérification : la grille telle qu'une cliente la verra. Treize lignes,
+-- aucune à 0 F.
+select name as article, price as prix, status as statut
+  from products
+ where id in ('hijab-tape', 'jersey', 'jersey-frise', 'satin-imprime', 'voile-viscose',
+              'voile-rayures', 'organza-degrade', 'voile-mj', 'dentelle', 'modal-imprime',
+              'modal-nayra', 'modal-fulani', 'silk-imprime')
+ order by price, name;

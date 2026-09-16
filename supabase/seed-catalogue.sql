@@ -17,7 +17,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'jersey', 'jersey', 'Jersey', 'Le hijab du quotidien. Maille jersey souple, tombé net, aucune épingle nécessaire. Choisissez votre teinte dans le nuancier ci-dessous.',
-  5500, null, 'jersey',
+  2500, null, 'jersey',
   '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, 'modal36'
@@ -86,7 +86,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'voile-mj', 'voile-mj', 'Voile MJ', 'Notre voile le plus fluide : un mélange de modal et de jersey. Il a la douceur et le tombé du modal, avec le maintien du jersey — il ne glisse pas et ne demande pas d''épingle. 170 × 60 cm. Faites défiler les photos pour voir le tombé, puis choisissez votre numéro de teinte dans le nuancier ci-dessous.',
-  7000, null, 'voile_mj',
+  6000, null, 'voile_mj',
   '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, 'modal36'
@@ -201,7 +201,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'modal-fulani', 'modal-fulani', 'Modal fulani', 'Modal au grain froissé, teint en nuances fondues : le relief reste visible dans le tissu et le dessin change d''un numéro à l''autre. Doux et mat. Choisissez votre numéro de teinte ci-dessus — le nuancier du fournisseur en compte davantage que ce que nos photos nomment, demandez-nous celui qui vous manque.',
-  6000, null, 'modal_fulani',
+  6500, null, 'modal_fulani',
   '[]'::jsonb, '[{"name":"Teinte","options":["#2 Charcoal black","#3 Navy","#6 Olive grass","#7 Brown","#10 Purple","#11 Sand"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   true, null

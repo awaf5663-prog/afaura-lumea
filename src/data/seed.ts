@@ -346,7 +346,7 @@ export const SEED_PRODUCTS: Product[] = [
     slug: 'voile-mj',
     name: 'Jersey liquide',
     description:
-      "Notre voile le plus fluide : un mélange de modal et de jersey. Il a la douceur et le tombé du modal, avec le maintien du jersey — il ne glisse pas et ne demande pas d'épingle. Faites défiler les photos pour voir le tombé, puis choisissez votre numéro de teinte dans le nuancier ci-dessous : 23 coloris, dont quatre portent un nom chez notre fournisseur — White, Cream, Black et Navy.",
+      "Notre voile le plus fluide : un mélange de modal et de jersey. Il a la douceur et le tombé du modal, avec le maintien du jersey — il ne glisse pas et ne demande pas d'épingle. 170 × 60 cm. Faites défiler les photos pour voir le tombé, puis choisissez votre numéro de teinte dans le nuancier ci-dessous : 23 coloris, dont quatre portent un nom chez notre fournisseur — White, Cream, Black et Navy. Une autre teinte vous tente ? Elle peut se commander : dites-nous laquelle, nous vérifions auprès de notre fournisseur et vous confirmons avant tout paiement.",
     price: 6000,
     compareAtPrice: null,
     category: 'voile_mj',
@@ -362,6 +362,8 @@ export const SEED_PRODUCTS: Product[] = [
     stock: null,
     status: 'active',
     colorChartId: 'jersey23',
+    otherColorsAvailable: true,
+    measurements: [{ label: 'Dimensions', value: '170 × 60 cm' }],
     createdAt: '2026-01-05T10:35:00.000Z',
   },
   {

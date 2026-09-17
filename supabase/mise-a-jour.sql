@@ -3507,3 +3507,31 @@ update products
 -- Vérification : la fiche pointe sur le nuancier de 23 teintes.
 select name as article, price as prix, color_chart_id as nuancier, status
   from products where id = 'voile-mj';
+
+-- ── 41. Jersey liquide : la mesure, et les teintes sur commande ──────
+--
+-- Deux ajouts à l'étape 40.
+--
+--   • La mesure 170 × 60 cm. Elle vivait sur une ancienne photo, remplacée à
+--     l'étape 40, et avait disparu avec elle. Elle revient dans le tableau
+--     des mesures, là où une cliente la cherche avant d'acheter un voile
+--     qu'elle ne peut pas essayer.
+--
+--   • Les teintes hors nuancier. Le fournisseur teint aussi à la demande :
+--     on l'annonce, et la cliente peut écrire la couleur qu'elle cherche.
+--     Son nuancier Pantone n'est PAS affiché — il dit ce qu'une usine peut
+--     teindre, pas ce qui est disponible ; le montrer ferait choisir une
+--     couleur qu'il faudrait ensuite retirer.
+
+update products
+   set measurements = '[{"label":"Dimensions","value":"170 × 60 cm"}]'::jsonb,
+       other_colors_available = true,
+       description = 'Notre voile le plus fluide : un mélange de modal et de jersey. Il a la douceur et le tombé du modal, avec le maintien du jersey — il ne glisse pas et ne demande pas d''épingle. 170 × 60 cm. Faites défiler les photos pour voir le tombé, puis choisissez votre numéro de teinte dans le nuancier ci-dessous : 23 coloris, dont quatre portent un nom chez notre fournisseur — White, Cream, Black et Navy. Une autre teinte vous tente ? Elle peut se commander : dites-nous laquelle, nous vérifions auprès de notre fournisseur et vous confirmons avant tout paiement.'
+ where id = 'voile-mj';
+
+-- Vérification : la mesure est enregistrée et les teintes sur commande aussi.
+select name as article,
+       measurements -> 0 ->> 'value' as dimensions,
+       other_colors_available as teintes_sur_commande,
+       color_chart_id as nuancier
+  from products where id = 'voile-mj';

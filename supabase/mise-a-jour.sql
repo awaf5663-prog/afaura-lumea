@@ -3590,3 +3590,28 @@ select name as article, price as prix, category as rayon, status,
 select (pricing -> 'feeExemptCategories') ? 'voile_imprime' as voile_imprime_sans_frais,
        jsonb_array_length(pricing -> 'feeExemptCategories') as rayons_dispenses
   from settings where id = 1;
+
+-- ── 43. Voile léopard : cinq coloris de plus (13 en tout) ────────────
+--
+-- Café, Noir, Gris clair, Marron clair, Brun rose rejoignent la fiche.
+--
+-- Un détail qui n'en est pas un : le fournisseur appelle « gris clair » DEUX
+-- teintes différentes — une presque blanche et une gris moyen. Deux coloris
+-- ne peuvent pas porter le même nom : le second deviendrait impossible à
+-- choisir, et le clic ramènerait toujours la photo du premier. La presque
+-- blanche est donc décrite par ce qu'elle est, « Blanc & noir », en attendant
+-- la grille de noms de la boutique.
+--
+-- `do update` sur les seules variantes : le prix et le statut ne sont pas
+-- touchés, pour ne rien écraser de ce qui aurait été ajusté depuis /admin.
+
+update products
+   set variants = '[{"name":"Coloris","options":["Bleu","Gris","Marron","Blanc & noir","Kaki clair — zébré","Kaki","Gris foncé","Gris rose","Café","Noir","Gris clair","Marron clair","Brun rose"],"soldOutOptions":[]}]'::jsonb
+ where id = 'voile-leopard';
+
+-- Vérification : treize coloris, tous différents.
+select name as article,
+       jsonb_array_length(variants -> 0 -> 'options') as coloris,
+       (select count(distinct valeur)
+          from jsonb_array_elements_text(variants -> 0 -> 'options') as valeur) as noms_distincts
+  from products where id = 'voile-leopard';

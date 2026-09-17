@@ -156,7 +156,7 @@ insert into products (
 ) values (
   'voile-leopard', 'voile-leopard', 'Voile léopard', 'Grand foulard léger en voile de polyester, imprimé en numérique. Il se porte en hijab comme en écharpe, sur une tenue unie qu''il suffit à habiller. Choisissez votre coloris ci-dessus : les photos suivent votre choix. D''autres couleurs arrivent — dites-nous celle que vous cherchez, nous confirmons avant paiement.',
   2000, null, 'voile_imprime',
-  '[]'::jsonb, '[{"name":"Coloris","options":["Bleu","Gris","Marron","Gris clair","Kaki clair — zébré","Kaki","Gris foncé","Gris rose"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
+  '[]'::jsonb, '[{"name":"Coloris","options":["Bleu","Gris","Marron","Blanc & noir","Kaki clair — zébré","Kaki","Gris foncé","Gris rose","Café","Noir","Gris clair","Marron clair","Brun rose"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   true, null
 )

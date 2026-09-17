@@ -121,6 +121,11 @@ import jerseyLiquideBleuCiel from '@/src/assets/products/jersey-liquide-bleu-cie
 import jerseyLiquideBrun from '@/src/assets/products/jersey-liquide-brun.webp';
 import jerseyLiquideCremePortee from '@/src/assets/products/jersey-liquide-creme-portee.webp';
 import jerseyLiquideNoir from '@/src/assets/products/jersey-liquide-noir.webp';
+import leoCafe from '@/src/assets/products/voile-leopard-cafe.webp';
+import leoNoir from '@/src/assets/products/voile-leopard-noir.webp';
+import leoGrisClair2 from '@/src/assets/products/voile-leopard-gris-clair-2.webp';
+import leoMarronClair from '@/src/assets/products/voile-leopard-marron-clair.webp';
+import leoBrunRose from '@/src/assets/products/voile-leopard-brun-rose.webp';
 import leoBleu from '@/src/assets/products/voile-leopard-bleu.webp';
 import leoGris from '@/src/assets/products/voile-leopard-gris.webp';
 import leoMarron from '@/src/assets/products/voile-leopard-marron.webp';
@@ -444,19 +449,36 @@ export const SEED_PRODUCTS: Product[] = [
     price: 2000,
     compareAtPrice: null,
     category: 'voile_imprime',
-    images: [leoBleu, leoGris, leoMarron, leoGrisClair, leoKakiClair, leoKaki, leoGrisFonce, leoGrisRose],
+    images: [
+      leoBleu, leoGris, leoMarron, leoGrisClair, leoKakiClair, leoKaki,
+      leoGrisFonce, leoGrisRose, leoCafe, leoNoir, leoGrisClair2, leoMarronClair,
+      leoBrunRose,
+    ],
     variants: [
       {
         name: 'Coloris',
+        /*
+         * Les noms du fournisseur, à une exception près : il appelle « gris
+         * clair » DEUX teintes différentes — une presque blanche et une gris
+         * moyen. Deux options ne peuvent pas porter le même nom, sinon la
+         * seconde devient impossible à choisir (photoOfOption prend la
+         * première trouvée). La presque blanche est donc décrite par ce
+         * qu'elle est, en attendant la grille de noms de la boutique.
+         */
         options: [
           'Bleu',
           'Gris',
           'Marron',
-          'Gris clair',
+          'Blanc & noir',
           'Kaki clair — zébré',
           'Kaki',
           'Gris foncé',
           'Gris rose',
+          'Café',
+          'Noir',
+          'Gris clair',
+          'Marron clair',
+          'Brun rose',
         ],
         soldOutOptions: [],
       },

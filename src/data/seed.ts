@@ -67,6 +67,11 @@ import pyjamaPois from '@/src/assets/products/pyjama-pois.webp';
 import pyjamaRayeRose from '@/src/assets/products/pyjama-raye-rose.webp';
 import shortsLotTrois from '@/src/assets/products/shorts-lot-trois.webp';
 import sacBordeaux from '@/src/assets/products/sac-bordeaux.webp';
+import sacAilesBordeaux from '@/src/assets/products/sac-ailes-bordeaux.webp';
+import sacAilesEcru from '@/src/assets/products/sac-ailes-ecru.webp';
+import sacAilesKaki from '@/src/assets/products/sac-ailes-kaki.webp';
+import sacAilesNoirCuir from '@/src/assets/products/sac-ailes-noir-cuir.webp';
+import sacAilesNoirSuedine from '@/src/assets/products/sac-ailes-noir-suedine.webp';
 import sacCabasBrun from '@/src/assets/products/sac-cabas-brun.webp';
 import sacLeopardBrun from '@/src/assets/products/sac-leopard-brun.webp';
 import shortNuit from '@/src/assets/products/short-nuit.webp';
@@ -1488,6 +1493,46 @@ export const SEED_PRODUCTS: Product[] = [
     isNew: true,
     otherColorsAvailable: true,
     createdAt: '2026-09-08T16:02:00.000Z',
+  },
+  {
+    /*
+     * UNE SEULE fiche pour cinq coloris, et non cinq fiches.
+     *
+     * C'est le même sac : même forme, même fermoir, même prix. Le découper
+     * en cinq articles obligerait la cliente à ouvrir cinq pages pour
+     * comparer des couleurs, et la boutique à changer cinq prix le jour où
+     * elle en change un.
+     *
+     * Les photos suivent le choix : il y a autant de coloris que de photos,
+     * donc choisir une couleur fait défiler jusqu'à la sienne (voir
+     * lib/variants). L'ordre des deux listes doit rester le même.
+     *
+     * Les deux noirs et l'écru ne se distinguent pas que par la couleur :
+     * la matière change aussi — suédine, cuir grainé, toile. Le dire évite
+     * qu'une cliente reçoive le bon coloris dans la mauvaise matière.
+     */
+    id: 'sac-ailes',
+    slug: 'sac-ailes',
+    name: 'Sac cabas à ailes',
+    description:
+      "Grand cabas à soufflets ouverts, qui lui donnent cette silhouette en ailes. Une patte sanglée et son fermoir doré ferment le devant ; les anses passent à l’épaule. Assez grand pour un ordinateur portable. Choisissez votre coloris ci-dessus : les photos suivent votre choix. D’autres couleurs arrivent — dites-nous celle que vous cherchez, nous confirmons avant paiement.",
+    price: 14000,
+    compareAtPrice: null,
+    category: 'sac',
+    // Même ordre que les coloris, photo par photo.
+    images: [sacAilesKaki, sacAilesEcru, sacAilesBordeaux, sacAilesNoirSuedine, sacAilesNoirCuir],
+    variants: [
+      {
+        name: 'Coloris',
+        options: ['Kaki', 'Écru & noir', 'Bordeaux', 'Noir suédine', 'Noir cuir'],
+        soldOutOptions: [],
+      },
+    ],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-17T09:00:00.000Z',
   },
   {
     id: 'sac-cabas-brun',

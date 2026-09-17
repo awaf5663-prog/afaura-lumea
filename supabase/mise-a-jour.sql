@@ -3443,3 +3443,39 @@ select name as article, price as prix, status as statut
 select count(*) filter (where status = 'active') as rentree_en_ligne,
        count(*) filter (where status = 'draft')  as rentree_en_brouillon
   from products where category = 'rentree';
+
+-- ── 39. Sac cabas à ailes — une fiche, cinq coloris ──────────────────
+--
+-- Grand cabas à soufflets ouverts, patte sanglée et fermoir doré. 14 000
+-- FCFA. Ses photos sont livrées DANS le site : rien à téléverser, rien qui
+-- pèse sur le quota de la base.
+--
+-- UNE seule fiche, et non cinq. C'est le même sac décliné en couleurs : le
+-- découper obligerait la cliente à ouvrir cinq pages pour comparer des
+-- teintes, et la boutique à changer cinq prix le jour où elle en change un.
+-- Choisir un coloris fait défiler la galerie jusqu'à sa photo.
+--
+-- Les deux noirs et l'écru ne se distinguent pas que par la couleur : la
+-- matière change aussi — suédine, cuir grainé, toile. Le dire évite qu'une
+-- cliente reçoive le bon coloris dans la mauvaise matière.
+--
+-- `do nothing` : relancer cette étape ne remettra jamais à 14 000 un prix
+-- que vous auriez ajusté depuis /admin.
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'sac-ailes', 'sac-ailes', 'Sac cabas à ailes',
+  'Grand cabas à soufflets ouverts, qui lui donnent cette silhouette en ailes. Une patte sanglée et son fermoir doré ferment le devant ; les anses passent à l''épaule. Assez grand pour un ordinateur portable. Choisissez votre coloris ci-dessus : les photos suivent votre choix. D''autres couleurs arrivent — dites-nous celle que vous cherchez, nous confirmons avant paiement.',
+  14000, null, 'sac', '[]'::jsonb,
+  '[{"name":"Coloris","options":["Kaki","Écru & noir","Bordeaux","Noir suédine","Noir cuir"],"soldOutOptions":[]}]'::jsonb,
+  '{}'::jsonb, null, 'active', true, false, true, null
+)
+on conflict (id) do nothing;
+
+-- Vérification : une seule ligne, cinq coloris, 14 000 FCFA.
+select name as article, price as prix, status as statut,
+       jsonb_array_length(variants -> 0 -> 'options') as coloris
+  from products where id = 'sac-ailes';

@@ -1174,6 +1174,29 @@ insert into products (
   images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
+  'sac-ailes', 'sac-ailes', 'Sac cabas à ailes', 'Grand cabas à soufflets ouverts, qui lui donnent cette silhouette en ailes. Une patte sanglée et son fermoir doré ferment le devant ; les anses passent à l’épaule. Assez grand pour un ordinateur portable. Choisissez votre coloris ci-dessus : les photos suivent votre choix. D’autres couleurs arrivent — dites-nous celle que vous cherchez, nous confirmons avant paiement.',
+  14000, null, 'sac',
+  '[]'::jsonb, '[{"name":"Coloris","options":["Kaki","Écru & noir","Bordeaux","Noir suédine","Noir cuir"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
   'sac-cabas-brun', 'sac-cabas-brun', 'Sac cabas brun', 'Cabas en cuir grainé souple, plis latéraux et anses longues. Se porte à la main comme à l’épaule.',
   15500, null, 'sac',
   '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',

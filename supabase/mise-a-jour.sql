@@ -3535,3 +3535,58 @@ select name as article,
        other_colors_available as teintes_sur_commande,
        color_chart_id as nuancier
   from products where id = 'voile-mj';
+
+-- ── 42. Voile léopard — un rayon neuf, et surtout pas « modal » ──────
+--
+-- La boutique pensait avoir affaire à du modal imprimé. La fiche du
+-- fournisseur dit autre chose : « Matériel : polyester », « Type du tissu :
+-- voile », « Procédé d'impression : impression numérique ». Le vendre sous
+-- le nom « Modal imprimé » aurait été une fausse indication de matière — et
+-- une matière annoncée à tort se sent dès que la cliente touche le tissu.
+--
+-- Il entre donc sous son vrai nom, dans un rayon neuf : « Voile imprimé ».
+--
+-- Une fiche, huit coloris, 2 000 FCFA. « Kaki clair » n'est pas léopard mais
+-- ZÉBRÉ : son nom le dit, pour qu'on ne commande pas des rayures en croyant
+-- prendre des taches.
+--
+-- DEUX choses à faire ici, et la seconde est facile à oublier :
+--
+--   1. poser la fiche ;
+--   2. AJOUTER `voile_imprime` aux rayons dispensés de frais de traitement.
+--      Le rayon est neuf : il n'hérite de rien. Sans cette ligne, un voile
+--      serait facturé alors que la boutique n'en veut sur aucun.
+
+-- 1. La fiche. Ses photos sont livrées avec le site.
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'voile-leopard', 'voile-leopard', 'Voile léopard',
+  'Grand foulard léger en voile de polyester, imprimé en numérique. Il se porte en hijab comme en écharpe, sur une tenue unie qu''il suffit à habiller. Choisissez votre coloris ci-dessus : les photos suivent votre choix. D''autres couleurs arrivent — dites-nous celle que vous cherchez, nous confirmons avant paiement.',
+  2000, null, 'voile_imprime', '[]'::jsonb,
+  '[{"name":"Coloris","options":["Bleu","Gris","Marron","Gris clair","Kaki clair — zébré","Kaki","Gris foncé","Gris rose"],"soldOutOptions":[]}]'::jsonb,
+  '{}'::jsonb, null, 'active', true, false, true, null
+)
+on conflict (id) do nothing;
+
+-- 2. Le rayon rejoint les dispensés de frais, sans toucher aux autres.
+update settings
+   set pricing = jsonb_set(
+     coalesce(pricing, '{}'::jsonb),
+     '{feeExemptCategories}',
+     coalesce(pricing -> 'feeExemptCategories', '[]'::jsonb) || '["voile_imprime"]'::jsonb,
+     true
+   )
+ where id = 1
+   and not (coalesce(pricing -> 'feeExemptCategories', '[]'::jsonb) ? 'voile_imprime');
+
+-- Vérification : la fiche, puis le rayon dans la liste des dispensés.
+select name as article, price as prix, category as rayon, status,
+       jsonb_array_length(variants -> 0 -> 'options') as coloris
+  from products where id = 'voile-leopard';
+
+select (pricing -> 'feeExemptCategories') ? 'voile_imprime' as voile_imprime_sans_frais,
+       jsonb_array_length(pricing -> 'feeExemptCategories') as rayons_dispenses
+  from settings where id = 1;

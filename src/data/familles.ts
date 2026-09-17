@@ -46,6 +46,7 @@ export const FAMILLES: Famille[] = [
       'modal_nayra',
       'silk_imprime',
       'organza_degrade',
+      'voile_imprime',
     ],
   },
   { id: 'abayas', name: 'Abayas & robes', categories: ['abaya', 'piece_unique', 'robes'] },

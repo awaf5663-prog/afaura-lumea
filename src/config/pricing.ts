@@ -106,6 +106,7 @@ export const DEFAULT_PRICING: PricingConfig = {
     'modal_nayra',
     'silk_imprime',
     'organza_degrade',
+    'voile_imprime',
     // Glosses et huiles à lèvres
     'lips',
   ],

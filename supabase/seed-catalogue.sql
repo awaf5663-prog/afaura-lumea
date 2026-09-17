@@ -9,7 +9,7 @@
 --  et les photos déjà téléversées depuis l'admin ne sont jamais écrasées.
 -- ═══════════════════════════════════════════════════════════════════
 
--- Catégories du catalogue : Abaya, Pièce unique, Viscose premium, Jersey liquide, Modal imprimé, Modal simple, Satin imprimé, Dentelle, Jersey, Jersey frisé, Hijab tape, Voile rayures, Modal fulani, Modal nayra, Silk imprimé, Organza dégradé, Rentrée, Packs, Robes, Lips gloss, Gommages, Parfums, Maquillage, Bougies, Sacs, Sous-vêtements & pyjamas, Chaussures, Combinaisons, Gels de douche, Laits corporels, Soins du visage, Accessoires beauté
+-- Catégories du catalogue : Abaya, Pièce unique, Viscose premium, Jersey liquide, Modal imprimé, Modal simple, Satin imprimé, Dentelle, Jersey, Jersey frisé, Hijab tape, Voile rayures, Modal fulani, Modal nayra, Silk imprimé, Organza dégradé, Voile imprimé, Rentrée, Packs, Robes, Lips gloss, Gommages, Parfums, Maquillage, Bougies, Sacs, Sous-vêtements & pyjamas, Chaussures, Combinaisons, Gels de douche, Laits corporels, Soins du visage, Accessoires beauté
 
 insert into products (
   id, slug, name, description, price, compare_at_price, category,
@@ -135,6 +135,29 @@ insert into products (
   6000, null, 'modal_imprime',
   '[]'::jsonb, '[{"name":"Modèle","options":["Zébré bordeaux","Pois sur brun","Pois sur blanc","Aquarelle","Léopard"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
+  true, null
+)
+on conflict (id) do update set
+  slug = excluded.slug,
+  name = excluded.name,
+  description = excluded.description,
+  price = excluded.price,
+  category = excluded.category,
+  variants = excluded.variants,
+  option_prices = excluded.option_prices,
+  status = excluded.status,
+  other_colors_available = excluded.other_colors_available,
+  color_chart_id = excluded.color_chart_id;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'voile-leopard', 'voile-leopard', 'Voile léopard', 'Grand foulard léger en voile de polyester, imprimé en numérique. Il se porte en hijab comme en écharpe, sur une tenue unie qu''il suffit à habiller. Choisissez votre coloris ci-dessus : les photos suivent votre choix. D''autres couleurs arrivent — dites-nous celle que vous cherchez, nous confirmons avant paiement.',
+  2000, null, 'voile_imprime',
+  '[]'::jsonb, '[{"name":"Coloris","options":["Bleu","Gris","Marron","Gris clair","Kaki clair — zébré","Kaki","Gris foncé","Gris rose"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
+  true, false,
   true, null
 )
 on conflict (id) do update set

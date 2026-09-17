@@ -121,6 +121,14 @@ import jerseyLiquideBleuCiel from '@/src/assets/products/jersey-liquide-bleu-cie
 import jerseyLiquideBrun from '@/src/assets/products/jersey-liquide-brun.webp';
 import jerseyLiquideCremePortee from '@/src/assets/products/jersey-liquide-creme-portee.webp';
 import jerseyLiquideNoir from '@/src/assets/products/jersey-liquide-noir.webp';
+import leoBleu from '@/src/assets/products/voile-leopard-bleu.webp';
+import leoGris from '@/src/assets/products/voile-leopard-gris.webp';
+import leoMarron from '@/src/assets/products/voile-leopard-marron.webp';
+import leoGrisClair from '@/src/assets/products/voile-leopard-gris-clair.webp';
+import leoKakiClair from '@/src/assets/products/voile-leopard-kaki-clair.webp';
+import leoKaki from '@/src/assets/products/voile-leopard-kaki.webp';
+import leoGrisFonce from '@/src/assets/products/voile-leopard-gris-fonce.webp';
+import leoGrisRose from '@/src/assets/products/voile-leopard-gris-rose.webp';
 import modalAquarelle from '@/src/assets/products/modal-aquarelle.webp';
 import modalLeopard from '@/src/assets/products/modal-leopard.webp';
 import modalPoisBlanc from '@/src/assets/products/modal-pois-blanc.webp';
@@ -189,6 +197,12 @@ export const CATEGORIES: Category[] = [
   { id: 'modal_nayra', name: 'Modal nayra' },
   { id: 'silk_imprime', name: 'Silk imprimé' },
   { id: 'organza_degrade', name: 'Organza dégradé' },
+  /*
+   * Voiles imprimés en polyester. Ils ne sont NI du modal NI du satin : le
+   * fournisseur écrit « polyester » sur sa fiche, et une matière annoncée à
+   * tort se sent dès que la cliente touche le tissu. D'où un rayon à eux.
+   */
+  { id: 'voile_imprime', name: 'Voile imprimé' },
   /*
    * Cadre portrait, comme les voiles. On a essayé le carré « photo entière » :
    * les photos de la boutique sont des captures d'écran bordées de bandes
@@ -404,6 +418,54 @@ export const SEED_PRODUCTS: Product[] = [
     status: 'active',
     otherColorsAvailable: true,
     createdAt: '2026-01-05T10:05:00.000Z',
+  },
+  {
+    /*
+     * UNE fiche, huit coloris. Même voile, même prix, même impression : le
+     * découper ferait ouvrir huit pages pour comparer des motifs.
+     *
+     * Ce n'est PAS du modal. La fiche du fournisseur dit « polyester » et
+     * « voile » ; la boutique l'avait pris pour du modal imprimé, et la
+     * vérification a tranché. Une matière annoncée à tort se sent dès que la
+     * cliente touche le tissu, et se paie à la livraison.
+     *
+     * « Kaki clair » n'est pas léopard mais ZÉBRÉ — c'est visible sur la
+     * photo, et le nom du coloris le dit, pour qu'une cliente ne commande pas
+     * des rayures en croyant prendre des taches.
+     *
+     * Autant de coloris que de photos, et dans le même ordre : choisir une
+     * couleur fait défiler jusqu'à la sienne (voir lib/variants).
+     */
+    id: 'voile-leopard',
+    slug: 'voile-leopard',
+    name: 'Voile léopard',
+    description:
+      "Grand foulard léger en voile de polyester, imprimé en numérique. Il se porte en hijab comme en écharpe, sur une tenue unie qu'il suffit à habiller. Choisissez votre coloris ci-dessus : les photos suivent votre choix. D'autres couleurs arrivent — dites-nous celle que vous cherchez, nous confirmons avant paiement.",
+    price: 2000,
+    compareAtPrice: null,
+    category: 'voile_imprime',
+    images: [leoBleu, leoGris, leoMarron, leoGrisClair, leoKakiClair, leoKaki, leoGrisFonce, leoGrisRose],
+    variants: [
+      {
+        name: 'Coloris',
+        options: [
+          'Bleu',
+          'Gris',
+          'Marron',
+          'Gris clair',
+          'Kaki clair — zébré',
+          'Kaki',
+          'Gris foncé',
+          'Gris rose',
+        ],
+        soldOutOptions: [],
+      },
+    ],
+    stock: null,
+    status: 'active',
+    isNew: true,
+    otherColorsAvailable: true,
+    createdAt: '2026-09-17T14:00:00.000Z',
   },
   {
     id: 'dentelle',

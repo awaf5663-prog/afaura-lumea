@@ -3670,3 +3670,70 @@ select name as article, price as prix, status as statut
               'voile-mj', 'dentelle', 'modal-imprime', 'modal-nayra', 'modal-fulani',
               'silk-imprime', 'piece-unique')
  order by price, name;
+
+-- ── 45. Jersey liquide à 5 000, et le nuancier du modal simple ───────
+--
+-- Deux demandes de la boutique.
+--
+-- 1. Jersey liquide : 6 000 → 5 000. Une baisse de plus, après les sept de
+--    l'étape 44. La grille entière est réécrite comme là-bas, pour que cette
+--    étape suffise quel que soit l'état de la base.
+--
+-- 2. Le modal simple reçoit SON nuancier. Jusqu'ici il partageait `modal36`
+--    avec le Jersey et le Voile viscose premium : trente-six aplats de
+--    couleur, sans photo. Il pointe désormais vers `modal34`, monté à partir
+--    des captures du nuancier fournisseur — trente-quatre teintes, chacune
+--    une VRAIE photo du tissu.
+--
+--    Le Jersey et le Voile viscose premium restent sur `modal36` : le
+--    nuancier remis par la boutique est celui du modal simple, et rien ne
+--    dit qu'il vaut pour les deux autres étoffes. Les y basculer aurait
+--    été une supposition, pas une information.
+--
+--    Les pastilles elles-mêmes (photos + codes hexadécimaux) vivent dans le
+--    site, pas en base : la base ne retient que l'IDENTIFIANT du nuancier.
+--    C'est pourquoi cette étape est si courte — le gros du travail est déjà
+--    déployé avec le site.
+--
+--    `other_colors_available` passe à vrai : le fournisseur propose d'autres
+--    teintes que les trente-quatre affichées. La fiche dira « D'autres
+--    coloris existent — dites-nous lequel vous cherchez », sans promettre
+--    une teinte précise ni un délai.
+
+update products p
+   set price = g.prix
+  from (values
+    ('hijab-tape',      2000),
+    ('jersey',          2500),
+    ('jersey-frise',    3500),
+    ('satin-imprime',   3500),
+    ('voile-leopard',   2000),
+    ('voile-rayures',   5000),
+    ('voile-viscose',   5000),
+    ('modal-simple',    4500),
+    ('organza-degrade', 5500),
+    ('voile-mj',        5000),
+    ('dentelle',        5000),
+    ('modal-imprime',   5000),
+    ('modal-nayra',     5000),
+    ('modal-fulani',    5000),
+    ('silk-imprime',    5000),
+    ('piece-unique',    5000)
+  ) as g(id, prix)
+ where p.id = g.id;
+
+update products
+   set color_chart_id = 'modal34',
+       other_colors_available = true
+ where id = 'modal-simple';
+
+-- Vérification : la grille à jour, et le nuancier de chaque étoffe qui en
+-- porte un. Le modal simple doit être le SEUL sur `modal34`.
+select name as article, price as prix, color_chart_id as nuancier,
+       other_colors_available as autres_coloris
+  from products
+ where id in ('hijab-tape', 'jersey', 'jersey-frise', 'satin-imprime', 'voile-leopard',
+              'voile-rayures', 'voile-viscose', 'modal-simple', 'organza-degrade',
+              'voile-mj', 'dentelle', 'modal-imprime', 'modal-nayra', 'modal-fulani',
+              'silk-imprime', 'piece-unique')
+ order by price, name;

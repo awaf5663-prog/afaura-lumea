@@ -109,7 +109,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'modal-simple', 'modal-simple', 'Modal simple', 'Modal uni, doux et respirant, très léger à porter. Un drapé souple qui reste impeccable toute la journée. Choisissez votre teinte dans le nuancier ci-dessous.',
-  5500, null, 'modal_simple',
+  4500, null, 'modal_simple',
   '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, 'modal36'
@@ -132,7 +132,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'modal-imprime', 'modal-imprime', 'Modal imprimé', 'Le confort du modal avec un imprimé travaillé. Faites défiler les photos pour voir les modèles, puis choisissez celui qui vous plaît. Vendu à l''unité.',
-  6000, null, 'modal_imprime',
+  5000, null, 'modal_imprime',
   '[]'::jsonb, '[{"name":"Modèle","options":["Zébré bordeaux","Pois sur brun","Pois sur blanc","Aquarelle","Léopard"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   true, null
@@ -178,7 +178,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'dentelle', 'dentelle', 'Dentelle', 'Hijab bordé de dentelle, pour les occasions : cérémonies, fêtes, invitations. Choisissez votre teinte dans le nuancier ci-dessous.',
-  6000, null, 'dentelle',
+  5000, null, 'dentelle',
   '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, 'dentelle12'
@@ -224,7 +224,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'modal-fulani', 'modal-fulani', 'Modal fulani', 'Modal au grain froissé, teint en nuances fondues : le relief reste visible dans le tissu et le dessin change d''un numéro à l''autre. Doux et mat. Choisissez votre numéro de teinte ci-dessus — le nuancier du fournisseur en compte davantage que ce que nos photos nomment, demandez-nous celui qui vous manque.',
-  6500, null, 'modal_fulani',
+  5000, null, 'modal_fulani',
   '[]'::jsonb, '[{"name":"Teinte","options":["#2 Charcoal black","#3 Navy","#6 Olive grass","#7 Brown","#10 Purple","#11 Sand"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   true, null
@@ -247,7 +247,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'modal-nayra', 'modal-nayra', 'Modal nayra', 'Un modal dégradé : la couleur part soutenue à un bout et s''éclaircit jusqu''à l''autre, si bien que le drapé change de teinte selon la façon dont vous le posez. Tombé souple, fini mat. Faites défiler les photos pour voir les dégradés, puis choisissez le vôtre.',
-  6000, null, 'modal_nayra',
+  5000, null, 'modal_nayra',
   '[]'::jsonb, '[{"name":"Dégradé","options":["Gris-bleu & sable","Bordeaux & rose","Violet & crème","Orange & brun"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   true, null
@@ -270,7 +270,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'silk-imprime', 'silk-imprime', 'Silk imprimé', 'Voile satiné à imprimé marbré : la lumière y accroche et le motif se déplie sur toute la longueur, comme une peinture. Pour les tenues où l''on veut être vue. Faites défiler les photos pour voir les imprimés ; il en existe d''autres que ceux montrés, demandez-nous.',
-  7000, null, 'silk_imprime',
+  5000, null, 'silk_imprime',
   '[]'::jsonb, '[{"name":"Imprimé","options":["Marbré bordeaux","Léopard brun","Marbré doré"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   true, null
@@ -316,7 +316,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'piece-unique', 'piece-unique', 'Pièce unique', 'Des modèles rares, reçus à l''unité. Faites défiler les photos pour les voir un par un, puis choisissez celui que vous voulez : chaque modèle n''existe qu''en un seul exemplaire.',
-  6000, null, 'piece_unique',
+  5000, null, 'piece_unique',
   '[]'::jsonb, '[{"name":"Modèle","options":["Noir fleuri","Crème fleuri","Taupe fleuri","Fauve","Écru & or"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, null

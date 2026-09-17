@@ -391,7 +391,7 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Modal simple',
     description:
       "Modal uni, doux et respirant, très léger à porter. Un drapé souple qui reste impeccable toute la journée. Choisissez votre teinte dans le nuancier ci-dessous.",
-    price: 5500,
+    price: 4500,
     compareAtPrice: null,
     category: 'modal_simple',
     images: [modalSimpleBordeaux, modalSimpleKakiNoir, modalSimpleNoir, modalSimpleColoris],
@@ -407,7 +407,7 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Modal imprimé',
     description:
       "Le confort du modal avec un imprimé travaillé. Faites défiler les photos pour voir les modèles, puis choisissez celui qui vous plaît. Vendu à l'unité.",
-    price: 6000,
+    price: 5000,
     compareAtPrice: null,
     category: 'modal_imprime',
     // L'ordre des photos suit l'ordre des modèles : faire défiler sélectionne.
@@ -495,7 +495,7 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Dentelle',
     description:
       "Hijab bordé de dentelle, pour les occasions : cérémonies, fêtes, invitations. Choisissez votre teinte dans le nuancier ci-dessous.",
-    price: 6000,
+    price: 5000,
     compareAtPrice: null,
     category: 'dentelle',
     images: [dentelleNoirBlanc, dentelleNoirRose, dentelleBrunRose, dentelleColoris],
@@ -559,7 +559,7 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Modal fulani',
     description:
       "Modal au grain froissé, teint en nuances fondues : le relief reste visible dans le tissu et le dessin change d'un numéro à l'autre. Doux et mat. Choisissez votre numéro de teinte ci-dessus — le nuancier du fournisseur en compte davantage que ce que nos photos nomment, demandez-nous celui qui vous manque.",
-    price: 6500,
+    price: 5000,
     compareAtPrice: null,
     category: 'modal_fulani',
     images: [fulaniDrape, fulaniNuancier, fulaniPlies, fulaniMarbreBleu],
@@ -594,7 +594,7 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Modal nayra',
     description:
       "Un modal dégradé : la couleur part soutenue à un bout et s'éclaircit jusqu'à l'autre, si bien que le drapé change de teinte selon la façon dont vous le posez. Tombé souple, fini mat. Faites défiler les photos pour voir les dégradés, puis choisissez le vôtre.",
-    price: 6000,
+    price: 5000,
     compareAtPrice: null,
     category: 'modal_nayra',
     images: [nayraDuo, nayraBordeaux, nayraViolet, nayraOrange],
@@ -623,7 +623,7 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Silk imprimé',
     description:
       "Voile satiné à imprimé marbré : la lumière y accroche et le motif se déplie sur toute la longueur, comme une peinture. Pour les tenues où l'on veut être vue. Faites défiler les photos pour voir les imprimés ; il en existe d'autres que ceux montrés, demandez-nous.",
-    price: 7000,
+    price: 5000,
     compareAtPrice: null,
     category: 'silk_imprime',
     images: [silkBordeaux, silkLeopard, silkMarbre, silkEtoffes],
@@ -677,7 +677,7 @@ export const SEED_PRODUCTS: Product[] = [
     name: 'Pièce unique',
     description:
       "Des modèles rares, reçus à l'unité. Faites défiler les photos pour les voir un par un, puis choisissez celui que vous voulez : chaque modèle n'existe qu'en un seul exemplaire.",
-    price: 6000,
+    price: 5000,
     compareAtPrice: null,
     category: 'piece_unique',
     // L'ordre des photos suit exactement l'ordre des modèles ci-dessous :

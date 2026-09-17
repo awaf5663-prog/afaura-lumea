@@ -3615,3 +3615,58 @@ select name as article,
        (select count(distinct valeur)
           from jsonb_array_elements_text(variants -> 0 -> 'options') as valeur) as noms_distincts
   from products where id = 'voile-leopard';
+
+-- ── 44. Nouveaux prix : six voiles baissent, et la pièce unique ───────
+--
+-- Sept prix demandés par la boutique. TOUS EN BAISSE, aucune hausse :
+--
+--     Silk imprimé    7 000 → 5 000   (−2 000, la plus forte)
+--     Modal fulani    6 500 → 5 000   (−1 500)
+--     Modal nayra     6 000 → 5 000   (−1 000)
+--     Dentelle        6 000 → 5 000   (−1 000)
+--     Modal imprimé   6 000 → 5 000   (−1 000)
+--     Modal simple    5 500 → 4 500   (−1 000)
+--     Pièce unique    6 000 → 5 000   (−1 000)
+--
+-- Comme aux étapes 33, 37 et 38, la grille ENTIÈRE est réécrite, pas
+-- seulement les sept lignes qui bougent. Ainsi cette étape donne le bon
+-- résultat quel que soit l'état de la base : peu importe lesquelles des
+-- étapes précédentes ont déjà été passées, après celle-ci les prix sont
+-- ceux d'aujourd'hui.
+--
+-- La « Pièce unique » n'est pas un voile — elle est dans le rayon
+-- `piece_unique`, qui n'est PAS dans la liste des rayons sans frais de
+-- l'étape 34. Les frais de traitement continuent donc de s'y appliquer.
+-- C'est bien le prix qui a été demandé, et rien d'autre.
+
+update products p
+   set price = g.prix
+  from (values
+    ('hijab-tape',      2000),
+    ('jersey',          2500),
+    ('jersey-frise',    3500),
+    ('satin-imprime',   3500),
+    ('voile-leopard',   2000),
+    ('voile-rayures',   5000),
+    ('voile-viscose',   5000),
+    ('modal-simple',    4500),
+    ('organza-degrade', 5500),
+    ('voile-mj',        6000),
+    ('dentelle',        5000),
+    ('modal-imprime',   5000),
+    ('modal-nayra',     5000),
+    ('modal-fulani',    5000),
+    ('silk-imprime',    5000),
+    ('piece-unique',    5000)
+  ) as g(id, prix)
+ where p.id = g.id;
+
+-- Vérification : la grille telle qu'une cliente la verra. Seize lignes,
+-- aucune à 0 F, et les sept nouveaux prix bien en place.
+select name as article, price as prix, status as statut
+  from products
+ where id in ('hijab-tape', 'jersey', 'jersey-frise', 'satin-imprime', 'voile-leopard',
+              'voile-rayures', 'voile-viscose', 'modal-simple', 'organza-degrade',
+              'voile-mj', 'dentelle', 'modal-imprime', 'modal-nayra', 'modal-fulani',
+              'silk-imprime', 'piece-unique')
+ order by price, name;

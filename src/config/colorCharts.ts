@@ -46,6 +46,29 @@ import frise33 from '@/src/assets/swatches/frise-33.webp';
 import frise34 from '@/src/assets/swatches/frise-34.webp';
 import frise35 from '@/src/assets/swatches/frise-35.webp';
 import frise36 from '@/src/assets/swatches/frise-36.webp';
+import jersey01 from '@/src/assets/swatches/jersey-01.webp';
+import jersey02 from '@/src/assets/swatches/jersey-02.webp';
+import jersey03 from '@/src/assets/swatches/jersey-03.webp';
+import jersey04 from '@/src/assets/swatches/jersey-04.webp';
+import jersey05 from '@/src/assets/swatches/jersey-05.webp';
+import jersey06 from '@/src/assets/swatches/jersey-06.webp';
+import jersey07 from '@/src/assets/swatches/jersey-07.webp';
+import jersey08 from '@/src/assets/swatches/jersey-08.webp';
+import jersey09 from '@/src/assets/swatches/jersey-09.webp';
+import jersey10 from '@/src/assets/swatches/jersey-10.webp';
+import jersey11 from '@/src/assets/swatches/jersey-11.webp';
+import jersey12 from '@/src/assets/swatches/jersey-12.webp';
+import jersey13 from '@/src/assets/swatches/jersey-13.webp';
+import jersey14 from '@/src/assets/swatches/jersey-14.webp';
+import jersey15 from '@/src/assets/swatches/jersey-15.webp';
+import jersey16 from '@/src/assets/swatches/jersey-16.webp';
+import jersey17 from '@/src/assets/swatches/jersey-17.webp';
+import jersey18 from '@/src/assets/swatches/jersey-18.webp';
+import jersey19 from '@/src/assets/swatches/jersey-19.webp';
+import jersey20 from '@/src/assets/swatches/jersey-20.webp';
+import jersey21 from '@/src/assets/swatches/jersey-21.webp';
+import jersey22 from '@/src/assets/swatches/jersey-22.webp';
+import jersey23 from '@/src/assets/swatches/jersey-23.webp';
 import type { ColorChart } from '@/src/types';
 
 /**
@@ -63,6 +86,43 @@ import type { ColorChart } from '@/src/types';
  *  Il apparaît alors dans la liste déroulante de /admin → Produits.
  */
 export const COLOR_CHARTS: ColorChart[] = [
+  {
+    id: 'jersey23',
+    label: 'Nuancier jersey liquide — 23 teintes',
+    note:
+      "Chaque pastille est une photo du tissu, découpée dans le nuancier du fournisseur : c'est la vraie matière, pas un aplat. Quatre teintes seulement portent un nom chez lui — les autres se commandent par leur numéro.",
+    /*
+     * Les teintes sont relevées sur la photo du nuancier, pastille par
+     * pastille : la couleur affichée est celle des pixels, jamais une
+     * approximation choisie à l'œil. La photo reste la référence ; le code
+     * hexadécimal ne sert que si elle ne charge pas.
+     */
+    swatches: [
+      { code: '01', hex: '#dfe2e6', name: 'White', image: jersey01 },
+      { code: '02', hex: '#eaebe5', name: 'Cream', image: jersey02 },
+      { code: '03', hex: '#101010', name: 'Black', image: jersey03 },
+      { code: '04', hex: '#ab9d8d', image: jersey04 },
+      { code: '05', hex: '#b5a397', image: jersey05 },
+      { code: '06', hex: '#a99386', image: jersey06 },
+      { code: '07', hex: '#957a6d', image: jersey07 },
+      { code: '08', hex: '#7d7d64', image: jersey08 },
+      { code: '09', hex: '#aba6a1', image: jersey09 },
+      { code: '10', hex: '#ede3d0', image: jersey10 },
+      { code: '11', hex: '#d4c8af', image: jersey11 },
+      { code: '12', hex: '#d2c5af', image: jersey12 },
+      { code: '13', hex: '#bdb49a', image: jersey13 },
+      { code: '14', hex: '#c1a889', image: jersey14 },
+      { code: '15', hex: '#6c4d2a', image: jersey15 },
+      { code: '16', hex: '#3c3c23', image: jersey16 },
+      { code: '17', hex: '#827560', image: jersey17 },
+      { code: '18', hex: '#6c5b47', image: jersey18 },
+      { code: '19', hex: '#786462', image: jersey19 },
+      { code: '20', hex: '#3c2c28', image: jersey20 },
+      { code: '21', hex: '#391527', image: jersey21 },
+      { code: '22', hex: '#47151f', image: jersey22 },
+      { code: '23', hex: '#13182e', name: 'Navy', image: jersey23 },
+    ],
+  },
   {
     id: 'modal36',
     label: 'Nuancier 36 teintes',

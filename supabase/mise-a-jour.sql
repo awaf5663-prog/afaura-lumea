@@ -3479,3 +3479,31 @@ on conflict (id) do nothing;
 select name as article, price as prix, status as statut,
        jsonb_array_length(variants -> 0 -> 'options') as coloris
   from products where id = 'sac-ailes';
+
+-- ── 40. Jersey liquide : nouvelles photos et nuancier de 23 teintes ──
+--
+-- La boutique a reçu les visuels et le nuancier de son fournisseur. Deux
+-- changements, tous deux LIVRÉS AVEC LE SITE — rien à téléverser, rien qui
+-- pèse sur le quota de la base :
+--
+--   • les quatre photos du fournisseur remplacent les anciennes : une portée
+--     en crème, puis le tombé sur tringle en bleu ciel, brun et noir ;
+--
+--   • le nuancier passe de 36 teintes (celui du modal, qui n'était pas le
+--     sien) à ses 23 vraies teintes. Chaque pastille est un morceau de la
+--     photo du nuancier : la cliente voit la matière, pas un aplat. Quatre
+--     seulement portent un nom chez le fournisseur — White, Cream, Black et
+--     Navy ; les autres se commandent par leur numéro, et aucun nom n'a été
+--     inventé pour combler les trous.
+--
+-- Côté base, une seule chose à faire : rattacher la fiche au bon nuancier.
+-- Les photos et les pastilles vivent dans le site.
+
+update products
+   set color_chart_id = 'jersey23',
+       description = 'Notre voile le plus fluide : un mélange de modal et de jersey. Il a la douceur et le tombé du modal, avec le maintien du jersey — il ne glisse pas et ne demande pas d''épingle. Faites défiler les photos pour voir le tombé, puis choisissez votre numéro de teinte dans le nuancier ci-dessous : 23 coloris, dont quatre portent un nom chez notre fournisseur — White, Cream, Black et Navy.'
+ where id = 'voile-mj';
+
+-- Vérification : la fiche pointe sur le nuancier de 23 teintes.
+select name as article, price as prix, color_chart_id as nuancier, status
+  from products where id = 'voile-mj';

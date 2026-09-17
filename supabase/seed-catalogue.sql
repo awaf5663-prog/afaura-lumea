@@ -85,11 +85,11 @@ insert into products (
   images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
-  'voile-mj', 'voile-mj', 'Jersey liquide', 'Notre voile le plus fluide : un mélange de modal et de jersey. Il a la douceur et le tombé du modal, avec le maintien du jersey — il ne glisse pas et ne demande pas d''épingle. 170 × 60 cm. Faites défiler les photos pour voir le tombé, puis choisissez votre numéro de teinte dans le nuancier ci-dessous.',
+  'voile-mj', 'voile-mj', 'Jersey liquide', 'Notre voile le plus fluide : un mélange de modal et de jersey. Il a la douceur et le tombé du modal, avec le maintien du jersey — il ne glisse pas et ne demande pas d''épingle. Faites défiler les photos pour voir le tombé, puis choisissez votre numéro de teinte dans le nuancier ci-dessous : 23 coloris, dont quatre portent un nom chez notre fournisseur — White, Cream, Black et Navy.',
   6000, null, 'voile_mj',
   '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
-  false, 'modal36'
+  false, 'jersey23'
 )
 on conflict (id) do update set
   slug = excluded.slug,

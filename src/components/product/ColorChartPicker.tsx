@@ -28,7 +28,10 @@ export function ColorChartPicker({
       <legend className="mb-2 text-[13px] font-medium text-graphite">
         Couleur
         {selected ? (
-          <span className="ml-2 text-stone">n° {selected.code}</span>
+          <span className="ml-2 text-stone">
+            n° {selected.code}
+            {selected.name ? ` — ${selected.name}` : ''}
+          </span>
         ) : (
           <span className="ml-2 text-mauve">à choisir</span>
         )}
@@ -48,7 +51,11 @@ export function ColorChartPicker({
               type="button"
               onClick={() => onChange(swatch.code)}
               aria-pressed={active}
-              aria-label={`Couleur numéro ${swatch.code}`}
+              aria-label={
+                swatch.name
+                  ? `Couleur numéro ${swatch.code} — ${swatch.name}`
+                  : `Couleur numéro ${swatch.code}`
+              }
               className="press flex flex-col items-center gap-1"
             >
               <span
@@ -74,6 +81,19 @@ export function ColorChartPicker({
               <span className={cn('text-[10.5px] tabular-nums', active ? 'text-ink' : 'text-stone')}>
                 {swatch.code}
               </span>
+              {/* Le nom du fournisseur, quand il en donne un. La plupart des
+                  teintes n'ont qu'un numéro : rien ne s'affiche alors, et la
+                  grille garde son alignement. */}
+              {swatch.name && (
+                <span
+                  className={cn(
+                    'max-w-[56px] truncate text-[9.5px] leading-tight',
+                    active ? 'text-mauve' : 'text-stone',
+                  )}
+                >
+                  {swatch.name}
+                </span>
+              )}
             </button>
           );
         })}

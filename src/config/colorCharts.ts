@@ -131,6 +131,11 @@ import foulard17 from '@/src/assets/swatches/foulard-17.webp';
 import foulard18 from '@/src/assets/swatches/foulard-18.webp';
 import foulard19 from '@/src/assets/swatches/foulard-19.webp';
 import foulard20 from '@/src/assets/swatches/foulard-20.webp';
+import foulard21 from '@/src/assets/swatches/foulard-21.webp';
+import foulard22 from '@/src/assets/swatches/foulard-22.webp';
+import foulard23 from '@/src/assets/swatches/foulard-23.webp';
+import foulard24 from '@/src/assets/swatches/foulard-24.webp';
+import foulard25 from '@/src/assets/swatches/foulard-25.webp';
 import jersey01 from '@/src/assets/swatches/jersey-01.webp';
 import jersey02 from '@/src/assets/swatches/jersey-02.webp';
 import jersey03 from '@/src/assets/swatches/jersey-03.webp';
@@ -250,11 +255,11 @@ export const COLOR_CHARTS: ColorChart[] = [
       { code: '18', hex: '#776866', image: modal18, photo: foulard18 },
       { code: '19', hex: '#b69f91', image: modal19, photo: foulard19 },
       { code: '20', hex: '#c8bfad', image: modal20, photo: foulard20 },
-      { code: '21', hex: '#765c63', image: modal21 },
-      { code: '22', hex: '#97767c', image: modal22 },
-      { code: '23', hex: '#b18486', image: modal23 },
-      { code: '24', hex: '#b39a96', image: modal24 },
-      { code: '25', hex: '#bbaaa2', image: modal25 },
+      { code: '21', hex: '#765c63', image: modal21, photo: foulard21 },
+      { code: '22', hex: '#97767c', image: modal22, photo: foulard22 },
+      { code: '23', hex: '#b18486', image: modal23, photo: foulard23 },
+      { code: '24', hex: '#b39a96', image: modal24, photo: foulard24 },
+      { code: '25', hex: '#bbaaa2', image: modal25, photo: foulard25 },
       { code: '26', hex: '#2d1d28', image: modal26 },
       { code: '27', hex: '#7b4e5d', image: modal27 },
       { code: '28', hex: '#5a4960', image: modal28 },

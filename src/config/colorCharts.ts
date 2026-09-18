@@ -80,6 +80,37 @@ import modal31 from '@/src/assets/swatches/modal-31.webp';
 import modal32 from '@/src/assets/swatches/modal-32.webp';
 import modal33 from '@/src/assets/swatches/modal-33.webp';
 import modal34 from '@/src/assets/swatches/modal-34.webp';
+import modal35 from '@/src/assets/swatches/modal-35.webp';
+import modal36 from '@/src/assets/swatches/modal-36.webp';
+import modal37 from '@/src/assets/swatches/modal-37.webp';
+import modal38 from '@/src/assets/swatches/modal-38.webp';
+import modal39 from '@/src/assets/swatches/modal-39.webp';
+import modal40 from '@/src/assets/swatches/modal-40.webp';
+import modal41 from '@/src/assets/swatches/modal-41.webp';
+import modal42 from '@/src/assets/swatches/modal-42.webp';
+import modal43 from '@/src/assets/swatches/modal-43.webp';
+import modal44 from '@/src/assets/swatches/modal-44.webp';
+import modal45 from '@/src/assets/swatches/modal-45.webp';
+import modal46 from '@/src/assets/swatches/modal-46.webp';
+import modal47 from '@/src/assets/swatches/modal-47.webp';
+import modal48 from '@/src/assets/swatches/modal-48.webp';
+import modal49 from '@/src/assets/swatches/modal-49.webp';
+import modal50 from '@/src/assets/swatches/modal-50.webp';
+import modal51 from '@/src/assets/swatches/modal-51.webp';
+import modal52 from '@/src/assets/swatches/modal-52.webp';
+import modal53 from '@/src/assets/swatches/modal-53.webp';
+import modal54 from '@/src/assets/swatches/modal-54.webp';
+import modal55 from '@/src/assets/swatches/modal-55.webp';
+import modal56 from '@/src/assets/swatches/modal-56.webp';
+import modal57 from '@/src/assets/swatches/modal-57.webp';
+import modal58 from '@/src/assets/swatches/modal-58.webp';
+import modal59 from '@/src/assets/swatches/modal-59.webp';
+import modal60 from '@/src/assets/swatches/modal-60.webp';
+import modal61 from '@/src/assets/swatches/modal-61.webp';
+import modal62 from '@/src/assets/swatches/modal-62.webp';
+import modal63 from '@/src/assets/swatches/modal-63.webp';
+import modal64 from '@/src/assets/swatches/modal-64.webp';
+import modal65 from '@/src/assets/swatches/modal-65.webp';
 import jersey01 from '@/src/assets/swatches/jersey-01.webp';
 import jersey02 from '@/src/assets/swatches/jersey-02.webp';
 import jersey03 from '@/src/assets/swatches/jersey-03.webp';
@@ -158,10 +189,10 @@ export const COLOR_CHARTS: ColorChart[] = [
     ],
   },
   {
-    id: 'modal34',
-    label: 'Nuancier modal simple — 34 teintes',
+    id: 'modal65',
+    label: 'Nuancier modal simple — 65 teintes',
     note:
-      "Chaque pastille est une photo du tissu, découpée dans le nuancier du fournisseur : c'est la vraie matière, pas un aplat. Les teintes se commandent par leur numéro — le fournisseur ne leur donne pas de nom. D'autres coloris existent et s'ajouteront ici au fur et à mesure.",
+      "Chaque pastille est une photo du tissu, découpée dans le nuancier du fournisseur : c'est la vraie matière, pas un aplat. Les teintes se commandent par leur numéro — le fournisseur ne leur donne pas de nom.",
     /*
      * Relevé sur les captures du nuancier fournisseur, pastille par pastille.
      * Le carré retenu est le plus dense en tissu de chaque vignette : le centre
@@ -169,6 +200,10 @@ export const COLOR_CHARTS: ColorChart[] = [
      * porte l'icône « agrandir » du fournisseur. Le code hexadécimal est la
      * MÉDIANE des pixels de ce carré, jamais une couleur choisie à l'œil ; il
      * ne sert que si la photo ne charge pas.
+     *
+     * Le nuancier est COMPLET : le fournisseur en annonce 65, les 65 sont là.
+     * C'est pourquoi la fiche ne promet plus « d'autres coloris » — il n'y en
+     * a pas d'autres.
      *
      * Aucun `name` : le fournisseur numérote ses teintes sans les nommer, et
      * inventer des noms de couleurs ferait dire au site ce qu'il ne sait pas.
@@ -209,6 +244,37 @@ export const COLOR_CHARTS: ColorChart[] = [
       { code: '32', hex: '#94434f', image: modal32 },
       { code: '33', hex: '#b78587', image: modal33 },
       { code: '34', hex: '#b88981', image: modal34 },
+      { code: '35', hex: '#b6a09a', image: modal35 },
+      { code: '36', hex: '#512526', image: modal36 },
+      { code: '37', hex: '#602c21', image: modal37 },
+      { code: '38', hex: '#876f48', image: modal38 },
+      { code: '39', hex: '#936358', image: modal39 },
+      { code: '40', hex: '#bc9161', image: modal40 },
+      { code: '41', hex: '#2d1c1b', image: modal41 },
+      { code: '42', hex: '#a78b7c', image: modal42 },
+      { code: '43', hex: '#b49991', image: modal43 },
+      { code: '44', hex: '#a58980', image: modal44 },
+      { code: '45', hex: '#cebaa3', image: modal45 },
+      { code: '46', hex: '#585858', image: modal46 },
+      { code: '47', hex: '#79757a', image: modal47 },
+      { code: '48', hex: '#88878b', image: modal48 },
+      { code: '49', hex: '#aba0a2', image: modal49 },
+      { code: '50', hex: '#9b919e', image: modal50 },
+      { code: '51', hex: '#253334', image: modal51 },
+      { code: '52', hex: '#5b5d53', image: modal52 },
+      { code: '53', hex: '#6b6357', image: modal53 },
+      { code: '54', hex: '#697166', image: modal54 },
+      { code: '55', hex: '#adb2a3', image: modal55 },
+      { code: '56', hex: '#1f2036', image: modal56 },
+      { code: '57', hex: '#343a5c', image: modal57 },
+      { code: '58', hex: '#6c8496', image: modal58 },
+      { code: '59', hex: '#a0a0a0', image: modal59 },
+      { code: '60', hex: '#abb3b5', image: modal60 },
+      { code: '61', hex: '#5d262f', image: modal61 },
+      { code: '62', hex: '#721218', image: modal62 },
+      { code: '63', hex: '#8f4f56', image: modal63 },
+      { code: '64', hex: '#9f726d', image: modal64 },
+      { code: '65', hex: '#cab0a8', image: modal65 },
     ],
   },
   {

@@ -112,7 +112,7 @@ insert into products (
   4500, null, 'modal_simple',
   '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
-  true, 'modal34'
+  false, 'modal65'
 )
 on conflict (id) do update set
   slug = excluded.slug,

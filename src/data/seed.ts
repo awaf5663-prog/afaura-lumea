@@ -398,8 +398,7 @@ export const SEED_PRODUCTS: Product[] = [
     variants: [],
     stock: null,
     status: 'active',
-    colorChartId: 'modal34',
-    otherColorsAvailable: true,
+    colorChartId: 'modal65',
     createdAt: '2026-01-05T10:10:00.000Z',
   },
   {

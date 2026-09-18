@@ -3737,3 +3737,38 @@ select name as article, price as prix, color_chart_id as nuancier,
               'voile-mj', 'dentelle', 'modal-imprime', 'modal-nayra', 'modal-fulani',
               'silk-imprime', 'piece-unique')
  order by price, name;
+
+-- ── 46. Le nuancier du modal simple est complet : 65 teintes ─────────
+--
+-- La boutique a envoyé la fin du nuancier fournisseur : #35 à #65. Les
+-- trente-et-une teintes qui manquaient à l'étape 45 sont désormais dans le
+-- site, découpées de la même façon — une vraie photo du tissu par pastille,
+-- et un code hexadécimal relevé à la médiane des pixels.
+--
+-- Le nuancier passe donc de `modal34` à `modal65`. Comme toujours, les
+-- pastilles vivent dans le site ; la base ne retient que l'identifiant.
+--
+-- `other_colors_available` REPASSE À FAUX, et c'est le point important de
+-- cette étape. Tant que le nuancier était incomplet, annoncer « d'autres
+-- coloris existent » était vrai. Maintenant que les 65 teintes du
+-- fournisseur sont toutes affichées, la même phrase serait un mensonge :
+-- il n'y a pas d'autre coloris à demander. Une promesse qui survit à sa
+-- raison d'être devient une promesse fausse.
+--
+-- Cette étape ne suppose pas que l'étape 45 a été passée : elle pose la
+-- valeur finale dans tous les cas.
+
+update products
+   set color_chart_id = 'modal65',
+       other_colors_available = false
+ where id = 'modal-simple';
+
+-- Vérification : le modal simple, et lui seul, porte `modal65`. Le Jersey
+-- et le Voile viscose premium gardent `modal36` — le nuancier reçu est
+-- celui du modal simple, rien ne dit qu'il vaut pour eux.
+select name as article, price as prix, color_chart_id as nuancier,
+       other_colors_available as autres_coloris
+  from products
+ where color_chart_id is not null
+    or id = 'modal-simple'
+ order by nuancier, name;

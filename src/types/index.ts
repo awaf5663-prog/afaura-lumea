@@ -9,6 +9,14 @@ export interface ColorSwatch {
   hex: string;
   /** Photo de la matière dans cette teinte : plus juste qu'un aplat pour la dentelle. */
   image?: string;
+  /**
+   * L'article entier dans cette teinte, montré quand la pastille est choisie.
+   *
+   * Facultatif, et il le restera : les photos arrivent teinte par teinte. Une
+   * pastille sans photo se choisit exactement comme avant — rien ne s'affiche,
+   * et rien ne laisse croire qu'il manque quelque chose.
+   */
+  photo?: string;
   name?: string;
 }
 

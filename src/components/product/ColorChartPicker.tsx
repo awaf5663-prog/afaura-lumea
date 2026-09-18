@@ -1,4 +1,5 @@
 import { Check, Info } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { cn } from '@/src/lib/cn';
 import type { ColorChart } from '@/src/types';
 
@@ -22,6 +23,22 @@ export function ColorChartPicker({
   error?: boolean;
 }) {
   const selected = chart.swatches.find((swatch) => swatch.code === value);
+  const cadre = useRef<HTMLElement>(null);
+
+  /*
+   * Amener le foulard à l'œil quand il n'y est pas.
+   *
+   * Le nuancier fait soixante-cinq pastilles : sur un téléphone, onze rangées
+   * peuvent séparer le doigt de la photo. `block: 'nearest'` ne bouge la page
+   * QUE si la photo est hors de vue — choisir une teinte déjà visible ne
+   * déplace rien, et personne ne se fait voler son défilement.
+   */
+  useEffect(() => {
+    const el = cadre.current;
+    if (!el) return;
+    const doux = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollIntoView({ block: 'nearest', behavior: doux ? 'smooth' : 'auto' });
+  }, [value]);
 
   return (
     <fieldset>
@@ -36,6 +53,33 @@ export function ColorChartPicker({
           <span className="ml-2 text-mauve">à choisir</span>
         )}
       </legend>
+
+      {/*
+        L'article entier dans la teinte choisie, AU-DESSUS du nuancier.
+        
+        Sous la grille, il aurait été relégué à onze rangées de pastilles du
+        doigt qui vient d'appuyer : personne ne l'aurait vu.
+        
+        Il n'apparaît que pour les teintes dont la photo est arrivée. Les
+        autres se choisissent comme avant, sans cadre vide ni « photo à
+        venir » — une absence annoncée attire l'œil sur ce qui manque.
+      */}
+      {selected?.photo && (
+        <figure ref={cadre} className="mb-3 scroll-mt-[76px]">{/* 76 px : les 64 de l'entête collant, plus une marge — sinon le
+              haut du foulard se range dessous en arrivant. */}
+          <img
+            src={selected.photo}
+            alt={`Le voile en teinte numéro ${selected.code}${selected.name ? ` — ${selected.name}` : ''}`}
+            loading="lazy"
+            decoding="async"
+            className="w-full rounded-[--radius-md] border border-line bg-white"
+          />
+          <figcaption className="mt-1.5 text-[12px] text-stone">
+            Teinte n° {selected.code}
+            {selected.name ? ` — ${selected.name}` : ''}
+          </figcaption>
+        </figure>
+      )}
 
       <div
         className={cn(

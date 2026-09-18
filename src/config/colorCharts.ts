@@ -111,6 +111,11 @@ import modal62 from '@/src/assets/swatches/modal-62.webp';
 import modal63 from '@/src/assets/swatches/modal-63.webp';
 import modal64 from '@/src/assets/swatches/modal-64.webp';
 import modal65 from '@/src/assets/swatches/modal-65.webp';
+import foulard01 from '@/src/assets/swatches/foulard-01.webp';
+import foulard02 from '@/src/assets/swatches/foulard-02.webp';
+import foulard03 from '@/src/assets/swatches/foulard-03.webp';
+import foulard04 from '@/src/assets/swatches/foulard-04.webp';
+import foulard05 from '@/src/assets/swatches/foulard-05.webp';
 import jersey01 from '@/src/assets/swatches/jersey-01.webp';
 import jersey02 from '@/src/assets/swatches/jersey-02.webp';
 import jersey03 from '@/src/assets/swatches/jersey-03.webp';
@@ -210,11 +215,11 @@ export const COLOR_CHARTS: ColorChart[] = [
      * La boutique doit fournir sa grille de noms.
      */
     swatches: [
-      { code: '01', hex: '#151418', image: modal01 },
-      { code: '02', hex: '#575d71', image: modal02 },
-      { code: '03', hex: '#2e2f2b', image: modal03 },
-      { code: '04', hex: '#1c1f2e', image: modal04 },
-      { code: '05', hex: '#273461', image: modal05 },
+      { code: '01', hex: '#151418', image: modal01, photo: foulard01 },
+      { code: '02', hex: '#575d71', image: modal02, photo: foulard02 },
+      { code: '03', hex: '#2e2f2b', image: modal03, photo: foulard03 },
+      { code: '04', hex: '#1c1f2e', image: modal04, photo: foulard04 },
+      { code: '05', hex: '#273461', image: modal05, photo: foulard05 },
       { code: '06', hex: '#6b4838', image: modal06 },
       { code: '07', hex: '#843c29', image: modal07 },
       { code: '08', hex: '#947b75', image: modal08 },

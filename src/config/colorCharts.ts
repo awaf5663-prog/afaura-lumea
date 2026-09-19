@@ -46,6 +46,16 @@ import frise33 from '@/src/assets/swatches/frise-33.webp';
 import frise34 from '@/src/assets/swatches/frise-34.webp';
 import frise35 from '@/src/assets/swatches/frise-35.webp';
 import frise36 from '@/src/assets/swatches/frise-36.webp';
+import friseTissu01 from '@/src/assets/swatches/frise-tissu-01.webp';
+import friseVoile01 from '@/src/assets/swatches/frise-voile-01.webp';
+import friseTissu02 from '@/src/assets/swatches/frise-tissu-02.webp';
+import friseVoile02 from '@/src/assets/swatches/frise-voile-02.webp';
+import friseTissu03 from '@/src/assets/swatches/frise-tissu-03.webp';
+import friseVoile03 from '@/src/assets/swatches/frise-voile-03.webp';
+import friseTissu04 from '@/src/assets/swatches/frise-tissu-04.webp';
+import friseVoile04 from '@/src/assets/swatches/frise-voile-04.webp';
+import friseTissu06 from '@/src/assets/swatches/frise-tissu-06.webp';
+import friseVoile06 from '@/src/assets/swatches/frise-voile-06.webp';
 import modal01 from '@/src/assets/swatches/modal-01.webp';
 import modal02 from '@/src/assets/swatches/modal-02.webp';
 import modal03 from '@/src/assets/swatches/modal-03.webp';
@@ -449,6 +459,32 @@ export const COLOR_CHARTS: ColorChart[] = [
       { code: '34', hex: '#e16e73', image: frise34 },
       { code: '35', hex: '#9d2332', image: frise35 },
       { code: '36', hex: '#50161c', image: frise36 },
+    ],
+  },
+  {
+    /*
+     * LE VRAI NUANCIER DU JERSEY FRISÉ — en cours de constitution.
+     *
+     * Les teintes arrivent par lots, photo par photo. Chacune porte le
+     * numéro et le nom imprimés par le fournisseur sur SA photo : jamais le
+     * rang d'affichage de son catalogue, qui saute des numéros (sa 5e
+     * vignette porte le #6).
+     *
+     * Il remplacera « frise36 », dont les numéros ne sont pas ceux du
+     * fournisseur — le n° 2 y est un blanc cassé, quand le vrai n° 2 est un
+     * vin rouge. Le remplacement n'aura lieu qu'une fois les teintes
+     * réunies : basculer à mi-chemin retirerait des choix à la cliente.
+     */
+    id: 'frise35',
+    label: 'Nuancier — jersey frisé',
+    note:
+      "Chaque pastille est une photo du tissu, prise au cœur du voile : le frisé et la couleur sont ceux de la vraie matière. Choisissez votre numéro — le nom est celui du fournisseur.",
+    swatches: [
+      { code: '01', hex: '#b09089', name: 'Nude clair', image: friseTissu01, photo: friseVoile01 },
+      { code: '02', hex: '#541819', name: 'Vin rouge', image: friseTissu02, photo: friseVoile02 },
+      { code: '03', hex: '#a38783', name: 'Nude rose clair', image: friseTissu03, photo: friseVoile03 },
+      { code: '04', hex: '#8e6e61', name: 'Thé au lait', image: friseTissu04, photo: friseVoile04 },
+      { code: '06', hex: '#aa8c7d', name: 'Nu', image: friseTissu06, photo: friseVoile06 },
     ],
   },
 ];

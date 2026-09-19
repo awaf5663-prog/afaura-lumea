@@ -124,86 +124,15 @@ export const DEFAULT_ALERT_THRESHOLDS: AlertThresholds = {
 };
 
 /**
- * Offres livrées avec le site.
+ * Offres livrées avec le site : AUCUNE.
  *
- * Les dates sont vides : aucune période n'est inventée ici. L'offre court
- * jusqu'à ce que la boutique fixe une date de fin dans /admin → Tarification,
- * ou la désactive. Les groupages concernés se cochent au même endroit, une
- * fois qu'ils existent — vide signifie « tous les groupages ».
+ * Le « Pack Afaura » et l'« Offre rentrée » ont été retirés en septembre 2026,
+ * la boutique les ayant déclarés terminés. Rien ne les remplace d'office : une
+ * remise qui s'appliquerait toute seule sans que la boutique l'ait voulue
+ * ferait perdre de l'argent à chaque commande.
+ *
+ * Une nouvelle offre se crée depuis /admin → Tarification. Les dates y restent
+ * vides tant que la boutique n'en fixe pas : aucune période n'est inventée
+ * ici, et « vide » pour les groupages signifie « tous les groupages ».
  */
-export const DEFAULT_PROMOTIONS: Promotion[] = [
-  {
-    id: 'rentree-etudiantes',
-    label: 'Offre rentrée',
-    description:
-      'Commande SHEIN étudiante : la livraison à Saint-Louis est offerte pendant la durée de l’offre.',
-    active: true,
-    scope: 'shein',
-    // Code à communiquer sur Instagram et WhatsApp. Vide = offre automatique.
-    code: 'RENTREE',
-    studentOnly: true,
-    startsAt: null,
-    endsAt: null,
-    minSubtotal: null,
-    groupingIds: [],
-    deliveryOptionIds: ['local'],
-    effect: { type: 'free_delivery' },
-  },
-  {
-    /*
-     * « Compose ton pack Afaura » : plus la cliente prend de voiles, plus la
-     * remise est forte. Offre automatique — pas de code à retenir, pas de
-     * case à cocher : elle s'applique dès le troisième voile.
-     *
-     * Les paliers sont ceux de l'affiche de la boutique : 3 → −5 %, 4 à 5 →
-     * −6 %, 6 et plus → −7 %. L'affiche s'arrête à « 6 à 10 » ; au-delà le
-     * taux reste à 7 %, car passer de dix à onze voiles ne doit jamais faire
-     * monter la facture.
-     *
-     * `categories` : tous les rayons de voiles. Ils décident du palier ET de
-     * l'assiette — un sac dans le même panier ne fait pas monter la remise et
-     * n'en profite pas. L'affiche dit « Pack Afaura », c'est un pack de
-     * voiles.
-     *
-     * Dates ouvertes : la boutique met fin à l'offre depuis /admin →
-     * Tarification, en la désactivant ou en lui donnant une date de fin.
-     */
-    id: 'pack-afaura',
-    label: 'Pack Afaura',
-    description:
-      'Composez votre pack : à partir de 3 voiles, la remise s’applique toute seule — et elle grandit avec le nombre de voiles choisis.',
-    active: true,
-    scope: 'store',
-    code: '',
-    studentOnly: false,
-    startsAt: null,
-    endsAt: null,
-    minSubtotal: null,
-    groupingIds: [],
-    deliveryOptionIds: [],
-    effect: {
-      type: 'percent_by_quantity',
-      categories: [
-        'voile_viscose',
-        'voile_mj',
-        'modal_imprime',
-        'modal_simple',
-        'satin_imprime',
-        'dentelle',
-        'jersey',
-        'jersey_frise',
-        'hijab_tape',
-        'voile_rayures',
-        'modal_fulani',
-        'modal_nayra',
-        'silk_imprime',
-        'organza_degrade',
-      ],
-      tiers: [
-        { minQuantity: 3, percent: 5 },
-        { minQuantity: 4, percent: 6 },
-        { minQuantity: 6, percent: 7 },
-      ],
-    },
-  },
-];
+export const DEFAULT_PROMOTIONS: Promotion[] = [];

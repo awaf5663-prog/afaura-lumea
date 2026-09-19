@@ -4259,3 +4259,33 @@ select name as article, price as prix, status as statut,
 select count(*) filter (where status = 'active') as rentree_encore_en_ligne,
        count(*)                                  as rentree_total
   from products where category = 'rentree';
+
+
+-- ═══════════════════════════════════════════════════════════════════════
+--  48. Les deux promotions sont terminees
+-- ═══════════════════════════════════════════════════════════════════════
+--
+--  La boutique a declare le « Pack Afaura » et l'« Offre rentree » expires
+--  en septembre 2026. Les deux quittent la base.
+--
+--  IDEMPOTENTE, et volontairement ciblee : on retire ces deux offres par
+--  leur identifiant au lieu de vider la colonne. Une offre creee plus tard
+--  depuis /admin -> Tarification survit donc a une relance de cette etape.
+--
+--  A PASSER APRES l'etape 47, qui installe le Pack Afaura. Dans l'autre
+--  ordre, 47 le remettrait.
+
+update settings
+   set promotions = coalesce(
+         (select jsonb_agg(offre)
+            from jsonb_array_elements(coalesce(promotions, '[]'::jsonb)) as offre
+           where offre ->> 'id' not in ('pack-afaura', 'rentree-etudiantes')),
+         '[]'::jsonb
+       )
+ where id = 1;
+
+--  Verification : plus aucune des deux, et ce qui restait est intact.
+select jsonb_array_length(coalesce(promotions, '[]'::jsonb)) as offres_restantes,
+       (select count(*) from jsonb_array_elements(coalesce(promotions, '[]'::jsonb)) as p
+         where p ->> 'id' in ('pack-afaura', 'rentree-etudiantes')) as offres_retirees_encore_la
+  from settings where id = 1;

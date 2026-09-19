@@ -86,17 +86,17 @@ export function ProductPage({ slug }: { slug: string }) {
   const colorChart = findColorChart(product?.colorChartId);
 
   /**
-   * La teinte choisie s'affiche DANS la galerie, pas dans un cadre à part.
+   * LES TEINTES SONT DANS LA GALERIE, TOUTES, DÈS L'OUVERTURE.
    *
-   * Sa photo s'ajoute en dernière position et la galerie s'y rend aussitôt :
-   * la cliente voit le voile dans sa teinte au même endroit que les autres
-   * photos, en grand. Une vignette isolée sous le nuancier faisait un second
-   * endroit où regarder.
+   * La galerie n'est pas seulement la vitrine de la fiche : c'est le voile
+   * lui-même, teinte après teinte. On peut la faire défiler comme un
+   * catalogue, ou appuyer sur une pastille pour aller droit à sa couleur —
+   * les deux sens fonctionnent, et le nuancier suit le défilement.
    *
-   * Seules les teintes dont la photo est arrivée ajoutent une vue ; les
+   * Seules les teintes dont la photo est arrivée prennent une place ; les
    * autres se choisissent sans rien changer à la galerie.
    */
-  const photoTeinte = colorChart?.swatches.find((t) => t.code === colorCode)?.photo;
+  const teintesEnPhoto = colorChart?.swatches.filter((t) => t.photo) ?? [];
 
   const photoGroup = product ? findPhotoGroup(product) : undefined;
   /** Modèle montré par la photo n° index. */
@@ -105,30 +105,38 @@ export function ProductPage({ slug }: { slug: string }) {
   /** Première photo qui montre ce modèle. */
   const photoAtOption = (option: string) => (photoGroup ? photoOfOption(photoGroup, option) : -1);
 
-  /** Les photos de la fiche, augmentées de la teinte choisie s'il y en a une. */
-  const photosGalerie = photoTeinte ? [...photos, photoTeinte] : photos;
+  /** Les photos de la fiche, puis le voile dans chacune de ses teintes. */
+  const photosGalerie = [...photos, ...teintesEnPhoto.map((t) => t.photo as string)];
   /*
    * Le libellé de chaque vue. Sur une fiche à modèles, c'est le nom du modèle ;
    * ailleurs il n'y en a pas, et la chaîne vide laisse la galerie dire
-   * « Photo 2 sur 5 » comme avant. La vue ajoutée, elle, s'annonce toujours :
-   * c'est elle que la cliente vient de demander.
+   * « Photo 2 sur 70 » comme avant. Les teintes, elles, s'annoncent toujours
+   * par leur numéro : c'est ce que la cliente commandera.
    */
   const legendes = photoGroup ? photoOptionsOf(photoGroup) : photos.map(() => '');
-  const labelsGalerie = photoTeinte
-    ? [...legendes, `Teinte n° ${colorCode}`]
+  const labelsGalerie = teintesEnPhoto.length
+    ? [...legendes, ...teintesEnPhoto.map((t) => `Teinte n° ${t.code}`)]
     : photoGroup && photoOptionsOf(photoGroup);
 
+  /** Rang de la vue qui montre cette teinte, −1 si sa photo n'est pas arrivée. */
+  const vueDeLaTeinte = (code: string) => {
+    const rang = teintesEnPhoto.findIndex((t) => t.code === code);
+    return rang < 0 ? -1 : photos.length + rang;
+  };
+  /** Teinte montrée par la vue n° index, si c'en est une. */
+  const teinteDeLaVue = (index: number) => teintesEnPhoto[index - photos.length]?.code;
+
   /*
-   * Choisir une teinte amène sa photo : elle est ajoutée en dernier, donc son
-   * index vaut `photos.length`. En quittant cette teinte, la vue disparaît —
-   * on ramène alors la galerie sur la dernière photo qui existe encore, sinon
-   * elle resterait pointée sur une vue absente.
+   * Appuyer sur une pastille amène la galerie jusqu'à cette teinte.
+   *
+   * `photos.length` fait partie des dépendances : les grandes photos arrivent
+   * après coup, et le rang d'une teinte se décale d'autant.
    */
   useEffect(() => {
-    setPhotoIndex((actuel) =>
-      photoTeinte ? photos.length : Math.min(actuel, Math.max(0, photos.length - 1)),
-    );
-  }, [photoTeinte, photos.length]);
+    if (!colorCode) return;
+    const rang = vueDeLaTeinte(colorCode);
+    if (rang >= 0) setPhotoIndex(rang);
+  }, [colorCode, photos.length, teintesEnPhoto.length]);
 
   const isSoldOutOption = (group: { soldOutOptions?: string[] }, option: string) =>
     (group.soldOutOptions ?? []).includes(option);
@@ -144,12 +152,18 @@ export function ProductPage({ slug }: { slug: string }) {
     );
   }, [product?.id]);
 
-  /** Faire défiler la galerie choisit le modèle correspondant. */
+  /** Faire défiler la galerie choisit le modèle — ou la teinte — correspondant. */
   const handlePhotoIndex = (index: number) => {
     setPhotoIndex(index);
     const option = optionAtPhoto(index);
     if (photoGroup && option) {
       setOptions((current) => ({ ...current, [photoGroup.name]: option }));
+    }
+    // Arriver sur le voile en n° 32, c'est avoir choisi le n° 32.
+    const teinte = teinteDeLaVue(index);
+    if (teinte && teinte !== colorCode) {
+      setColorCode(teinte);
+      setColorError(false);
     }
   };
 

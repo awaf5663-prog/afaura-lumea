@@ -141,6 +141,7 @@ import modalPoisBrun from '@/src/assets/products/modal-pois-brun.webp';
 import modalZebreBordeaux from '@/src/assets/products/modal-zebre-bordeaux.webp';
 import modalSimpleBordeaux from '@/src/assets/products/modal-simple-bordeaux.webp';
 import modalSimpleColoris from '@/src/assets/products/modal-simple-coloris.webp';
+import modalSimpleCouverture from '@/src/assets/products/modal-simple-couverture.webp';
 import modalSimpleKakiNoir from '@/src/assets/products/modal-simple-kaki-noir.webp';
 import modalSimpleNoir from '@/src/assets/products/modal-simple-noir.webp';
 import pieceCremeFleuri from '@/src/assets/products/piece-creme-fleuri.webp';
@@ -394,7 +395,19 @@ export const SEED_PRODUCTS: Product[] = [
     price: 4500,
     compareAtPrice: null,
     category: 'modal_simple',
-    images: [modalSimpleBordeaux, modalSimpleKakiNoir, modalSimpleNoir, modalSimpleColoris],
+    /*
+     * La couverture d'abord : le modal porté, en gros plan. C'est la photo
+     * que la cliente voit dans la boutique et en ouvrant la fiche. Les
+     * soixante-cinq teintes du nuancier viennent ensuite, ajoutées par la
+     * fiche elle-même — voir ProductPage.
+     */
+    images: [
+      modalSimpleCouverture,
+      modalSimpleBordeaux,
+      modalSimpleKakiNoir,
+      modalSimpleNoir,
+      modalSimpleColoris,
+    ],
     variants: [],
     stock: null,
     status: 'active',

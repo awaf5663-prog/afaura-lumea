@@ -46,6 +46,7 @@ export function Gallery({
    * qu'un saut d'une photo à la suivante.
    */
   const pending = useRef<number | null>(null);
+  const bandeRef = useRef<HTMLDivElement | null>(null);
 
   // Le parent change de modèle : on amène la photo correspondante.
   useEffect(() => {
@@ -70,6 +71,27 @@ export function Gallery({
     return () => window.clearTimeout(timer);
   }, [activeIndex]);
 
+  /*
+   * La vignette active vient se montrer dans sa bande.
+   *
+   * Sur une fiche à soixante-dix photos, la vignette de la teinte choisie est
+   * loin hors de la bande : sans cela, rien ne dirait où l'on est. On déplace
+   * la BANDE seulement, jamais la page — `scrollIntoView` aurait emmené la
+   * fiche entière avec lui.
+   */
+  useEffect(() => {
+    const bande = bandeRef.current;
+    const vignette = bande?.children[activeIndex] as HTMLElement | undefined;
+    if (!bande || !vignette) return;
+    const gauche = vignette.offsetLeft;
+    const droite = gauche + vignette.offsetWidth;
+    const doux = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const aller = (left: number) => bande.scrollTo({ left, behavior: doux ? 'smooth' : 'auto' });
+    if (gauche < bande.scrollLeft + 8) aller(gauche - 8);
+    else if (droite > bande.scrollLeft + bande.clientWidth - 8)
+      aller(droite - bande.clientWidth + 8);
+  }, [activeIndex]);
+
   // La cliente fait défiler : on remonte le modèle atteint.
   const handleScroll = () => {
     const scroller = scrollerRef.current;
@@ -89,6 +111,13 @@ export function Gallery({
   };
 
   const single = list.length === 1;
+  /*
+   * Les points de position ne valent que tant qu'on peut les compter d'un
+   * coup d'œil. Soixante-dix points déborderaient de la photo et ne diraient
+   * plus rien : la ligne « Teinte n° 32 — 6 sur 70 », sous la galerie, est
+   * alors le seul repère utile.
+   */
+  const points = !single && list.length <= 8;
 
   return (
     /*
@@ -148,7 +177,7 @@ export function Gallery({
           ))}
         </div>
 
-        {!single && (
+        {points && (
           <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center">
             <div className="flex items-center gap-1.5 rounded-full bg-ink/45 px-2.5 py-1.5 backdrop-blur-sm">
               {list.map((_, index) => (
@@ -173,7 +202,7 @@ export function Gallery({
               : `Photo ${activeIndex + 1} sur ${list.length}`}
           </p>
 
-          <div className="no-scrollbar mt-3 flex gap-2 overflow-x-auto">
+          <div ref={bandeRef} className="no-scrollbar mt-3 flex gap-2 overflow-x-auto">
             {list.map((image, index) => (
               <button
                 key={`${image}-thumb-${index}`}

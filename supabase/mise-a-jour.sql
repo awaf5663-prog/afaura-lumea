@@ -3772,3 +3772,490 @@ select name as article, price as prix, color_chart_id as nuancier,
  where color_chart_id is not null
     or id = 'modal-simple'
  order by nuancier, name;
+
+
+-- ══════════════════════════════════════════════════════════════════════
+--  47. RATTRAPAGE COMPLET — remplace les étapes 34 à 46
+-- ══════════════════════════════════════════════════════════════════════
+--
+--  À COLLER EN UNE SEULE FOIS. Cette étape amène la base à l'état du site
+--  quel que soit son point de départ : que vous ayez passé certaines des
+--  étapes 34 à 46 ou aucune, le résultat est le même.
+--
+--  Pourquoi une seule étape plutôt que treize : treize blocs à coller dans
+--  le bon ordre, c'est treize occasions d'en sauter un ou de les inverser.
+--  Et l'ordre comptait vraiment — la 34 devait précéder la 42, faute de
+--  quoi un rayon de voiles se serait vu facturer des frais.
+--
+--  Tout y est écrit de façon RÉPÉTABLE : la relancer deux fois ne casse
+--  rien et ne double rien.
+--
+--  ───────────────────────────────────────────────────────────────────
+--  1. TARIFICATION
+--  ───────────────────────────────────────────────────────────────────
+--
+--  Le taux du dollar passe de 600 à 550, celui que pratique la boutique.
+--
+--  Les tranches de frais de traitement :
+--        1 a 10 articles  -> 2 000 FCFA
+--       11 a 20 articles  -> 2 500 FCFA
+--       plus de 20        -> 3 000 FCFA
+--  L'ancienne grille s'arretait a 10 articles et n'annoncait plus aucun
+--  montant au-dela ; desormais toute commande en a un.
+--
+--  Les rayons dispenses de frais sont les seize voiles et les lips gloss :
+--  ils sont achetes par lots et gardes sur place, donc les choisir ne
+--  declenche aucune commande, donc aucun travail a facturer. Les autres
+--  rayons -- et TOUTES les demandes SHEIN -- restent soumis a la grille.
+
+update settings
+   set pricing = jsonb_build_object(
+         'strategy',   'item_tiers',
+         'tiers',      jsonb_build_array(
+             jsonb_build_object('id','t1','minItems',1, 'maxItems',10,  'fee',2000),
+             jsonb_build_object('id','t2','minItems',11,'maxItems',20,  'fee',2500),
+             jsonb_build_object('id','t3','minItems',21,'maxItems',null,'fee',3000)
+         ),
+         'valuePercent', jsonb_build_object('percent',12,'minFee',2000,'maxFee',null),
+         'deliveryOptions', coalesce(pricing -> 'deliveryOptions', '[]'::jsonb),
+         'conversionRates', coalesce(pricing -> 'conversionRates', '{}'::jsonb)
+                            || jsonb_build_object('XOF',1,'EUR',655.957,'USD',550),
+         'defaultCurrency', coalesce(pricing ->> 'defaultCurrency', 'EUR'),
+         'feeExemptCategories', jsonb_build_array(
+             'voile_viscose','voile_mj','modal_imprime','modal_simple',
+             'satin_imprime','dentelle','jersey','jersey_frise','hijab_tape',
+             'voile_rayures','modal_fulani','modal_nayra','silk_imprime',
+             'organza_degrade','voile_imprime','lips'
+         )
+       )
+ where id = 1;
+
+--  Le Pack Afaura : la remise grandit avec le nombre de voiles.
+--    3 voiles -> 5 pour cent   ;   4 a 5 -> 6 pour cent   ;   6 et plus -> 7 pour cent
+--  Elle ne porte que sur les voiles, jamais sur le reste du panier.
+
+update settings
+   set promotions = coalesce(
+         (select jsonb_agg(offre)
+            from jsonb_array_elements(coalesce(promotions, '[]'::jsonb)) as offre
+           where offre ->> 'id' <> 'pack-afaura'),
+         '[]'::jsonb
+       ) || jsonb_build_array(jsonb_build_object(
+         'id', 'pack-afaura',
+         'label', 'Pack Afaura',
+         'description', 'Composez votre pack : a partir de 3 voiles, la remise s''applique toute seule -- et elle grandit avec le nombre de voiles choisis.',
+         'active', true,
+         'scope', 'store',
+         'code', '',
+         'studentOnly', false,
+         'startsAt', null,
+         'endsAt', null,
+         'minSubtotal', null,
+         'groupingIds', '[]'::jsonb,
+         'deliveryOptionIds', '[]'::jsonb,
+         'effect', jsonb_build_object(
+           'type', 'percent_by_quantity',
+           'categories', '["voile_viscose","voile_mj","modal_imprime","modal_simple",
+                           "satin_imprime","dentelle","jersey","jersey_frise","hijab_tape",
+                           "voile_rayures","modal_fulani","modal_nayra","silk_imprime",
+                           "organza_degrade"]'::jsonb,
+           'tiers', '[{"minQuantity":3,"percent":5},
+                      {"minQuantity":4,"percent":6},
+                      {"minQuantity":6,"percent":7}]'::jsonb
+         )
+       ))
+ where id = 1;
+
+--  ───────────────────────────────────────────────────────────────────
+--  2. LE CALCUL DES COMMANDES
+--  ───────────────────────────────────────────────────────────────────
+--
+--  Cette fonction est le coeur de la boutique : c'est elle, et elle seule,
+--  qui decide du montant d'une commande. Le navigateur ne lui envoie que
+--  des identifiants d'articles et des quantites ; elle relit les prix, les
+--  frais et les remises dans la base. Un prix modifie dans le navigateur
+--  n'a donc aucun effet sur ce qui est facture.
+--
+--  Elle applique desormais les rayons sans frais ET le Pack Afaura.
+
+create or replace function create_order(
+  p_customer_name text,
+  p_phone text,
+  p_address text,
+  p_city text,
+  p_note text,
+  p_delivery_zone_id text,
+  p_payment_method text,
+  p_items jsonb,
+  p_promo_code text default '',
+  p_is_student boolean default false
+) returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  v_order_id uuid;
+  v_number text;
+  v_subtotal integer := 0;
+  v_articles integer := 0;
+  v_service integer := 0;
+  v_tiers jsonb;
+  -- Rayons dispensés de frais de traitement, relus dans les réglages.
+  v_sans_frais jsonb;
+  v_fee integer;
+  v_item jsonb;
+  v_product products%rowtype;
+  v_quantity integer;
+  v_unit integer;
+  v_label text;
+  v_promotions jsonb;
+  v_promo jsonb;
+  v_promo_label text;
+  v_fee_before integer;
+  v_discount integer := 0;
+  -- Assiette d'une offre par quantité : les unités et le prix des seuls
+  -- rayons concernés. Remplies pendant la boucle des articles, car il faut
+  -- le rayon de chaque fiche, qui n'est connu qu'ici.
+  v_pack_rayons jsonb;
+  v_pack_unites integer := 0;
+  v_pack_montant integer := 0;
+  v_pack_percent integer;
+  v_pack_seuil integer;
+  v_palier jsonb;
+  v_today text := to_char(now(), 'YYYY-MM-DD');
+  v_code text := upper(btrim(coalesce(p_promo_code, '')));
+begin
+  if jsonb_array_length(coalesce(p_items, '[]'::jsonb)) = 0 then
+    raise exception 'Panier vide';
+  end if;
+
+  select (delivery_fees ->> p_delivery_zone_id)::integer,
+         coalesce(promotions, '[]'::jsonb),
+         coalesce(pricing -> 'tiers', '[]'::jsonb),
+         coalesce(pricing -> 'feeExemptCategories', '[]'::jsonb)
+    into v_fee, v_promotions, v_tiers, v_sans_frais
+    from settings where id = 1;
+
+  /*
+   * Rayons de la PREMIÈRE offre par quantité active. On les repère avant la
+   * boucle : le prix et les unités de l'assiette s'accumulent article par
+   * article, et il serait absurde de reparcourir le panier ensuite.
+   *
+   * Une liste vide vaut « tout le panier », comme partout ailleurs dans les
+   * promotions.
+   */
+  select coalesce(promo -> 'effect' -> 'categories', '[]'::jsonb)
+    into v_pack_rayons
+    from jsonb_array_elements(v_promotions) as promo
+   where coalesce((promo ->> 'active')::boolean, false)
+     and coalesce(promo -> 'effect' ->> 'type', '') = 'percent_by_quantity'
+   limit 1;
+
+  v_label := p_delivery_zone_id;
+  v_number := 'CMD-' || to_char(now(), 'YYYY') || '-' || lpad(nextval('order_seq')::text, 5, '0');
+
+  insert into orders (
+    order_number, customer_name, phone, address, city, note,
+    delivery_zone_id, delivery_label, delivery_fee, subtotal, total,
+    payment_method, payment_method_label, promo_code
+  ) values (
+    v_number, p_customer_name, p_phone, p_address, p_city, p_note,
+    p_delivery_zone_id, v_label, v_fee, 0, 0,
+    p_payment_method, p_payment_method, v_code
+  ) returning id into v_order_id;
+
+  for v_item in select * from jsonb_array_elements(p_items) loop
+    select * into v_product from products where id = v_item ->> 'product_id';
+    if not found or v_product.status <> 'active' then
+      raise exception 'Produit indisponible : %', v_item ->> 'product_id';
+    end if;
+
+    v_quantity := greatest(1, least(99, (v_item ->> 'quantity')::integer));
+    if v_product.stock is not null and v_quantity > v_product.stock then
+      raise exception 'Stock insuffisant pour %', v_product.name;
+    end if;
+
+    -- Prix unitaire : celui de l'option choisie s'il en a un, sinon celui de
+    -- l'article. Relu dans la table, jamais reçu du navigateur.
+    v_unit := prix_option(v_product, coalesce(v_item -> 'options', '{}'::jsonb));
+
+    insert into order_items (order_id, product_id, name, quantity, unit_price, options)
+    values (
+      v_order_id, v_product.id, v_product.name, v_quantity, v_unit,
+      coalesce(v_item -> 'options', '{}'::jsonb)
+    );
+
+    v_subtotal := v_subtotal + v_unit * v_quantity;
+    /*
+     * Les articles se comptent en unités, pas en lignes : douze cahiers font
+     * douze articles. Même règle que pour les demandes SHEIN.
+     *
+     * Deux exceptions, pour la même raison de fond — le travail n'a pas lieu.
+     * Les frais paient une commande : trouver la pièce, la regrouper, la
+     * suivre jusqu'ici.
+     *
+     *   • l'article est DÉJÀ EN BOUTIQUE : il est là, on le remet, et la
+     *     livraison se convient de vive voix ;
+     *   • son RAYON est dispensé par les réglages (Tarification → rayons sans
+     *     frais) : la boutique achète ces articles par lots, pour elle.
+     *
+     * Le rayon et l'état sont RELUS DANS LA FICHE, jamais reçus du navigateur :
+     * c'est ce qui empêche un panier bricolé de réclamer une exemption. La
+     * liste des rayons vient des réglages, pas du navigateur non plus.
+     */
+    if not coalesce(v_product.ready_to_ship, false)
+       and not (v_sans_frais ? v_product.category) then
+      v_articles := v_articles + v_quantity;
+    end if;
+
+    /*
+     * Assiette de l'offre par quantité. Le rayon vient de la FICHE, jamais du
+     * panier : c'est ce qui empêche un article de se réclamer d'un rayon
+     * remisé. Liste de rayons vide = tout le panier compte.
+     */
+    if v_pack_rayons is not null
+       and (jsonb_array_length(v_pack_rayons) = 0 or v_pack_rayons ? v_product.category) then
+      v_pack_unites := v_pack_unites + v_quantity;
+      v_pack_montant := v_pack_montant + v_unit * v_quantity;
+    end if;
+
+    if v_product.stock is not null then
+      update products set stock = greatest(0, stock - v_quantity) where id = v_product.id;
+    end if;
+  end loop;
+
+  -- Frais de traitement, d'après la grille des réglages. Grille vide : aucun
+  -- frais. Calculé ici, jamais reçu du navigateur.
+  v_service := frais_boutique(v_articles, v_tiers);
+
+  -- Offres. Toutes les conditions renseignées doivent être remplies ; une liste
+  -- vide ne restreint rien. Vérifiées ici, jamais d'après le navigateur, qui ne
+  -- transmet qu'un code et une déclaration.
+  for v_promo in select * from jsonb_array_elements(v_promotions) loop
+    continue when not coalesce((v_promo ->> 'active')::boolean, false);
+    continue when coalesce(v_promo ->> 'scope', 'all') not in ('all', 'store');
+    continue when coalesce((v_promo ->> 'studentOnly')::boolean, false)
+                  and not coalesce(p_is_student, false);
+    continue when v_promo ->> 'startsAt' is not null and v_today < (v_promo ->> 'startsAt');
+    continue when v_promo ->> 'endsAt' is not null and v_today > (v_promo ->> 'endsAt');
+    continue when jsonb_array_length(coalesce(v_promo -> 'deliveryOptionIds', '[]'::jsonb)) > 0
+                  and not (coalesce(v_promo -> 'deliveryOptionIds', '[]'::jsonb)
+                           ? p_delivery_zone_id);
+    -- Montant minimum d'articles : le seuil porte sur le prix des articles
+    -- seuls, jamais sur les frais ni la livraison. Absent = aucun minimum.
+    continue when jsonb_typeof(v_promo -> 'minSubtotal') = 'number'
+                  and v_subtotal < (v_promo ->> 'minSubtotal')::numeric;
+    -- Une offre à code ne s'applique jamais toute seule.
+    continue when upper(btrim(coalesce(v_promo ->> 'code', ''))) <> v_code;
+
+    if coalesce(v_promo -> 'effect' ->> 'type', '') = 'free_delivery'
+       and v_fee is not null and v_fee > 0 then
+      v_fee_before := v_fee;
+      v_fee := 0;
+      v_promo_label := v_promo ->> 'label';
+      exit;
+    elsif coalesce(v_promo -> 'effect' ->> 'type', '') = 'discount_amount' then
+      -- Plafonnée au montant connu : une remise ne rend jamais d'argent.
+      v_discount := least(
+        greatest(0, coalesce((v_promo -> 'effect' ->> 'amount')::integer, 0)),
+        v_subtotal + v_service + coalesce(v_fee, 0)
+      );
+      if v_discount > 0 then
+        v_promo_label := v_promo ->> 'label';
+        exit;
+      end if;
+    elsif coalesce(v_promo -> 'effect' ->> 'type', '') = 'percent_by_quantity' then
+      /*
+       * Remise par quantité : « 3 voiles −5 %, 4 à 5 −6 %, 6 et plus −7 % ».
+       *
+       * Le palier retenu est le PLUS ÉLEVÉ dont le seuil est atteint, et non
+       * le premier rencontré : une cliente qui dépasse le dernier palier
+       * garde son pourcentage. Sans cette règle, passer de dix à onze voiles
+       * ferait monter la facture.
+       */
+      v_pack_percent := 0;
+      v_pack_seuil := -1;
+      for v_palier in
+        select * from jsonb_array_elements(coalesce(v_promo -> 'effect' -> 'tiers', '[]'::jsonb))
+      loop
+        continue when coalesce((v_palier ->> 'minQuantity')::integer, 0) > v_pack_unites;
+        continue when coalesce((v_palier ->> 'percent')::integer, 0) <= 0;
+        if coalesce((v_palier ->> 'minQuantity')::integer, 0) > v_pack_seuil then
+          v_pack_seuil := (v_palier ->> 'minQuantity')::integer;
+          v_pack_percent := (v_palier ->> 'percent')::integer;
+        end if;
+      end loop;
+
+      if v_pack_percent > 0 and v_pack_montant > 0 then
+        -- Arrondi à l'entier : le franc CFA n'a pas de centimes. Plafonnée au
+        -- montant connu, comme toute remise.
+        v_discount := least(
+          round(v_pack_montant::numeric * v_pack_percent / 100)::integer,
+          v_subtotal + v_service + coalesce(v_fee, 0)
+        );
+        if v_discount > 0 then
+          v_promo_label := v_promo ->> 'label';
+          exit;
+        end if;
+      end if;
+    end if;
+  end loop;
+
+  update orders
+     set subtotal = v_subtotal,
+         service_fee = v_service,
+         delivery_fee = v_fee,
+         delivery_fee_before_promotion = v_fee_before,
+         discount = v_discount,
+         promotion_label = v_promo_label,
+         total = v_subtotal + v_service + coalesce(v_fee, 0) - v_discount
+   where id = v_order_id;
+
+  return (
+    select to_jsonb(o) || jsonb_build_object(
+      'order_items', coalesce((select jsonb_agg(to_jsonb(i)) from order_items i where i.order_id = o.id), '[]'::jsonb)
+    )
+    from orders o where o.id = v_order_id
+  );
+end;
+$$;
+
+--  ───────────────────────────────────────────────────────────────────
+--  3. LE CATALOGUE
+--  ───────────────────────────────────────────────────────────────────
+--
+--  Les deux fiches creees depuis l'etape 34. `on conflict do nothing` :
+--  si elles existent deja, rien n'est ecrase.
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'sac-ailes', 'sac-ailes', 'Sac cabas à ailes',
+  'Grand cabas à soufflets ouverts, qui lui donnent cette silhouette en ailes. Une patte sanglée et son fermoir doré ferment le devant ; les anses passent à l''épaule. Assez grand pour un ordinateur portable. Choisissez votre coloris ci-dessus : les photos suivent votre choix. D''autres couleurs arrivent — dites-nous celle que vous cherchez, nous confirmons avant paiement.',
+  14000, null, 'sac', '[]'::jsonb,
+  '[{"name":"Coloris","options":["Kaki","Écru & noir","Bordeaux","Noir suédine","Noir cuir"],"soldOutOptions":[]}]'::jsonb,
+  '{}'::jsonb, null, 'active', true, false, true, null
+)
+on conflict (id) do nothing;
+
+insert into products (
+  id, slug, name, description, price, compare_at_price, category,
+  images, variants, option_prices, stock, status, is_new, is_popular,
+  other_colors_available, color_chart_id
+) values (
+  'voile-leopard', 'voile-leopard', 'Voile léopard',
+  'Grand foulard léger en voile de polyester, imprimé en numérique. Il se porte en hijab comme en écharpe, sur une tenue unie qu''il suffit à habiller. Choisissez votre coloris ci-dessus : les photos suivent votre choix. D''autres couleurs arrivent — dites-nous celle que vous cherchez, nous confirmons avant paiement.',
+  2000, null, 'voile_imprime', '[]'::jsonb,
+  '[{"name":"Coloris","options":["Bleu","Gris","Marron","Gris clair","Kaki clair — zébré","Kaki","Gris foncé","Gris rose"],"soldOutOptions":[]}]'::jsonb,
+  '{}'::jsonb, null, 'active', true, false, true, null
+)
+on conflict (id) do nothing;
+
+--  Le voile MJ s'appelle desormais Jersey liquide. Seul le NOM change :
+--  le `slug` reste `voile-mj`, donc les liens deja partages sur Instagram
+--  et WhatsApp continuent d'ouvrir la fiche. Un lien mort coute plus cher
+--  qu'une adresse qui ne dit plus tout a fait le nom.
+
+update products set name = 'Jersey liquide' where id = 'voile-mj';
+
+--  Le rayon Rentree quitte la boutique. Les fiches passent EN BROUILLON,
+--  elles ne sont PAS supprimees : la rentree revient chaque annee, et les
+--  photos, les prix et les descriptions sont du travail deja fait. Elles
+--  restent dans /admin puis Produits, invisibles pour les clientes.
+
+update products set status = 'draft' where category = 'rentree';
+
+--  La grille des prix, ENTIERE. Ecrire toute la grille plutot que les
+--  seules lignes qui changent, c'est ce qui rend cette etape sure quel que
+--  soit l'etat de depart.
+
+update products p
+   set price = g.prix
+  from (values
+    ('hijab-tape',      2000),
+    ('voile-leopard',   2000),
+    ('jersey',          2500),
+    ('jersey-frise',    3500),
+    ('satin-imprime',   3500),
+    ('modal-simple',    4500),
+    ('dentelle',        5000),
+    ('modal-imprime',   5000),
+    ('modal-nayra',     5000),
+    ('modal-fulani',    5000),
+    ('piece-unique',    5000),
+    ('silk-imprime',    5000),
+    ('voile-rayures',   5000),
+    ('voile-viscose',   5000),
+    ('voile-mj',        5000),
+    ('organza-degrade', 5500)
+  ) as g(id, prix)
+ where p.id = g.id;
+
+--  Les nuanciers. Le modal simple a le sien, complet : 65 teintes, chacune
+--  une vraie photo du tissu. Il ne promet plus d'autres coloris -- les 65
+--  du fournisseur sont toutes affichees, la phrase serait devenue fausse.
+--  Le Jersey et le Voile viscose gardent l'ancien nuancier de 36 aplats :
+--  le nuancier recu est celui du modal simple, rien ne dit qu'il vaut pour
+--  eux.
+
+update products
+   set color_chart_id = 'modal65',
+       other_colors_available = false
+ where id = 'modal-simple';
+
+update products
+   set color_chart_id = 'jersey23',
+       other_colors_available = true,
+       measurements = '[{"label":"Dimensions","value":"170 × 60 cm"}]'::jsonb
+ where id = 'voile-mj';
+
+--  Les treize coloris du voile leopard. Le fournisseur appelle « gris clair »
+--  DEUX teintes differentes ; deux coloris ne peuvent pas porter le meme nom,
+--  le second deviendrait impossible a choisir. La presque blanche est donc
+--  decrite par ce qu'elle est, « Blanc & noir », en attendant la grille de
+--  noms de la boutique.
+
+update products
+   set variants = '[{"name":"Coloris","options":["Bleu","Gris","Marron","Blanc & noir","Kaki clair — zébré","Kaki","Gris foncé","Gris rose","Café","Noir","Gris clair","Marron clair","Brun rose"],"soldOutOptions":[]}]'::jsonb
+ where id = 'voile-leopard';
+
+--  ───────────────────────────────────────────────────────────────────
+--  VERIFICATIONS -- lisez ces quatre tableaux apres avoir execute
+--  ───────────────────────────────────────────────────────────────────
+
+--  1. La tarification. Attendu : taux 550, trois tranches, 16 rayons sans
+--     frais, le Pack Afaura actif.
+select (pricing -> 'conversionRates' ->> 'USD')             as taux_du_dollar,
+       jsonb_array_length(pricing -> 'tiers')               as nombre_de_tranches,
+       jsonb_array_length(pricing -> 'feeExemptCategories') as rayons_sans_frais,
+       (select p -> 'effect' ->> 'type' from jsonb_array_elements(promotions) as p
+         where p ->> 'id' = 'pack-afaura') as pack_afaura_type,
+       (select jsonb_array_length(p -> 'effect' -> 'tiers') from jsonb_array_elements(promotions) as p
+         where p ->> 'id' = 'pack-afaura') as pack_afaura_paliers
+  from settings where id = 1;
+
+--  2. Les tranches de frais, en clair.
+select t ->> 'minItems' as a_partir_de,
+       coalesce(t ->> 'maxItems', 'et plus') as jusqu_a,
+       t ->> 'fee' as frais
+  from settings, jsonb_array_elements(pricing -> 'tiers') as t
+ where id = 1
+ order by (t ->> 'minItems')::int;
+
+--  3. Le catalogue. Dix-sept lignes, aucune a 0 F.
+select name as article, price as prix, status as statut,
+       color_chart_id as nuancier, other_colors_available as autres_coloris
+  from products
+ where id in ('hijab-tape','voile-leopard','jersey','jersey-frise','satin-imprime',
+              'modal-simple','dentelle','modal-imprime','modal-nayra','modal-fulani',
+              'piece-unique','silk-imprime','voile-rayures','voile-viscose','voile-mj',
+              'organza-degrade','sac-ailes')
+ order by price, name;
+
+--  4. La rentree : aucune fiche ne doit rester en ligne.
+select count(*) filter (where status = 'active') as rentree_encore_en_ligne,
+       count(*)                                  as rentree_total
+  from products where category = 'rentree';

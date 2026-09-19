@@ -22,11 +22,9 @@ export const DEFAULT_PRICING: PricingConfig = {
    * le même travail de préparation.
    */
   tiers: [
-    { id: 't1', minItems: 1, maxItems: 3, fee: 2000 },
-    { id: 't2', minItems: 4, maxItems: 6, fee: 2500 },
-    { id: 't3', minItems: 7, maxItems: 10, fee: 3000 },
-    // Au-delà de 10 articles : aucun montant annoncé automatiquement.
-    { id: 't4', minItems: 11, maxItems: null, fee: null },
+    { id: 't1', minItems: 1, maxItems: 10, fee: 2000 },
+    { id: 't2', minItems: 11, maxItems: 20, fee: 2500 },
+    { id: 't3', minItems: 21, maxItems: null, fee: 3000 },
   ],
 
   /** Stratégie alternative : pourcentage de la valeur déclarée des articles. */
@@ -72,7 +70,7 @@ export const DEFAULT_PRICING: PricingConfig = {
      * couvre aussi les frais de transfert, que le cours brut ignore. Il se
      * change depuis Administration → Tarification le jour où elle le décide.
      */
-    USD: 600,
+    USD: 550,
   },
 
   defaultCurrency: 'EUR',

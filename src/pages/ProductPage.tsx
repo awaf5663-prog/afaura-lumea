@@ -85,12 +85,50 @@ export function ProductPage({ slug }: { slug: string }) {
 
   const colorChart = findColorChart(product?.colorChartId);
 
+  /**
+   * La teinte choisie s'affiche DANS la galerie, pas dans un cadre à part.
+   *
+   * Sa photo s'ajoute en dernière position et la galerie s'y rend aussitôt :
+   * la cliente voit le voile dans sa teinte au même endroit que les autres
+   * photos, en grand. Une vignette isolée sous le nuancier faisait un second
+   * endroit où regarder.
+   *
+   * Seules les teintes dont la photo est arrivée ajoutent une vue ; les
+   * autres se choisissent sans rien changer à la galerie.
+   */
+  const photoTeinte = colorChart?.swatches.find((t) => t.code === colorCode)?.photo;
+
   const photoGroup = product ? findPhotoGroup(product) : undefined;
   /** Modèle montré par la photo n° index. */
   const optionAtPhoto = (index: number) =>
     photoGroup ? photoOptionsOf(photoGroup)[index] : undefined;
   /** Première photo qui montre ce modèle. */
   const photoAtOption = (option: string) => (photoGroup ? photoOfOption(photoGroup, option) : -1);
+
+  /** Les photos de la fiche, augmentées de la teinte choisie s'il y en a une. */
+  const photosGalerie = photoTeinte ? [...photos, photoTeinte] : photos;
+  /*
+   * Le libellé de chaque vue. Sur une fiche à modèles, c'est le nom du modèle ;
+   * ailleurs il n'y en a pas, et la chaîne vide laisse la galerie dire
+   * « Photo 2 sur 5 » comme avant. La vue ajoutée, elle, s'annonce toujours :
+   * c'est elle que la cliente vient de demander.
+   */
+  const legendes = photoGroup ? photoOptionsOf(photoGroup) : photos.map(() => '');
+  const labelsGalerie = photoTeinte
+    ? [...legendes, `Teinte n° ${colorCode}`]
+    : photoGroup && photoOptionsOf(photoGroup);
+
+  /*
+   * Choisir une teinte amène sa photo : elle est ajoutée en dernier, donc son
+   * index vaut `photos.length`. En quittant cette teinte, la vue disparaît —
+   * on ramène alors la galerie sur la dernière photo qui existe encore, sinon
+   * elle resterait pointée sur une vue absente.
+   */
+  useEffect(() => {
+    setPhotoIndex((actuel) =>
+      photoTeinte ? photos.length : Math.min(actuel, Math.max(0, photos.length - 1)),
+    );
+  }, [photoTeinte, photos.length]);
 
   const isSoldOutOption = (group: { soldOutOptions?: string[] }, option: string) =>
     (group.soldOutOptions ?? []).includes(option);
@@ -237,9 +275,9 @@ export function ProductPage({ slug }: { slug: string }) {
 
       <div className="mt-4 grid gap-8 lg:grid-cols-2 lg:gap-14">
         <Gallery
-          images={photos}
+          images={photosGalerie}
           alt={product.name}
-          labels={photoGroup && photoOptionsOf(photoGroup)}
+          labels={labelsGalerie || undefined}
           activeIndex={photoIndex}
           onIndexChange={handlePhotoIndex}
           cadrage={cadragePhoto(product)}

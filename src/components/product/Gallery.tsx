@@ -122,7 +122,7 @@ export function Gallery({
               'w-full shrink-0 snap-center max-h-[56vh] sm:max-h-none lg:max-h-[min(68vh,600px)]',
               // Fond rose crème et fondu du blanc pour les packshots : même
               // traitement que sur les vignettes de la boutique.
-              cadrage === 'carre' ? 'isolate aspect-square bg-rosecreme' : 'aspect-[4/5]',
+              cadrage === 'carre' ? 'isolate aspect-square bg-white' : 'aspect-[4/5]',
             )}
           >
               {image ? (
@@ -140,7 +140,7 @@ export function Gallery({
               ) : (
                 /* Même principe que sur la vignette : on ne s'excuse pas en
                    petit gris, on tient la place proprement. */
-                <div className="grid size-full place-items-center bg-rosecreme px-6 text-center">
+                <div className="grid size-full place-items-center bg-white px-6 text-center">
                   <span className="font-display text-[20px] leading-tight text-mauve">{alt}</span>
                 </div>
               )}
@@ -191,7 +191,7 @@ export function Gallery({
                   alt=""
                   className={cn(
                     'size-full',
-                    cadrage === 'carre' ? 'bg-rosecreme object-contain' : 'object-cover',
+                    cadrage === 'carre' ? 'bg-white object-contain' : 'object-cover',
                   )}
                   loading="lazy"
                 />

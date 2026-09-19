@@ -51,7 +51,7 @@ export function ProductCard({ product, priority }: { product: Product; priority?
             'relative overflow-hidden rounded-[--radius-md]',
             // `isolate` : le fondu de la photo (voir plus bas) doit rester
             // dans la vignette et ne pas déteindre sur la page.
-            carre ? 'isolate aspect-square bg-rosecreme' : 'aspect-[3/4] bg-cream',
+            carre ? 'isolate aspect-square bg-white' : 'aspect-[3/4] bg-cream',
           )}
         >
           {vignette ? (

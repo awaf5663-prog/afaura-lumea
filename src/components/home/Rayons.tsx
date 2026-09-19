@@ -57,7 +57,7 @@ export function Rayons({ products }: { products: Product[] }) {
           {rayons.map((rayon) => (
             <li key={rayon.id}>
               <Link to={`/boutique?famille=${rayon.id}`} className="group block">
-                <div className="relative overflow-hidden rounded-[--radius-md] bg-rosecreme">
+                <div className="relative overflow-hidden rounded-[--radius-md] bg-white">
                   {rayon.photo ? (
                     <img
                       src={rayon.photo}

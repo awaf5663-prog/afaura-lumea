@@ -3775,7 +3775,7 @@ select name as article, price as prix, color_chart_id as nuancier,
 
 
 -- ══════════════════════════════════════════════════════════════════════
---  47. RATTRAPAGE COMPLET — remplace les étapes 34 à 46
+--  47. RATTRAPAGE COMPLET — remplace les étapes 34 à 48
 -- ══════════════════════════════════════════════════════════════════════
 --
 --  À COLLER EN UNE SEULE FOIS. Cette étape amène la base à l'état du site
@@ -3830,40 +3830,25 @@ update settings
        )
  where id = 1;
 
---  Le Pack Afaura : la remise grandit avec le nombre de voiles.
---    3 voiles -> 5 pour cent   ;   4 a 5 -> 6 pour cent   ;   6 et plus -> 7 pour cent
---  Elle ne porte que sur les voiles, jamais sur le reste du panier.
+--  LES PROMOTIONS SONT TERMINEES.
+--
+--  La boutique a declare le « Pack Afaura » et l'« Offre rentree » expires
+--  en septembre 2026. Les deux quittent la base.
+--
+--  Retrait CIBLE, par identifiant, plutot qu'un vidage de la colonne : une
+--  offre creee plus tard depuis /admin -> Tarification survit donc a une
+--  relance de cette etape.
+--
+--  Rien ne les remplace. Une remise qui s'appliquerait toute seule sans que
+--  la boutique l'ait voulue couterait de l'argent a chaque commande.
 
 update settings
    set promotions = coalesce(
          (select jsonb_agg(offre)
             from jsonb_array_elements(coalesce(promotions, '[]'::jsonb)) as offre
-           where offre ->> 'id' <> 'pack-afaura'),
+           where offre ->> 'id' not in ('pack-afaura', 'rentree-etudiantes')),
          '[]'::jsonb
-       ) || jsonb_build_array(jsonb_build_object(
-         'id', 'pack-afaura',
-         'label', 'Pack Afaura',
-         'description', 'Composez votre pack : a partir de 3 voiles, la remise s''applique toute seule -- et elle grandit avec le nombre de voiles choisis.',
-         'active', true,
-         'scope', 'store',
-         'code', '',
-         'studentOnly', false,
-         'startsAt', null,
-         'endsAt', null,
-         'minSubtotal', null,
-         'groupingIds', '[]'::jsonb,
-         'deliveryOptionIds', '[]'::jsonb,
-         'effect', jsonb_build_object(
-           'type', 'percent_by_quantity',
-           'categories', '["voile_viscose","voile_mj","modal_imprime","modal_simple",
-                           "satin_imprime","dentelle","jersey","jersey_frise","hijab_tape",
-                           "voile_rayures","modal_fulani","modal_nayra","silk_imprime",
-                           "organza_degrade"]'::jsonb,
-           'tiers', '[{"minQuantity":3,"percent":5},
-                      {"minQuantity":4,"percent":6},
-                      {"minQuantity":6,"percent":7}]'::jsonb
-         )
-       ))
+       )
  where id = 1;
 
 --  ───────────────────────────────────────────────────────────────────
@@ -4227,14 +4212,13 @@ update products
 --  ───────────────────────────────────────────────────────────────────
 
 --  1. La tarification. Attendu : taux 550, trois tranches, 16 rayons sans
---     frais, le Pack Afaura actif.
+--     frais, et AUCUNE des deux offres supprimees.
 select (pricing -> 'conversionRates' ->> 'USD')             as taux_du_dollar,
        jsonb_array_length(pricing -> 'tiers')               as nombre_de_tranches,
        jsonb_array_length(pricing -> 'feeExemptCategories') as rayons_sans_frais,
-       (select p -> 'effect' ->> 'type' from jsonb_array_elements(promotions) as p
-         where p ->> 'id' = 'pack-afaura') as pack_afaura_type,
-       (select jsonb_array_length(p -> 'effect' -> 'tiers') from jsonb_array_elements(promotions) as p
-         where p ->> 'id' = 'pack-afaura') as pack_afaura_paliers
+       jsonb_array_length(coalesce(promotions, '[]'::jsonb)) as offres_restantes,
+       (select count(*) from jsonb_array_elements(coalesce(promotions, '[]'::jsonb)) as p
+         where p ->> 'id' in ('pack-afaura','rentree-etudiantes')) as offres_supprimees_encore_la
   from settings where id = 1;
 
 --  2. Les tranches de frais, en clair.
@@ -4261,31 +4245,3 @@ select count(*) filter (where status = 'active') as rentree_encore_en_ligne,
   from products where category = 'rentree';
 
 
--- ═══════════════════════════════════════════════════════════════════════
---  48. Les deux promotions sont terminees
--- ═══════════════════════════════════════════════════════════════════════
---
---  La boutique a declare le « Pack Afaura » et l'« Offre rentree » expires
---  en septembre 2026. Les deux quittent la base.
---
---  IDEMPOTENTE, et volontairement ciblee : on retire ces deux offres par
---  leur identifiant au lieu de vider la colonne. Une offre creee plus tard
---  depuis /admin -> Tarification survit donc a une relance de cette etape.
---
---  A PASSER APRES l'etape 47, qui installe le Pack Afaura. Dans l'autre
---  ordre, 47 le remettrait.
-
-update settings
-   set promotions = coalesce(
-         (select jsonb_agg(offre)
-            from jsonb_array_elements(coalesce(promotions, '[]'::jsonb)) as offre
-           where offre ->> 'id' not in ('pack-afaura', 'rentree-etudiantes')),
-         '[]'::jsonb
-       )
- where id = 1;
-
---  Verification : plus aucune des deux, et ce qui restait est intact.
-select jsonb_array_length(coalesce(promotions, '[]'::jsonb)) as offres_restantes,
-       (select count(*) from jsonb_array_elements(coalesce(promotions, '[]'::jsonb)) as p
-         where p ->> 'id' in ('pack-afaura', 'rentree-etudiantes')) as offres_retirees_encore_la
-  from settings where id = 1;

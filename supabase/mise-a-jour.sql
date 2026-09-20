@@ -4284,3 +4284,53 @@ select id as fiche, name as article, color_chart_id as nuancier,
   from products
  where color_chart_id in ('frise35', 'frise36')
  order by id;
+
+
+-- ═══════════════════════════════════════════════════════════════════════
+--  49. Les nouveaux prix des voiles
+-- ═══════════════════════════════════════════════════════════════════════
+--
+--  La grille du catalogue des voiles de la boutique, septembre 2026. Onze
+--  modeles baissent, de 20 a 55 pour cent.
+--
+--  Les cinq voiles qui ne figurent pas sur cette affiche gardent leur prix,
+--  sur decision de la boutique : Hijab tape et Voile leopard a 2 000, Satin
+--  imprime a 3 500, Voile viscose premium et Piece unique a 5 000. Ils sont
+--  ecrits ici QUAND MEME : la grille entiere, plutot que les seules lignes
+--  qui changent, est ce qui rend cette etape sure quel que soit l'etat de
+--  depart, et relancable sans risque.
+--
+--  IDEMPOTENTE.
+
+update products p
+   set price = g.prix
+  from (values
+    -- Les onze de l'affiche.
+    ('jersey',          2000),   -- etait 2 500
+    ('jersey-frise',    2000),   -- etait 3 500
+    ('organza-degrade', 2500),   -- etait 5 500
+    ('silk-imprime',    2500),   -- etait 5 000
+    ('modal-simple',    3000),   -- etait 4 500
+    ('modal-fulani',    3000),   -- etait 5 000
+    ('modal-imprime',   3500),   -- etait 5 000
+    ('modal-nayra',     3500),   -- etait 5 000
+    ('voile-rayures',   3500),   -- etait 5 000
+    ('voile-mj',        3500),   -- etait 5 000  (Jersey liquide)
+    ('dentelle',        4000),   -- etait 5 000
+    -- Les cinq hors affiche, inchanges.
+    ('hijab-tape',      2000),
+    ('voile-leopard',   2000),
+    ('satin-imprime',   3500),
+    ('piece-unique',    5000),
+    ('voile-viscose',   5000)
+  ) as g(id, prix)
+ where p.id = g.id;
+
+--  Verification : seize voiles, aucun a 0 F, et les onze aux nouveaux prix.
+select name as article, price as prix, status as statut
+  from products
+ where id in ('hijab-tape','voile-leopard','jersey','jersey-frise','satin-imprime',
+              'modal-simple','dentelle','modal-imprime','modal-nayra','modal-fulani',
+              'piece-unique','silk-imprime','voile-rayures','voile-viscose','voile-mj',
+              'organza-degrade')
+ order by price, name;

@@ -66,6 +66,16 @@ import friseTissu10 from '@/src/assets/swatches/frise-tissu-10.webp';
 import friseVoile10 from '@/src/assets/swatches/frise-voile-10.webp';
 import friseTissu12 from '@/src/assets/swatches/frise-tissu-12.webp';
 import friseVoile12 from '@/src/assets/swatches/frise-voile-12.webp';
+import friseTissu13 from '@/src/assets/swatches/frise-tissu-13.webp';
+import friseVoile13 from '@/src/assets/swatches/frise-voile-13.webp';
+import friseTissu14 from '@/src/assets/swatches/frise-tissu-14.webp';
+import friseVoile14 from '@/src/assets/swatches/frise-voile-14.webp';
+import friseTissu15 from '@/src/assets/swatches/frise-tissu-15.webp';
+import friseVoile15 from '@/src/assets/swatches/frise-voile-15.webp';
+import friseTissu16 from '@/src/assets/swatches/frise-tissu-16.webp';
+import friseVoile16 from '@/src/assets/swatches/frise-voile-16.webp';
+import friseTissu17 from '@/src/assets/swatches/frise-tissu-17.webp';
+import friseVoile17 from '@/src/assets/swatches/frise-voile-17.webp';
 import modal01 from '@/src/assets/swatches/modal-01.webp';
 import modal02 from '@/src/assets/swatches/modal-02.webp';
 import modal03 from '@/src/assets/swatches/modal-03.webp';
@@ -500,6 +510,11 @@ export const COLOR_CHARTS: ColorChart[] = [
       { code: '09', hex: '#7f6964', name: 'Taupe', image: friseTissu09, photo: friseVoile09 },
       { code: '10', hex: '#95807a', name: 'Gruau', image: friseTissu10, photo: friseVoile10 },
       { code: '12', hex: '#705752', name: 'Gris', image: friseTissu12, photo: friseVoile12 },
+      { code: '13', hex: '#8b7273', name: 'Mauve poussiéreux', image: friseTissu13, photo: friseVoile13 },
+      { code: '14', hex: '#83603a', name: 'Jaune moutarde', image: friseTissu14, photo: friseVoile14 },
+      { code: '15', hex: '#9a6c69', name: 'Rose poussiéreux', image: friseTissu15, photo: friseVoile15 },
+      { code: '16', hex: '#231616', name: 'Café noir', image: friseTissu16, photo: friseVoile16 },
+      { code: '17', hex: '#573b36', name: 'Brun moyen', image: friseTissu17, photo: friseVoile17 },
     ],
   },
 ];

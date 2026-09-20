@@ -56,6 +56,16 @@ import friseTissu04 from '@/src/assets/swatches/frise-tissu-04.webp';
 import friseVoile04 from '@/src/assets/swatches/frise-voile-04.webp';
 import friseTissu06 from '@/src/assets/swatches/frise-tissu-06.webp';
 import friseVoile06 from '@/src/assets/swatches/frise-voile-06.webp';
+import friseTissu07 from '@/src/assets/swatches/frise-tissu-07.webp';
+import friseVoile07 from '@/src/assets/swatches/frise-voile-07.webp';
+import friseTissu08 from '@/src/assets/swatches/frise-tissu-08.webp';
+import friseVoile08 from '@/src/assets/swatches/frise-voile-08.webp';
+import friseTissu09 from '@/src/assets/swatches/frise-tissu-09.webp';
+import friseVoile09 from '@/src/assets/swatches/frise-voile-09.webp';
+import friseTissu10 from '@/src/assets/swatches/frise-tissu-10.webp';
+import friseVoile10 from '@/src/assets/swatches/frise-voile-10.webp';
+import friseTissu12 from '@/src/assets/swatches/frise-tissu-12.webp';
+import friseVoile12 from '@/src/assets/swatches/frise-voile-12.webp';
 import modal01 from '@/src/assets/swatches/modal-01.webp';
 import modal02 from '@/src/assets/swatches/modal-02.webp';
 import modal03 from '@/src/assets/swatches/modal-03.webp';
@@ -485,6 +495,11 @@ export const COLOR_CHARTS: ColorChart[] = [
       { code: '03', hex: '#a38783', name: 'Nude rose clair', image: friseTissu03, photo: friseVoile03 },
       { code: '04', hex: '#8e6e61', name: 'Thé au lait', image: friseTissu04, photo: friseVoile04 },
       { code: '06', hex: '#aa8c7d', name: 'Nu', image: friseTissu06, photo: friseVoile06 },
+      { code: '07', hex: '#8d6d63', name: 'Chameau clair', image: friseTissu07, photo: friseVoile07 },
+      { code: '08', hex: '#704939', name: 'Brun caramel', image: friseTissu08, photo: friseVoile08 },
+      { code: '09', hex: '#7f6964', name: 'Taupe', image: friseTissu09, photo: friseVoile09 },
+      { code: '10', hex: '#95807a', name: 'Gruau', image: friseTissu10, photo: friseVoile10 },
+      { code: '12', hex: '#705752', name: 'Gris', image: friseTissu12, photo: friseVoile12 },
     ],
   },
 ];

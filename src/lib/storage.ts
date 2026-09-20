@@ -55,5 +55,13 @@ export const STORAGE_KEYS = {
    * tous les navigateurs sur une lecture propre, sans que personne ait à
    * vider quoi que ce soit.
    */
-  catalogueEnCache: 'lumea.catalogue.cache.v2',
+  /*
+   * v3, septembre 2026 : la boutique a baissé onze prix de voiles d'un coup.
+   * Un catalogue gardé restait affiché jusqu'à cinq minutes avec les anciens
+   * montants — court dans l'absolu, long quand la cliente regarde le prix
+   * qu'on vient de changer et ne le voit pas bouger. Changer le numéro fait
+   * repartir TOUS les navigateurs sur une lecture propre, dès la page
+   * suivante, sans que personne ait à vider quoi que ce soit.
+   */
+  catalogueEnCache: 'lumea.catalogue.cache.v3',
 } as const;

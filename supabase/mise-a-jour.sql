@@ -4248,3 +4248,39 @@ select count(*) filter (where status = 'active') as rentree_encore_en_ligne,
   from products where category = 'rentree';
 
 
+
+
+-- ═══════════════════════════════════════════════════════════════════════
+--  48. Le Jersey frise recoit le vrai nuancier du fournisseur
+-- ═══════════════════════════════════════════════════════════════════════
+--
+--  La fiche montrait « frise36 » : trente-six numeros qui N'ETAIENT PAS
+--  ceux du fournisseur. Son n° 2 y etait un blanc casse, quand le vrai n° 2
+--  est un vin rouge. Une cliente qui commandait « le n° 2 » ne recevait pas
+--  ce qu'elle avait vu.
+--
+--  « frise35 » est le sien : trente-deux teintes, chacune photographiee,
+--  avec le numero ET le nom qu'il imprime sur sa propre photo. La
+--  numerotation va jusqu'a 35 parce que trois numeros n'existent pas chez
+--  lui -- les 5, 11 et 20. On ne renumerote pas : une cliente commande le
+--  numero qu'elle voit, et ce numero doit etre celui qu'il reconnait.
+--
+--  IDEMPOTENTE. A passer apres l'etape 47.
+--
+--  A PASSER AVEC LA PUBLICATION DU SITE, pas avant : le nuancier lui-meme
+--  vit dans le code. Executee sur une boutique encore en ligne dans sa
+--  version precedente, la fiche perdrait son nuancier jusqu'a la
+--  publication.
+
+update products
+   set color_chart_id = 'frise35',
+       other_colors_available = false
+ where id = 'jersey-frise';
+
+--  Verification : la fiche pointe le bon nuancier, et rien d'autre ne
+--  reste accroche a l'ancien.
+select id as fiche, name as article, color_chart_id as nuancier,
+       other_colors_available as autres_coloris
+  from products
+ where color_chart_id in ('frise35', 'frise36')
+ order by id;

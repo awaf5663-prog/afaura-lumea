@@ -324,7 +324,7 @@ export const SEED_PRODUCTS: Product[] = [
     variants: [],
     stock: null,
     status: 'active',
-    colorChartId: 'frise36',
+    colorChartId: 'frise35',
     createdAt: '2026-01-05T10:30:00.000Z',
   },
   {

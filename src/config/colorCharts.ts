@@ -106,6 +106,10 @@ import friseTissu32 from '@/src/assets/swatches/frise-tissu-32.webp';
 import friseVoile32 from '@/src/assets/swatches/frise-voile-32.webp';
 import friseTissu33 from '@/src/assets/swatches/frise-tissu-33.webp';
 import friseVoile33 from '@/src/assets/swatches/frise-voile-33.webp';
+import friseTissu34 from '@/src/assets/swatches/frise-tissu-34.webp';
+import friseVoile34 from '@/src/assets/swatches/frise-voile-34.webp';
+import friseTissu35 from '@/src/assets/swatches/frise-tissu-35.webp';
+import friseVoile35 from '@/src/assets/swatches/frise-voile-35.webp';
 import modal01 from '@/src/assets/swatches/modal-01.webp';
 import modal02 from '@/src/assets/swatches/modal-02.webp';
 import modal03 from '@/src/assets/swatches/modal-03.webp';
@@ -463,8 +467,16 @@ export const COLOR_CHARTS: ColorChart[] = [
     ],
   },
   {
+    /*
+     * REMPLACÉ par « frise35 », et conservé seulement le temps que la base
+     * soit mise à jour (étape SQL 48). Le rayon du nuancier d'une fiche vit
+     * en base : tant qu'elle dit « frise36 », le retirer d'ici priverait la
+     * fiche de tout nuancier. Il s'en ira à l'étape suivante.
+     *
+     * Ses trente-six numéros ne sont pas ceux du fournisseur.
+     */
     id: 'frise36',
-    label: 'Nuancier 36 teintes — jersey frisé',
+    label: 'Nuancier 36 teintes — jersey frisé (remplacé)',
     note:
       "Le frisé visible sur les pastilles est photographié sur nos voiles ; la teinte, elle, est appliquée dessus pour vous montrer le rendu de chaque numéro.",
     /**
@@ -513,20 +525,23 @@ export const COLOR_CHARTS: ColorChart[] = [
   },
   {
     /*
-     * LE VRAI NUANCIER DU JERSEY FRISÉ — en cours de constitution.
+     * LE NUANCIER DU JERSEY FRISÉ — celui du fournisseur, complet.
      *
-     * Les teintes arrivent par lots, photo par photo. Chacune porte le
-     * numéro et le nom imprimés par le fournisseur sur SA photo : jamais le
-     * rang d'affichage de son catalogue, qui saute des numéros (sa 5e
-     * vignette porte le #6).
+     * Trente-deux teintes, chacune avec le numéro et le nom imprimés par le
+     * fournisseur sur SA photo. Jamais le rang d'affichage de son catalogue,
+     * qui saute des numéros : sa 5e vignette porte le #6.
      *
-     * Il remplacera « frise36 », dont les numéros ne sont pas ceux du
-     * fournisseur — le n° 2 y est un blanc cassé, quand le vrai n° 2 est un
-     * vin rouge. Le remplacement n'aura lieu qu'une fois les teintes
-     * réunies : basculer à mi-chemin retirerait des choix à la cliente.
+     * LA NUMÉROTATION VA JUSQU'À 35, MAIS TROIS NUMÉROS N'EXISTENT PAS chez
+     * lui : 5, 11 et 20. Son catalogue s'arrête à trente-deux photos. On ne
+     * renumérote pas pour faire joli — une cliente commande le numéro qu'elle
+     * voit, et ce numéro doit être celui que le fournisseur reconnaît.
+     *
+     * Il remplace « frise36 », dont les trente-six numéros n'étaient pas les
+     * siens : le n° 2 y était un blanc cassé, quand le vrai n° 2 est un vin
+     * rouge.
      */
     id: 'frise35',
-    label: 'Nuancier — jersey frisé',
+    label: 'Nuancier 32 teintes — jersey frisé',
     note:
       "Chaque pastille est une photo du tissu, prise au cœur du voile : le frisé et la couleur sont ceux de la vraie matière. Choisissez votre numéro — le nom est celui du fournisseur.",
     swatches: [
@@ -560,6 +575,8 @@ export const COLOR_CHARTS: ColorChart[] = [
       { code: '31', hex: '#d2cbd6', name: 'Blanc pur', image: friseTissu31, photo: friseVoile31 },
       { code: '32', hex: '#857c83', name: 'Gris clair', image: friseTissu32, photo: friseVoile32 },
       { code: '33', hex: '#373027', name: 'Vert olive', image: friseTissu33, photo: friseVoile33 },
+      { code: '34', hex: '#512d41', name: 'Aubergine violette', image: friseTissu34, photo: friseVoile34 },
+      { code: '35', hex: '#271112', name: 'Bourgogne', image: friseTissu35, photo: friseVoile35 },
     ],
   },
 ];

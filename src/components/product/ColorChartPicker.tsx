@@ -87,11 +87,18 @@ export function ColorChartPicker({
               </span>
               {/* Le nom du fournisseur, quand il en donne un. La plupart des
                   teintes n'ont qu'un numéro : rien ne s'affiche alors, et la
-                  grille garde son alignement. */}
+                  grille garde son alignement.
+
+                  Sur deux lignes, pas tronqué : « Nude rose clair » et « Nude
+                  clair » deviennent le même « Nude ro… » quand on les coupe,
+                  et ce sont deux teintes voisines qu'une cliente doit pouvoir
+                  départager. La hauteur est fixée à ces deux lignes pour que
+                  les rangées restent alignées, qu'un nom tienne sur une ou
+                  sur deux. */}
               {swatch.name && (
                 <span
                   className={cn(
-                    'max-w-[56px] truncate text-[9.5px] leading-tight',
+                    'line-clamp-2 h-[22px] max-w-[84px] text-[9.5px] leading-[11px]',
                     active ? 'text-mauve' : 'text-stone',
                   )}
                 >

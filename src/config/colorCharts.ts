@@ -86,6 +86,16 @@ import friseTissu22 from '@/src/assets/swatches/frise-tissu-22.webp';
 import friseVoile22 from '@/src/assets/swatches/frise-voile-22.webp';
 import friseTissu23 from '@/src/assets/swatches/frise-tissu-23.webp';
 import friseVoile23 from '@/src/assets/swatches/frise-voile-23.webp';
+import friseTissu24 from '@/src/assets/swatches/frise-tissu-24.webp';
+import friseVoile24 from '@/src/assets/swatches/frise-voile-24.webp';
+import friseTissu25 from '@/src/assets/swatches/frise-tissu-25.webp';
+import friseVoile25 from '@/src/assets/swatches/frise-voile-25.webp';
+import friseTissu26 from '@/src/assets/swatches/frise-tissu-26.webp';
+import friseVoile26 from '@/src/assets/swatches/frise-voile-26.webp';
+import friseTissu27 from '@/src/assets/swatches/frise-tissu-27.webp';
+import friseVoile27 from '@/src/assets/swatches/frise-voile-27.webp';
+import friseTissu28 from '@/src/assets/swatches/frise-tissu-28.webp';
+import friseVoile28 from '@/src/assets/swatches/frise-voile-28.webp';
 import modal01 from '@/src/assets/swatches/modal-01.webp';
 import modal02 from '@/src/assets/swatches/modal-02.webp';
 import modal03 from '@/src/assets/swatches/modal-03.webp';
@@ -530,6 +540,11 @@ export const COLOR_CHARTS: ColorChart[] = [
       { code: '21', hex: '#4b4248', name: 'Gris brume', image: friseTissu21, photo: friseVoile21 },
       { code: '22', hex: '#785556', name: 'Rose pâle', image: friseTissu22, photo: friseVoile22 },
       { code: '23', hex: '#311b17', name: 'Café rougeâtre', image: friseTissu23, photo: friseVoile23 },
+      { code: '24', hex: '#121010', name: 'Noir', image: friseTissu24, photo: friseVoile24 },
+      { code: '25', hex: '#332a30', name: 'Charbon de bois', image: friseTissu25, photo: friseVoile25 },
+      { code: '26', hex: '#1e2421', name: 'Vert foncé', image: friseTissu26, photo: friseVoile26 },
+      { code: '27', hex: '#1a1721', name: 'Bleu marine', image: friseTissu27, photo: friseVoile27 },
+      { code: '28', hex: '#323759', name: 'Bleu royal', image: friseTissu28, photo: friseVoile28 },
     ],
   },
 ];

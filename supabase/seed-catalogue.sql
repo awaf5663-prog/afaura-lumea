@@ -17,7 +17,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'jersey', 'jersey', 'Jersey', 'Le hijab du quotidien. Maille jersey souple, tombé net, aucune épingle nécessaire. Choisissez votre teinte dans le nuancier ci-dessous.',
-  2500, null, 'jersey',
+  2000, null, 'jersey',
   '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, 'modal36'
@@ -40,7 +40,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'jersey-frise', 'jersey-frise', 'Jersey frisé', 'Jersey à bord frisé : la maille est terminée par des volants qui tiennent la forme et habillent le visage sans épingle. Faites défiler les photos pour voir le tombé et le détail du frisé, puis choisissez votre numéro de teinte dans le nuancier ci-dessous.',
-  3500, null, 'jersey_frise',
+  2000, null, 'jersey_frise',
   '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, 'frise36'
@@ -86,7 +86,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'voile-mj', 'voile-mj', 'Jersey liquide', 'Notre voile le plus fluide : un mélange de modal et de jersey. Il a la douceur et le tombé du modal, avec le maintien du jersey — il ne glisse pas et ne demande pas d''épingle. 170 × 60 cm. Faites défiler les photos pour voir le tombé, puis choisissez votre numéro de teinte dans le nuancier ci-dessous : 23 coloris, dont quatre portent un nom chez notre fournisseur — White, Cream, Black et Navy. Une autre teinte vous tente ? Elle peut se commander : dites-nous laquelle, nous vérifions auprès de notre fournisseur et vous confirmons avant tout paiement.',
-  5000, null, 'voile_mj',
+  3500, null, 'voile_mj',
   '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   true, 'jersey23'
@@ -109,7 +109,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'modal-simple', 'modal-simple', 'Modal simple', 'Modal uni, doux et respirant, très léger à porter. Un drapé souple qui reste impeccable toute la journée. Choisissez votre teinte dans le nuancier ci-dessous.',
-  4500, null, 'modal_simple',
+  3000, null, 'modal_simple',
   '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, 'modal65'
@@ -132,7 +132,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'modal-imprime', 'modal-imprime', 'Modal imprimé', 'Le confort du modal avec un imprimé travaillé. Faites défiler les photos pour voir les modèles, puis choisissez celui qui vous plaît. Vendu à l''unité.',
-  5000, null, 'modal_imprime',
+  3500, null, 'modal_imprime',
   '[]'::jsonb, '[{"name":"Modèle","options":["Zébré bordeaux","Pois sur brun","Pois sur blanc","Aquarelle","Léopard"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   true, null
@@ -178,7 +178,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'dentelle', 'dentelle', 'Dentelle', 'Hijab bordé de dentelle, pour les occasions : cérémonies, fêtes, invitations. Choisissez votre teinte dans le nuancier ci-dessous.',
-  5000, null, 'dentelle',
+  4000, null, 'dentelle',
   '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   false, false,
   false, 'dentelle12'
@@ -201,7 +201,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'voile-rayures', 'voile-rayures', 'Voile rayures', 'Un voile teint en rayures fondues : deux ou trois teintes qui se répondent sur toute la longueur. Faites défiler les photos pour voir les coloris portés, puis choisissez le vôtre. D''autres teintes existent hors des photos : dites-nous celle que vous cherchez, nous confirmons avant paiement.',
-  5000, null, 'voile_rayures',
+  3500, null, 'voile_rayures',
   '[]'::jsonb, '[{"name":"Coloris","options":["Bleu marine","Bleu canard & rouille","Gris & rose","Kaki & vert olive","Anthracite","Bleu & bleu ciel","Lilas","Orange & violet"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   true, null
@@ -224,7 +224,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'modal-fulani', 'modal-fulani', 'Modal fulani', 'Modal au grain froissé, teint en nuances fondues : le relief reste visible dans le tissu et le dessin change d''un numéro à l''autre. Doux et mat. Choisissez votre numéro de teinte ci-dessus — le nuancier du fournisseur en compte davantage que ce que nos photos nomment, demandez-nous celui qui vous manque.',
-  5000, null, 'modal_fulani',
+  3000, null, 'modal_fulani',
   '[]'::jsonb, '[{"name":"Teinte","options":["#2 Charcoal black","#3 Navy","#6 Olive grass","#7 Brown","#10 Purple","#11 Sand"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   true, null
@@ -247,7 +247,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'modal-nayra', 'modal-nayra', 'Modal nayra', 'Un modal dégradé : la couleur part soutenue à un bout et s''éclaircit jusqu''à l''autre, si bien que le drapé change de teinte selon la façon dont vous le posez. Tombé souple, fini mat. Faites défiler les photos pour voir les dégradés, puis choisissez le vôtre.',
-  5000, null, 'modal_nayra',
+  3500, null, 'modal_nayra',
   '[]'::jsonb, '[{"name":"Dégradé","options":["Gris-bleu & sable","Bordeaux & rose","Violet & crème","Orange & brun"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   true, null
@@ -270,7 +270,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'silk-imprime', 'silk-imprime', 'Silk imprimé', 'Voile satiné à imprimé marbré : la lumière y accroche et le motif se déplie sur toute la longueur, comme une peinture. Pour les tenues où l''on veut être vue. Faites défiler les photos pour voir les imprimés ; il en existe d''autres que ceux montrés, demandez-nous.',
-  5000, null, 'silk_imprime',
+  2500, null, 'silk_imprime',
   '[]'::jsonb, '[{"name":"Imprimé","options":["Marbré bordeaux","Léopard brun","Marbré doré"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   true, null
@@ -293,7 +293,7 @@ insert into products (
   other_colors_available, color_chart_id
 ) values (
   'organza-degrade', 'organza-degrade', 'Organza dégradé', 'Organza léger et légèrement brillant, teint en dégradé. Plus transparent que nos modals : il se porte volontiers en deuxième voile, sur une sous-cagoule ou un hijab uni, pour les cérémonies. Faites défiler les photos pour voir les dégradés, puis choisissez le vôtre.',
-  5500, null, 'organza_degrade',
+  2500, null, 'organza_degrade',
   '[]'::jsonb, '[{"name":"Dégradé","options":["Rose & nude","Gris & noir","Prune","Brun","Rouge & noir"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
   true, null

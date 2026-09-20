@@ -76,6 +76,16 @@ import friseTissu16 from '@/src/assets/swatches/frise-tissu-16.webp';
 import friseVoile16 from '@/src/assets/swatches/frise-voile-16.webp';
 import friseTissu17 from '@/src/assets/swatches/frise-tissu-17.webp';
 import friseVoile17 from '@/src/assets/swatches/frise-voile-17.webp';
+import friseTissu18 from '@/src/assets/swatches/frise-tissu-18.webp';
+import friseVoile18 from '@/src/assets/swatches/frise-voile-18.webp';
+import friseTissu19 from '@/src/assets/swatches/frise-tissu-19.webp';
+import friseVoile19 from '@/src/assets/swatches/frise-voile-19.webp';
+import friseTissu21 from '@/src/assets/swatches/frise-tissu-21.webp';
+import friseVoile21 from '@/src/assets/swatches/frise-voile-21.webp';
+import friseTissu22 from '@/src/assets/swatches/frise-tissu-22.webp';
+import friseVoile22 from '@/src/assets/swatches/frise-voile-22.webp';
+import friseTissu23 from '@/src/assets/swatches/frise-tissu-23.webp';
+import friseVoile23 from '@/src/assets/swatches/frise-voile-23.webp';
 import modal01 from '@/src/assets/swatches/modal-01.webp';
 import modal02 from '@/src/assets/swatches/modal-02.webp';
 import modal03 from '@/src/assets/swatches/modal-03.webp';
@@ -515,6 +525,11 @@ export const COLOR_CHARTS: ColorChart[] = [
       { code: '15', hex: '#9a6c69', name: 'Rose poussiéreux', image: friseTissu15, photo: friseVoile15 },
       { code: '16', hex: '#231616', name: 'Café noir', image: friseTissu16, photo: friseVoile16 },
       { code: '17', hex: '#573b36', name: 'Brun moyen', image: friseTissu17, photo: friseVoile17 },
+      { code: '18', hex: '#503227', name: 'Chocolat', image: friseTissu18, photo: friseVoile18 },
+      { code: '19', hex: '#69433e', name: 'Brun rougeâtre', image: friseTissu19, photo: friseVoile19 },
+      { code: '21', hex: '#4b4248', name: 'Gris brume', image: friseTissu21, photo: friseVoile21 },
+      { code: '22', hex: '#785556', name: 'Rose pâle', image: friseTissu22, photo: friseVoile22 },
+      { code: '23', hex: '#311b17', name: 'Café rougeâtre', image: friseTissu23, photo: friseVoile23 },
     ],
   },
 ];

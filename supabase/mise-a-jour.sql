@@ -3861,7 +3861,10 @@ update settings
 --  frais et les remises dans la base. Un prix modifie dans le navigateur
 --  n'a donc aucun effet sur ce qui est facture.
 --
---  Elle applique desormais les rayons sans frais ET le Pack Afaura.
+--  Elle applique les rayons sans frais, et la premiere offre par quantite
+--  ACTIVE en base -- il n'y en a plus aucune, et c'est voulu : le jour ou
+--  la boutique en creera une depuis /admin, cette fonction la prendra
+--  sans qu'il faille y revenir.
 
 create or replace function create_order(
   p_customer_name text,

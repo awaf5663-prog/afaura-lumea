@@ -142,6 +142,18 @@ import silkTissu06 from '@/src/assets/swatches/silk-tissu-06.webp';
 import silkVoile06 from '@/src/assets/swatches/silk-voile-06.webp';
 import viscoseTissu01 from '@/src/assets/swatches/viscose-tissu-01.webp';
 import viscoseVoile01 from '@/src/assets/swatches/viscose-voile-01.webp';
+import lot41Tissu01 from '@/src/assets/swatches/lot41-tissu-01.webp';
+import lot41Voile01 from '@/src/assets/swatches/lot41-voile-01.webp';
+import lot41Tissu02 from '@/src/assets/swatches/lot41-tissu-02.webp';
+import lot41Voile02 from '@/src/assets/swatches/lot41-voile-02.webp';
+import lot41Tissu03 from '@/src/assets/swatches/lot41-tissu-03.webp';
+import lot41Voile03 from '@/src/assets/swatches/lot41-voile-03.webp';
+import lot41Tissu04 from '@/src/assets/swatches/lot41-tissu-04.webp';
+import lot41Voile04 from '@/src/assets/swatches/lot41-voile-04.webp';
+import lot41Tissu05 from '@/src/assets/swatches/lot41-tissu-05.webp';
+import lot41Voile05 from '@/src/assets/swatches/lot41-voile-05.webp';
+import lot41Tissu06 from '@/src/assets/swatches/lot41-tissu-06.webp';
+import lot41Voile06 from '@/src/assets/swatches/lot41-voile-06.webp';
 import modal01 from '@/src/assets/swatches/modal-01.webp';
 import modal02 from '@/src/assets/swatches/modal-02.webp';
 import modal03 from '@/src/assets/swatches/modal-03.webp';
@@ -709,6 +721,34 @@ export const COLOR_CHARTS: ColorChart[] = [
        * ainsi.
        */
       { code: '01', hex: '#7a4b47', image: viscoseTissu01, photo: viscoseVoile01 },
+    ],
+  },
+  {
+    /*
+     * LE LOT DE 41 — ARTICLE NON ENCORE DÉTERMINÉ.
+     *
+     * Quarante et un imprimés chez le fournisseur, à 1 881 F par 2 pièces
+     * minimum. La boutique ne m'a pas encore dit de quel article il
+     * s'agit, et je ne le devine pas : le tissu brille comme un satin,
+     * mais « il ressemble à » n'est pas « c'est », et une déduction écrite
+     * en dur finit par se lire comme un fait.
+     *
+     * AUCUNE FICHE NE PORTE CE NUANCIER. Il n'apparaît donc nulle part
+     * dans la boutique — c'est du travail mis de côté, prêt à être
+     * rattaché le jour où la boutique tranche. Son identifiant ne nomme
+     * aucun article pour la même raison.
+     */
+    id: 'lot41',
+    label: 'Nuancier — lot de 41 (article à confirmer)',
+    note:
+      "Chaque pastille est une photo du voile, prise sur toute sa largeur : l'imprimé s'y lit en entier. Les teintes se commandent par leur numéro — le fournisseur ne leur donne pas de nom.",
+    swatches: [
+      { code: '01', hex: '#ae766c', image: lot41Tissu01, photo: lot41Voile01 },
+      { code: '02', hex: '#8d9483', image: lot41Tissu02, photo: lot41Voile02 },
+      { code: '03', hex: '#95aeae', image: lot41Tissu03, photo: lot41Voile03 },
+      { code: '04', hex: '#7f7555', image: lot41Tissu04, photo: lot41Voile04 },
+      { code: '05', hex: '#5e2d35', image: lot41Tissu05, photo: lot41Voile05 },
+      { code: '06', hex: '#673c43', image: lot41Tissu06, photo: lot41Voile06 },
     ],
   },
 ];

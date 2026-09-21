@@ -110,6 +110,16 @@ import friseTissu34 from '@/src/assets/swatches/frise-tissu-34.webp';
 import friseVoile34 from '@/src/assets/swatches/frise-voile-34.webp';
 import friseTissu35 from '@/src/assets/swatches/frise-tissu-35.webp';
 import friseVoile35 from '@/src/assets/swatches/frise-voile-35.webp';
+import organzaTissu01 from '@/src/assets/swatches/organza-tissu-01.webp';
+import organzaVoile01 from '@/src/assets/swatches/organza-voile-01.webp';
+import organzaTissu02 from '@/src/assets/swatches/organza-tissu-02.webp';
+import organzaVoile02 from '@/src/assets/swatches/organza-voile-02.webp';
+import organzaTissu03 from '@/src/assets/swatches/organza-tissu-03.webp';
+import organzaVoile03 from '@/src/assets/swatches/organza-voile-03.webp';
+import organzaTissu04 from '@/src/assets/swatches/organza-tissu-04.webp';
+import organzaVoile04 from '@/src/assets/swatches/organza-voile-04.webp';
+import organzaTissu05 from '@/src/assets/swatches/organza-tissu-05.webp';
+import organzaVoile05 from '@/src/assets/swatches/organza-voile-05.webp';
 import modal01 from '@/src/assets/swatches/modal-01.webp';
 import modal02 from '@/src/assets/swatches/modal-02.webp';
 import modal03 from '@/src/assets/swatches/modal-03.webp';
@@ -577,6 +587,34 @@ export const COLOR_CHARTS: ColorChart[] = [
       { code: '33', hex: '#373027', name: 'Vert olive', image: friseTissu33, photo: friseVoile33 },
       { code: '34', hex: '#512d41', name: 'Aubergine violette', image: friseTissu34, photo: friseVoile34 },
       { code: '35', hex: '#271112', name: 'Bourgogne', image: friseTissu35, photo: friseVoile35 },
+    ],
+  },
+  {
+    /*
+     * LE NUANCIER DE L'ORGANZA DÉGRADÉ — en cours de constitution.
+     *
+     * Neuf dégradés chez le fournisseur, numérotés de 1 à 9 ; ils arrivent
+     * par lots. Chacun porte le numéro et le nom imprimés sur SA photo.
+     *
+     * La pastille n'est pas un carré de tissu comme ailleurs, mais une
+     * TRANCHE sur toute la largeur du voile : un dégradé pris au centre ne
+     * montrerait qu'un bout de lui-même — la pastille du « vin rouge & noir »
+     * serait rouge, et le noir qui fait la moitié du voile n'apparaîtrait
+     * nulle part.
+     *
+     * La fiche garde ses options descriptives tant que les neuf ne sont pas
+     * là : basculer à mi-chemin retirerait des choix à la cliente.
+     */
+    id: 'organza9',
+    label: 'Nuancier — organza dégradé',
+    note:
+      "Chaque pastille est une photo du voile, prise sur toute sa largeur : le dégradé s'y lit en entier. Choisissez votre numéro — le nom est celui du fournisseur.",
+    swatches: [
+      { code: '01', hex: '#2c1319', name: 'Vin rouge & noir', image: organzaTissu01, photo: organzaVoile01 },
+      { code: '02', hex: '#2d2627', name: 'Noir & marron', image: organzaTissu02, photo: organzaVoile02 },
+      { code: '03', hex: '#6f554e', name: 'Café & marron', image: organzaTissu03, photo: organzaVoile03 },
+      { code: '04', hex: '#ab8d86', name: 'Rose & beige', image: organzaTissu04, photo: organzaVoile04 },
+      { code: '05', hex: '#a0826f', name: 'Jaune champagne', image: organzaTissu05, photo: organzaVoile05 },
     ],
   },
 ];

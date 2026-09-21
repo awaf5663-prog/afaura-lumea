@@ -128,6 +128,12 @@ import organzaTissu08 from '@/src/assets/swatches/organza-tissu-08.webp';
 import organzaVoile08 from '@/src/assets/swatches/organza-voile-08.webp';
 import organzaTissu09 from '@/src/assets/swatches/organza-tissu-09.webp';
 import organzaVoile09 from '@/src/assets/swatches/organza-voile-09.webp';
+import silkTissu01 from '@/src/assets/swatches/silk-tissu-01.webp';
+import silkVoile01 from '@/src/assets/swatches/silk-voile-01.webp';
+import silkTissu02 from '@/src/assets/swatches/silk-tissu-02.webp';
+import silkVoile02 from '@/src/assets/swatches/silk-voile-02.webp';
+import silkTissu03 from '@/src/assets/swatches/silk-tissu-03.webp';
+import silkVoile03 from '@/src/assets/swatches/silk-voile-03.webp';
 import modal01 from '@/src/assets/swatches/modal-01.webp';
 import modal02 from '@/src/assets/swatches/modal-02.webp';
 import modal03 from '@/src/assets/swatches/modal-03.webp';
@@ -637,6 +643,30 @@ export const COLOR_CHARTS: ColorChart[] = [
       { code: '07', hex: '#4d223b', name: 'Taro violet', image: organzaTissu07, photo: organzaVoile07 },
       { code: '08', hex: '#9c9d9a', name: 'Vert menthe', image: organzaTissu08, photo: organzaVoile08 },
       { code: '09', hex: '#737287', name: 'Bleu gris', image: organzaTissu09, photo: organzaVoile09 },
+    ],
+  },
+  {
+    /*
+     * LE NUANCIER DU SILK IMPRIMÉ — en cours de constitution.
+     *
+     * Six imprimés chez le fournisseur, numérotés de 1 à 6 ; ils arrivent
+     * par lots. Chacun porte le numéro et le nom imprimés sur SA photo.
+     *
+     * La pastille est une TRANCHE sur toute la largeur du voile, comme pour
+     * l'organza : le marbré est fait de taches, et un carré pris au centre
+     * tomberait sur une seule d'entre elles sans rien dire du motif.
+     *
+     * La fiche garde ses options descriptives tant que les six ne sont pas
+     * là : basculer à mi-chemin retirerait des choix à la cliente.
+     */
+    id: 'silk6',
+    label: 'Nuancier — silk imprimé',
+    note:
+      "Chaque pastille est une photo du voile, prise sur toute sa largeur : le marbré s'y lit en entier. Choisissez votre numéro — le nom est celui du fournisseur.",
+    swatches: [
+      { code: '01', hex: '#322725', name: 'Brun moka', image: silkTissu01, photo: silkVoile01 },
+      { code: '02', hex: '#4f3743', name: 'Violet mauve', image: silkTissu02, photo: silkVoile02 },
+      { code: '03', hex: '#2f2131', name: 'Violet profond', image: silkTissu03, photo: silkVoile03 },
     ],
   },
 ];

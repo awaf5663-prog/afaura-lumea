@@ -294,9 +294,9 @@ insert into products (
 ) values (
   'organza-degrade', 'organza-degrade', 'Organza dégradé', 'Organza léger et légèrement brillant, teint en dégradé. Plus transparent que nos modals : il se porte volontiers en deuxième voile, sur une sous-cagoule ou un hijab uni, pour les cérémonies. Les photos montrent la matière et l''étendue des dégradés ; dites-nous celui que vous cherchez, nous confirmons sa disponibilité avant l''envoi.',
   2500, null, 'organza_degrade',
-  '[]'::jsonb, '[{"name":"Dégradé","options":["Rose & nude","Gris & noir","Prune","Brun","Rouge & noir"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
-  true, null
+  false, 'organza9'
 )
 on conflict (id) do update set
   slug = excluded.slug,

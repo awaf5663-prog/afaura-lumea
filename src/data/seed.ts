@@ -664,30 +664,24 @@ export const SEED_PRODUCTS: Product[] = [
     compareAtPrice: null,
     category: 'organza_degrade',
     /*
-     * Les quatre photos de présentation du fournisseur, en remplacement des
-     * quatre anciennes. Elles montrent la gamme, pas un dégradé en
-     * particulier : les teintes arriveront une par une, comme pour le
-     * jersey frisé, et prendront alors leur place dans la galerie.
+     * Les quatre photos de présentation du fournisseur. Elles montrent la
+     * gamme, pas un dégradé en particulier — chacun des neuf a sa propre
+     * photo dans le nuancier, et la galerie l'y prend quand on le choisit.
      */
     images: [organzaColoris, organzaDrape, organzaEtal, organzaEventail],
-    variants: [
-      {
-        name: 'Dégradé',
-        // Décrits d'après les photos : le fournisseur ne les nomme pas.
-        options: [
-          'Rose & nude',
-          'Gris & noir',
-          'Prune',
-          'Brun',
-          'Rouge & noir',
-        ],
-        soldOutOptions: [],
-      },
-    ],
+    /*
+     * Le nuancier du fournisseur remplace les cinq options que la boutique
+     * avait décrites d'après les photos : il a ses propres numéros et ses
+     * propres noms, et c'est par le NUMÉRO qu'une cliente commande.
+     */
+    variants: [],
     stock: null,
     status: 'active',
     isNew: true,
-    otherColorsAvailable: true,
+    colorChartId: 'organza9',
+    // Les neuf du fournisseur sont toutes au nuancier : plus rien à
+    // promettre en dehors, la phrase serait devenue fausse.
+    otherColorsAvailable: false,
     createdAt: '2026-09-15T18:20:00.000Z',
   },
   {

@@ -4365,3 +4365,41 @@ select name as article, price as prix,
        (description like '%puis choisissez le v%') as ancienne_phrase_encore_la,
        jsonb_array_length(coalesce(images, '[]'::jsonb)) as photos_en_base
   from products where id = 'organza-degrade';
+
+
+-- ═══════════════════════════════════════════════════════════════════════
+--  51. Organza degrade : le nuancier du fournisseur
+-- ═══════════════════════════════════════════════════════════════════════
+--
+--  La fiche proposait cinq options que la boutique avait DECRITES d'apres
+--  les photos, faute de noms du fournisseur : « Rose & nude », « Prune »,
+--  « Brun »... Il les nomme et les numerote desormais, et c'est par le
+--  NUMERO qu'une cliente commande.
+--
+--  Ses neuf degrades entrent donc comme nuancier : chacun avec sa photo,
+--  son numero et son nom. Les options descriptives partent — deux facons
+--  de choisir la meme chose, c'est une de trop, et la seconde ne dit rien
+--  au fournisseur.
+--
+--  `other_colors_available` passe a false : les neuf sont toutes au
+--  nuancier, il n'y a plus rien a promettre en dehors.
+--
+--  IDEMPOTENTE.
+--
+--  A PASSER AVEC LA PUBLICATION DU SITE, pas avant : le nuancier lui-meme
+--  vit dans le code. Executee sur une boutique encore en ligne dans sa
+--  version precedente, la fiche perdrait ses options SANS recevoir le
+--  nuancier — plus aucun choix de couleur.
+
+update products
+   set color_chart_id = 'organza9',
+       variants = '[]'::jsonb,
+       other_colors_available = false
+ where id = 'organza-degrade';
+
+--  Verification : le nuancier en place, plus aucune option, et le prix
+--  inchange.
+select name as article, price as prix, color_chart_id as nuancier,
+       jsonb_array_length(coalesce(variants, '[]'::jsonb)) as options_restantes,
+       other_colors_available as autres_coloris
+  from products where id = 'organza-degrade';

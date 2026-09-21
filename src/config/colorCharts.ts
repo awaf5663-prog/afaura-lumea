@@ -120,6 +120,14 @@ import organzaTissu04 from '@/src/assets/swatches/organza-tissu-04.webp';
 import organzaVoile04 from '@/src/assets/swatches/organza-voile-04.webp';
 import organzaTissu05 from '@/src/assets/swatches/organza-tissu-05.webp';
 import organzaVoile05 from '@/src/assets/swatches/organza-voile-05.webp';
+import organzaTissu06 from '@/src/assets/swatches/organza-tissu-06.webp';
+import organzaVoile06 from '@/src/assets/swatches/organza-voile-06.webp';
+import organzaTissu07 from '@/src/assets/swatches/organza-tissu-07.webp';
+import organzaVoile07 from '@/src/assets/swatches/organza-voile-07.webp';
+import organzaTissu08 from '@/src/assets/swatches/organza-tissu-08.webp';
+import organzaVoile08 from '@/src/assets/swatches/organza-voile-08.webp';
+import organzaTissu09 from '@/src/assets/swatches/organza-tissu-09.webp';
+import organzaVoile09 from '@/src/assets/swatches/organza-voile-09.webp';
 import modal01 from '@/src/assets/swatches/modal-01.webp';
 import modal02 from '@/src/assets/swatches/modal-02.webp';
 import modal03 from '@/src/assets/swatches/modal-03.webp';
@@ -591,10 +599,10 @@ export const COLOR_CHARTS: ColorChart[] = [
   },
   {
     /*
-     * LE NUANCIER DE L'ORGANZA DÉGRADÉ — en cours de constitution.
+     * LE NUANCIER DE L'ORGANZA DÉGRADÉ — celui du fournisseur, complet.
      *
-     * Neuf dégradés chez le fournisseur, numérotés de 1 à 9 ; ils arrivent
-     * par lots. Chacun porte le numéro et le nom imprimés sur SA photo.
+     * Ses neuf dégradés, numérotés de 1 à 9, chacun avec le numéro et le nom
+     * qu'il imprime sur sa propre photo.
      *
      * La pastille n'est pas un carré de tissu comme ailleurs, mais une
      * TRANCHE sur toute la largeur du voile : un dégradé pris au centre ne
@@ -602,11 +610,11 @@ export const COLOR_CHARTS: ColorChart[] = [
      * serait rouge, et le noir qui fait la moitié du voile n'apparaîtrait
      * nulle part.
      *
-     * La fiche garde ses options descriptives tant que les neuf ne sont pas
-     * là : basculer à mi-chemin retirerait des choix à la cliente.
+     * Il remplace les cinq options que la boutique avait décrites d'après
+     * les photos, faute de noms du fournisseur. Elle en a désormais.
      */
     id: 'organza9',
-    label: 'Nuancier — organza dégradé',
+    label: 'Nuancier 9 dégradés — organza',
     note:
       "Chaque pastille est une photo du voile, prise sur toute sa largeur : le dégradé s'y lit en entier. Choisissez votre numéro — le nom est celui du fournisseur.",
     swatches: [
@@ -615,6 +623,10 @@ export const COLOR_CHARTS: ColorChart[] = [
       { code: '03', hex: '#6f554e', name: 'Café & marron', image: organzaTissu03, photo: organzaVoile03 },
       { code: '04', hex: '#ab8d86', name: 'Rose & beige', image: organzaTissu04, photo: organzaVoile04 },
       { code: '05', hex: '#a0826f', name: 'Jaune champagne', image: organzaTissu05, photo: organzaVoile05 },
+      { code: '06', hex: '#252229', name: 'Noir & gris', image: organzaTissu06, photo: organzaVoile06 },
+      { code: '07', hex: '#4d223b', name: 'Taro violet', image: organzaTissu07, photo: organzaVoile07 },
+      { code: '08', hex: '#9c9d9a', name: 'Vert menthe', image: organzaTissu08, photo: organzaVoile08 },
+      { code: '09', hex: '#737287', name: 'Bleu gris', image: organzaTissu09, photo: organzaVoile09 },
     ],
   },
 ];

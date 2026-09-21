@@ -134,6 +134,12 @@ import silkTissu02 from '@/src/assets/swatches/silk-tissu-02.webp';
 import silkVoile02 from '@/src/assets/swatches/silk-voile-02.webp';
 import silkTissu03 from '@/src/assets/swatches/silk-tissu-03.webp';
 import silkVoile03 from '@/src/assets/swatches/silk-voile-03.webp';
+import silkTissu04 from '@/src/assets/swatches/silk-tissu-04.webp';
+import silkVoile04 from '@/src/assets/swatches/silk-voile-04.webp';
+import silkTissu05 from '@/src/assets/swatches/silk-tissu-05.webp';
+import silkVoile05 from '@/src/assets/swatches/silk-voile-05.webp';
+import silkTissu06 from '@/src/assets/swatches/silk-tissu-06.webp';
+import silkVoile06 from '@/src/assets/swatches/silk-voile-06.webp';
 import modal01 from '@/src/assets/swatches/modal-01.webp';
 import modal02 from '@/src/assets/swatches/modal-02.webp';
 import modal03 from '@/src/assets/swatches/modal-03.webp';
@@ -667,6 +673,9 @@ export const COLOR_CHARTS: ColorChart[] = [
       { code: '01', hex: '#322725', name: 'Brun moka', image: silkTissu01, photo: silkVoile01 },
       { code: '02', hex: '#4f3743', name: 'Violet mauve', image: silkTissu02, photo: silkVoile02 },
       { code: '03', hex: '#2f2131', name: 'Violet profond', image: silkTissu03, photo: silkVoile03 },
+      { code: '04', hex: '#552830', name: 'Vin rouge', image: silkTissu04, photo: silkVoile04 },
+      { code: '05', hex: '#2c414b', name: 'Bleu canard', image: silkTissu05, photo: silkVoile05 },
+      { code: '06', hex: '#1e1d2c', name: 'Bleu marine', image: silkTissu06, photo: silkVoile06 },
     ],
   },
 ];

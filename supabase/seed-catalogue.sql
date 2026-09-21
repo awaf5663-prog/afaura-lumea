@@ -269,11 +269,11 @@ insert into products (
   images, variants, option_prices, stock, status, is_new, is_popular,
   other_colors_available, color_chart_id
 ) values (
-  'silk-imprime', 'silk-imprime', 'Silk imprimé', 'Voile satiné à imprimé marbré : la lumière y accroche et le motif se déplie sur toute la longueur, comme une peinture. Pour les tenues où l''on veut être vue. Faites défiler les photos pour voir les imprimés ; il en existe d''autres que ceux montrés, demandez-nous.',
+  'silk-imprime', 'silk-imprime', 'Silk imprimé', 'Voile satiné à imprimé marbré : la lumière y accroche et le motif se déplie sur toute la longueur, comme une peinture. Pour les tenues où l''on veut être vue. Six imprimés au nuancier : appuyez sur un numéro, sa photo s''affiche dans la galerie.',
   2500, null, 'silk_imprime',
-  '[]'::jsonb, '[{"name":"Imprimé","options":["Marbré bordeaux","Léopard brun","Marbré doré"],"soldOutOptions":[]}]'::jsonb, '{}'::jsonb, null, 'active',
+  '[]'::jsonb, '[]'::jsonb, '{}'::jsonb, null, 'active',
   true, false,
-  true, null
+  false, 'silk6'
 )
 on conflict (id) do update set
   slug = excluded.slug,

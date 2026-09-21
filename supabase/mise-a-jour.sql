@@ -4403,3 +4403,48 @@ select name as article, price as prix, color_chart_id as nuancier,
        jsonb_array_length(coalesce(variants, '[]'::jsonb)) as options_restantes,
        other_colors_available as autres_coloris
   from products where id = 'organza-degrade';
+
+
+-- ═══════════════════════════════════════════════════════════════════════
+--  52. Silk imprime : le nuancier du fournisseur, complet
+-- ═══════════════════════════════════════════════════════════════════════
+--
+--  Meme histoire que l'organza. La fiche proposait trois options que la
+--  BOUTIQUE avait decrites d'apres les photos, faute de noms : « Marbre
+--  bordeaux », « Leopard brun », « Marbre dore ». Le fournisseur nomme et
+--  numerote ses six imprimes ; c'est par le NUMERO qu'une cliente commande.
+--
+--  Les options descriptives partent, et `other_colors_available` passe a
+--  false : les six sont toutes au nuancier, il n'y a plus rien a promettre
+--  en dehors.
+--
+--  La description perd la meme promesse : « il en existe d'autres que ceux
+--  montres, demandez-nous » etait vraie tant que le nuancier n'existait
+--  pas. Elle ne l'est plus.
+--
+--  IDEMPOTENTE.
+--
+--  A PASSER AVEC LA PUBLICATION DU SITE, pas avant : le nuancier lui-meme
+--  vit dans le code. Executee sur une boutique encore en ligne dans sa
+--  version precedente, la fiche perdrait ses options SANS recevoir le
+--  nuancier — plus aucun choix de couleur.
+
+update products
+   set color_chart_id = 'silk6',
+       variants = '[]'::jsonb,
+       other_colors_available = false,
+       description = 'Voile satiné à imprimé marbré : la lumière y accroche '
+                  || 'et le motif se déplie sur toute la longueur, comme une '
+                  || 'peinture. Pour les tenues où l''on veut être vue. Six '
+                  || 'imprimés au nuancier : appuyez sur un numéro, sa photo '
+                  || 's''affiche dans la galerie.'
+ where id = 'silk-imprime';
+
+--  Verification : le nuancier en place, plus aucune option, l'ancienne
+--  promesse partie, et le prix inchange.
+select name as article, price as prix, color_chart_id as nuancier,
+       jsonb_array_length(coalesce(variants, '[]'::jsonb)) as options_restantes,
+       other_colors_available as autres_coloris,
+       (description like '%demandez-nous%') as ancienne_promesse_encore_la,
+       jsonb_array_length(coalesce(images, '[]'::jsonb)) as photos_en_base
+  from products where id = 'silk-imprime';

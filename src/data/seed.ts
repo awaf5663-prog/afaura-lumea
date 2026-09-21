@@ -173,10 +173,6 @@ import rayuresLilas from '@/src/assets/products/rayures-lilas.webp';
 import rayuresOrangeViolet from '@/src/assets/products/rayures-orange-violet.webp';
 import silkColoris from '@/src/assets/products/silk-coloris.webp';
 import silkPlies from '@/src/assets/products/silk-plies.webp';
-import silkBordeaux from '@/src/assets/products/silk-bordeaux.webp';
-import silkEtoffes from '@/src/assets/products/silk-etoffes.webp';
-import silkLeopard from '@/src/assets/products/silk-leopard.webp';
-import silkMarbre from '@/src/assets/products/silk-marbre.webp';
 import viscoseBordeaux from '@/src/assets/products/viscose-bordeaux.webp';
 import viscoseEcru from '@/src/assets/products/viscose-ecru.webp';
 import viscoseKhaki from '@/src/assets/products/viscose-khaki.webp';
@@ -637,29 +633,34 @@ export const SEED_PRODUCTS: Product[] = [
     slug: 'silk-imprime',
     name: 'Silk imprimé',
     description:
-      "Voile satiné à imprimé marbré : la lumière y accroche et le motif se déplie sur toute la longueur, comme une peinture. Pour les tenues où l'on veut être vue. Faites défiler les photos pour voir les imprimés ; il en existe d'autres que ceux montrés, demandez-nous.",
+      "Voile satiné à imprimé marbré : la lumière y accroche et le motif se déplie sur toute la longueur, comme une peinture. Pour les tenues où l'on veut être vue. Six imprimés au nuancier : appuyez sur un numéro, sa photo s'affiche dans la galerie.",
     price: 2500,
     compareAtPrice: null,
     category: 'silk_imprime',
     /*
-     * Les deux photos de présentation du fournisseur passent EN TÊTE : ce
-     * sont elles qu'on voit dans la boutique et à l'ouverture de la fiche.
-     * Les quatre anciennes restent derrière — la boutique a demandé une
-     * couverture, pas un remplacement.
+     * Les deux photos de présentation du fournisseur, et elles seules.
+     *
+     * Les quatre anciennes sont parties avec la bascule au nuancier : elles
+     * montraient un imprimé léopard et des voiles jaune et or qui ne sont
+     * PAS parmi les six. Tant qu'on promettait « d'autres imprimés, demandez-
+     * nous », elles avaient leur place ; maintenant que les six sont tout ce
+     * qui existe, elles montraient à une cliente ce qu'elle ne peut pas
+     * commander.
      */
-    images: [silkColoris, silkPlies, silkBordeaux, silkLeopard, silkMarbre, silkEtoffes],
-    variants: [
-      {
-        name: 'Imprimé',
-        // Décrits d'après les photos : le fournisseur ne les nomme pas.
-        options: ['Marbré bordeaux', 'Léopard brun', 'Marbré doré'],
-        soldOutOptions: [],
-      },
-    ],
+    images: [silkColoris, silkPlies],
+    /*
+     * Le nuancier du fournisseur remplace les trois options que la boutique
+     * avait décrites d'après les photos : il a ses propres numéros et ses
+     * propres noms, et c'est par le NUMÉRO qu'une cliente commande.
+     */
+    variants: [],
     stock: null,
     status: 'active',
     isNew: true,
-    otherColorsAvailable: true,
+    colorChartId: 'silk6',
+    // Les six du fournisseur sont toutes au nuancier : plus rien à
+    // promettre en dehors, la phrase serait devenue fausse.
+    otherColorsAvailable: false,
     createdAt: '2026-09-15T18:15:00.000Z',
   },
   {

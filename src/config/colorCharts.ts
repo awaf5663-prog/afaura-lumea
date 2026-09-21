@@ -134,6 +134,14 @@ import silkTissu02 from '@/src/assets/swatches/silk-tissu-02.webp';
 import silkVoile02 from '@/src/assets/swatches/silk-voile-02.webp';
 import silkTissu03 from '@/src/assets/swatches/silk-tissu-03.webp';
 import silkVoile03 from '@/src/assets/swatches/silk-voile-03.webp';
+import silkTissu04 from '@/src/assets/swatches/silk-tissu-04.webp';
+import silkVoile04 from '@/src/assets/swatches/silk-voile-04.webp';
+import silkTissu05 from '@/src/assets/swatches/silk-tissu-05.webp';
+import silkVoile05 from '@/src/assets/swatches/silk-voile-05.webp';
+import silkTissu06 from '@/src/assets/swatches/silk-tissu-06.webp';
+import silkVoile06 from '@/src/assets/swatches/silk-voile-06.webp';
+import viscoseTissu01 from '@/src/assets/swatches/viscose-tissu-01.webp';
+import viscoseVoile01 from '@/src/assets/swatches/viscose-voile-01.webp';
 import modal01 from '@/src/assets/swatches/modal-01.webp';
 import modal02 from '@/src/assets/swatches/modal-02.webp';
 import modal03 from '@/src/assets/swatches/modal-03.webp';
@@ -572,34 +580,34 @@ export const COLOR_CHARTS: ColorChart[] = [
       "Chaque pastille est une photo du tissu, prise au cœur du voile : le frisé et la couleur sont ceux de la vraie matière. Choisissez votre numéro — le nom est celui du fournisseur.",
     swatches: [
       { code: '01', hex: '#b2938b', name: 'Nude clair', image: friseTissu01, photo: friseVoile01 },
-      { code: '02', hex: '#56191b', name: 'Vin rouge', image: friseTissu02, photo: friseVoile02 },
-      { code: '03', hex: '#a58985', name: 'Nude rose clair', image: friseTissu03, photo: friseVoile03 },
+      { code: '02', hex: '#56191a', name: 'Vin rouge', image: friseTissu02, photo: friseVoile02 },
+      { code: '03', hex: '#a68985', name: 'Nude rose clair', image: friseTissu03, photo: friseVoile03 },
       { code: '04', hex: '#907163', name: 'Thé au lait', image: friseTissu04, photo: friseVoile04 },
       { code: '06', hex: '#ac8e7f', name: 'Nu', image: friseTissu06, photo: friseVoile06 },
-      { code: '07', hex: '#8f7065', name: 'Chameau clair', image: friseTissu07, photo: friseVoile07 },
+      { code: '07', hex: '#907065', name: 'Chameau clair', image: friseTissu07, photo: friseVoile07 },
       { code: '08', hex: '#724a3b', name: 'Brun caramel', image: friseTissu08, photo: friseVoile08 },
       { code: '09', hex: '#816b66', name: 'Taupe', image: friseTissu09, photo: friseVoile09 },
       { code: '10', hex: '#97827c', name: 'Gruau', image: friseTissu10, photo: friseVoile10 },
-      { code: '12', hex: '#715955', name: 'Gris', image: friseTissu12, photo: friseVoile12 },
-      { code: '13', hex: '#8c7474', name: 'Mauve poussiéreux', image: friseTissu13, photo: friseVoile13 },
-      { code: '14', hex: '#85623c', name: 'Jaune moutarde', image: friseTissu14, photo: friseVoile14 },
-      { code: '15', hex: '#9c6e6b', name: 'Rose poussiéreux', image: friseTissu15, photo: friseVoile15 },
+      { code: '12', hex: '#725954', name: 'Gris', image: friseTissu12, photo: friseVoile12 },
+      { code: '13', hex: '#8d7475', name: 'Mauve poussiéreux', image: friseTissu13, photo: friseVoile13 },
+      { code: '14', hex: '#85623b', name: 'Jaune moutarde', image: friseTissu14, photo: friseVoile14 },
+      { code: '15', hex: '#9d6e6b', name: 'Rose poussiéreux', image: friseTissu15, photo: friseVoile15 },
       { code: '16', hex: '#231716', name: 'Café noir', image: friseTissu16, photo: friseVoile16 },
       { code: '17', hex: '#593d37', name: 'Brun moyen', image: friseTissu17, photo: friseVoile17 },
-      { code: '18', hex: '#523329', name: 'Chocolat', image: friseTissu18, photo: friseVoile18 },
-      { code: '19', hex: '#6a4540', name: 'Brun rougeâtre', image: friseTissu19, photo: friseVoile19 },
-      { code: '21', hex: '#4c4349', name: 'Gris brume', image: friseTissu21, photo: friseVoile21 },
-      { code: '22', hex: '#7a5758', name: 'Rose pâle', image: friseTissu22, photo: friseVoile22 },
+      { code: '18', hex: '#523328', name: 'Chocolat', image: friseTissu18, photo: friseVoile18 },
+      { code: '19', hex: '#6b4540', name: 'Brun rougeâtre', image: friseTissu19, photo: friseVoile19 },
+      { code: '21', hex: '#4d4449', name: 'Gris brume', image: friseTissu21, photo: friseVoile21 },
+      { code: '22', hex: '#7b5757', name: 'Rose pâle', image: friseTissu22, photo: friseVoile22 },
       { code: '23', hex: '#321b18', name: 'Café rougeâtre', image: friseTissu23, photo: friseVoile23 },
       { code: '24', hex: '#131111', name: 'Noir', image: friseTissu24, photo: friseVoile24 },
-      { code: '25', hex: '#332b31', name: 'Charbon de bois', image: friseTissu25, photo: friseVoile25 },
+      { code: '25', hex: '#342b32', name: 'Charbon de bois', image: friseTissu25, photo: friseVoile25 },
       { code: '26', hex: '#1f2522', name: 'Vert foncé', image: friseTissu26, photo: friseVoile26 },
       { code: '27', hex: '#1b1822', name: 'Bleu marine', image: friseTissu27, photo: friseVoile27 },
-      { code: '28', hex: '#34385a', name: 'Bleu royal', image: friseTissu28, photo: friseVoile28 },
+      { code: '28', hex: '#34385b', name: 'Bleu royal', image: friseTissu28, photo: friseVoile28 },
       { code: '29', hex: '#855145', name: 'Terre cuite', image: friseTissu29, photo: friseVoile29 },
-      { code: '30', hex: '#d4cdc9', name: 'Abricot à la crème', image: friseTissu30, photo: friseVoile30 },
+      { code: '30', hex: '#d5cdca', name: 'Abricot à la crème', image: friseTissu30, photo: friseVoile30 },
       { code: '31', hex: '#d2cbd6', name: 'Blanc pur', image: friseTissu31, photo: friseVoile31 },
-      { code: '32', hex: '#857c83', name: 'Gris clair', image: friseTissu32, photo: friseVoile32 },
+      { code: '32', hex: '#857d83', name: 'Gris clair', image: friseTissu32, photo: friseVoile32 },
       { code: '33', hex: '#373027', name: 'Vert olive', image: friseTissu33, photo: friseVoile33 },
       { code: '34', hex: '#512d41', name: 'Aubergine violette', image: friseTissu34, photo: friseVoile34 },
       { code: '35', hex: '#271112', name: 'Bourgogne', image: friseTissu35, photo: friseVoile35 },
@@ -635,14 +643,14 @@ export const COLOR_CHARTS: ColorChart[] = [
       "Chaque pastille est une photo du voile, prise sur toute sa largeur : le dégradé s'y lit en entier. Choisissez votre numéro — le nom est celui du fournisseur.",
     swatches: [
       { code: '01', hex: '#2c1319', name: 'Vin rouge & noir', image: organzaTissu01, photo: organzaVoile01 },
-      { code: '02', hex: '#2d2627', name: 'Noir & marron', image: organzaTissu02, photo: organzaVoile02 },
-      { code: '03', hex: '#6f554e', name: 'Café & marron', image: organzaTissu03, photo: organzaVoile03 },
-      { code: '04', hex: '#ab8d86', name: 'Rose & beige', image: organzaTissu04, photo: organzaVoile04 },
-      { code: '05', hex: '#a0826f', name: 'Jaune champagne', image: organzaTissu05, photo: organzaVoile05 },
+      { code: '02', hex: '#2e2727', name: 'Noir & marron', image: organzaTissu02, photo: organzaVoile02 },
+      { code: '03', hex: '#715750', name: 'Café & marron', image: organzaTissu03, photo: organzaVoile03 },
+      { code: '04', hex: '#ac8d86', name: 'Rose & beige', image: organzaTissu04, photo: organzaVoile04 },
+      { code: '05', hex: '#a1826f', name: 'Jaune champagne', image: organzaTissu05, photo: organzaVoile05 },
       { code: '06', hex: '#252229', name: 'Noir & gris', image: organzaTissu06, photo: organzaVoile06 },
-      { code: '07', hex: '#4d223b', name: 'Taro violet', image: organzaTissu07, photo: organzaVoile07 },
-      { code: '08', hex: '#9c9d9a', name: 'Vert menthe', image: organzaTissu08, photo: organzaVoile08 },
-      { code: '09', hex: '#737287', name: 'Bleu gris', image: organzaTissu09, photo: organzaVoile09 },
+      { code: '07', hex: '#4e223b', name: 'Taro violet', image: organzaTissu07, photo: organzaVoile07 },
+      { code: '08', hex: '#9c9e9a', name: 'Vert menthe', image: organzaTissu08, photo: organzaVoile08 },
+      { code: '09', hex: '#737288', name: 'Bleu gris', image: organzaTissu09, photo: organzaVoile09 },
     ],
   },
   {
@@ -666,7 +674,41 @@ export const COLOR_CHARTS: ColorChart[] = [
     swatches: [
       { code: '01', hex: '#322725', name: 'Brun moka', image: silkTissu01, photo: silkVoile01 },
       { code: '02', hex: '#4f3743', name: 'Violet mauve', image: silkTissu02, photo: silkVoile02 },
-      { code: '03', hex: '#2f2131', name: 'Violet profond', image: silkTissu03, photo: silkVoile03 },
+      { code: '03', hex: '#2f2231', name: 'Violet profond', image: silkTissu03, photo: silkVoile03 },
+      { code: '04', hex: '#552831', name: 'Vin rouge', image: silkTissu04, photo: silkVoile04 },
+      { code: '05', hex: '#2c414b', name: 'Bleu canard', image: silkTissu05, photo: silkVoile05 },
+      { code: '06', hex: '#1e1d2c', name: 'Bleu marine', image: silkTissu06, photo: silkVoile06 },
+    ],
+  },
+  {
+    /*
+     * LE NUANCIER DU VOILE VISCOSE — en cours de constitution.
+     *
+     * Soixante-cinq imprimés chez le fournisseur, qui arrivent par lots.
+     *
+     * La fiche reste sur `modal36` tant que les soixante-cinq ne sont pas
+     * là. Basculer maintenant lui retirerait ses trente-six choix actuels
+     * pour n'en offrir qu'un : une cliente y perdrait, et pour des
+     * semaines. La bascule se fera d'un coup, à 65/65.
+     *
+     * Et `modal36` est justement ce qu'il faut remplacer : c'est le
+     * nuancier du MODAL, que la viscose empruntait faute d'avoir le sien.
+     * Deux matières différentes sous les mêmes trente-six teintes sans
+     * noms — la viscose a le sien maintenant.
+     */
+    id: 'viscose65',
+    label: 'Nuancier — voile viscose',
+    note:
+      "Chaque pastille est une photo du voile, prise sur toute sa largeur : le marbré s'y lit en entier. Les teintes se commandent par leur numéro — le fournisseur ne leur donne pas de nom.",
+    swatches: [
+      /*
+       * SANS NOM, et c'est voulu. Le fournisseur écrit « viscose color 1 » :
+       * c'est un numéro déguisé, pas un nom de couleur. Lui en inventer un
+       * ferait dire à la boutique ce que personne n'a dit, et le numéro
+       * suffit à commander. Les soixante-cinq du modal simple sont déjà
+       * ainsi.
+       */
+      { code: '01', hex: '#7a4b47', image: viscoseTissu01, photo: viscoseVoile01 },
     ],
   },
 ];

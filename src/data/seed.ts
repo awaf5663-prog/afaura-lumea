@@ -171,6 +171,8 @@ import rayuresEtoffes from '@/src/assets/products/rayures-etoffes.webp';
 import rayuresKakiOlive from '@/src/assets/products/rayures-kaki-olive.webp';
 import rayuresLilas from '@/src/assets/products/rayures-lilas.webp';
 import rayuresOrangeViolet from '@/src/assets/products/rayures-orange-violet.webp';
+import silkColoris from '@/src/assets/products/silk-coloris.webp';
+import silkPlies from '@/src/assets/products/silk-plies.webp';
 import silkBordeaux from '@/src/assets/products/silk-bordeaux.webp';
 import silkEtoffes from '@/src/assets/products/silk-etoffes.webp';
 import silkLeopard from '@/src/assets/products/silk-leopard.webp';
@@ -639,7 +641,13 @@ export const SEED_PRODUCTS: Product[] = [
     price: 2500,
     compareAtPrice: null,
     category: 'silk_imprime',
-    images: [silkBordeaux, silkLeopard, silkMarbre, silkEtoffes],
+    /*
+     * Les deux photos de présentation du fournisseur passent EN TÊTE : ce
+     * sont elles qu'on voit dans la boutique et à l'ouverture de la fiche.
+     * Les quatre anciennes restent derrière — la boutique a demandé une
+     * couverture, pas un remplacement.
+     */
+    images: [silkColoris, silkPlies, silkBordeaux, silkLeopard, silkMarbre, silkEtoffes],
     variants: [
       {
         name: 'Imprimé',

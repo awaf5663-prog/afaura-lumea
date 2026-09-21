@@ -4334,3 +4334,34 @@ select name as article, price as prix, status as statut
               'piece-unique','silk-imprime','voile-rayures','voile-viscose','voile-mj',
               'organza-degrade')
  order by price, name;
+
+
+-- ═══════════════════════════════════════════════════════════════════════
+--  50. Organza degrade : la description suit ses nouvelles photos
+-- ═══════════════════════════════════════════════════════════════════════
+--
+--  Les quatre photos de la fiche ont ete remplacees par les photos de
+--  presentation du fournisseur : elles montrent la GAMME, plus un degrade
+--  chacune. La description disait « faites defiler les photos pour voir les
+--  degrades, puis choisissez le votre » — ce qu'on ne peut plus faire.
+--
+--  Les photos, elles, n'ont besoin d'aucune etape : la colonne `images` de
+--  cette fiche est vide, et la boutique prend alors celles du site.
+--
+--  IDEMPOTENTE. Sans urgence : une description un peu datee ne coute rien,
+--  la coller au prochain passage suffit.
+
+update products
+   set description = 'Organza léger et légèrement brillant, teint en dégradé. '
+                  || 'Plus transparent que nos modals : il se porte volontiers en '
+                  || 'deuxième voile, sur une sous-cagoule ou un hijab uni, pour les '
+                  || 'cérémonies. Les photos montrent la matière et l''étendue des '
+                  || 'dégradés ; dites-nous celui que vous cherchez, nous confirmons '
+                  || 'sa disponibilité avant l''envoi.'
+ where id = 'organza-degrade';
+
+--  Verification : la fiche, son prix, et l'absence de l'ancienne phrase.
+select name as article, price as prix,
+       (description like '%puis choisissez le v%') as ancienne_phrase_encore_la,
+       jsonb_array_length(coalesce(images, '[]'::jsonb)) as photos_en_base
+  from products where id = 'organza-degrade';

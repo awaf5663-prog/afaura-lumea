@@ -162,10 +162,10 @@ import nayraBordeaux from '@/src/assets/products/nayra-bordeaux.webp';
 import nayraDuo from '@/src/assets/products/nayra-duo.webp';
 import nayraOrange from '@/src/assets/products/nayra-orange.webp';
 import nayraViolet from '@/src/assets/products/nayra-violet.webp';
-import organzaBrun from '@/src/assets/products/organza-brun.webp';
-import organzaNoir from '@/src/assets/products/organza-noir.webp';
-import organzaPile from '@/src/assets/products/organza-pile.webp';
-import organzaRose from '@/src/assets/products/organza-rose.webp';
+import organzaColoris from '@/src/assets/products/organza-coloris.webp';
+import organzaDrape from '@/src/assets/products/organza-drape.webp';
+import organzaEtal from '@/src/assets/products/organza-etal.webp';
+import organzaEventail from '@/src/assets/products/organza-eventail.webp';
 import rayuresColoris from '@/src/assets/products/rayures-coloris.webp';
 import rayuresEtoffes from '@/src/assets/products/rayures-etoffes.webp';
 import rayuresKakiOlive from '@/src/assets/products/rayures-kaki-olive.webp';
@@ -659,11 +659,17 @@ export const SEED_PRODUCTS: Product[] = [
     slug: 'organza-degrade',
     name: 'Organza dégradé',
     description:
-      "Organza léger et légèrement brillant, teint en dégradé. Plus transparent que nos modals : il se porte volontiers en deuxième voile, sur une sous-cagoule ou un hijab uni, pour les cérémonies. Faites défiler les photos pour voir les dégradés, puis choisissez le vôtre.",
+      "Organza léger et légèrement brillant, teint en dégradé. Plus transparent que nos modals : il se porte volontiers en deuxième voile, sur une sous-cagoule ou un hijab uni, pour les cérémonies. Les photos montrent la matière et l'étendue des dégradés ; dites-nous celui que vous cherchez, nous confirmons sa disponibilité avant l'envoi.",
     price: 2500,
     compareAtPrice: null,
     category: 'organza_degrade',
-    images: [organzaRose, organzaNoir, organzaBrun, organzaPile],
+    /*
+     * Les quatre photos de présentation du fournisseur, en remplacement des
+     * quatre anciennes. Elles montrent la gamme, pas un dégradé en
+     * particulier : les teintes arriveront une par une, comme pour le
+     * jersey frisé, et prendront alors leur place dans la galerie.
+     */
+    images: [organzaColoris, organzaDrape, organzaEtal, organzaEventail],
     variants: [
       {
         name: 'Dégradé',

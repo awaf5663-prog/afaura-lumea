@@ -550,9 +550,11 @@ export const COLOR_CHARTS: ColorChart[] = [
      * qui saute des numéros : sa 5e vignette porte le #6.
      *
      * LA NUMÉROTATION VA JUSQU'À 35, MAIS TROIS NUMÉROS N'EXISTENT PAS chez
-     * lui : 5, 11 et 20. Son catalogue s'arrête à trente-deux photos. On ne
-     * renumérote pas pour faire joli — une cliente commande le numéro qu'elle
-     * voit, et ce numéro doit être celui que le fournisseur reconnaît.
+     * lui : 5, 11 et 20. Son catalogue s'arrête à trente-deux photos, et la
+     * boutique l'a confirmé auprès de lui en septembre 2026 — ce n'est pas
+     * une déduction tirée de son affichage, c'est établi. On ne renumérote
+     * donc pas pour faire joli : une cliente commande le numéro qu'elle voit,
+     * et ce numéro doit être celui que le fournisseur reconnaît.
      *
      * Il remplace « frise36 », dont les trente-six numéros n'étaient pas les
      * siens : le n° 2 y était un blanc cassé, quand le vrai n° 2 est un vin
@@ -612,6 +614,14 @@ export const COLOR_CHARTS: ColorChart[] = [
      *
      * Il remplace les cinq options que la boutique avait décrites d'après
      * les photos, faute de noms du fournisseur. Elle en a désormais.
+     *
+     * LES NOMS SONT ARRÊTÉS. Le fournisseur écrit « 1 vin rouge noir-180 »,
+     * « 9 yang bleu gris-180 » : le numéro de tête et le « -180 » de queue
+     * ne sont pas des couleurs et ont été retirés, « yang » non plus et a été
+     * écarté. La boutique a validé ces noms courts, et a choisi de ne PAS
+     * écrire de mesure sur la fiche. Le « -180 » est vraisemblablement une
+     * longueur en centimètres ; vraisemblablement ne suffit pas pour une
+     * mesure affichée à une cliente.
      */
     id: 'organza9',
     label: 'Nuancier 9 dégradés — organza',

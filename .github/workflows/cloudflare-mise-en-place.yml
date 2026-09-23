@@ -1,0 +1,87 @@
+# ═══════════════════════════════════════════════════════════════════════
+#  MISE EN PLACE DE CLOUDFLARE — à lancer UNE FOIS, à la main
+# ═══════════════════════════════════════════════════════════════════════
+#
+#  Pourquoi un workflow et non des commandes à taper : l'ordinateur qui
+#  écrit ce code n'a pas le droit de joindre Cloudflare. Les machines de
+#  GitHub, elles, l'ont. La boutique n'a donc rien à installer — elle
+#  clique sur « Run workflow ».
+#
+#  CE QU'IL FAUT AVANT DE LE LANCER : un secret `CLOUDFLARE_API_TOKEN`
+#  dans Settings → Secrets and variables → Actions, avec les permissions
+#  Workers Scripts (Edit), D1 (Edit) et Workers R2 Storage (Edit).
+#
+#  CE QU'IL FAIT : crée la base D1 et le seau R2 s'ils n'existent pas,
+#  applique le schéma, puis AFFICHE l'identifiant de la base. Cet
+#  identifiant doit ensuite être recopié dans cloudflare/wrangler.toml.
+#
+#  Il est SANS DANGER À RELANCER : la création échoue proprement si la
+#  ressource existe déjà, et le schéma est écrit pour être rejoué.
+name: Cloudflare — mise en place
+
+on:
+  workflow_dispatch:
+
+jobs:
+  mettre-en-place:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Vérifier que le jeton est bien là
+        env:
+          JETON: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: |
+          if [ -z "$JETON" ]; then
+            echo "::error::Le secret CLOUDFLARE_API_TOKEN est absent."
+            echo "Settings → Secrets and variables → Actions → New repository secret."
+            exit 1
+          fi
+          echo "Jeton présent."
+
+      # `|| true` : relancer ce workflow ne doit pas échouer parce que la
+      # ressource existe déjà. Ce qui compte vient après — l'identifiant.
+      - name: Créer la base et le seau
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 70d1b4a84fbb48c3532402cd9e405fb9
+        run: |
+          npx --yes wrangler@latest d1 create afaura-lumea || true
+          npx --yes wrangler@latest r2 bucket create afaura-lumea-photos || true
+
+      - name: Relever l'identifiant de la base
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 70d1b4a84fbb48c3532402cd9e405fb9
+        run: |
+          echo "──────────────────────────────────────────────────────"
+          npx --yes wrangler@latest d1 info afaura-lumea --json \
+            | tee /tmp/d1.json
+          echo "──────────────────────────────────────────────────────"
+          node -e "
+            const d = require('/tmp/d1.json');
+            const id = d.uuid ?? d.database_id ?? d.id;
+            if (!id) { console.error('identifiant introuvable'); process.exit(1); }
+            console.log('IDENTIFIANT DE LA BASE : ' + id);
+            console.log('À recopier dans cloudflare/wrangler.toml, database_id.');
+          "
+
+      - name: Appliquer le schéma
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 70d1b4a84fbb48c3532402cd9e405fb9
+        run: |
+          npx --yes wrangler@latest d1 execute afaura-lumea --remote \
+            --file cloudflare/schema.sql
+
+      - name: Vérifier que les tables sont là
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 70d1b4a84fbb48c3532402cd9e405fb9
+        run: |
+          npx --yes wrangler@latest d1 execute afaura-lumea --remote \
+            --command "select name from sqlite_master where type='table' order by name"

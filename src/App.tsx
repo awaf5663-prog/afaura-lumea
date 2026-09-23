@@ -1,33 +1,32 @@
-import { Suspense, lazy, useState } from 'react';
-import { EcranEntree } from '@/src/components/brand/EcranEntree';
-import { CartDrawer } from '@/src/components/cart/CartDrawer';
-import { ErrorBoundary } from '@/src/components/ErrorBoundary';
-import { BottomNav } from '@/src/components/layout/BottomNav';
-import { Footer } from '@/src/components/layout/Footer';
-import { Header } from '@/src/components/layout/Header';
-import { WhatsAppFab } from '@/src/components/layout/WhatsAppFab';
-import { AdminAuthProvider } from '@/src/hooks/useAdminAuth';
-import { CartProvider } from '@/src/hooks/useCart';
-import { FavorisProvider } from '@/src/hooks/useFavoris';
-import { SettingsProvider } from '@/src/hooks/useSettings';
-import { ToastProvider } from '@/src/hooks/useToast';
-import { RouterProvider, matchPath, useRouter } from '@/src/lib/router';
-import { useVersionCheck } from '@/src/hooks/useVersionCheck';
-import { useVisitTracking } from '@/src/hooks/useVisitTracking';
+import { Suspense, lazy, useState } from "react";
+import { BoutiqueEnPause } from "@/src/components/brand/BoutiqueEnPause";
+import { EcranEntree } from "@/src/components/brand/EcranEntree";
+import { BOUTIQUE_EN_PAUSE } from "@/src/config/site";
+import { CartDrawer } from "@/src/components/cart/CartDrawer";
+import { ErrorBoundary } from "@/src/components/ErrorBoundary";
+import { BottomNav } from "@/src/components/layout/BottomNav";
+import { Footer } from "@/src/components/layout/Footer";
+import { Header } from "@/src/components/layout/Header";
+import { WhatsAppFab } from "@/src/components/layout/WhatsAppFab";
+import { AdminAuthProvider } from "@/src/hooks/useAdminAuth";
+import { CartProvider } from "@/src/hooks/useCart";
+import { FavorisProvider } from "@/src/hooks/useFavoris";
+import { SettingsProvider } from "@/src/hooks/useSettings";
+import { ToastProvider } from "@/src/hooks/useToast";
+import { RouterProvider, matchPath, useRouter } from "@/src/lib/router";
+import { useVersionCheck } from "@/src/hooks/useVersionCheck";
+import { useVisitTracking } from "@/src/hooks/useVisitTracking";
 
-import { CartPage } from '@/src/pages/CartPage';
-import { CheckoutPage } from '@/src/pages/CheckoutPage';
+import { CartPage } from "@/src/pages/CartPage";
+import { CheckoutPage } from "@/src/pages/CheckoutPage";
 
+import { HomePage } from "@/src/pages/HomePage";
 
-import { HomePage } from '@/src/pages/HomePage';
+import { ProductPage } from "@/src/pages/ProductPage";
+import { ShopPage } from "@/src/pages/ShopPage";
 
-
-import { ProductPage } from '@/src/pages/ProductPage';
-import { ShopPage } from '@/src/pages/ShopPage';
-
-
-import { SheinPage } from '@/src/pages/SheinPage';
-import { SheinRequestPage } from '@/src/pages/SheinRequestPage';
+import { SheinPage } from "@/src/pages/SheinPage";
+import { SheinRequestPage } from "@/src/pages/SheinRequestPage";
 
 /*
  * L'administration est chargée à la demande, et pas avec le reste du site.
@@ -42,73 +41,91 @@ import { SheinRequestPage } from '@/src/pages/SheinRequestPage';
  * Ces pages-là non plus n'ont pas à voyager avec la boutique : on les ouvre
  * après avoir vu les articles, ou jamais. Chacune arrive quand on y va.
  */
-const AboutPage = lazy(() => import('@/src/pages/AboutPage').then((m) => ({ default: m.AboutPage })));
-const FaqPage = lazy(() => import('@/src/pages/FaqPage').then((m) => ({ default: m.FaqPage })));
+const AboutPage = lazy(() =>
+  import("@/src/pages/AboutPage").then((m) => ({ default: m.AboutPage })),
+);
+const FaqPage = lazy(() =>
+  import("@/src/pages/FaqPage").then((m) => ({ default: m.FaqPage })),
+);
 const HowItWorksPage = lazy(() =>
-  import('@/src/pages/HowItWorksPage').then((m) => ({ default: m.HowItWorksPage })),
+  import("@/src/pages/HowItWorksPage").then((m) => ({
+    default: m.HowItWorksPage,
+  })),
 );
 const SizeGuidePage = lazy(() =>
-  import('@/src/pages/SizeGuidePage').then((m) => ({ default: m.SizeGuidePage })),
+  import("@/src/pages/SizeGuidePage").then((m) => ({
+    default: m.SizeGuidePage,
+  })),
 );
 const TrackingPage = lazy(() =>
-  import('@/src/pages/TrackingPage').then((m) => ({ default: m.TrackingPage })),
+  import("@/src/pages/TrackingPage").then((m) => ({ default: m.TrackingPage })),
 );
 const SheinConfirmationPage = lazy(() =>
-  import('@/src/pages/SheinConfirmationPage').then((m) => ({ default: m.SheinConfirmationPage })),
+  import("@/src/pages/SheinConfirmationPage").then((m) => ({
+    default: m.SheinConfirmationPage,
+  })),
 );
 const ConfirmationPage = lazy(() =>
-  import('@/src/pages/ConfirmationPage').then((m) => ({ default: m.ConfirmationPage })),
+  import("@/src/pages/ConfirmationPage").then((m) => ({
+    default: m.ConfirmationPage,
+  })),
 );
 const FavorisPage = lazy(() =>
-  import('@/src/pages/FavorisPage').then((m) => ({ default: m.FavorisPage })),
+  import("@/src/pages/FavorisPage").then((m) => ({ default: m.FavorisPage })),
 );
 const NotFoundPage = lazy(() =>
-  import('@/src/pages/NotFoundPage').then((m) => ({ default: m.NotFoundPage })),
+  import("@/src/pages/NotFoundPage").then((m) => ({ default: m.NotFoundPage })),
 );
 
 const AdminPage = lazy(() =>
-  import('@/src/pages/admin/AdminPage').then((m) => ({ default: m.AdminPage })),
+  import("@/src/pages/admin/AdminPage").then((m) => ({ default: m.AdminPage })),
 );
 
 function Routes() {
   const { path } = useRouter();
 
-  const product = matchPath('/produit/:slug', path);
+  const product = matchPath("/produit/:slug", path);
   if (product) return <ProductPage slug={product.slug} />;
 
-  const confirmation = matchPath('/confirmation/:orderNumber', path);
-  if (confirmation) return <ConfirmationPage orderNumber={confirmation.orderNumber} />;
+  const confirmation = matchPath("/confirmation/:orderNumber", path);
+  if (confirmation)
+    return <ConfirmationPage orderNumber={confirmation.orderNumber} />;
 
-  const sheinConfirmation = matchPath('/shein/confirmation/:requestNumber', path);
+  const sheinConfirmation = matchPath(
+    "/shein/confirmation/:requestNumber",
+    path,
+  );
   if (sheinConfirmation)
-    return <SheinConfirmationPage requestNumber={sheinConfirmation.requestNumber} />;
+    return (
+      <SheinConfirmationPage requestNumber={sheinConfirmation.requestNumber} />
+    );
 
   switch (path) {
-    case '/':
+    case "/":
       return <HomePage />;
-    case '/boutique':
+    case "/boutique":
       return <ShopPage />;
-    case '/favoris':
+    case "/favoris":
       return <FavorisPage />;
-    case '/panier':
+    case "/panier":
       return <CartPage />;
-    case '/commander':
+    case "/commander":
       return <CheckoutPage />;
-    case '/shein':
+    case "/shein":
       return <SheinPage />;
-    case '/shein/demande':
+    case "/shein/demande":
       return <SheinRequestPage />;
-    case '/comment-ca-marche':
+    case "/comment-ca-marche":
       return <HowItWorksPage />;
-    case '/suivi':
+    case "/suivi":
       return <TrackingPage />;
-    case '/faq':
+    case "/faq":
       return <FaqPage />;
-    case '/a-propos':
+    case "/a-propos":
       return <AboutPage />;
-    case '/guide-des-tailles':
+    case "/guide-des-tailles":
       return <SizeGuidePage />;
-    case '/admin':
+    case "/admin":
       return <AdminPage />;
     default:
       return <NotFoundPage />;
@@ -118,7 +135,7 @@ function Routes() {
 function Shell() {
   const { path } = useRouter();
   const [cartOpen, setCartOpen] = useState(false);
-  const isAdmin = path.startsWith('/admin');
+  const isAdmin = path.startsWith("/admin");
   /*
    * Le bouton WhatsApp flotte au-dessus de la page, à hauteur fixe. Sur le
    * panier et la commande, il tombait pile sur le récapitulatif et masquait
@@ -130,7 +147,7 @@ function Shell() {
    * commande le répète sous le bouton d'envoi. Le bouton flottant reste
    * partout ailleurs, où il n'a rien d'important à recouvrir.
    */
-  const pageDeMontants = path === '/panier' || path === '/commander';
+  const pageDeMontants = path === "/panier" || path === "/commander";
   // Une version plus récente est en ligne : on recharge sur les pages
   // tranquilles, on propose sur celles où quelqu'un est en train de saisir.
   const { nouvelleVersion, recharger } = useVersionCheck(path);
@@ -163,10 +180,17 @@ function Shell() {
 
       {!isAdmin && <Header onOpenCart={() => setCartOpen(true)} />}
 
-      <main id="contenu" className={isAdmin ? 'flex-1' : 'flex-1 pb-safe-nav lg:pb-0'}>
+      <main
+        id="contenu"
+        className={isAdmin ? "flex-1" : "flex-1 pb-safe-nav lg:pb-0"}
+      >
         {/* Le reste de la page (entête, menu, panier) survit à une erreur de
             rendu : la cliente garde de quoi naviguer au lieu d'une page vide. */}
-        <ErrorBoundary key={path} label="cette page" className="container-page my-10">
+        <ErrorBoundary
+          key={path}
+          label="cette page"
+          className="container-page my-10"
+        >
           {/*
             Les pages chargées à la demande arrivent avec un temps de retard.
             Une seule attente les couvre toutes, discrète : la boutique et
@@ -197,20 +221,42 @@ function Shell() {
   );
 }
 
+/**
+ * LA PAUSE SE DÉCIDE ICI, AU-DESSUS DE TOUT LE RESTE.
+ *
+ * Pas dans Shell : là-bas, les fournisseurs de données sont déjà montés
+ * et ont déjà interrogé la base. Or on met le site en pause précisément
+ * les jours où elle ne répond pas — l'écran d'attente se serait affiché
+ * par-dessus une volée d'erreurs, et la visite aurait été comptée dans
+ * une base qui refuse tout.
+ *
+ * Ici, rien de cela n'existe : un seul crochet, celui qui lit l'adresse,
+ * et la décision. L'administration reste ouverte, pour que la boutique y
+ * entre dès que la base répond de nouveau, sans attendre une publication.
+ */
+function Racine() {
+  const { path } = useRouter();
+  if (BOUTIQUE_EN_PAUSE && !path.startsWith("/admin"))
+    return <BoutiqueEnPause />;
+  return (
+    <ToastProvider>
+      <SettingsProvider>
+        <AdminAuthProvider>
+          <CartProvider>
+            <FavorisProvider>
+              <Shell />
+            </FavorisProvider>
+          </CartProvider>
+        </AdminAuthProvider>
+      </SettingsProvider>
+    </ToastProvider>
+  );
+}
+
 export default function App() {
   return (
     <RouterProvider>
-      <ToastProvider>
-        <SettingsProvider>
-          <AdminAuthProvider>
-            <CartProvider>
-              <FavorisProvider>
-                <Shell />
-              </FavorisProvider>
-            </CartProvider>
-          </AdminAuthProvider>
-        </SettingsProvider>
-      </ToastProvider>
+      <Racine />
     </RouterProvider>
   );
 }

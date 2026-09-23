@@ -43,8 +43,19 @@ jobs:
       # plus dans le sous-dossier /afaura-lumea/. Le chemin de base doit suivre :
       # sinon la page demande ses fichiers à une adresse qui n'existe pas, et
       # s'affiche entièrement vide.
+      # ── BOUTIQUE EN PAUSE ──
+      #
+      # « oui » remplace toute la boutique par un écran qui dit qu'elle
+      # revient, avec le bouton WhatsApp : la boutique continue donc de
+      # vendre par message. L'espace d'administration reste ouvert.
+      #
+      # Le réglage vit ICI et non dans la base : on met le site en pause
+      # précisément les jours où la base ne répond pas.
+      #
+      # POUR ROUVRIR LA BOUTIQUE : remettre « non » et republier.
       - name: Construire le site
         env:
+          VITE_BOUTIQUE_EN_PAUSE: oui
           VITE_BASE_PATH: /
           VITE_SITE_URL: https://afauralumea.shop
           VITE_SUPABASE_URL: https://mhutsbfnzoiuqsoxkdji.supabase.co

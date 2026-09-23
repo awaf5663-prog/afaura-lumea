@@ -26,8 +26,8 @@ const env = import.meta.env;
  * Ici, une valeur vide ou faite d'espaces vaut « non renseignée ».
  */
 function reglage(valeur: unknown, defaut: string): string {
-  const texte = typeof valeur === 'string' ? valeur.trim() : '';
-  return texte === '' ? defaut : texte;
+  const texte = typeof valeur === "string" ? valeur.trim() : "";
+  return texte === "" ? defaut : texte;
 }
 
 /**
@@ -37,7 +37,10 @@ function reglage(valeur: unknown, defaut: string): string {
  * (récapitulatif de commande, demande SHEIN). Sans elle, le site bascule sur
  * WHATSAPP_LINK ci-dessous et propose à la cliente de copier le message.
  */
-export const WHATSAPP_NUMBER: string = reglage(env.VITE_WHATSAPP_NUMBER, '221781071604');
+export const WHATSAPP_NUMBER: string = reglage(
+  env.VITE_WHATSAPP_NUMBER,
+  "221781071604",
+);
 
 /**
  * Lien court WhatsApp Business (wa.me/message/XXXX) — solution de repli.
@@ -47,44 +50,62 @@ export const WHATSAPP_NUMBER: string = reglage(env.VITE_WHATSAPP_NUMBER, '221781
  */
 export const WHATSAPP_LINK: string = reglage(
   env.VITE_WHATSAPP_LINK,
-  'https://wa.me/message/A4C6VTCHWW4QH1',
+  "https://wa.me/message/A4C6VTCHWW4QH1",
 );
 
 /** Date/heure de clôture du prochain groupage (ISO 8601). Vide = aucun groupage annoncé. */
-export const NEXT_GROUPING_DATE: string = reglage(env.VITE_NEXT_GROUPING_DATE, '');
+export const NEXT_GROUPING_DATE: string = reglage(
+  env.VITE_NEXT_GROUPING_DATE,
+  "",
+);
 
 /** Numéros marchands pour le paiement mobile. Vides = instructions envoyées sur WhatsApp. */
-export const WAVE_NUMBER: string = reglage(env.VITE_WAVE_NUMBER, '221765614578');
-export const ORANGE_MONEY_NUMBER: string = reglage(env.VITE_ORANGE_MONEY_NUMBER, '221781071604');
+export const WAVE_NUMBER: string = reglage(
+  env.VITE_WAVE_NUMBER,
+  "221765614578",
+);
+export const ORANGE_MONEY_NUMBER: string = reglage(
+  env.VITE_ORANGE_MONEY_NUMBER,
+  "221781071604",
+);
 
 /** Adresse e-mail de contact (facultative). */
-export const CONTACT_EMAIL: string = reglage(env.VITE_CONTACT_EMAIL, '');
+export const CONTACT_EMAIL: string = reglage(env.VITE_CONTACT_EMAIL, "");
 
 /** Compte Instagram (sans @). Vide = le lien n'est pas affiché. */
-export const INSTAGRAM_HANDLE: string = reglage(env.VITE_INSTAGRAM_HANDLE, 'afau.ra');
+export const INSTAGRAM_HANDLE: string = reglage(
+  env.VITE_INSTAGRAM_HANDLE,
+  "afau.ra",
+);
 
 /**
  * Compte TikTok (sans @). Vide tant que la boutique ne l'a pas communiqué :
  * le lien n'apparaît pas, plutôt que de pointer vers un compte inventé.
  */
-export const TIKTOK_HANDLE: string = reglage(env.VITE_TIKTOK_HANDLE, 'mrs_shiinee');
+export const TIKTOK_HANDLE: string = reglage(
+  env.VITE_TIKTOK_HANDLE,
+  "mrs_shiinee",
+);
 
 /**
  * Tableau Pinterest de la boutique. Adresse complète : Pinterest ne se déduit
  * pas d'un identifiant comme Instagram ou TikTok.
  */
-export const PINTEREST_URL: string = reglage(env.VITE_PINTEREST_URL, 'https://pin.it/1PkUIqPuv');
+export const PINTEREST_URL: string = reglage(
+  env.VITE_PINTEREST_URL,
+  "https://pin.it/1PkUIqPuv",
+);
 
 /** URL publique du site, utilisée pour les balises SEO / Open Graph. */
 export const SITE_URL: string = reglage(
   env.VITE_SITE_URL,
-  typeof window !== 'undefined' ? window.location.origin : '',
+  typeof window !== "undefined" ? window.location.origin : "",
 );
 
 export const BRAND = {
-  name: 'Afaura Luméa',
-  shortName: 'Luméa',
-  tagline: 'Tes envies, notre organisation.',
+  name: "Afaura Luméa",
+  shortName: "Luméa",
+  tagline: "Tes envies, notre organisation.",
   /**
    * Une phrase = tout le concept. Affichée dans le hero.
    *
@@ -95,8 +116,8 @@ export const BRAND = {
    */
   pitch:
     "Voiles et abayas, parfums, soins, sacs, chaussures, maquillage — et tout ce que tu repères sur SHEIN. Commandé pour toi et regroupé jusqu'à Saint-Louis, à un prix clair en FCFA confirmé avant que tu paies.",
-  city: 'Saint-Louis, Sénégal',
-  currency: 'FCFA',
+  city: "Saint-Louis, Sénégal",
+  currency: "FCFA",
 } as const;
 
 /** Frais de service SHEIN. `null` = calculé au cas par cas et confirmé avant paiement. */
@@ -113,32 +134,32 @@ export interface DeliveryZone {
   label: string;
   hint?: string;
   fee: number | null;
-  type: 'delivery' | 'pickup';
+  type: "delivery" | "pickup";
 }
 
 export const DELIVERY_ZONES: DeliveryZone[] = [
   {
-    id: 'pickup',
-    label: 'Point de retrait',
-    hint: 'Adresse et horaires communiqués sur WhatsApp après confirmation.',
+    id: "pickup",
+    label: "Point de retrait",
+    hint: "Adresse et horaires communiqués sur WhatsApp après confirmation.",
     fee: 0,
-    type: 'pickup',
+    type: "pickup",
   },
   {
     // Les identifiants restent neutres : changer de ville ne modifie que le libellé,
     // et les commandes déjà enregistrées gardent une zone valide.
-    id: 'city',
-    label: 'Livraison Saint-Louis',
+    id: "city",
+    label: "Livraison Saint-Louis",
     hint: "Île, Sor et quartiers de la ville.",
     fee: null,
-    type: 'delivery',
+    type: "delivery",
   },
   {
-    id: 'around',
-    label: 'Environs de Saint-Louis',
-    hint: 'Communes voisines et périphérie.',
+    id: "around",
+    label: "Environs de Saint-Louis",
+    hint: "Communes voisines et périphérie.",
     fee: null,
-    type: 'delivery',
+    type: "delivery",
   },
   {
     /*
@@ -147,11 +168,11 @@ export const DELIVERY_ZONES: DeliveryZone[] = [
      * sous cette clé. Seul le libellé change quand la boutique dessert de
      * nouvelles villes — on ne nomme que celles où elle livre vraiment.
      */
-    id: 'regions',
-    label: 'Louga, Thiès, Dakar',
-    hint: 'Expédition par transporteur. Frais selon la ville, confirmés sur WhatsApp.',
+    id: "regions",
+    label: "Louga, Thiès, Dakar",
+    hint: "Expédition par transporteur. Frais selon la ville, confirmés sur WhatsApp.",
     fee: null,
-    type: 'delivery',
+    type: "delivery",
   },
 ];
 
@@ -165,24 +186,49 @@ export interface PaymentMethod {
 
 export const PAYMENT_METHODS: PaymentMethod[] = [
   {
-    id: 'wave',
-    label: 'Wave',
-    description: 'Transfert Wave, puis envoi de la capture de confirmation sur WhatsApp.',
+    id: "wave",
+    label: "Wave",
+    description:
+      "Transfert Wave, puis envoi de la capture de confirmation sur WhatsApp.",
     requiresProof: true,
   },
   {
-    id: 'orange_money',
-    label: 'Orange Money',
-    description: 'Transfert Orange Money, puis envoi de la capture sur WhatsApp.',
+    id: "orange_money",
+    label: "Orange Money",
+    description:
+      "Transfert Orange Money, puis envoi de la capture sur WhatsApp.",
     requiresProof: true,
   },
   {
-    id: 'cash',
-    label: 'Paiement à la livraison',
-    description: 'Vous réglez en espèces au moment de la remise, à Saint-Louis et ses environs.',
+    id: "cash",
+    label: "Paiement à la livraison",
+    description:
+      "Vous réglez en espèces au moment de la remise, à Saint-Louis et ses environs.",
     requiresProof: false,
   },
 ];
 
 /** Passe d'accès à l'espace admin en mode local (voir README : sécurité réelle = Supabase Auth). */
-export const ADMIN_PASSCODE: string = reglage(env.VITE_ADMIN_PASSCODE, 'lumea-admin');
+export const ADMIN_PASSCODE: string = reglage(
+  env.VITE_ADMIN_PASSCODE,
+  "lumea-admin",
+);
+
+/**
+ * ─────────────────────────────────────────────────────────────
+ *  BOUTIQUE EN PAUSE
+ * ─────────────────────────────────────────────────────────────
+ *  Quand ce réglage est vrai, une visiteuse ne voit plus la boutique mais
+ *  un écran qui dit qu'elle revient, avec le bouton WhatsApp. Elle peut
+ *  donc toujours commander — par message, comme avant le site.
+ *
+ *  POURQUOI DANS LE CODE, ET NON DANS LA BASE. On met le site en pause
+ *  précisément les jours où la base ne répond plus. Un réglage rangé
+ *  là-bas ne serait pas lisible ces jours-là, c'est-à-dire exactement
+ *  quand il sert. Celui-ci part avec la publication et ne dépend de rien.
+ *
+ *  L'espace d'administration, lui, reste accessible : la boutique doit
+ *  pouvoir y entrer dès que la base répond de nouveau.
+ */
+export const BOUTIQUE_EN_PAUSE: boolean =
+  reglage(env.VITE_BOUTIQUE_EN_PAUSE, "non").toLowerCase() === "oui";

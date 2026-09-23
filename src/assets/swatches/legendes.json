@@ -447,60 +447,6 @@
    183
   ]
  },
- "lot41-voile-01": {
-  "legende": [
-   551,
-   1076,
-   616,
-   1119
-  ],
-  "numero": null
- },
- "lot41-voile-02": {
-  "legende": [
-   547,
-   1076,
-   623,
-   1119
-  ],
-  "numero": null
- },
- "lot41-voile-03": {
-  "legende": [
-   546,
-   1076,
-   623,
-   1119
-  ],
-  "numero": null
- },
- "lot41-voile-04": {
-  "legende": [
-   546,
-   1076,
-   625,
-   1119
-  ],
-  "numero": null
- },
- "lot41-voile-05": {
-  "legende": [
-   546,
-   1076,
-   624,
-   1119
-  ],
-  "numero": null
- },
- "lot41-voile-06": {
-  "legende": [
-   366,
-   1076,
-   624,
-   1119
-  ],
-  "numero": null
- },
  "organza-voile-01": {
   "legende": [
    339,
@@ -717,6 +663,105 @@
    1068,
    775,
    1128
+  ],
+  "numero": null
+ },
+ "viscose41-voile-01": {
+  "legende": [
+   551,
+   1076,
+   616,
+   1119
+  ],
+  "numero": null
+ },
+ "viscose41-voile-02": {
+  "legende": [
+   547,
+   1076,
+   623,
+   1119
+  ],
+  "numero": null
+ },
+ "viscose41-voile-03": {
+  "legende": [
+   546,
+   1076,
+   623,
+   1119
+  ],
+  "numero": null
+ },
+ "viscose41-voile-04": {
+  "legende": [
+   546,
+   1076,
+   625,
+   1119
+  ],
+  "numero": null
+ },
+ "viscose41-voile-05": {
+  "legende": [
+   546,
+   1076,
+   624,
+   1119
+  ],
+  "numero": null
+ },
+ "viscose41-voile-06": {
+  "legende": [
+   366,
+   1076,
+   624,
+   1119
+  ],
+  "numero": null
+ },
+ "viscose41-voile-07": {
+  "legende": [
+   390,
+   1076,
+   621,
+   1122
+  ],
+  "numero": null
+ },
+ "viscose41-voile-08": {
+  "legende": [
+   267,
+   1014,
+   624,
+   1169
+  ],
+  "numero": null
+ },
+ "viscose41-voile-09": {
+  "legende": [
+   546,
+   1076,
+   624,
+   1119
+  ],
+  "numero": null
+ },
+ "viscose41-voile-10": {
+  "legende": [
+   551,
+   1076,
+   619,
+   1119
+  ],
+  "numero": null
+ },
+ "viscose41-voile-11": {
+  "legende": [
+   557,
+   1075,
+   611,
+   1119
   ],
   "numero": null
  }

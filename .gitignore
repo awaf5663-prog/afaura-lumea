@@ -16,3 +16,8 @@ public/version.json
 # Secrets d'essai du Worker : ne partent jamais au dépôt.
 cloudflare/.dev.vars
 cloudflare/.wrangler/
+
+# La reprise des données Supabase : elle contient les NOMS, TÉLÉPHONES et
+# ADRESSES des clientes. Elle se produit sur la machine de la boutique, se
+# relit, s'applique, et ne rentre jamais dans le dépôt.
+cloudflare/reprise*.sql

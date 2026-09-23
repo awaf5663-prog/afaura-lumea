@@ -100,6 +100,51 @@ avec le nombre d'articles. S'il dit autre chose, il dit aussi quoi faire.
 
 ---
 
+## Reprendre les commandes déjà passées
+
+Le catalogue vient du code : l'étape 1 le remet en place toute seule. Vos
+**commandes, demandes SHEIN, groupages et réglages**, eux, ne sont nulle part
+ailleurs que dans Supabase. Voici comment les emmener.
+
+> Faisable seulement si l'éditeur SQL de Supabase répond encore. Le quota
+> bloque les lectures du site ; l'éditeur du tableau de bord passe parfois
+> quand même. Si c'est le cas, faites-le **avant** toute autre chose.
+
+Dans **SQL Editor**, une requête par table :
+
+```sql
+select json_agg(t) from orders t;
+```
+
+Puis la même chose en remplaçant `orders` par : `order_items`,
+`shein_requests`, `shein_items`, `groupings`, `settings`, `alert_settings`.
+
+Enregistrez chaque résultat dans un fichier portant le nom de la table —
+`orders.json`, `order_items.json`, etc. — tous dans le même dossier. Puis :
+
+```
+node scripts/reprendre-supabase.mjs <ce dossier>
+```
+
+Le script produit `cloudflare/reprise.sql` **sans rien écrire dans la base** :
+vous pouvez le relire avant de l'appliquer.
+
+```
+wrangler d1 execute afaura-lumea --remote --file cloudflare/reprise.sql
+```
+
+Ce fichier contient les **noms, téléphones et adresses de vos clientes**. Il
+reste sur votre machine : il n'entre pas dans le dépôt, et le dépôt est réglé
+pour le refuser.
+
+> **Ce que le script fait et qui ne se voit pas.** Il remet les compteurs de
+> numérotation là où Postgres s'était arrêté. Sans cela, votre première
+> commande chez Cloudflare porterait un numéro **déjà donné à une cliente**, et
+> le suivi rendrait l'autre commande. C'est la partie la plus facile à oublier,
+> et la plus ennuyeuse à réparer après coup.
+
+---
+
 ## Rouvrir la boutique
 
 Le site est actuellement **en pause** aux yeux des visiteuses. C'est un réglage

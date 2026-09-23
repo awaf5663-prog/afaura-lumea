@@ -43,15 +43,33 @@ jobs:
           fi
           echo "Jeton présent."
 
-      # `|| true` : relancer ce workflow ne doit pas échouer parce que la
-      # ressource existe déjà. Ce qui compte vient après — l'identifiant.
+      # `|| true` était une mauvaise idée, et le premier passage l'a
+      # montré : R2 a refusé — « Please enable R2 through the Cloudflare
+      # Dashboard » — et le workflow s'est terminé en VERT quand même.
+      # Un échec masqué est pire qu'un échec.
+      #
+      # On distingue donc les deux cas. « Existe déjà » est normal quand on
+      # relance ; tout le reste s'affiche et fait échouer l'étape.
       - name: Créer la base et le seau
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: 70d1b4a84fbb48c3532402cd9e405fb9
         run: |
-          npx --yes wrangler@latest d1 create afaura-lumea || true
-          npx --yes wrangler@latest r2 bucket create afaura-lumea-photos || true
+          creer() {
+            local quoi="$1"; shift
+            if sortie=$("$@" 2>&1); then
+              echo "$sortie"; return 0
+            fi
+            echo "$sortie"
+            if grep -qiE "already exists|existe déjà" <<<"$sortie"; then
+              echo "→ $quoi existait déjà, on continue."
+              return 0
+            fi
+            echo "::error::Création de $quoi refusée. Voir le message ci-dessus."
+            return 1
+          }
+          creer "la base D1"  npx --yes wrangler@latest d1 create afaura-lumea
+          creer "le seau R2"  npx --yes wrangler@latest r2 bucket create afaura-lumea-photos
 
       - name: Relever l'identifiant de la base
         env:

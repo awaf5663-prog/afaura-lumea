@@ -16,14 +16,14 @@ compatibility_date = "2026-09-01"
 account_id = "70d1b4a84fbb48c3532402cd9e405fb9"
 
 # ── La base de données ─────────────────────────────────────────────────
-#  `database_id` se remplit APRÈS la création de la base, au premier
-#  passage du workflow de mise en place. Tant qu'il vaut la valeur
-#  ci-dessous, le déploiement s'arrête avec un message clair plutôt que
-#  d'écrire dans une base qui n'existe pas.
+#  Créée le 23 septembre 2026 par le workflow de mise en place, région
+#  ENAM. L'identifiant n'est pas un secret : il désigne la base, il ne
+#  l'ouvre pas — c'est le jeton d'API qui ouvre, et il vit dans les
+#  secrets du dépôt.
 [[d1_databases]]
 binding = "DB"
 database_name = "afaura-lumea"
-database_id = "A_REMPLIR_APRES_CREATION"
+database_id = "e1d8a40c-8d8b-4d5c-b406-99b2b7bcb110"
 
 # ── Le stockage des photos ─────────────────────────────────────────────
 #  C'est ici que vont les photos téléversées depuis l'administration. Le

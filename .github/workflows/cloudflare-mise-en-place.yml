@@ -21,6 +21,15 @@ name: Cloudflare — mise en place
 
 on:
   workflow_dispatch:
+    inputs:
+      remettre_a_zero:
+        description: "EFFACE TOUT et réapplique le schéma. À n'utiliser que sur une base vide."
+        type: boolean
+        default: false
+      activer_r2:
+        description: "Créer aussi le seau R2 (à n'activer qu'une fois R2 activé dans le tableau de bord Cloudflare)"
+        type: boolean
+        default: false
 
 jobs:
   mettre-en-place:
@@ -68,8 +77,16 @@ jobs:
             echo "::error::Création de $quoi refusée. Voir le message ci-dessus."
             return 1
           }
-          creer "la base D1"  npx --yes wrangler@latest d1 create afaura-lumea
-          creer "le seau R2"  npx --yes wrangler@latest r2 bucket create afaura-lumea-photos
+          creer "la base D1" npx --yes wrangler@latest d1 create afaura-lumea
+
+          #  R2 ne se crée que si on le demande. Il faut d'abord l'activer à
+          #  la main dans le tableau de bord — sans quoi Cloudflare refuse
+          #  avec « Please enable R2 through the Cloudflare Dashboard ».
+          if [ "${{ inputs.activer_r2 }}" = "true" ]; then
+            creer "le seau R2" npx --yes wrangler@latest r2 bucket create afaura-lumea-photos
+          else
+            echo "R2 non demandé : on passe. La boutique l'activera plus tard."
+          fi
 
       - name: Relever l'identifiant de la base
         env:
@@ -86,6 +103,37 @@ jobs:
             if (!id) { console.error('identifiant introuvable'); process.exit(1); }
             console.log('IDENTIFIANT DE LA BASE : ' + id);
             console.log('À recopier dans cloudflare/wrangler.toml, database_id.');
+          "
+
+      # ── Remise à zéro, sur demande explicite ─────────────────────────
+      #
+      #  `create table if not exists` ne touche pas à une table qui existe
+      #  déjà : une colonne ajoutée au schéma n'apparaîtrait donc jamais
+      #  sur une base en place. Tant que la base est vide, tout effacer et
+      #  repartir du schéma est la manière la plus sûre — et la plus
+      #  lisible — de la remettre d'aplomb.
+      #
+      #  CECI EFFACE LES DONNÉES. C'est pour cela que ça se demande à la
+      #  main, que ce n'est jamais le défaut, et que ça n'arrivera plus une
+      #  fois les commandes de la boutique dans la base.
+      - name: Remettre la base à zéro (si demandé)
+        if: ${{ inputs.remettre_a_zero }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 70d1b4a84fbb48c3532402cd9e405fb9
+        run: |
+          echo "⚠️  Effacement demandé."
+          npx --yes wrangler@latest d1 execute afaura-lumea --remote --command "
+            drop table if exists order_items;
+            drop table if exists shein_items;
+            drop table if exists orders;
+            drop table if exists shein_requests;
+            drop table if exists groupings;
+            drop table if exists products;
+            drop table if exists settings;
+            drop table if exists alert_settings;
+            drop table if exists visits;
+            drop table if exists compteurs;
           "
 
       - name: Appliquer le schéma

@@ -95,6 +95,9 @@ create table if not exists orders (
   delivery_fee                  integer,          -- null = à confirmer
   delivery_fee_before_promotion integer,          -- tarif avant offre, si offerte
   subtotal                      integer not null,
+  -- Frais de traitement de la boutique. Comme tous les montants : calcule
+  -- par le Worker, jamais recu du navigateur.
+  service_fee                   integer not null default 0,
   discount                      integer not null default 0,
   promotion_label               text,
   promo_code                    text not null default '',
@@ -228,6 +231,10 @@ create table if not exists alert_settings (
   telegram_token    text not null default '',
   telegram_chat_id  text not null default '',
   ntfy_topic        text not null default '',
+  -- Par defaut, l'alerte ne dit PAS qui est la cliente : un canal ntfy est
+  -- lisible par quiconque devine son nom. La boutique peut l'activer en
+  -- connaissance de cause depuis l'administration.
+  include_customer  integer not null default 0 check (include_customer in (0, 1)),
   enabled           integer not null default 0 check (enabled in (0, 1)),
   updated_at        text not null default (strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))
 );

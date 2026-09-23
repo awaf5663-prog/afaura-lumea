@@ -99,8 +99,21 @@ jobs:
         with:
           path: dist
 
+  # ── PUBLIER N'A DE SENS QUE DEPUIS LA BRANCHE PRINCIPALE ──────────────
+  #
+  #  L'environnement github-pages n'accepte que `main` : sur une branche de
+  #  côté, ce travail est REFUSÉ avant même de démarrer — six secondes, pas
+  #  de journal, une croix rouge. Il l'a été à chaque envoi.
+  #
+  #  Une vérification qui ne peut qu'être rouge n'apprend rien, et elle coûte
+  #  cher : elle habitue à ignorer le rouge, et le jour où une vraie panne
+  #  s'affiche, elle ressemble à celle d'hier.
+  #
+  #  On construit donc partout — c'est ainsi qu'on voit qu'une branche casse
+  #  le site — mais on ne publie que depuis `main`.
   publier:
     needs: construire
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

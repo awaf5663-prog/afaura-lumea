@@ -180,7 +180,7 @@ async function uneDemande(id: string, env: Env) {
     ...demande,
     is_student: vrai(demande!.is_student),
     quote: lireJson(demande!.quote, null),
-    items: articles.results,
+    shein_items: articles.results,
   };
 }
 
@@ -211,7 +211,7 @@ export async function listSheinRequests(_corps: Record<string, unknown>, env: En
     ...d,
     is_student: vrai(d.is_student),
     quote: lireJson(d.quote, null),
-    items: parDemande.get(String(d.id)) ?? [],
+    shein_items: parDemande.get(String(d.id)) ?? [],
   }));
 }
 

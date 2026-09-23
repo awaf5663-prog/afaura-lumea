@@ -259,7 +259,15 @@ export async function createOrder(corps: Record<string, unknown>, env: Env) {
   return unecommande(idCommande, env);
 }
 
-/** Relit une commande entière, ses lignes comprises. */
+/**
+ * Relit une commande entière, ses lignes comprises.
+ *
+ * Les lignes s'appellent `order_items` et non `items` : c'est le nom que
+ * portaient les lignes chez Supabase, et les convertisseurs du site —
+ * partagés entre les deux fournisseurs — le lisent tel quel. Un nom
+ * différent aurait demandé une traduction de plus, donc un endroit de
+ * plus où se tromper.
+ */
 async function unecommande(id: string, env: Env) {
   const commande = await env.DB.prepare('select * from orders where id = ?1').bind(id).first();
   exige(commande, 'Commande introuvable.', 404);
@@ -267,7 +275,7 @@ async function unecommande(id: string, env: Env) {
     .prepare('select * from order_items where order_id = ?1')
     .bind(id)
     .all();
-  return { ...commande, items: lignes.results };
+  return { ...commande, order_items: lignes.results };
 }
 
 /**
@@ -304,7 +312,7 @@ export async function listOrders(_corps: Record<string, unknown>, env: Env) {
     liste.push(l);
     parCommande.set(l.order_id, liste);
   }
-  return commandes.results.map((c) => ({ ...c, items: parCommande.get(c.id) ?? [] }));
+  return commandes.results.map((c) => ({ ...c, order_items: parCommande.get(c.id) ?? [] }));
 }
 
 const ETATS_COMMANDE = new Set([

@@ -1,7 +1,7 @@
 import { BarChart3, Info } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '@/src/lib/cn';
-import { db, isSupabaseConfigured } from '@/src/services';
+import { db, isServeurConfigure } from '@/src/services';
 import type { VisitPeriod, VisitStats } from '@/src/services';
 
 /**
@@ -282,7 +282,7 @@ export function AdminVisits({ refreshToken = 0 }: { refreshToken?: number }) {
               gonflent un peu le total. Vos propres passages dans l'administration ne sont pas
               comptés. Enfin, rien n'est enregistré sur la personne : ni nom, ni téléphone, ni
               adresse IP — un numéro tiré au hasard, la page, l'heure.
-              {!isSupabaseConfigured() && (
+              {!isServeurConfigure() && (
                 <>
                   {' '}
                   <strong className="font-medium">

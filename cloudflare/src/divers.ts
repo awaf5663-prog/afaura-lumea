@@ -139,27 +139,27 @@ export async function recordVisit(corps: Record<string, unknown>, env: Env) {
 }
 
 export async function getVisitStats(_corps: Record<string, unknown>, env: Env) {
-  const depuis = (jours: number) =>
-    new Date(Date.now() - jours * 86400000).toISOString();
-  const compter = async (sql: string, ...args: unknown[]) =>
-    ((await env.DB.prepare(sql).bind(...args).first<{ n: number }>())?.n ?? 0);
-
-  return {
-    visites24h: await compter('select count(*) as n from visits where created_at >= ?1', depuis(1)),
-    visites7j: await compter('select count(*) as n from visits where created_at >= ?1', depuis(7)),
-    visites30j: await compter('select count(*) as n from visits where created_at >= ?1', depuis(30)),
-    visiteurs30j: await compter(
-      'select count(distinct visitor) as n from visits where created_at >= ?1', depuis(30)),
-    parJour: (await env.DB.prepare(
-      "select substr(created_at, 1, 10) as jour, count(*) as visites," +
-      ' count(distinct visitor) as visiteurs from visits where created_at >= ?1' +
-      ' group by jour order by jour',
-    ).bind(depuis(30)).all()).results,
-    pages: (await env.DB.prepare(
-      'select path, count(*) as visites from visits where created_at >= ?1' +
-      ' group by path order by visites desc limit 20',
-    ).bind(depuis(30)).all()).results,
-  };
+  /*
+   * ON REND LES VISITES BRUTES, ET NON DES TOTAUX DÉJÀ CALCULÉS.
+   *
+   * Le site sait déjà les agréger : `services/visitStats.ts` le fait pour
+   * le mode local, et découpe les journées exactement comme il faut. Un
+   * second calcul ici — en SQL, avec ses propres bornes de journée — finirait
+   * par donner d'autres chiffres que le premier, et personne ne saurait
+   * lequel croire.
+   *
+   * Le coût est acceptable : c'est une lecture réservée à la boutique, faite
+   * de loin en loin, et le transfert depuis Cloudflare n'est pas facturé —
+   * ce qui n'était pas le cas là d'où l'on vient.
+   */
+  const lignes = await env.DB
+    .prepare(
+      'select visitor, path, created_at from visits' +
+      ' where created_at >= ?1 order by created_at',
+    )
+    .bind(new Date(Date.now() - 400 * 86400000).toISOString())
+    .all<{ visitor: string; path: string; created_at: string }>();
+  return lignes.results.map((v) => ({ visitor: v.visitor, path: v.path, at: v.created_at }));
 }
 
 // ── Alertes ────────────────────────────────────────────────────────────

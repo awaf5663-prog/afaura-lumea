@@ -92,7 +92,7 @@ export interface VisitStats {
  * VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY sont définies).
  */
 export interface DataSource {
-  mode: 'local' | 'supabase';
+  mode: 'local' | 'supabase' | 'cloudflare';
 
   /**
    * Le catalogue, sans les grandes photos.

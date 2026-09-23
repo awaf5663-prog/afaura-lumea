@@ -147,7 +147,20 @@ export async function createSheinRequest(
   };
 
   const id = identifiant();
-  const numero = await prochainNumero(env.DB, 'shein', 'SHE');
+  /*
+   * « SHEIN », et non « SHE ».
+   *
+   * Postgres écrivait 'SHEIN-' || l'année || le numéro (voir la fonction
+   * create_shein_request de supabase/schema.sql). Le port avait raccourci
+   * en « SHE » — sans raison, juste en recopiant de mémoire. Les demandes
+   * déjà passées portent donc SHEIN-2026-00005, et la suivante serait
+   * sortie en SHE-2026-00006 : deux formats de numéro dans le même
+   * carnet, et une cliente qui cherche sa demande avec le numéro qu'on
+   * lui a donné.
+   *
+   * Trouvé en regardant les vraies données de la boutique, pas le code.
+   */
+  const numero = await prochainNumero(env.DB, 'shein', 'SHEIN');
   const quand = maintenant();
 
   await env.DB.batch([

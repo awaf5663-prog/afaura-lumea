@@ -1,0 +1,38 @@
+# ═══════════════════════════════════════════════════════════════════════
+#  LE WORKER : la seule porte vers les données de la boutique
+# ═══════════════════════════════════════════════════════════════════════
+#
+#  Ce fichier ne contient AUCUN SECRET, et n'en contiendra jamais.
+#
+#  L'identifiant de compte et celui de la base ne sont pas des secrets :
+#  ils désignent, ils n'ouvrent rien. Ce qui ouvre — le jeton d'API
+#  Cloudflare, le mot de passe de l'administration, le jeton du robot
+#  Telegram — vit dans les secrets du dépôt GitHub et dans les secrets du
+#  Worker, jamais ici, jamais dans le dépôt.
+
+name = "afaura-lumea-api"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+account_id = "70d1b4a84fbb48c3532402cd9e405fb9"
+
+# ── La base de données ─────────────────────────────────────────────────
+#  `database_id` se remplit APRÈS la création de la base, au premier
+#  passage du workflow de mise en place. Tant qu'il vaut la valeur
+#  ci-dessous, le déploiement s'arrête avec un message clair plutôt que
+#  d'écrire dans une base qui n'existe pas.
+[[d1_databases]]
+binding = "DB"
+database_name = "afaura-lumea"
+database_id = "A_REMPLIR_APRES_CREATION"
+
+# ── Le stockage des photos ─────────────────────────────────────────────
+#  C'est ici que vont les photos téléversées depuis l'administration. Le
+#  transfert depuis R2 n'est pas facturé : c'est précisément ce qui a
+#  manqué au fournisseur précédent, où les photos vivaient dans la base
+#  et où chaque visite les retéléchargeait.
+[[r2_buckets]]
+binding = "PHOTOS"
+bucket_name = "afaura-lumea-photos"
+
+[observability]
+enabled = true

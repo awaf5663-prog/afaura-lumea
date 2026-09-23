@@ -317,7 +317,18 @@ async function rest<T>(path: string, init: RequestInit = {}): Promise<T> {
 
 type Row = Record<string, any>;
 
-const toProduct = (r: Row): Product => ({
+/*
+ * ─────────────────────────────────────────────────────────────
+ *  LES CONVERTISSEURS SONT EXPORTÉS
+ * ─────────────────────────────────────────────────────────────
+ *  Ils traduisent une ligne de base vers ce que les écrans attendent, et
+ *  retour. L'adaptateur Cloudflare s'en sert AUSSI : le Worker rend des
+ *  lignes de la même forme, et deux jeux de convertisseurs finiraient par
+ *  se contredire — un champ ajouté ici, oublié là, et une fiche perdrait
+ *  sa mesure ou son nuancier selon le fournisseur de base. Un seul jeu,
+ *  deux transports.
+ */
+export const toProduct = (r: Row): Product => ({
   id: r.id,
   slug: r.slug,
   name: r.name,
@@ -358,7 +369,7 @@ const toProduct = (r: Row): Product => ({
   createdAt: r.created_at,
 });
 
-const fromProduct = (p: Product): Row => ({
+export const fromProduct = (p: Product): Row => ({
   id: p.id,
   slug: p.slug,
   name: p.name,
@@ -498,7 +509,7 @@ async function corbeille(table: string, ids: string[], trashed: boolean): Promis
   }
 }
 
-const toOrder = (r: Row): Order => ({
+export const toOrder = (r: Row): Order => ({
   id: r.id,
   orderNumber: r.order_number,
   customerName: r.customer_name,
@@ -534,7 +545,7 @@ const toOrder = (r: Row): Order => ({
   deletedAt: r.deleted_at ?? null,
 });
 
-const toShein = (r: Row): SheinRequest => ({
+export const toShein = (r: Row): SheinRequest => ({
   id: r.id,
   requestNumber: r.request_number,
   customerName: r.customer_name,
@@ -563,7 +574,7 @@ const toShein = (r: Row): SheinRequest => ({
   deletedAt: r.deleted_at ?? null,
 });
 
-const toGrouping = (r: Row): Grouping => ({
+export const toGrouping = (r: Row): Grouping => ({
   id: r.id,
   reference: r.reference,
   destination: r.destination ?? '',
@@ -582,7 +593,7 @@ const toGrouping = (r: Row): Grouping => ({
   updatedAt: r.updated_at,
 });
 
-const fromGrouping = (g: Grouping): Row => ({
+export const fromGrouping = (g: Grouping): Row => ({
   id: g.id,
   reference: g.reference,
   destination: g.destination,

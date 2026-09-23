@@ -53,11 +53,34 @@ jobs:
       # précisément les jours où la base ne répond pas.
       #
       # POUR ROUVRIR LA BOUTIQUE : remettre « non » et republier.
+      #
+      # ── OÙ LE SITE PREND SES DONNÉES ──
+      #
+      # Tant que VITE_WORKER_URL est vide, le site continue de lire
+      # Supabase, exactement comme avant : renseigner l'adresse du Worker
+      # est ce qui bascule la boutique sur Cloudflare, et l'effacer est ce
+      # qui la ramène en arrière. Rien d'autre à changer, et surtout rien
+      # à changer dans le code.
+      #
+      # L'adresse se met dans Settings → Secrets and variables → Actions →
+      # onglet Variables, sous le nom WORKER_URL. Ce n'est pas un secret :
+      # elle part de toute façon dans le JavaScript du site. Ce qui protège
+      # les données, c'est que le Worker exige le mot de passe pour tout ce
+      # qui est réservé (voir cloudflare/src/acces.ts).
+      - name: Dire d'où viendront les données
+        run: |
+          if [ -n "${{ vars.WORKER_URL }}" ]; then
+            echo "Source : le Worker Cloudflare (${{ vars.WORKER_URL }})."
+          else
+            echo "Source : Supabase. La variable WORKER_URL n'est pas renseignée."
+          fi
+
       - name: Construire le site
         env:
           VITE_BOUTIQUE_EN_PAUSE: oui
           VITE_BASE_PATH: /
           VITE_SITE_URL: https://afauralumea.shop
+          VITE_WORKER_URL: ${{ vars.WORKER_URL }}
           VITE_SUPABASE_URL: https://mhutsbfnzoiuqsoxkdji.supabase.co
           VITE_SUPABASE_ANON_KEY: sb_publishable_lMzrL8g6JkaE0jWdabLD-Q_-8TQ5i9h
         run: npm run build
@@ -76,8 +99,21 @@ jobs:
         with:
           path: dist
 
+  # ── PUBLIER N'A DE SENS QUE DEPUIS LA BRANCHE PRINCIPALE ──────────────
+  #
+  #  L'environnement github-pages n'accepte que `main` : sur une branche de
+  #  côté, ce travail est REFUSÉ avant même de démarrer — six secondes, pas
+  #  de journal, une croix rouge. Il l'a été à chaque envoi.
+  #
+  #  Une vérification qui ne peut qu'être rouge n'apprend rien, et elle coûte
+  #  cher : elle habitue à ignorer le rouge, et le jour où une vraie panne
+  #  s'affiche, elle ressemble à celle d'hier.
+  #
+  #  On construit donc partout — c'est ainsi qu'on voit qu'une branche casse
+  #  le site — mais on ne publie que depuis `main`.
   publier:
     needs: construire
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

@@ -34,7 +34,7 @@ import type { AlertSettings, DataSource, OrderDraft, SheinDraft } from './types'
  * configuré, sans toucher au reste du code.
  */
 
-function defaultSettings(): StoreSettings {
+export function defaultSettings(): StoreSettings {
   return {
     whatsappNumber: WHATSAPP_NUMBER,
     whatsappLink: WHATSAPP_LINK,

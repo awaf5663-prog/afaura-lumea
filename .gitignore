@@ -12,3 +12,19 @@ preview/
 
 # Empreinte de publication, régénérée à chaque build.
 public/version.json
+
+# Secrets d'essai du Worker : ne partent jamais au dépôt.
+cloudflare/.dev.vars
+cloudflare/.wrangler/
+
+# La reprise des données Supabase : le FICHIER PRODUIT contient les NOMS,
+# TÉLÉPHONES et ADRESSES des clientes. Il se fabrique sur la machine de la
+# boutique, se relit, s'applique, et ne rentre jamais dans le dépôt.
+#
+# La REQUÊTE qui le fabrique, elle, ne contient aucune donnée et doit être
+# suivie : c'est elle qu'on relit quand on veut comprendre ce qui a été
+# emmené. La première version de cette règle disait « reprise*.sql » et
+# avalait les deux — une règle trop large ne protège pas mieux, elle fait
+# disparaître ce qu'on voulait garder.
+cloudflare/reprise.sql
+cloudflare/reprise-essai*.sql

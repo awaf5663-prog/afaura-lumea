@@ -12,8 +12,9 @@
 #  Workers Scripts (Edit), D1 (Edit) et Workers R2 Storage (Edit).
 #
 #  CE QU'IL FAIT : crée la base D1 et le seau R2 s'ils n'existent pas,
-#  applique le schéma, puis AFFICHE l'identifiant de la base. Cet
-#  identifiant doit ensuite être recopié dans cloudflare/wrangler.toml.
+#  applique le schéma, verse le catalogue, puis AFFICHE l'identifiant de
+#  la base. Cet identifiant doit ensuite être recopié dans
+#  cloudflare/wrangler.toml.
 #
 #  Il est SANS DANGER À RELANCER : la création échoue proprement si la
 #  ressource existe déjà, et le schéma est écrit pour être rejoué.
@@ -21,6 +22,15 @@ name: Cloudflare — mise en place
 
 on:
   workflow_dispatch:
+    inputs:
+      remettre_a_zero:
+        description: "EFFACE TOUT et réapplique le schéma. À n'utiliser que sur une base vide."
+        type: boolean
+        default: false
+      activer_r2:
+        description: "Créer aussi le seau R2 (à n'activer qu'une fois R2 activé dans le tableau de bord Cloudflare)"
+        type: boolean
+        default: false
 
 jobs:
   mettre-en-place:
@@ -43,15 +53,41 @@ jobs:
           fi
           echo "Jeton présent."
 
-      # `|| true` : relancer ce workflow ne doit pas échouer parce que la
-      # ressource existe déjà. Ce qui compte vient après — l'identifiant.
+      # `|| true` était une mauvaise idée, et le premier passage l'a
+      # montré : R2 a refusé — « Please enable R2 through the Cloudflare
+      # Dashboard » — et le workflow s'est terminé en VERT quand même.
+      # Un échec masqué est pire qu'un échec.
+      #
+      # On distingue donc les deux cas. « Existe déjà » est normal quand on
+      # relance ; tout le reste s'affiche et fait échouer l'étape.
       - name: Créer la base et le seau
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: 70d1b4a84fbb48c3532402cd9e405fb9
         run: |
-          npx --yes wrangler@latest d1 create afaura-lumea || true
-          npx --yes wrangler@latest r2 bucket create afaura-lumea-photos || true
+          creer() {
+            local quoi="$1"; shift
+            if sortie=$("$@" 2>&1); then
+              echo "$sortie"; return 0
+            fi
+            echo "$sortie"
+            if grep -qiE "already exists|existe déjà" <<<"$sortie"; then
+              echo "→ $quoi existait déjà, on continue."
+              return 0
+            fi
+            echo "::error::Création de $quoi refusée. Voir le message ci-dessus."
+            return 1
+          }
+          creer "la base D1" npx --yes wrangler@latest d1 create afaura-lumea
+
+          #  R2 ne se crée que si on le demande. Il faut d'abord l'activer à
+          #  la main dans le tableau de bord — sans quoi Cloudflare refuse
+          #  avec « Please enable R2 through the Cloudflare Dashboard ».
+          if [ "${{ inputs.activer_r2 }}" = "true" ]; then
+            creer "le seau R2" npx --yes wrangler@latest r2 bucket create afaura-lumea-photos
+          else
+            echo "R2 non demandé : on passe. La boutique l'activera plus tard."
+          fi
 
       - name: Relever l'identifiant de la base
         env:
@@ -70,6 +106,37 @@ jobs:
             console.log('À recopier dans cloudflare/wrangler.toml, database_id.');
           "
 
+      # ── Remise à zéro, sur demande explicite ─────────────────────────
+      #
+      #  `create table if not exists` ne touche pas à une table qui existe
+      #  déjà : une colonne ajoutée au schéma n'apparaîtrait donc jamais
+      #  sur une base en place. Tant que la base est vide, tout effacer et
+      #  repartir du schéma est la manière la plus sûre — et la plus
+      #  lisible — de la remettre d'aplomb.
+      #
+      #  CECI EFFACE LES DONNÉES. C'est pour cela que ça se demande à la
+      #  main, que ce n'est jamais le défaut, et que ça n'arrivera plus une
+      #  fois les commandes de la boutique dans la base.
+      - name: Remettre la base à zéro (si demandé)
+        if: ${{ inputs.remettre_a_zero }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 70d1b4a84fbb48c3532402cd9e405fb9
+        run: |
+          echo "⚠️  Effacement demandé."
+          npx --yes wrangler@latest d1 execute afaura-lumea --remote --command "
+            drop table if exists order_items;
+            drop table if exists shein_items;
+            drop table if exists orders;
+            drop table if exists shein_requests;
+            drop table if exists groupings;
+            drop table if exists products;
+            drop table if exists settings;
+            drop table if exists alert_settings;
+            drop table if exists visits;
+            drop table if exists compteurs;
+          "
+
       - name: Appliquer le schéma
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -78,6 +145,23 @@ jobs:
           npx --yes wrangler@latest d1 execute afaura-lumea --remote \
             --file cloudflare/schema.sql
 
+      # Le catalogue vit dans le code du site (src/data/seed.ts) et le
+      # fichier ci-dessous en sort — voir scripts/generate-seed.mjs. Sans
+      # cette étape la base serait en place mais vide, et la boutique
+      # s'ouvrirait sans un seul article.
+      #
+      # Les articles déjà présents sont mis à jour, jamais dupliqués : on
+      # peut le rejouer. Les photos téléversées depuis l'administration ne
+      # sont pas touchées — la colonne images n'est pas dans la liste des
+      # champs remis à jour.
+      - name: Verser le catalogue
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 70d1b4a84fbb48c3532402cd9e405fb9
+        run: |
+          npx --yes wrangler@latest d1 execute afaura-lumea --remote \
+            --file cloudflare/seed-catalogue.sql
+
       - name: Vérifier que les tables sont là
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -85,3 +169,6 @@ jobs:
         run: |
           npx --yes wrangler@latest d1 execute afaura-lumea --remote \
             --command "select name from sqlite_master where type='table' order by name"
+          echo "──────────────────────────────────────────────────────"
+          npx --yes wrangler@latest d1 execute afaura-lumea --remote \
+            --command "select count(*) as articles from products"

@@ -8,14 +8,14 @@ import { cn } from '@/src/lib/cn';
 import { formatDate, formatFcfa } from '@/src/lib/format';
 import { useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
-import { db, isSupabaseConfigured } from '@/src/services';
+import { db, isServeurConfigure } from '@/src/services';
 import { groupingCount, groupingFillRate } from '@/src/hooks/useGroupings';
 import { isWhatsappConfigured } from '@/src/lib/whatsapp';
 import { countSince, lastSeen, markSeen } from '@/src/lib/adminSeen';
 import type { Grouping, Order, Product, SheinRequest } from '@/src/types';
 import { AdminGroupings, computeGroupingStats } from './AdminGroupings';
 import { AdminLogin } from './AdminLogin';
-import { SupabaseStatus } from '@/src/components/admin/SupabaseStatus';
+import { ServeurStatus } from '@/src/components/admin/ServeurStatus';
 import { AdminPricing } from './AdminPricing';
 import { AdminOrders } from './AdminOrders';
 import { AdminProducts } from './AdminProducts';
@@ -161,8 +161,8 @@ export function AdminPage() {
         </div>
       </header>
 
-      {isSupabaseConfigured() ? (
-        <SupabaseStatus />
+      {isServeurConfigure() ? (
+        <ServeurStatus />
       ) : (
         <div className="mt-5 flex items-start gap-2.5 rounded-[--radius-md] bg-blush/60 px-4 py-3 text-[12.5px] leading-relaxed text-graphite">
           <ShieldAlert className="mt-0.5 size-4 shrink-0" />
@@ -172,8 +172,8 @@ export function AdminPage() {
             commande envoyée depuis le téléphone d'une cliente reste sur son téléphone :{' '}
             <strong className="font-medium">elle n'apparaîtra pas dans cette liste</strong>, et les
             étapes que vous faites avancer ici ne remonteront pas sur sa page Suivi. C'est parfait
-            pour essayer le site, pas pour vendre. Branchez Supabase (voir README) avant la première
-            vraie commande.
+            pour essayer le site, pas pour vendre. Branchez le serveur (voir README) avant la
+            première vraie commande.
           </span>
         </div>
       )}

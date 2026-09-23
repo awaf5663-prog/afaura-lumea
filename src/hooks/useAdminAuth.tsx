@@ -2,13 +2,19 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import { ADMIN_PASSCODE } from '@/src/config/site';
 import { STORAGE_KEYS, removeKey } from '@/src/lib/storage';
 import { useRouter } from '@/src/lib/router';
-import { isSupabaseConfigured } from '@/src/services';
+import { modeDonnees } from '@/src/services';
 import { supabaseSignIn, supabaseSignOut } from '@/src/services/supabaseAdapter';
+import { cloudflareSignIn, cloudflareSignOut } from '@/src/services/cloudflareAdapter';
 
 interface AdminAuthValue {
   authenticated: boolean;
-  /** 'supabase' = véritable authentification serveur ; 'local' = simple garde-fou. */
-  mode: 'supabase' | 'local';
+  /**
+   * 'supabase' et 'cloudflare' = véritable authentification serveur : c'est
+   * le serveur qui accepte ou refuse, et il refusera aussi toutes les
+   * lectures réservées. 'local' = simple garde-fou dans le navigateur, qui
+   * n'empêche que les curieux.
+   */
+  mode: 'supabase' | 'cloudflare' | 'local';
   signIn: (identifier: string, secret: string) => Promise<void>;
   signOut: () => void;
 }
@@ -17,7 +23,7 @@ const AdminAuthContext = createContext<AdminAuthValue | null>(null);
 
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const { path } = useRouter();
-  const mode: AdminAuthValue['mode'] = isSupabaseConfigured() ? 'supabase' : 'local';
+  const mode: AdminAuthValue['mode'] = modeDonnees();
 
   /*
    * L'accès n'est JAMAIS conservé.
@@ -38,6 +44,11 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
     async (identifier, secret) => {
       if (mode === 'supabase') {
         await supabaseSignIn(identifier, secret);
+      } else if (mode === 'cloudflare') {
+        /* Pas d'identifiant côté Cloudflare : un seul mot de passe, celui
+           de la boutique, rangé dans les secrets du dépôt et jamais dans
+           le JavaScript envoyé aux visiteuses. */
+        await cloudflareSignIn(secret);
       } else if (secret !== ADMIN_PASSCODE) {
         throw new Error('Code incorrect.');
       }
@@ -48,6 +59,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(() => {
     if (mode === 'supabase') supabaseSignOut();
+    if (mode === 'cloudflare') cloudflareSignOut();
     removeKey(STORAGE_KEYS.adminSession);
     setAuthenticated(false);
   }, [mode]);

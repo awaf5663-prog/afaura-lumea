@@ -97,7 +97,7 @@ function estLaBoutique(requete: Request, env: Env): boolean {
 }
 
 export default {
-  async fetch(requete: Request, env: Env): Promise<Response> {
+  async fetch(requete: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const origine = origineAutorisee(requete, env);
 
     if (requete.method === 'OPTIONS') {
@@ -134,7 +134,23 @@ export default {
     try {
       /* `listGroupings` a besoin de savoir QUI appelle : la boutique voit
          le coût logistique d'un groupage, une cliente non. */
-      const resultat = await appliquer(methode, corps, env, exige === 'boutique' || estLaBoutique(requete, env));
+      /*
+       * `attendre` : ce qui doit partir SANS faire attendre la cliente.
+       *
+       * L'alerte de commande en est le seul usage. Chez Supabase elle
+       * partait par pg_net, qui rend la main aussitôt ; ici c'est
+       * waitUntil qui joue ce rôle — le Worker reste vivant le temps que
+       * ntfy réponde, mais la commande est confirmée tout de suite. Une
+       * notification lente ne doit pas ralentir une vente, et une
+       * notification perdue ne doit pas perdre la commande.
+       */
+      const resultat = await appliquer(
+        methode,
+        corps,
+        env,
+        exige === 'boutique' || estLaBoutique(requete, env),
+        (promesse) => ctx.waitUntil(promesse),
+      );
       return reponse({ resultat }, 200, origine);
     } catch (erreur) {
       /*

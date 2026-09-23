@@ -79,7 +79,7 @@ qui ne marchait pas avant.
 
 - **Changer le catalogue** se fait depuis l'admin, plus par SQL.
 - Si vous modifiez `src/data/seed.ts`, régénérez le fichier avec
-  `node scripts/generate-supabase-seed.mjs`.
+  `node scripts/generate-seed.mjs`.
 - Les réglages (tarifs, offres, groupages) sont stockés dans la table
   `settings`, ligne 1. Ils suivent automatiquement.
 

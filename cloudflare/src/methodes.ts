@@ -18,7 +18,19 @@ import * as shein from './shein';
 import * as divers from './divers';
 
 type Corps = Record<string, unknown>;
-type Methode = (corps: Corps, env: Env, boutique: boolean) => Promise<unknown>;
+/**
+ * `attendre` laisse une méthode lancer un travail qui survit à la réponse
+ * — l'alerte de commande, et rien d'autre pour l'instant. Les méthodes qui
+ * n'en ont pas besoin ne le déclarent simplement pas : une fonction à trois
+ * paramètres se range sans peine dans une case qui en propose quatre.
+ */
+export type Attendre = (promesse: Promise<unknown>) => void;
+type Methode = (
+  corps: Corps,
+  env: Env,
+  boutique: boolean,
+  attendre: Attendre,
+) => Promise<unknown>;
 
 const TABLE: Record<string, Methode> = {
   // Catalogue
@@ -63,7 +75,13 @@ const TABLE: Record<string, Methode> = {
   testAlert: divers.testAlert,
 };
 
-export async function appliquer(methode: string, corps: unknown, env: Env, boutique: boolean) {
+export async function appliquer(
+  methode: string,
+  corps: unknown,
+  env: Env,
+  boutique: boolean,
+  attendre: Attendre,
+) {
   const fonction = Object.prototype.hasOwnProperty.call(TABLE, methode) ? TABLE[methode] : undefined;
   /*
    * Ne devrait jamais arriver : acces.ts a déjà refusé l'inconnu. Mais si
@@ -71,7 +89,12 @@ export async function appliquer(methode: string, corps: unknown, env: Env, bouti
    * REFUS, pas un appel à une fonction absente.
    */
   if (!fonction) throw new ErreurLisible('Requête refusée.', 404);
-  return fonction((corps && typeof corps === 'object' ? corps : {}) as Corps, env, boutique);
+  return fonction(
+    (corps && typeof corps === 'object' ? corps : {}) as Corps,
+    env,
+    boutique,
+    attendre,
+  );
 }
 
 /** Les méthodes réellement branchées — pour que les recettes les comparent. */

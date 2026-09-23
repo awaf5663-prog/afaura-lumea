@@ -14,6 +14,8 @@
  *  compris ses bizarreries voulues — expliquées au fil du code.
  */
 import type { Env } from './index';
+import type { Attendre } from './methodes';
+import { prevenir } from './divers';
 import {
   entier, exige, identifiant, lireJson, maintenant,
   fraisBoutique, prixOption, prochainNumero, texte, vrai,
@@ -50,7 +52,12 @@ interface Offre {
   effect?: { type?: unknown; amount?: unknown; categories?: unknown; tiers?: unknown };
 }
 
-export async function createOrder(corps: Record<string, unknown>, env: Env) {
+export async function createOrder(
+  corps: Record<string, unknown>,
+  env: Env,
+  _boutique: boolean,
+  attendre?: Attendre,
+) {
   const articles = Array.isArray(corps.items) ? (corps.items as LigneArticle[]) : [];
   exige(articles.length > 0, 'Panier vide.');
   exige(articles.length <= 60, 'Panier trop long.');
@@ -91,7 +98,6 @@ export async function createOrder(corps: Record<string, unknown>, env: Env) {
     ? (offreQuantite!.effect!.categories as unknown[]).filter((x): x is string => typeof x === 'string')
     : null;
 
-  const numero = await prochainNumero(env.DB, 'commande', 'CMD');
   const idCommande = identifiant();
 
   let sousTotal = 0;
@@ -222,6 +228,16 @@ export async function createOrder(corps: Record<string, unknown>, env: Env) {
   const quand = maintenant();
 
   /*
+   * LE NUMÉRO SE PREND EN DERNIER, une fois toutes les vérifications
+   * passées. Il était pris en premier, et un panier refusé — un article
+   * retiré du catalogue, un stock épuisé — consommait quand même son
+   * numéro : la suite des commandes se retrouvait trouée. Pour la
+   * boutique, un trou dans la numérotation ressemble à une commande
+   * perdue, et on cherche longtemps une commande qui n'a jamais existé.
+   */
+  const numero = await prochainNumero(env.DB, 'commande', 'CMD');
+
+  /*
    * TOUT PART EN UN SEUL LOT. D1 exécute un `batch` dans une transaction :
    * soit la commande, ses lignes et les stocks passent ensemble, soit rien
    * ne passe. Une commande à moitié écrite — des lignes sans commande, un
@@ -256,7 +272,22 @@ export async function createOrder(corps: Record<string, unknown>, env: Env) {
   ];
   await env.DB.batch(operations);
 
-  return unecommande(idCommande, env);
+  const commande = await unecommande(idCommande, env);
+
+  /*
+   * L'ALERTE PART APRÈS L'ENREGISTREMENT, JAMAIS AVANT — et elle ne fait
+   * pas attendre la cliente : `attendre` la confie au Worker, qui reste
+   * en vie le temps que ntfy réponde pendant que la confirmation part.
+   *
+   * Sans `attendre` (une recette qui appelle la fonction directement),
+   * on l'attend simplement. Elle n'échoue jamais bruyamment de toute
+   * façon : voir prevenir().
+   */
+  const alerte = prevenir(env, 'commande', commande as Record<string, unknown>);
+  if (attendre) attendre(alerte);
+  else await alerte;
+
+  return commande;
 }
 
 /**

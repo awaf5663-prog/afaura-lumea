@@ -31,7 +31,11 @@ function preconnexionBase() {
   return {
     name: 'preconnexion-base',
     transformIndexHtml(html: string) {
-      const url = process.env.VITE_SUPABASE_URL;
+      /* La même règle que dans src/services/index.ts, et pour la même
+         raison : si les deux configurations coexistent, c'est le Worker
+         qui sert. Annoncer l'autre adresse ferait ouvrir une connexion
+         vers une base que le site n'interroge plus. */
+      const url = process.env.VITE_WORKER_URL || process.env.VITE_SUPABASE_URL;
       if (!url) return html;
       let origine: string;
       try {

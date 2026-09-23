@@ -12,8 +12,9 @@
 #  Workers Scripts (Edit), D1 (Edit) et Workers R2 Storage (Edit).
 #
 #  CE QU'IL FAIT : crée la base D1 et le seau R2 s'ils n'existent pas,
-#  applique le schéma, puis AFFICHE l'identifiant de la base. Cet
-#  identifiant doit ensuite être recopié dans cloudflare/wrangler.toml.
+#  applique le schéma, verse le catalogue, puis AFFICHE l'identifiant de
+#  la base. Cet identifiant doit ensuite être recopié dans
+#  cloudflare/wrangler.toml.
 #
 #  Il est SANS DANGER À RELANCER : la création échoue proprement si la
 #  ressource existe déjà, et le schéma est écrit pour être rejoué.
@@ -144,6 +145,23 @@ jobs:
           npx --yes wrangler@latest d1 execute afaura-lumea --remote \
             --file cloudflare/schema.sql
 
+      # Le catalogue vit dans le code du site (src/data/seed.ts) et le
+      # fichier ci-dessous en sort — voir scripts/generate-seed.mjs. Sans
+      # cette étape la base serait en place mais vide, et la boutique
+      # s'ouvrirait sans un seul article.
+      #
+      # Les articles déjà présents sont mis à jour, jamais dupliqués : on
+      # peut le rejouer. Les photos téléversées depuis l'administration ne
+      # sont pas touchées — la colonne images n'est pas dans la liste des
+      # champs remis à jour.
+      - name: Verser le catalogue
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: 70d1b4a84fbb48c3532402cd9e405fb9
+        run: |
+          npx --yes wrangler@latest d1 execute afaura-lumea --remote \
+            --file cloudflare/seed-catalogue.sql
+
       - name: Vérifier que les tables sont là
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -151,3 +169,6 @@ jobs:
         run: |
           npx --yes wrangler@latest d1 execute afaura-lumea --remote \
             --command "select name from sqlite_master where type='table' order by name"
+          echo "──────────────────────────────────────────────────────"
+          npx --yes wrangler@latest d1 execute afaura-lumea --remote \
+            --command "select count(*) as articles from products"

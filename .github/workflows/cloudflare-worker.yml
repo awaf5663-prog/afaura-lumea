@@ -1,0 +1,183 @@
+# ═══════════════════════════════════════════════════════════════════════
+#  PUBLIER LE WORKER — la porte des données de la boutique
+# ═══════════════════════════════════════════════════════════════════════
+#
+#  CE QU'IL FAUT AVANT : deux secrets dans Settings → Secrets and
+#  variables → Actions.
+#
+#    CLOUDFLARE_API_TOKEN   le jeton d'API, avec Workers Scripts (Edit)
+#                           et D1 (Edit)
+#    ADMIN_MOT_DE_PASSE     le mot de passe de l'espace administrateur
+#
+#  LE MOT DE PASSE NE PASSE JAMAIS PAR LE SITE. Il est déposé comme
+#  secret du Worker, chez Cloudflare, et n'apparaît ni dans le dépôt, ni
+#  dans le JavaScript envoyé aux visiteuses, ni dans ce fichier. Le site,
+#  lui, ne l'a que le temps d'une session dans l'onglet de la boutique —
+#  voir src/services/cloudflareAdapter.ts.
+#
+#  QUAND LE LANCER : à chaque changement dans cloudflare/, ce qui se fait
+#  tout seul sur la branche principale. Le bouton « Run workflow » sert à
+#  republier sans avoir rien changé — par exemple après avoir modifié le
+#  mot de passe dans les secrets.
+name: Cloudflare — publier le Worker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cloudflare/**'
+      - '.github/workflows/cloudflare-worker.yml'
+  workflow_dispatch:
+
+# Deux publications en même temps se marcheraient dessus : la seconde
+# pourrait arriver avant la première et remettre en ligne du code plus
+# ancien. On les met à la queue leu leu.
+concurrency:
+  group: worker-cloudflare
+  cancel-in-progress: false
+
+jobs:
+  publier:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Vérifier que les secrets sont bien là
+        env:
+          JETON: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          MOT_DE_PASSE: ${{ secrets.ADMIN_MOT_DE_PASSE }}
+        run: |
+          manque=0
+          if [ -z "$JETON" ]; then
+            echo "::error::Le secret CLOUDFLARE_API_TOKEN est absent."
+            manque=1
+          fi
+          if [ -z "$MOT_DE_PASSE" ]; then
+            echo "::error::Le secret ADMIN_MOT_DE_PASSE est absent. Sans lui, le Worker refuserait toute connexion à l'administration."
+            manque=1
+          fi
+          [ "$manque" = 0 ] || {
+            echo "Settings → Secrets and variables → Actions → New repository secret."
+            exit 1
+          }
+          echo "Les deux secrets sont présents."
+
+      # Le code du Worker est vérifié AVANT d'être publié, pas après. Une
+      # erreur de type mise en ligne, c'est la boutique qui la découvre.
+      - name: Vérifier le code du Worker
+        run: |
+          npm ci
+          npx tsc -p cloudflare/tsconfig.json
+
+      - name: Vérifier le texte des alertes
+        run: node cloudflare/recettes/recette-alerte.mjs
+
+      # ── LA RECETTE TOURNE CONTRE UN VRAI WORKER ──────────────────────
+      #
+      #  Sur une base LOCALE et jetable, jamais celle de la boutique : une
+      #  recette qui écrit dans les vraies commandes n'est pas une
+      #  recette, c'est un accident. Aucun jeton Cloudflare n'est donné à
+      #  cette étape, ce qui le garantit plutôt que de l'espérer.
+      #
+      #  Ce qu'elle vérifie ne se lit pas dans le code : qu'un mot de
+      #  passe faux est refusé, qu'un total envoyé par le navigateur est
+      #  ignoré, qu'un coût logistique ne sort pas. Publier sans l'avoir
+      #  passée reviendrait à vérifier après coup, sur la boutique.
+      - name: Éprouver le Worker sur une base d'essai
+        working-directory: cloudflare
+        run: |
+          npx --yes wrangler@latest d1 execute afaura-lumea --local --file schema.sql
+          npx --yes wrangler@latest d1 execute afaura-lumea --local --file seed-catalogue.sql
+
+          npx --yes wrangler@latest dev --local --port 8787 --ip 127.0.0.1 \
+            --var ORIGINES:https://afauralumea.shop \
+            --var ADMIN_MOT_DE_PASSE:mot-de-passe-d-essai \
+            > /tmp/worker-essai.log 2>&1 &
+          echo $! > /tmp/worker.pid
+
+          # Attendre qu'il réponde vraiment, plutôt que de dormir un temps
+          # arbitraire : trop court la recette échoue pour rien, trop long
+          # on attend sans raison.
+          for i in $(seq 1 60); do
+            if curl -sf -o /dev/null -X POST http://127.0.0.1:8787/api/getSettings \
+                 -H 'content-type: application/json' \
+                 -H 'Origin: https://afauralumea.shop' --data '{}'; then
+              echo "Le Worker d'essai répond (après ${i}s)."
+              break
+            fi
+            sleep 1
+          done
+
+          # `if` et non `;` : le shell s'arrête au premier échec, et la
+          # recette échouée n'arriverait jamais jusqu'à l'arrêt du Worker
+          # ni jusqu'au journal — c'est-à-dire jusqu'à ce qui explique
+          # POURQUOI elle a échoué.
+          if node recettes/recette-worker.mjs http://127.0.0.1:8787 mot-de-passe-d-essai; then
+            etat=0
+          else
+            etat=1
+          fi
+          kill "$(cat /tmp/worker.pid)" 2>/dev/null || true
+          if [ $etat -ne 0 ]; then
+            echo "::error::La recette du Worker a échoué : rien n'est publié."
+            echo "── journal du Worker d'essai ──"
+            tail -40 /tmp/worker-essai.log
+            exit 1
+          fi
+
+      # ── Les secrets du Worker ────────────────────────────────────────
+      #
+      #  `wrangler secret put` lit sur l'entrée standard : le mot de passe
+      #  ne passe donc pas par la ligne de commande, où il apparaîtrait
+      #  dans la liste des processus de la machine.
+      #
+      #  ORIGINES n'est pas un secret — c'est la liste des sites autorisés
+      #  à appeler le Worker — mais elle se dépose de la même façon, pour
+      #  qu'elle se change sans republier le code.
+      - name: Déposer les secrets du Worker
+        working-directory: cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          MOT_DE_PASSE: ${{ secrets.ADMIN_MOT_DE_PASSE }}
+        run: |
+          printf '%s' "$MOT_DE_PASSE" \
+            | npx --yes wrangler@latest secret put ADMIN_MOT_DE_PASSE
+          printf '%s' "https://afauralumea.shop,https://www.afauralumea.shop" \
+            | npx --yes wrangler@latest secret put ORIGINES
+
+      - name: Publier
+        working-directory: cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npx --yes wrangler@latest deploy 2>&1 | tee /tmp/deploy.log
+
+      # Publier n'est pas la même chose que répondre. On le vérifie en
+      # appelant vraiment le Worker — avec une méthode publique, sans
+      # mot de passe, exactement comme le ferait une visiteuse.
+      - name: Vérifier que le Worker répond
+        run: |
+          adresse=$(grep -oE 'https://[a-z0-9.-]+\.workers\.dev' /tmp/deploy.log | head -1)
+          if [ -z "$adresse" ]; then
+            echo "::warning::Adresse du Worker introuvable dans le journal — vérification sautée."
+            exit 0
+          fi
+          echo "Adresse : $adresse"
+          code=$(curl -s -o /tmp/reponse.json -w '%{http_code}' \
+            -X POST "$adresse/api/getSettings" \
+            -H 'content-type: application/json' \
+            -H 'Origin: https://afauralumea.shop' \
+            --data '{}')
+          echo "Code HTTP : $code"
+          head -c 400 /tmp/reponse.json; echo
+          [ "$code" = "200" ] || {
+            echo "::error::Le Worker est publié mais ne répond pas correctement."
+            exit 1
+          }
+          echo "──────────────────────────────────────────────────────"
+          echo "ADRESSE DU WORKER : $adresse"
+          echo "À recopier dans le secret VITE_WORKER_URL du dépôt,"
+          echo "puis republier le site."

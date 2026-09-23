@@ -53,11 +53,34 @@ jobs:
       # précisément les jours où la base ne répond pas.
       #
       # POUR ROUVRIR LA BOUTIQUE : remettre « non » et republier.
+      #
+      # ── OÙ LE SITE PREND SES DONNÉES ──
+      #
+      # Tant que VITE_WORKER_URL est vide, le site continue de lire
+      # Supabase, exactement comme avant : renseigner l'adresse du Worker
+      # est ce qui bascule la boutique sur Cloudflare, et l'effacer est ce
+      # qui la ramène en arrière. Rien d'autre à changer, et surtout rien
+      # à changer dans le code.
+      #
+      # L'adresse se met dans Settings → Secrets and variables → Actions →
+      # onglet Variables, sous le nom WORKER_URL. Ce n'est pas un secret :
+      # elle part de toute façon dans le JavaScript du site. Ce qui protège
+      # les données, c'est que le Worker exige le mot de passe pour tout ce
+      # qui est réservé (voir cloudflare/src/acces.ts).
+      - name: Dire d'où viendront les données
+        run: |
+          if [ -n "${{ vars.WORKER_URL }}" ]; then
+            echo "Source : le Worker Cloudflare (${{ vars.WORKER_URL }})."
+          else
+            echo "Source : Supabase. La variable WORKER_URL n'est pas renseignée."
+          fi
+
       - name: Construire le site
         env:
           VITE_BOUTIQUE_EN_PAUSE: oui
           VITE_BASE_PATH: /
           VITE_SITE_URL: https://afauralumea.shop
+          VITE_WORKER_URL: ${{ vars.WORKER_URL }}
           VITE_SUPABASE_URL: https://mhutsbfnzoiuqsoxkdji.supabase.co
           VITE_SUPABASE_ANON_KEY: sb_publishable_lMzrL8g6JkaE0jWdabLD-Q_-8TQ5i9h
         run: npm run build

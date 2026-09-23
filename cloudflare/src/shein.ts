@@ -11,6 +11,8 @@
  *  boutique complète ensuite à la main.
  */
 import type { Env } from './index';
+import type { Attendre } from './methodes';
+import { prevenir } from './divers';
 import { bit, entier, exige, identifiant, lireJson, maintenant, prochainNumero, texte, vrai } from './outils';
 
 interface Article {
@@ -26,7 +28,12 @@ interface Offre {
   effect?: { type?: unknown };
 }
 
-export async function createSheinRequest(corps: Record<string, unknown>, env: Env) {
+export async function createSheinRequest(
+  corps: Record<string, unknown>,
+  env: Env,
+  _boutique: boolean,
+  attendre?: Attendre,
+) {
   const articles = Array.isArray(corps.items) ? (corps.items as Article[]) : [];
   exige(articles.length > 0, 'Aucun article dans la demande.');
   exige(articles.length <= 60, 'Demande trop longue.');
@@ -169,7 +176,14 @@ export async function createSheinRequest(corps: Record<string, unknown>, env: En
     ),
   ]);
 
-  return uneDemande(id, env);
+  const demande = await uneDemande(id, env);
+
+  // Même règle que pour une commande : voir createOrder.
+  const alerte = prevenir(env, 'shein', demande as Record<string, unknown>);
+  if (attendre) attendre(alerte);
+  else await alerte;
+
+  return demande;
 }
 
 async function uneDemande(id: string, env: Env) {

@@ -219,17 +219,107 @@ export async function testAlert(_corps: Record<string, unknown>, env: Env) {
  * Ne fait jamais échouer la commande : une notification perdue est
  * ennuyeuse, une commande perdue est grave.
  */
-export async function prevenir(env: Env, titre: string, message: string) {
+/**
+ * Les intitulés qui apparaissent dans l'alerte.
+ *
+ * Repris mot pour mot de la fonction `libelle_alerte` de Postgres, y
+ * compris le détail qui ne se devine pas : « city » devient
+ * « Saint-Louis » et non « Livraison Saint-Louis », parce que la ligne du
+ * message dit déjà « Livraison : ». Une alerte qui change de formulation
+ * du jour au lendemain se lit moins vite — et une alerte se lit d'un
+ * coup d'œil, souvent en servant une cliente.
+ */
+const INTITULES: Record<string, string> = {
+  pickup: 'Point de retrait',
+  city: 'Saint-Louis',
+  around: 'Environs de Saint-Louis',
+  regions: 'Louga, Thiès, Dakar',
+  wave: 'Wave',
+  orange_money: 'Orange Money',
+  cash: 'Paiement à la livraison',
+};
+
+const intitule = (code: unknown): string => {
+  const c = texte(code, 60);
+  return INTITULES[c] ?? (c || '—');
+};
+
+/**
+ * Le texte de l'alerte d'une commande.
+ *
+ * Porté ligne à ligne depuis `texte_alerte` : même ordre, mêmes mots,
+ * même règle sur les coordonnées. `avecClient` vient du réglage de la
+ * boutique et vaut NON par défaut — un canal ntfy n'a pas de mot de
+ * passe, et qui devine son nom lirait sinon le nom, le téléphone et
+ * l'adresse de chaque cliente.
+ */
+export function texteAlerteCommande(c: Record<string, unknown>, avecClient: boolean): string {
+  const lignes = [`N° ${texte(c.order_number, 40)}`];
+  if (avecClient) lignes.push(`${texte(c.customer_name, 120)} — ${texte(c.phone, 40)}`);
+  lignes.push(`Total : ${String(c.total ?? 0)} FCFA`);
+  /* « frais à confirmer » : la boutique fixe elle-même la livraison hors
+     zone. L'alerte doit le dire, sinon le total lu n'est pas le total dû. */
+  const aConfirmer = (c.delivery_fee === null || c.delivery_fee === undefined)
+    && texte(c.delivery_zone_id, 40) !== 'pickup';
+  lignes.push(
+    `Livraison : ${intitule(c.delivery_zone_id)}${aConfirmer ? ' (frais à confirmer)' : ''}`,
+  );
+  lignes.push(`Paiement : ${intitule(c.payment_method)}`);
+  if (avecClient && texte(c.address, 300)) lignes.push(texte(c.address, 300));
+  return lignes.join('\n');
+}
+
+/** Le texte de l'alerte d'une demande SHEIN. Même origine, même règle. */
+export function texteAlerteShein(d: Record<string, unknown>, avecClient: boolean): string {
+  const lignes = [`N° ${texte(d.request_number, 40)}`];
+  if (avecClient) lignes.push(`${texte(d.customer_name, 120)} — ${texte(d.phone, 40)}`);
+  lignes.push('À chiffrer, puis à confirmer à la cliente.');
+  return lignes.join('\n');
+}
+
+/**
+ * Prévient la boutique qu'une commande est arrivée.
+ *
+ * NE FAIT JAMAIS ÉCHOUER LA COMMANDE. Une notification perdue est
+ * ennuyeuse ; une commande perdue est grave. Tout est donc enfermé dans un
+ * try, et l'échec part au journal du Worker — où il se lit, contrairement
+ * au déclencheur Postgres qui avalait ses erreurs en silence.
+ *
+ * Le corps est construit ici et non par qui appelle : `include_customer`
+ * se lit en même temps que le canal, et deux lectures séparées finiraient
+ * par se désaccorder — le texte dirait le nom de la cliente alors que le
+ * réglage dit de ne pas le dire.
+ */
+export async function prevenir(
+  env: Env,
+  source: 'commande' | 'shein',
+  ligne: Record<string, unknown>,
+) {
   try {
     const conf = await env.DB
-      .prepare('select ntfy_topic, enabled from alert_settings where id = 1')
-      .first<{ ntfy_topic: string; enabled: number }>();
+      .prepare('select ntfy_topic, enabled, include_customer from alert_settings where id = 1')
+      .first<{ ntfy_topic: string; enabled: number; include_customer: number }>();
     if (!conf || !vrai(conf.enabled) || !conf.ntfy_topic) return;
-    await fetch('https://ntfy.sh/', {
+
+    const avecClient = vrai(conf.include_customer);
+    const reponse = await fetch('https://ntfy.sh/', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ topic: conf.ntfy_topic, title: titre, message }),
+      /* Par l'entrée JSON de ntfy, et non en texte brut sur /<canal> :
+         c'est ainsi que les accents et les retours à la ligne arrivent
+         correctement. Priorité 4 et l'étiquette du caddie : l'alerte
+         sonne et se reconnaît, exactement comme avant. */
+      body: JSON.stringify({
+        topic: conf.ntfy_topic,
+        title: source === 'commande' ? 'Nouvelle commande' : 'Nouvelle demande SHEIN',
+        message: source === 'commande'
+          ? texteAlerteCommande(ligne, avecClient)
+          : texteAlerteShein(ligne, avecClient),
+        priority: 4,
+        tags: ['shopping_cart'],
+      }),
     });
+    if (!reponse.ok) console.error('[alerte] ntfy a répondu', reponse.status);
   } catch (e) {
     console.error('[alerte]', e);
   }

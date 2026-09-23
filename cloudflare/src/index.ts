@@ -132,7 +132,9 @@ export default {
     }
 
     try {
-      const resultat = await appliquer(methode, corps, env);
+      /* `listGroupings` a besoin de savoir QUI appelle : la boutique voit
+         le coût logistique d'un groupage, une cliente non. */
+      const resultat = await appliquer(methode, corps, env, exige === 'boutique' || estLaBoutique(requete, env));
       return reponse({ resultat }, 200, origine);
     } catch (erreur) {
       /*

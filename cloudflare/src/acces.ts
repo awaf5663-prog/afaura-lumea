@@ -85,5 +85,8 @@ export const METHODES = Object.keys(ACCES);
  * Rend `null` pour une méthode inconnue — qui sera refusée.
  */
 export function exigence(methode: string): Exigence | null {
-  return Object.prototype.hasOwnProperty.call(ACCES, methode) ? ACCES[methode] : null;
+  /* `?? null` et non `ACCES[methode]` : avec `noUncheckedIndexedAccess`,
+     une lecture d'index peut valoir `undefined`, et on veut UNE seule
+     façon de dire « inconnue ». */
+  return Object.prototype.hasOwnProperty.call(ACCES, methode) ? (ACCES[methode] ?? null) : null;
 }

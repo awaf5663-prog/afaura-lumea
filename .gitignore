@@ -12,3 +12,7 @@ preview/
 
 # Empreinte de publication, régénérée à chaque build.
 public/version.json
+
+# Secrets d'essai du Worker : ne partent jamais au dépôt.
+cloudflare/.dev.vars
+cloudflare/.wrangler/

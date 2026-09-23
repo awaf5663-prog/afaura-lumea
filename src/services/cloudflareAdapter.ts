@@ -26,8 +26,27 @@ import { defaultSettings } from './localAdapter';
 
 const env = import.meta.env;
 
-/** L'adresse du Worker. Vide = on ne passe pas par Cloudflare. */
-export const WORKER_URL: string = (env.VITE_WORKER_URL ?? '').toString().trim();
+/**
+ * L'adresse du Worker. Vide = on ne passe pas par Cloudflare.
+ *
+ * LA BARRE FINALE EST RETIRÉE, et ce n'est pas de la coquetterie. Les
+ * appels se construisent en `adresse + '/api/' + méthode` : une adresse
+ * qui finit déjà par une barre donne « …dev//api/getSettings », et le
+ * Worker, qui cherche un chemin commençant par « /api/ », ne reconnaît
+ * plus rien. Il répond « Requête refusée » à TOUT.
+ *
+ * La panne ne ressemble pas à sa cause : la boutique est vide, l'admin
+ * ne s'ouvre pas, et rien ne dit qu'une barre est en trop. C'est arrivé
+ * à la mise en service, où l'adresse avait été collée depuis Cloudflare
+ * — qui l'affiche justement avec sa barre.
+ *
+ * On enlève donc les espaces ET les barres, une fois pour toutes, plutôt
+ * que de compter sur la personne qui remplira la variable.
+ */
+export const WORKER_URL: string = (env.VITE_WORKER_URL ?? '')
+  .toString()
+  .trim()
+  .replace(/\/+$/, '');
 
 /**
  * Le mot de passe de l'administration.

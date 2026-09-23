@@ -104,44 +104,46 @@ avec le nombre d'articles. S'il dit autre chose, il dit aussi quoi faire.
 
 Le catalogue vient du code : l'étape 1 le remet en place toute seule. Vos
 **commandes, demandes SHEIN, groupages et réglages**, eux, ne sont nulle part
-ailleurs que dans Supabase. Voici comment les emmener.
+ailleurs que dans Supabase.
 
-> Faisable seulement si l'éditeur SQL de Supabase répond encore. Le quota
-> bloque les lectures du site ; l'éditeur du tableau de bord passe parfois
-> quand même. Si c'est le cas, faites-le **avant** toute autre chose.
+> Faisable seulement tant que l'éditeur SQL de Supabase répond. Le quota
+> bloque les lectures du site ; l'éditeur du tableau de bord passe souvent
+> quand même. Si c'est le cas, **faites cette partie en premier** — c'est la
+> seule chose qui ne se refabrique pas.
 
-Dans **SQL Editor**, une requête par table :
+**Vos clientes ne passent par personne.** Leurs noms, téléphones et adresses
+vont de votre écran Supabase à votre écran Cloudflare, directement. Ils ne
+partent ni dans un fichier envoyé, ni dans une conversation, ni dans le dépôt.
 
-```sql
-select json_agg(t) from orders t;
-```
+### a) Dans Supabase
 
-Puis la même chose en remplaçant `orders` par : `order_items`,
-`shein_requests`, `shein_items`, `groupings`, `settings`, `alert_settings`.
+**SQL Editor** → coller tout le contenu de
+`cloudflare/reprise-depuis-supabase.sql` → **Run**.
 
-Enregistrez chaque résultat dans un fichier portant le nom de la table —
-`orders.json`, `order_items.json`, etc. — tous dans le même dossier. Puis :
+Cette requête ne modifie rien : elle lit, et rend **un seul résultat** — une
+longue suite d'instructions. Copiez-la et gardez-la (Notes, un e-mail à
+vous-même, peu importe, du moment que c'est à vous).
 
-```
-node scripts/reprendre-supabase.mjs <ce dossier>
-```
+### b) Dans Cloudflare, une fois l'étape 1 faite
 
-Le script produit `cloudflare/reprise.sql` **sans rien écrire dans la base** :
-vous pouvez le relire avant de l'appliquer.
+**Workers & Pages → D1 → afaura-lumea → Console** → coller ce que vous avez
+gardé → exécuter.
 
-```
-wrangler d1 execute afaura-lumea --remote --file cloudflare/reprise.sql
-```
+### c) Vérifier
 
-Ce fichier contient les **noms, téléphones et adresses de vos clientes**. Il
-reste sur votre machine : il n'entre pas dans le dépôt, et le dépôt est réglé
-pour le refuser.
+Dans l'administration, onglet **Commandes** : vos anciennes commandes sont là,
+avec leurs montants et leur avancement.
 
-> **Ce que le script fait et qui ne se voit pas.** Il remet les compteurs de
+> **Ce que la requête fait et qui ne se voit pas.** Elle remet les compteurs de
 > numérotation là où Postgres s'était arrêté. Sans cela, votre première
 > commande chez Cloudflare porterait un numéro **déjà donné à une cliente**, et
 > le suivi rendrait l'autre commande. C'est la partie la plus facile à oublier,
 > et la plus ennuyeuse à réparer après coup.
+
+> **Si vous préférez passer par des fichiers** (export JSON table par table),
+> `scripts/reprendre-supabase.mjs` fait la même conversion à partir d'un
+> dossier de `.json`. Le résultat contient alors vos clientes : il reste sur
+> votre machine, et le dépôt est réglé pour le refuser.
 
 ---
 

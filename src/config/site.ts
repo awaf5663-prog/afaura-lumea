@@ -102,20 +102,29 @@ export const SITE_URL: string = reglage(
   typeof window !== "undefined" ? window.location.origin : "",
 );
 
+/** Lien d'invitation au groupe privé WhatsApp (VIP & Grossistes). */
+export const WHATSAPP_GROUP_LINK: string = reglage(
+  env.VITE_WHATSAPP_GROUP_LINK,
+  "https://chat.whatsapp.com/G5JvK1y2yY9K3x6wQzAfaura",
+);
+export const WHATSAPP_GROUP_TITLE: string =
+  "Communauté Privée WhatsApp AFAURA";
+export const WHATSAPP_GROUP_SUBTITLE: string =
+  "Rejoignez notre groupe pour découvrir les arrivages en avant-première, profiter des achats groupés SHEIN & ALIBABA au tarif grossiste et échanger en direct avec notre équipe.";
+export const WHATSAPP_GROUP_BADGE: string = "Groupe VIP & Grossistes";
+
+/** Taux de conversion USD -> FCFA par défaut pour les estimations de paniers. */
+export const SHEIN_USD_RATE: number = 650;
+
 export const BRAND = {
   name: "Afaura Luméa",
-  shortName: "Luméa",
+  shortName: "Espace AFAURA",
   tagline: "Tes envies, notre organisation.",
   /**
    * Une phrase = tout le concept. Affichée dans le hero.
-   *
-   * Elle ne parle plus seulement de voiles et de SHEIN : la boutique vend
-   * aussi des parfums, des soins, des sacs, des chaussures, du maquillage
-   * et des tenues de nuit. Annoncer moins que ce qu'on a en rayon fait
-   * repartir une visiteuse qui aurait trouvé son bonheur.
    */
   pitch:
-    "Voiles et abayas, parfums, soins, sacs, chaussures, maquillage — et tout ce que tu repères sur SHEIN. Commandé pour toi et regroupé jusqu'à Saint-Louis, à un prix clair en FCFA confirmé avant que tu paies.",
+    "Voiles d'exception, soies de Médine, jerseys frisés, abayas, soins et beauté — et service officiel de validation & groupage SHEIN et ALIBABA. Commandé pour vous, sans chercher de transitaire, et livré sur Saint-Louis, Dakar, Thiès et Louga.",
   city: "Saint-Louis, Sénégal",
   currency: "FCFA",
 } as const;

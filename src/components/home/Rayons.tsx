@@ -53,39 +53,38 @@ export function Rayons({ products }: { products: Product[] }) {
           </Link>
         </div>
 
-        <ul className="mt-8 grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 lg:grid-cols-5 lg:gap-6">
+        <ul className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3 lg:grid-cols-5 lg:gap-5">
           {rayons.map((rayon) => (
             <li key={rayon.id}>
-              <Link to={`/boutique?famille=${rayon.id}`} className="group block">
-                <div className="relative overflow-hidden rounded-[--radius-md] bg-white">
+              <Link
+                to={`/boutique?famille=${rayon.id}`}
+                className="card-3d-soft group block p-2.5 sm:p-3 bg-white border border-[#F4C7D3]/60 hover:border-[#E296A9] rounded-2xl sm:rounded-3xl transition-all shadow-xs hover:shadow-md"
+              >
+                <div className="relative overflow-hidden rounded-[14px] sm:rounded-[18px] bg-[#FAF3F4] border border-[#F4C7D3]/30">
                   {rayon.photo ? (
                     <img
                       src={rayon.photo}
-                      alt=""
+                      alt={rayon.name}
                       loading="lazy"
                       decoding="async"
-                      className={cn(
-                        'aspect-square w-full object-cover transition-transform duration-[600ms]',
-                        'ease-out group-hover:scale-[1.05]',
-                      )}
+                      className="aspect-square w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                     />
                   ) : (
-                    /*
-                      Un rayon sans photo garde sa place : il a des articles, et
-                      la cliente doit pouvoir y entrer. Son nom en grand vaut
-                      mieux qu'un « photo à venir » qui fait trou dans la vitrine.
-                    */
-                    <div className="grid aspect-square w-full place-items-center px-3 text-center">
-                      <span className="font-display text-[19px] leading-tight text-mauve">
+                    <div className="grid aspect-square w-full place-items-center px-3 text-center bg-[#FAF3F4]">
+                      <span className="font-display text-[17px] leading-tight text-[#7E1E3C]">
                         {rayon.name}
                       </span>
                     </div>
                   )}
                 </div>
-                <p className="mt-2.5 font-display text-[16px] leading-tight">{rayon.name}</p>
-                <p className="mt-0.5 text-[12px] text-stone">
-                  {rayon.nombre} article{rayon.nombre > 1 ? 's' : ''}
-                </p>
+                <div className="mt-2.5 px-1">
+                  <p className="font-serif font-semibold text-[15px] sm:text-[16px] leading-tight text-[#3D1220] group-hover:text-[#7E1E3C] transition-colors truncate">
+                    {rayon.name}
+                  </p>
+                  <p className="mt-0.5 text-[11px] sm:text-[12px] text-[#8A6470] font-medium">
+                    {rayon.nombre} modèle{rayon.nombre > 1 ? 's' : ''}
+                  </p>
+                </div>
               </Link>
             </li>
           ))}

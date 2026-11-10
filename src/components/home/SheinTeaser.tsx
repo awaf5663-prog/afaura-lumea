@@ -10,14 +10,16 @@ export function SheinTeaser() {
     <section className="container-page mt-24">
       <Reveal>
         <div className="overflow-hidden rounded-[--radius-xl] bg-rosedark px-6 py-12 text-ivory sm:px-12 sm:py-16">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-ivory/60">Service de commande groupée</p>
+          <p className="text-[11px] uppercase tracking-[0.2em] text-ivory/60">
+            Service de commande groupée · SHEIN & ALIBABA
+          </p>
           <h2 className="mt-4 max-w-2xl text-[30px] text-ivory sm:text-[40px]">
-            Tu as repéré des articles sur SHEIN ? Envoie-les-nous.
+            Tu as repéré des articles sur SHEIN ou ALIBABA ? Envoie-les-nous.
           </h2>
           <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-ivory/75">
             Tu nous transmets les liens, tailles et couleurs. On vérifie la disponibilité, on te donne
-            le montant total en FCFA, et ta commande part avec le prochain groupage. Pas de carte
-            bancaire internationale, pas de calcul de frais dans ton coin.
+            le montant total en FCFA, et ta commande part avec notre groupage mutualisé — sans aucun
+            transitaire externe à chercher. Livraison assurée sur Saint-Louis, Dakar, Thiès et Louga.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Button
@@ -25,7 +27,7 @@ export function SheinTeaser() {
               variant="light"
               onClick={() => navigate('/shein')}
             >
-              Transmettre mon panier SHEIN
+              Transmettre mon panier SHEIN / ALIBABA
               <ArrowRight className="size-4" />
             </Button>
             <Button

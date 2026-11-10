@@ -39,80 +39,59 @@ export function ProductCard({ product, priority }: { product: Product; priority?
   const remise = pourcentageRemise(product);
 
   return (
-    <article className="group relative">
+    <article className="card-3d group relative flex flex-col p-2.5 sm:p-3.5 bg-white border border-[#F4C7D3]/60 hover:border-[#E296A9] rounded-2xl sm:rounded-3xl transition-all duration-300 shadow-xs hover:shadow-md select-none">
       <Link to={`/produit/${product.slug}`} className="block">
-        {/*
-          Deux cadrages selon la catégorie. Un voile porté remplit un cadre
-          portrait ; une gourde photographiée sur fond neutre, elle, y perdait
-          son bouchon ou son pied. Voir Category.photo.
-        */}
         <div
           className={cn(
-            'relative overflow-hidden rounded-[--radius-md]',
-            // `isolate` : le fondu de la photo (voir plus bas) doit rester
-            // dans la vignette et ne pas déteindre sur la page.
-            carre ? 'isolate aspect-square bg-white' : 'aspect-[3/4] bg-cream',
+            'relative overflow-hidden rounded-[16px] sm:rounded-[20px] border border-[#F4C7D3]/40',
+            carre ? 'isolate aspect-square bg-white' : 'aspect-[4/5] bg-gradient-to-b from-[#FAF3F4] via-[#FCE8EE]/50 to-[#F5E6EA]',
           )}
         >
           {vignette ? (
             <img
-              /* Une vignette n'a pas besoin de la grande photo. Voir lib/apercu. */
               src={vignette}
               alt={product.name}
               loading={priority ? 'eager' : 'lazy'}
               decoding="async"
               className={cn(
-                'size-full transition-transform duration-[600ms] ease-out group-hover:scale-[1.04]',
-                // `contain` : on montre l'article entier, quitte à laisser du
-                // fond rose autour. `cover` remplit, mais rogne.
-                //
-                // `mix-blend-multiply` fond le blanc de la photo dans le rose
-                // crème : un article photographié sur fond blanc paraît
-                // découpé, posé sur la couleur de la boutique. C'est réservé
-                // aux packshots (cadrage carré) ; une photo portée garde son
-                // décor intact.
+                'size-full transition-transform duration-[600ms] ease-out group-hover:scale-[1.05]',
                 carre ? 'object-contain p-2 mix-blend-multiply' : 'object-cover',
               )}
             />
           ) : (
-            /*
-              Un article sans photo garde tout de même une vignette digne :
-              son nom, sur le fond de la boutique. « Photo à venir » écrit en
-              petit gris fait négligé — et c'est la première chose qu'une
-              cliente voit de cet article.
-            */
             <div className="grid size-full place-items-center px-3 text-center">
-              <span className="font-display text-[15px] leading-tight text-mauve">
+              <span className="font-display text-[15px] leading-tight text-[#7E1E3C]">
                 {product.name}
               </span>
             </div>
           )}
 
-          <div className="absolute left-2.5 top-2.5 flex flex-col items-start gap-1.5">
-            {/* La remise se lit sur la photo, comme le prix barré se lit dessous.
-                Le pourcentage vient de l'ancien prix réel : pas de pastille sans
-                promotion saisie en administration. */}
+          {/* Badges on the photo */}
+          <div className="absolute left-2 top-2 flex flex-col items-start gap-1">
             {remise !== null && (
-              <span className="rounded-full bg-brand px-2 py-1 text-[11px] font-semibold tabular-nums text-white">
+              <span className="rounded-md bg-[#7E1E3C] px-2 py-0.5 text-[10px] font-bold tabular-nums text-white shadow-xs">
                 −{remise} %
+              </span>
+            )}
+            {(product.wholesaleLot || product.priceDizaine) && (
+              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-[#581127] text-[#FCE8EE] shadow-xs">
+                Gros {product.priceDizaine && product.wholesaleLot ? '10/12p' : product.priceDizaine ? '10p' : '12p'}
               </span>
             )}
             {product.isNew && <Badge tone="new">Nouveau</Badge>}
             {product.isPopular && <Badge tone="popular">Populaire</Badge>}
-            {/* Ce qui attend en boutique se dit tout de suite : c'est
-                l'argument le plus fort face à un délai de groupage. */}
             {product.readyToShip && <Badge tone="stock">En stock</Badge>}
           </div>
 
           {soldOut && (
-            <div className="absolute inset-0 grid place-items-center bg-ivory/70">
+            <div className="absolute inset-0 grid place-items-center bg-ivory/70 backdrop-blur-xs">
               <Badge tone="soldout">Indisponible</Badge>
             </div>
           )}
         </div>
       </Link>
 
-      {/* Hors du lien : un cœur cliqué met de côté, il n'ouvre pas la fiche. */}
+      {/* Heart Wishlist button */}
       <button
         type="button"
         aria-pressed={favori}
@@ -121,57 +100,70 @@ export function ProductCard({ product, priority }: { product: Product; priority?
           const ajoute = basculer(product.id);
           notify(ajoute ? `${product.name} mis de côté` : `${product.name} retiré des favoris`);
         }}
-        className="press absolute right-2.5 top-2.5 grid size-9 place-items-center rounded-full bg-ivory/85 text-ink backdrop-blur-sm transition-colors hover:bg-ivory"
+        className={cn(
+          'press absolute right-4 top-4 grid size-8 sm:size-8.5 place-items-center rounded-full transition-all shadow-xs',
+          favori ? 'bg-[#E296A9] text-[#581127] shadow-sm' : 'bg-white/90 hover:bg-white text-[#8A6470] border border-[#F4C7D3]/60',
+        )}
       >
-        <Heart className={cn('size-[17px]', favori && 'fill-brand text-brand')} strokeWidth={1.7} />
+        <Heart className={cn('size-4', favori && 'fill-[#581127] text-[#581127]')} strokeWidth={1.8} />
       </button>
 
-      <div className="mt-3 flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <Link to={`/produit/${product.slug}`}>
-            <h3 className="line-clamp-2 font-display text-[17px] leading-tight">{product.name}</h3>
-          </Link>
-          <span className="mt-1 flex items-baseline gap-1.5 whitespace-nowrap">
-            {aPlusieursPrix && <span className="text-[12.5px] text-stone">dès</span>}
-            <Price
-              amount={prixLePlusBas(product)}
-              compareAt={product.compareAtPrice}
-              className="text-[14px]"
-            />
-          </span>
-          {/* Les options se montrent quand elles se lisent ; sinon on se
-              contente de dire combien il y en a. */}
-          {resume && valeursMontrees(resume).montrees.length > 0 ? (
-            <OptionsVignette resume={resume} />
-          ) : (
-            choiceCount > 1 && (
-              <p className="mt-0.5 text-[12px] text-mauve">{choiceCount} modèles au choix</p>
-            )
-          )}
-        </div>
+      {/* Info & Price */}
+      <div className="mt-2.5 flex flex-col flex-grow min-w-0">
+        <Link to={`/produit/${product.slug}`} className="block">
+          <h3 className="line-clamp-2 text-xs sm:text-sm font-medium text-[#3D1220] group-hover:text-[#7E1E3C] transition-colors leading-snug">
+            {product.name}
+          </h3>
+        </Link>
 
-        {!soldOut &&
-          (needsChoice ? (
-            <Link
-              to={`/produit/${product.slug}`}
-              aria-label={`Choisir les options de ${product.name}`}
-              className="press grid size-10 shrink-0 place-items-center rounded-full border border-line bg-white text-ink"
-            >
-              <SlidersHorizontal className="size-4" />
-            </Link>
-          ) : (
-            <button
-              type="button"
-              aria-label={`Ajouter ${product.name} au panier`}
-              onClick={() => {
-                add(product, {});
-                notify(`${product.name} ajouté au panier`);
-              }}
-              className="press grid size-10 shrink-0 place-items-center rounded-full bg-ink text-ivory"
-            >
-              <Plus className="size-4" />
-            </button>
-          ))}
+        {/* Wholesale extra hint if defined */}
+        {(product.priceDizaine || product.wholesaleLot) && (
+          <p className="text-[10px] text-[#8A6470] font-medium mt-0.5">
+            Tarif gros : {product.priceDizaine ? `${product.priceDizaine.toLocaleString('fr-FR')} F (10p)` : `${product.wholesaleLot?.price.toLocaleString('fr-FR')} F (${product.wholesaleLot?.quantity}p)`}
+          </p>
+        )}
+
+        {/* Options / Colors */}
+        {resume && valeursMontrees(resume).montrees.length > 0 ? (
+          <OptionsVignette resume={resume} />
+        ) : (
+          choiceCount > 1 && (
+            <p className="mt-1 text-[11px] text-[#7E1E3C] font-medium">{choiceCount} modèles au choix</p>
+          )
+        )}
+
+        {/* Bottom price + Action */}
+        <div className="mt-auto pt-2 flex items-center justify-between border-t border-[#F4C7D3]/30 min-w-0 gap-1.5">
+          <div className="flex flex-col min-w-0">
+            <span className="text-xs sm:text-sm font-bold text-[#7E1E3C] truncate leading-tight">
+              {aPlusieursPrix && <span className="text-[11px] font-normal text-[#8A6470] mr-1">dès</span>}
+              <Price amount={prixLePlusBas(product)} compareAt={product.compareAtPrice} className="text-xs sm:text-sm" />
+            </span>
+          </div>
+
+          {!soldOut &&
+            (needsChoice ? (
+              <Link
+                to={`/produit/${product.slug}`}
+                aria-label={`Choisir les options de ${product.name}`}
+                className="press grid size-8 sm:size-9 shrink-0 place-items-center rounded-xl border border-[#F4C7D3] bg-[#FAF3F4] text-[#581127] hover:bg-[#FCE8EE] transition-colors"
+              >
+                <SlidersHorizontal className="size-3.5" />
+              </Link>
+            ) : (
+              <button
+                type="button"
+                aria-label={`Ajouter ${product.name} au panier`}
+                onClick={() => {
+                  add(product, {});
+                  notify(`${product.name} ajouté au panier`);
+                }}
+                className="press grid size-8 sm:size-9 shrink-0 place-items-center rounded-xl button-3d-rose-fonce text-white shadow-xs cursor-pointer"
+              >
+                <Plus className="size-4 stroke-[2.5]" />
+              </button>
+            ))}
+        </div>
       </div>
     </article>
   );

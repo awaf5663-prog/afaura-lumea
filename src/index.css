@@ -15,44 +15,39 @@
    à 4,21 avec l'ancienne gamme, passe maintenant à 4,67.
    ───────────────────────────────────────────────────────────── */
 @theme {
-  /* Fonds — le magenta, pâli à l'extrême */
-  --color-ivory: #fcf7fa; /* fond principal */
-  --color-cream: #f8edf3; /* surfaces, cartes */
-  --color-blush: #e5cedb; /* rose clair — c'est la couleur de ses visuels */
+  /* Fonds Espace AFAURA */
+  --color-ivory: #faf3f4; /* fond principal doux */
+  --color-cream: #fce8ee; /* surfaces douces, cartes */
+  --color-blush: #f4c7d3; /* rose délicat pour bordures et accents */
+  --color-rosecreme: #fcf6f8;
 
-  /* Rose crème — fond des photos d'articles : le rose de la marque
-     réchauffé de beige, pour que le blanc des packshots disparaisse
-     dedans plutôt que de former un carré blanc au milieu de la page. */
-  --color-rosecreme: #f9efe8;
+  --color-sand: #f5cbd5;
+  --color-clay: #e296a9;
+  --color-line: #f4c7d366;
 
-  /* Beiges — conservés, en contrepoint chaud */
-  --color-sand: #e9d9cb;
-  --color-clay: #dac6b4;
-  --color-line: #ebdbe4;
+  /* Magentas / Bordeaux signature AFAURA */
+  --color-brand: #7e1e3c; /* Rose foncé / bordeaux signature */
+  --color-mauve: #7e1e3c;
+  --color-chart: #7e1e3c;
+  --color-rosedark: #581127; /* Bordeaux profond impérial */
+  --color-rosepoudre: #e296a9; /* Rose poudré satiné */
 
-  /* Magentas */
-  --color-brand: #c1498b; /* SA couleur, exacte — boutons, aplats */
-  --color-mauve: #8e2961; /* la même, assombrie pour rester lisible en texte */
-  --color-chart: #c1498b; /* barres des graphiques */
-  --color-rosedark: #5b203f; /* magenta profond — grandes surfaces sombres */
-
-  /* Noirs et gris, teintés de magenta plutôt que de brun */
-  --color-ink: #1c1218;
-  --color-graphite: #47333f;
-  --color-stone: #695460;
+  /* Textes chaleureux */
+  --color-ink: #3d1220; /* Texte sombre bordeaux profond */
+  --color-graphite: #541225;
+  --color-stone: #8a6470; /* Texte secondaire raffiné */
 
   --color-gold: #b08d57;
 
-  --font-display: 'Fraunces', 'Times New Roman', serif;
-  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  /* Lettres rondes et pleines de l'écran d'entrée, à l'image du logo. */
-  --font-entree: 'Fredoka', 'Trebuchet MS', system-ui, sans-serif;
+  --font-display: 'Playfair Display', 'Fraunces', Georgia, serif;
+  --font-sans: 'Jost', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-entree: 'Playfair Display', serif;
 
   --radius-xs: 6px;
   --radius-sm: 10px;
-  --radius-md: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
 }
 
 @layer base {
@@ -79,9 +74,9 @@
   h2,
   h3 {
     font-family: var(--font-display);
-    font-weight: 400;
+    font-weight: 500;
     letter-spacing: -0.015em;
-    line-height: 1.1;
+    line-height: 1.15;
   }
 
   /* Cible tactile minimale confortable sur mobile */
@@ -115,7 +110,7 @@
     font-size: 0.6875rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--color-mauve);
   }
 
@@ -137,6 +132,66 @@
   }
   .no-scrollbar {
     scrollbar-width: none;
+  }
+
+  /* ── Effets Signature Espace AFAURA ── */
+  .card-3d {
+    background: #ffffff;
+    border: 1px solid #f4c7d373;
+    border-radius: 26px;
+    transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 14px 34px -8px rgba(126, 30, 60, 0.12), 0 4px 14px -2px rgba(0, 0, 0, 0.04);
+  }
+  .card-3d:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -10px rgba(126, 30, 60, 0.18), 0 8px 18px -4px rgba(0, 0, 0, 0.06);
+  }
+  .card-3d-soft {
+    background: #fce8ee;
+    border: 1px solid #f4c7d359;
+    border-radius: 24px;
+    box-shadow: 0 8px 24px -4px rgba(126, 30, 60, 0.08), inset 0 1px 2px #fffffff2;
+  }
+  .button-3d-rose-fonce, .button-3d-bordeaux {
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    color: #ffffff !important;
+    background: linear-gradient(145deg, #8e2345, #581127) !important;
+    border: 1px solid rgba(226, 150, 169, 0.35) !important;
+    box-shadow: 0 10px 24px -5px rgba(126, 30, 60, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.35) !important;
+  }
+  .button-3d-rose-fonce:hover, .button-3d-bordeaux:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(145deg, #a02b50, #6e1532) !important;
+    box-shadow: 0 14px 28px -5px rgba(126, 30, 60, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.45) !important;
+  }
+  .button-3d-rose-fonce:active, .button-3d-bordeaux:active {
+    transform: translateY(1px);
+    box-shadow: 0 4px 12px -2px rgba(126, 30, 60, 0.35) !important;
+  }
+  .button-3d-rose-poudre {
+    color: #581127 !important;
+    background: linear-gradient(145deg, #f5cbd5, #e399ab) !important;
+    transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    box-shadow: 0 8px 20px -4px rgba(226, 150, 169, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.6) !important;
+    font-weight: 700;
+  }
+  .button-3d-rose-poudre:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px -4px rgba(226, 150, 169, 0.65) !important;
+  }
+  .floating-dock {
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+    background: rgba(88, 17, 39, 0.94);
+    border: 1px solid rgba(244, 199, 211, 0.25);
+    box-shadow: 0 20px 40px -8px rgba(61, 18, 32, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.25);
+  }
+  .glass-pill {
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 0 6px 18px -3px rgba(126, 30, 60, 0.08);
   }
 }
 

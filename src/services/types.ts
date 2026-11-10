@@ -35,6 +35,14 @@ export interface SheinDraft {
   isStudent: boolean;
   /** Code promo saisi par la cliente. Vide = aucun. */
   promoCode: string;
+  /** Plateforme visée : 'shein', 'alibaba' ou mixte 'mixed'. */
+  platform?: 'shein' | 'alibaba' | 'mixed';
+  /** Mode d'acheminement Alibaba si applicable : 'express_avion' ou 'fret_maritime'. */
+  alibabaTransitMode?: 'express_avion' | 'fret_maritime';
+  /** Total estimé en devises d'origine (USD par ex). */
+  currencyAmount?: number | null;
+  /** Taux de conversion USD appliqué. */
+  usdRateApplied?: number;
 }
 
 /** Un total de pages vues et le nombre de navigateurs distincts derrière. */

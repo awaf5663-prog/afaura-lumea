@@ -115,13 +115,11 @@ export interface Product {
    * libellé d'option ; le montant est relu ici, côté serveur.
    */
   optionPrices?: Record<string, Record<string, number>>;
-  /**
-   * Mesures réelles de l'article, saisies depuis l'administration.
-   *
-   * Jamais de valeur inventée ici : tant que la boutique n'a pas mesuré la
-   * pièce, la fiche n'affiche pas de tableau plutôt qu'un chiffre approximatif
-   * sur lequel une cliente choisirait sa taille.
-   */
+  /** Lot grossiste (ex: 12 pièces à 36 000 FCFA). */
+  wholesaleLot?: { quantity: number; price: number } | null;
+  /** Prix pour un lot de 10 pièces (dizaine grossiste) en FCFA. */
+  priceDizaine?: number | null;
+  /** Mesures réelles de l'article, saisies depuis l'administration. */
   measurements?: ProductMeasurement[];
   createdAt: string;
 }
@@ -299,6 +297,14 @@ export interface SheinRequest {
   isStudent: boolean;
   /** Code promo saisi par la cliente, tel quel. Vide = aucun. */
   promoCode: string;
+  /** Plateforme visée : 'shein', 'alibaba' ou mixte 'mixed' (shein & alibaba). */
+  platform?: 'shein' | 'alibaba' | 'mixed';
+  /** Mode d'acheminement Alibaba si applicable : 'express_avion' ou 'fret_maritime'. */
+  alibabaTransitMode?: 'express_avion' | 'fret_maritime';
+  /** Total estimé en devises d'origine (USD par ex). */
+  currencyAmount?: number | null;
+  /** Taux de conversion USD appliqué. */
+  usdRateApplied?: number;
   createdAt: string;
   updatedAt: string;
   /**
@@ -487,6 +493,14 @@ export interface StoreSettings {
   promotions: Promotion[];
   /** Avis recueillis auprès des clientes et publiés par la boutique. */
   reviews: Review[];
+  /** Lien d'invitation à la communauté WhatsApp privée / VIP & Grossistes. */
+  whatsappGroupLink?: string;
+  whatsappGroupTitle?: string;
+  whatsappGroupSubtitle?: string;
+  whatsappGroupBadge?: string;
+  whatsappGroupActive?: boolean;
+  /** Taux de conversion standard pour paniers SHEIN/USD (ex: 650 FCFA). */
+  sheinUsdRate?: number;
 }
 
 /* ─────────────────────────────────────────────────────────────

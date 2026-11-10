@@ -52,6 +52,13 @@ export function defaultSettings(): StoreSettings {
     promotions: DEFAULT_PROMOTIONS,
     // Aucun avis livré avec le site : ils viennent des vraies clientes.
     reviews: [],
+    whatsappGroupLink: 'https://chat.whatsapp.com/G5JvK1y2yY9K3x6wQzAfaura',
+    whatsappGroupTitle: 'Communauté Privée WhatsApp AFAURA',
+    whatsappGroupSubtitle:
+      'Rejoignez notre groupe pour découvrir les arrivages en avant-première, profiter des achats groupés SHEIN & ALIBABA au tarif grossiste et échanger en direct avec notre équipe.',
+    whatsappGroupBadge: 'Groupe VIP & Grossistes',
+    whatsappGroupActive: true,
+    sheinUsdRate: 650,
   };
 }
 
@@ -354,6 +361,10 @@ export const localAdapter: DataSource = {
       deliveryOptionId: quote.deliveryOptionId,
       isStudent: draft.isStudent,
       promoCode: draft.promoCode.trim().toUpperCase(),
+      platform: draft.platform ?? 'shein',
+      alibabaTransitMode: draft.alibabaTransitMode,
+      currencyAmount: draft.currencyAmount,
+      usdRateApplied: draft.usdRateApplied,
       createdAt: now,
       updatedAt: now,
     };

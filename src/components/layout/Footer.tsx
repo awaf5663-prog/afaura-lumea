@@ -31,7 +31,7 @@ const COLUMNS = [
   {
     title: 'Services',
     links: [
-      { to: '/shein', label: 'Commande SHEIN' },
+      { to: '/shein', label: 'Groupages SHEIN & ALIBABA' },
       { to: '/comment-ca-marche', label: 'Comment ça marche' },
       { to: '/guide-des-tailles', label: 'Guide des tailles' },
       { to: '/suivi', label: 'Suivre ma commande' },
@@ -97,6 +97,16 @@ export function Footer() {
                 </a>
               </li>
             )}
+            <li>
+              <a
+                href="https://chat.whatsapp.com/G5JvK1y2yY9K3x6wQzAfaura"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link-underline font-medium text-emerald-800"
+              >
+                Communauté Privée VIP →
+              </a>
+            </li>
             {CONTACT_EMAIL && (
               <li>
                 <a href={`mailto:${CONTACT_EMAIL}`} className="link-underline inline-flex items-center gap-2">

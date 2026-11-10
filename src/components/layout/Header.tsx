@@ -65,77 +65,106 @@ export function Header({ onOpenCart }: { onOpenCart: () => void }) {
 
       <header
         className={cn(
-          'sticky top-0 z-50 transition-colors duration-300',
-          scrolled ? 'border-b border-line bg-ivory/92 backdrop-blur-md' : 'bg-ivory',
+          'sticky top-0 z-50 transition-all duration-300',
+          scrolled ? 'border-b border-[#F4C7D3]/60 bg-[#FAF3F4]/95 backdrop-blur-xl shadow-xs' : 'bg-[#FAF3F4]/90 backdrop-blur-md',
         )}
       >
-        <div className="container-page flex h-16 items-center justify-between gap-3">
-          <button
-            type="button"
-            className="press -ml-2 grid size-10 place-items-center rounded-full text-ink xl:hidden"
-            aria-label="Ouvrir le menu"
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen(true)}
-          >
-            <Menu className="size-5" />
-          </button>
+        <div className="container-page flex h-16 sm:h-20 items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className="press -ml-2 grid size-10 place-items-center rounded-full text-[#3D1220] xl:hidden hover:bg-[#FCE8EE]/50"
+              aria-label="Ouvrir le menu"
+              aria-expanded={menuOpen}
+              onClick={() => setMenuOpen(true)}
+            >
+              <Menu className="size-5" />
+            </button>
 
-          <Link to="/" className="flex items-center gap-2.5" aria-label={`${BRAND.name} — accueil`}>
-            {/*
-              Le symbole du logo, pas le logo entier : à cette taille la signature
-              « MODESTE. LUMIÈRE. INTEMPORELLE. » serait un pâté illisible.
-            */}
-            <img src={symbole} alt="" className="size-8 shrink-0 object-contain" />
-            <span className="flex flex-col items-start">
-              <span className="font-display text-[20px] leading-none tracking-[0.02em]">{BRAND.name}</span>
-              <span className="mt-0.5 text-[9px] uppercase tracking-[0.32em] text-stone">{BRAND.city}</span>
-            </span>
-          </Link>
+            <Link to="/" className="flex items-center gap-2.5 group select-none" aria-label={`${BRAND.name} — accueil`}>
+              <img
+                src={symbole}
+                alt=""
+                className="size-8 sm:size-9 shrink-0 object-contain drop-shadow-sm transition-transform duration-300 group-hover:scale-105"
+              />
+              <span className="flex flex-col items-start text-left">
+                <span className="text-xl sm:text-2xl font-serif tracking-[0.16em] text-[#581127] font-bold leading-none">
+                  AFAURA
+                </span>
+                <span className="text-[9px] tracking-[0.25em] uppercase text-[#8A6470] font-sans font-medium mt-0.5">
+                  Espace Catalogue
+                </span>
+              </span>
+            </Link>
 
-          {/*
-            Le menu complet ne s'affiche qu'à partir de 1280 px : en dessous, les
-            neuf entrées passaient à la ligne et la barre montait sur deux ou
-            trois étages. Sur les écrans plus étroits, c'est le bouton menu qui
-            prend le relais — il donne accès exactement aux mêmes pages.
-          */}
-          <nav className="hidden items-center gap-5 xl:flex" aria-label="Navigation principale">
+            {/* Quick Pills like Espace AFAURA */}
+            <div className="hidden lg:flex items-center gap-2 ml-4">
+              <Link
+                to="/boutique"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs font-semibold cursor-pointer transition-all bg-white/80 border-[#F4C7D3]/60 text-[#7E1E3C] shadow-xs hover:bg-white hover:border-[#E296A9]"
+              >
+                <span>Catalogue</span>
+              </Link>
+              <Link
+                to="/shein"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border text-xs font-semibold cursor-pointer transition-all shadow-xs bg-gradient-to-r from-[#FAF3F4] to-[#FCE8EE] border-[#E296A9]/70 text-[#581127] hover:border-[#7E1E3C]"
+              >
+                <span>Services Exclusifs</span>
+              </Link>
+            </div>
+          </div>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden xl:flex items-center gap-5" aria-label="Navigation principale">
             {NAV.map((item) => (
               <NavLink key={item.to} {...item} />
             ))}
           </nav>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Quick Tracking Button */}
+            <Link
+              to="/suivi"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#FAF3F4] via-[#FFF8F9] to-[#FCE8EE] shadow-xs border border-[#E296A9] hover:border-[#7E1E3C] text-[#581127] text-xs font-bold transition-all"
+              title="Suivre et consulter mes commandes"
+            >
+              <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Suivi Colis</span>
+            </Link>
+
             <button
               type="button"
               onClick={() => navigate('/boutique?focus=recherche')}
-              className="press grid size-10 place-items-center rounded-full text-ink"
+              className="press grid size-9 sm:size-10 place-items-center rounded-full text-[#3D1220] hover:bg-white/80 transition-colors"
               aria-label="Rechercher un article"
             >
-              <Search className="size-5" />
+              <Search className="size-5 text-[#581127]" />
             </button>
+
             <Link
               to="/favoris"
-              className="press relative grid size-10 place-items-center rounded-full text-ink"
+              className="press relative grid size-9 sm:size-10 place-items-center rounded-full text-[#3D1220] hover:bg-white/80 transition-colors"
               aria-label={`Mes favoris, ${favoris} article${favoris > 1 ? 's' : ''}`}
             >
-              <Heart className="size-5" strokeWidth={1.7} />
+              <Heart className="size-5 text-[#581127]" strokeWidth={1.8} />
               {favoris > 0 && (
-                <span className="absolute -right-0.5 -top-0.5 grid size-[18px] place-items-center rounded-full bg-brand text-[10px] font-semibold text-white">
+                <span className="absolute -right-0.5 -top-0.5 grid size-[18px] place-items-center rounded-full bg-[#7E1E3C] text-[10px] font-semibold text-white shadow-xs">
                   {favoris > 99 ? '99+' : favoris}
                 </span>
               )}
             </Link>
+
             <button
               type="button"
               onClick={onOpenCart}
-              className="press relative grid size-10 place-items-center rounded-full text-ink"
+              className="press relative grid size-9 sm:size-10 place-items-center rounded-full text-[#3D1220] hover:bg-white/80 transition-colors"
               aria-label={`Panier, ${count} article${count > 1 ? 's' : ''}`}
             >
-              <ShoppingBag className="size-5" />
+              <ShoppingBag className="size-5 text-[#581127]" />
               {count > 0 && (
                 <span
                   key={pulse}
-                  className="animate-pop absolute -right-0.5 -top-0.5 grid size-[18px] place-items-center rounded-full bg-ink text-[10px] font-semibold text-ivory"
+                  className="animate-pop absolute -right-0.5 -top-0.5 grid size-[18px] place-items-center rounded-full bg-[#581127] text-[10px] font-bold text-white shadow-sm"
                 >
                   {count > 99 ? '99+' : count}
                 </span>

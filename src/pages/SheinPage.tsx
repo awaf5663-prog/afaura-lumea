@@ -1,7 +1,8 @@
-import { ArrowRight, CircleHelp, Info } from 'lucide-react';
+import { ArrowRight, CircleHelp, Globe, Info, Package, Plane, Ship, Sparkles } from 'lucide-react';
 import { GroupingCapacity } from '@/src/components/shein/GroupingCapacity';
 import { PromotionNotice } from '@/src/components/shein/PromotionNotice';
 import { HowItWorks } from '@/src/components/home/HowItWorks';
+import { WhatsAppCommunityCard } from '@/src/components/brand/WhatsAppCommunityCard';
 import { Button } from '@/src/components/ui/Button';
 import { Reveal } from '@/src/components/ui/Reveal';
 import { useGroupings } from '@/src/hooks/useGroupings';
@@ -11,11 +12,11 @@ import { useRouter } from '@/src/lib/router';
 import { useSeo } from '@/src/lib/seo';
 
 const WHAT_WE_NEED = [
-  'Le lien de l’article (le bouton « Partager » de SHEIN copie le lien)',
-  'La taille et la couleur exactes',
-  'La quantité',
-  'Le prix affiché sur SHEIN',
-  'Une capture d’écran si c’est plus simple pour vous',
+  'Le lien de l’article (ou bouton « Partager » sur l’application SHEIN ou ALIBABA)',
+  'La taille, variante et couleur exactes',
+  'La quantité souhaitée (à l’unité ou en gros pour Alibaba)',
+  'Le prix affiché sur la plateforme (en FCFA, USD $ ou EUR €)',
+  'Une capture d’écran de votre panier si c’est plus simple pour vous',
 ];
 
 export function SheinPage() {
@@ -25,27 +26,31 @@ export function SheinPage() {
   const pricing = settings?.pricing;
 
   useSeo({
-    title: 'Commander sur SHEIN depuis le Sénégal',
+    title: 'Commandes Groupées SHEIN & ALIBABA — Espace AFAURA',
     description:
-      'Transmettez-nous vos articles SHEIN : nous vérifions, confirmons le montant en FCFA et intégrons votre commande au prochain groupage vers Saint-Louis.',
+      'Transmettez-nous vos articles SHEIN ou ALIBABA : validation officielle, groupage mutualisé, prise en charge de A à Z sans transitaire et livraison à Saint-Louis, Dakar, Thiès et Louga.',
   });
 
   return (
     <div className="pt-8">
       <section className="container-page">
-        <p className="eyebrow">Service de commande groupée</p>
+        <p className="eyebrow inline-flex items-center gap-1.5">
+          <Sparkles className="size-3.5" />
+          Service de commande groupée officiel · SHEIN & ALIBABA
+        </p>
         <h1 className="mt-3 max-w-3xl text-[36px] leading-[1.06] sm:text-[52px]">
-          Tu choisis sur SHEIN. Nous, on s'occupe de la commande.
+          Tu choisis sur SHEIN ou ALIBABA. Nous, on s'occupe de TOUT.
         </h1>
         <p className="mt-5 max-w-2xl text-[15.5px] leading-relaxed text-graphite">
-          Pas de carte bancaire internationale, pas de frais surprise, pas d'adresse à l'étranger à
-          trouver. Vous nous envoyez ce que vous voulez, nous vous donnons un montant clair en FCFA,
-          et votre commande voyage avec notre prochain groupage.
+          Pas de carte bancaire internationale, pas de compte en devises, et surtout{' '}
+          <strong className="font-medium text-ink">aucun transitaire à chercher</strong>. Vous nous
+          transmettez vos liens ou captures, nous confirmons le montant exact en FCFA, et votre
+          commande voyage avec notre groupage sécurisé jusqu'à Saint-Louis, Dakar, Thiès et Louga.
         </p>
 
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Button size="lg" onClick={() => navigate('/shein/demande')}>
-            Transmettre mon panier SHEIN
+            Transmettre mon panier SHEIN / ALIBABA
             <ArrowRight className="size-4" />
           </Button>
           <Button size="lg" variant="secondary" onClick={() => navigate('/suivi')}>
@@ -53,17 +58,54 @@ export function SheinPage() {
           </Button>
         </div>
 
-        <div className="mt-8 max-w-md space-y-3">
+        {/* Atouts clés SHEIN & ALIBABA */}
+        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="rounded-[--radius-md] border border-mauve/20 bg-cream/70 p-4">
+            <div className="flex items-center gap-2 text-[14px] font-medium text-rosedark">
+              <Package className="size-4 text-brand" />
+              <span>SHEIN Express</span>
+            </div>
+            <p className="mt-1 text-[12.5px] text-graphite">
+              Acheminement régulier par groupage, réception en <strong className="font-medium text-ink">15 jours max</strong> (2 semaines).
+            </p>
+          </div>
+
+          <div className="rounded-[--radius-md] border border-mauve/20 bg-cream/70 p-4">
+            <div className="flex items-center gap-2 text-[14px] font-medium text-rosedark">
+              <Plane className="size-4 text-brand" />
+              <span>ALIBABA Fret Avion</span>
+            </div>
+            <p className="mt-1 text-[12.5px] text-graphite">
+              Idéal grossistes & commandes urgentes, réception en <strong className="font-medium text-ink">15 à 20 jours</strong>.
+            </p>
+          </div>
+
+          <div className="rounded-[--radius-md] border border-mauve/20 bg-cream/70 p-4 sm:col-span-2 lg:col-span-1">
+            <div className="flex items-center gap-2 text-[14px] font-medium text-rosedark">
+              <Ship className="size-4 text-brand" />
+              <span>ALIBABA Fret Maritime</span>
+            </div>
+            <p className="mt-1 text-[12.5px] text-graphite">
+              Ultra économique pour les gros volumes & cartons, délai 2 à 3 mois maximum.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 max-w-md space-y-3">
           <PromotionNotice kind="shein" />
           <GroupingCapacity grouping={displayed} settings={settings} />
         </div>
 
+        <div className="mt-8">
+          <WhatsAppCommunityCard />
+        </div>
+
         <p className="mt-8 flex max-w-2xl gap-2.5 rounded-[--radius-md] border border-line bg-cream/60 px-4 py-3.5 text-[13px] leading-relaxed text-graphite">
-          <Info className="mt-0.5 size-4 shrink-0" />
+          <Info className="mt-0.5 size-4 shrink-0 text-mauve" />
           <span>
-            Nous sommes un service indépendant de commande groupée. Nous ne sommes ni SHEIN, ni un
-            revendeur officiel, ni affiliés à la marque. Nous achetons les articles pour vous et
-            organisons leur acheminement jusqu'à Saint-Louis.
+            Espace AFAURA est un service de conciergerie logistique et commande groupée. Nous validons,
+            achetons pour vous, mutualisons le fret et assurons le dédouanement et la livraison locale.
+            Montant 100% garanti en FCFA avant tout paiement.
           </span>
         </p>
       </section>

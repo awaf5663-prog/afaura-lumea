@@ -4,6 +4,7 @@ import { WhatsAppLink } from '@/src/components/whatsapp/WhatsAppLink';
 import { Gallery } from '@/src/components/product/Gallery';
 import { ProductCard } from '@/src/components/product/ProductCard';
 import { VariantPicker } from '@/src/components/product/VariantPicker';
+import { WholesalePricingCard } from '@/src/components/product/WholesalePricingCard';
 import { Badge } from '@/src/components/ui/Badge';
 import { Button } from '@/src/components/ui/Button';
 import { EmptyState } from '@/src/components/ui/EmptyState';
@@ -419,6 +420,9 @@ export function ProductPage({ slug }: { slug: string }) {
                 label={product.name}
               />
             </div>
+
+            {/* Tarif grossiste et revendeurs (lots de 10 et douzaines) */}
+            <WholesalePricingCard product={product} selectedOptions={options} />
           </div>
 
           <div className="mt-8 hidden gap-3 lg:flex">

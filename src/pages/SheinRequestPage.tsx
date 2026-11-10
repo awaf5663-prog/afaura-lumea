@@ -1,4 +1,17 @@
-import { AlertCircle, ImagePlus, Plus, Trash2, X } from 'lucide-react';
+import {
+  AlertCircle,
+  Building2,
+  Calculator,
+  Check,
+  ImagePlus,
+  Package,
+  Plane,
+  Plus,
+  Ship,
+  Sparkles,
+  Trash2,
+  X,
+} from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { RappelMesures } from '@/src/components/guide/GuideMesures';
 import { GroupingCapacity } from '@/src/components/shein/GroupingCapacity';
@@ -60,6 +73,13 @@ export function SheinRequestPage() {
   const pricing = settings?.pricing;
   const currencies = useMemo(() => Object.keys(pricing?.conversionRates ?? { XOF: 1 }), [pricing]);
   const defaultCurrency = pricing?.defaultCurrency ?? 'XOF';
+
+  const [platform, setPlatform] = useState<'shein' | 'alibaba' | 'mixed'>('shein');
+  const [alibabaTransitMode, setAlibabaTransitMode] = useState<'express_avion' | 'fret_maritime'>('express_avion');
+  const [usdAmount, setUsdAmount] = useState('');
+  const [city, setCity] = useState('Saint-Louis');
+
+  const usdRate = settings?.sheinUsdRate || 650;
 
   const [customerName, setCustomerName] = useState('');
   const [phone, setPhone] = useState('');
@@ -186,52 +206,78 @@ export function SheinRequestPage() {
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const request = await db.createSheinRequest({
-        customerName,
-        phone,
-        note,
-        deliveryOptionId,
-        isStudent,
-        promoCode,
-        items: items.filter((item) => item.productUrl.trim() || item.reference.trim()),
-      });
+      const noteParts = [
+        note.trim(),
+        `Ville de livraison : ${city}`,
+      platform !== 'shein'
+        ? `Acheminement Alibaba : ${
+            alibabaTransitMode === 'express_avion'
+              ? 'Fret Express Avion (15-20j)'
+              : 'Fret Maritime Bateau (2-3 mois max)'
+          } (Transit géré par AFAURA)`
+        : '',
+      usdAmount
+        ? `Panier déclaré : ${usdAmount} $ USD (~${Math.round(
+            parseFloat(usdAmount) * usdRate,
+          ).toLocaleString('fr-FR')} FCFA à 1$ = ${usdRate} F)`
+        : '',
+    ].filter(Boolean);
 
-      const mine = readJson<Array<{ requestNumber: string; phone: string }>>(STORAGE_KEYS.myShein, []);
-      writeJson(STORAGE_KEYS.myShein, [
-        { requestNumber: request.requestNumber, phone: normalizePhone(phone) },
-        ...mine.filter((m) => m.requestNumber !== request.requestNumber),
-      ]);
+    const request = await db.createSheinRequest({
+      customerName,
+      phone,
+      note: noteParts.join(' · '),
+      deliveryOptionId,
+      isStudent,
+      promoCode,
+      platform,
+      alibabaTransitMode: platform !== 'shein' ? alibabaTransitMode : undefined,
+      currencyAmount: usdAmount ? parseFloat(usdAmount) : null,
+      usdRateApplied: usdRate,
+      items: items.filter((item) => item.productUrl.trim() || item.reference.trim()),
+    });
 
-      setRelecture(false);
-      navigate(`/shein/confirmation/${request.requestNumber}`);
-      // WhatsApp part avec la demande en main : c'est ce message qui
-      // prévient la boutique qu'une demande vient d'arriver.
-      openWhatsapp(whatsapp.url(buildSheinMessage(request)));
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Envoi impossible pour le moment.';
-      setSubmitError(message);
-      notify(message, 'error');
-      setSubmitting(false);
-      setRelecture(false);
-    }
-  };
+    const mine = readJson<Array<{ requestNumber: string; phone: string }>>(STORAGE_KEYS.myShein, []);
+    writeJson(STORAGE_KEYS.myShein, [
+      { requestNumber: request.requestNumber, phone: normalizePhone(phone) },
+      ...mine.filter((m) => m.requestNumber !== request.requestNumber),
+    ]);
 
-  const retenus = items.filter((item) => item.productUrl.trim() || item.reference.trim());
-  const nbArticles = retenus.reduce((n, i) => n + Math.max(1, i.quantity), 0);
-  const optionLivraison = (pricing?.deliveryOptions ?? []).find((o) => o.id === deliveryOptionId);
-  const recapitulatif: LigneRecap[] = [
-    { label: 'Nom', value: customerName.trim() || '—' },
-    { label: 'Téléphone', value: prettyPhone(phone) || '—', cle: true },
-    { label: 'Livraison', value: optionLivraison?.label ?? '—' },
-    { label: 'Articles', value: `${nbArticles} article${nbArticles > 1 ? 's' : ''}` },
-    {
-      label: 'Estimation',
-      value:
-        quote && quote.total !== null
-          ? `${formatFcfa(quote.total)} — à confirmer`
-          : 'confirmée avant paiement',
-    },
-  ];
+    setRelecture(false);
+    navigate(`/shein/confirmation/${request.requestNumber}`);
+    // WhatsApp part avec la demande en main : c'est ce message qui
+    // prévient la boutique qu'une demande vient d'arriver.
+    openWhatsapp(whatsapp.url(buildSheinMessage(request)));
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Envoi impossible pour le moment.';
+    setSubmitError(message);
+    notify(message, 'error');
+    setSubmitting(false);
+    setRelecture(false);
+  }
+};
+
+const retenus = items.filter((item) => item.productUrl.trim() || item.reference.trim());
+const nbArticles = retenus.reduce((n, i) => n + Math.max(1, i.quantity), 0);
+const optionLivraison = (pricing?.deliveryOptions ?? []).find((o) => o.id === deliveryOptionId);
+const recapitulatif: LigneRecap[] = [
+  { label: 'Nom', value: customerName.trim() || '—' },
+  { label: 'Téléphone', value: prettyPhone(phone) || '—', cle: true },
+  {
+    label: 'Plateforme',
+    value: platform === 'shein' ? 'SHEIN' : platform === 'alibaba' ? 'ALIBABA' : 'SHEIN & ALIBABA',
+  },
+  { label: 'Ville', value: city },
+  { label: 'Livraison', value: optionLivraison?.label ?? '—' },
+  { label: 'Articles', value: `${nbArticles} article${nbArticles > 1 ? 's' : ''}` },
+  {
+    label: 'Estimation',
+    value:
+      quote && quote.total !== null
+        ? `${formatFcfa(quote.total)} — à confirmer`
+        : 'confirmée avant paiement',
+  },
+];
 
   return (
     <form onSubmit={submit} className="container-page py-8">
@@ -264,8 +310,156 @@ export function SheinRequestPage() {
 
         <div className="grid gap-10 lg:grid-cols-[1.35fr_1fr] lg:items-start lg:gap-14">
           <div>
-            <section className="mt-10">
-              <h2 className="text-[22px]">Vos coordonnées</h2>
+            {/* 1. Choix de la plateforme : SHEIN / ALIBABA / MIXTE */}
+            <section className="mt-8 rounded-[--radius-lg] border border-mauve/25 bg-gradient-to-br from-cream/90 via-blush/25 to-cream/80 p-5 shadow-xs">
+              <div className="flex items-center gap-2">
+                <Sparkles className="size-4 text-brand" />
+                <h2 className="text-[18px] font-medium text-rosedark">Plateforme de commande groupée</h2>
+              </div>
+              <p className="mt-1 text-[13px] text-graphite">
+                Sélectionnez d'où proviennent vos articles. Espace AFAURA valide, commande et organise
+                le fret sans transitaire tiers.
+              </p>
+
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setPlatform('shein')}
+                  className={`press flex flex-col items-start rounded-[--radius-md] border p-3 text-left transition ${
+                    platform === 'shein'
+                      ? 'border-brand bg-white shadow-xs ring-2 ring-brand/20'
+                      : 'border-line bg-white/70 hover:bg-white'
+                  }`}
+                >
+                  <div className="flex w-full items-center justify-between">
+                    <span className="font-semibold text-[14px] text-ink">SHEIN</span>
+                    {platform === 'shein' && <Check className="size-4 text-brand" />}
+                  </div>
+                  <span className="mt-1 text-[11.5px] text-stone">Délai rapide ~15 jours max</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPlatform('alibaba')}
+                  className={`press flex flex-col items-start rounded-[--radius-md] border p-3 text-left transition ${
+                    platform === 'alibaba'
+                      ? 'border-[#ff6a00] bg-orange-50/60 shadow-xs ring-2 ring-orange-500/20'
+                      : 'border-line bg-white/70 hover:bg-white'
+                  }`}
+                >
+                  <div className="flex w-full items-center justify-between">
+                    <span className="font-semibold text-[14px] text-[#c94d00]">ALIBABA</span>
+                    {platform === 'alibaba' && <Check className="size-4 text-[#c94d00]" />}
+                  </div>
+                  <span className="mt-1 text-[11.5px] text-stone">Grossiste & lots usine</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setPlatform('mixed')}
+                  className={`press flex flex-col items-start rounded-[--radius-md] border p-3 text-left transition ${
+                    platform === 'mixed'
+                      ? 'border-mauve bg-white shadow-xs ring-2 ring-mauve/20'
+                      : 'border-line bg-white/70 hover:bg-white'
+                  }`}
+                >
+                  <div className="flex w-full items-center justify-between">
+                    <span className="font-semibold text-[14px] text-mauve">Mixte (2 en 1)</span>
+                    {platform === 'mixed' && <Check className="size-4 text-mauve" />}
+                  </div>
+                  <span className="mt-1 text-[11.5px] text-stone">Articles Shein + Alibaba</span>
+                </button>
+              </div>
+
+              {/* Options spécifiques Alibaba si concerné */}
+              {(platform === 'alibaba' || platform === 'mixed') && (
+                <div className="mt-4 rounded-[--radius-md] border border-orange-200 bg-white/95 p-4">
+                  <div className="flex items-center gap-2 text-[13px] font-medium text-[#c94d00]">
+                    <Plane className="size-4" />
+                    <span>Mode d'acheminement Groupage ALIBABA</span>
+                  </div>
+                  <div className="mt-2.5 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setAlibabaTransitMode('express_avion')}
+                      className={`press flex items-start gap-2.5 rounded-[--radius-sm] border p-2.5 text-left text-[12.5px] ${
+                        alibabaTransitMode === 'express_avion'
+                          ? 'border-[#ff6a00] bg-orange-50 text-ink font-medium shadow-2xs'
+                          : 'border-line bg-white text-stone'
+                      }`}
+                    >
+                      <Plane className="mt-0.5 size-4 text-[#c94d00] shrink-0" />
+                      <div>
+                        <div className="font-semibold text-ink">Fret Express Avion</div>
+                        <div className="text-[11px] text-stone">15 à 20 jours ouvrés</div>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setAlibabaTransitMode('fret_maritime')}
+                      className={`press flex items-start gap-2.5 rounded-[--radius-sm] border p-2.5 text-left text-[12.5px] ${
+                        alibabaTransitMode === 'fret_maritime'
+                          ? 'border-[#ff6a00] bg-orange-50 text-ink font-medium shadow-2xs'
+                          : 'border-line bg-white text-stone'
+                      }`}
+                    >
+                      <Ship className="mt-0.5 size-4 text-blue-600 shrink-0" />
+                      <div>
+                        <div className="font-semibold text-ink">Fret Maritime (Bateau)</div>
+                        <div className="text-[11px] text-stone">2 à 3 mois max (très économique)</div>
+                      </div>
+                    </button>
+                  </div>
+
+                  <p className="mt-2.5 text-[11.5px] leading-relaxed text-stone">
+                    <strong className="font-medium text-graphite">
+                      Vous n'avez pas besoin de chercher un transitaire !
+                    </strong>{' '}
+                    L'Espace AFAURA se charge de TOUT pour Alibaba : contact fournisseur, dédouanement,
+                    formalités fret et acheminement jusqu'au Sénégal.
+                  </p>
+                </div>
+              )}
+
+              {/* Convertisseur rapide USD -> FCFA */}
+              <div className="mt-4 pt-3.5 border-t border-mauve/15">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
+                  <div className="flex items-center gap-1.5 text-[12.5px] font-medium text-graphite">
+                    <Calculator className="size-3.5 text-mauve" />
+                    <span>Montant total panier sur l'application (en USD $) :</span>
+                  </div>
+                  <span className="text-[11px] text-stone bg-white/80 px-2.5 py-0.5 rounded-full border border-mauve/15 w-fit">
+                    Taux indicatif : 1 $ = {usdRate} FCFA
+                  </span>
+                </div>
+                <div className="mt-2 flex items-center gap-3">
+                  <div className="relative w-36">
+                    <input
+                      type="number"
+                      min="0"
+                      step="any"
+                      placeholder="Ex: 50"
+                      value={usdAmount}
+                      onChange={(e) => setUsdAmount(e.target.value)}
+                      className="w-full rounded-[--radius-sm] border border-line bg-white px-3 py-1.5 text-[14px] font-semibold text-ink focus:border-brand focus:outline-none"
+                    />
+                    <span className="absolute right-3 top-2 text-[12.5px] text-stone">$ USD</span>
+                  </div>
+                  {parseFloat(usdAmount) > 0 && (
+                    <div className="text-[13px] text-graphite font-medium">
+                      ≈{' '}
+                      <strong className="text-rosedark font-bold text-[15px]">
+                        {formatFcfa(Math.round(parseFloat(usdAmount) * usdRate))}
+                      </strong>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            <section className="mt-8">
+              <h2 className="text-[22px]">Vos coordonnées & livraison</h2>
               <div className="mt-5 grid gap-x-4 sm:grid-cols-2">
                 <FormRow>
                   <Label htmlFor="name">Nom complet</Label>
@@ -297,6 +491,21 @@ export function SheinRequestPage() {
                     autoComplete="tel"
                   />
                   <ErrorText>{errors.phone}</ErrorText>
+                </FormRow>
+
+                <FormRow className="sm:col-span-2">
+                  <Label htmlFor="city">Ville de livraison</Label>
+                  <Select
+                    id="city"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                  >
+                    <option value="Saint-Louis">Saint-Louis (Île, Sor et quartiers)</option>
+                    <option value="Dakar">Dakar (Mermoz, Almadies, Plateau, etc.)</option>
+                    <option value="Thiès">Thiès</option>
+                    <option value="Louga">Louga</option>
+                    <option value="Autre localité">Autre ville / région (Sénégal)</option>
+                  </Select>
                 </FormRow>
               </div>
             </section>

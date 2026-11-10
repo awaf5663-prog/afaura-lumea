@@ -7,6 +7,7 @@ import { InstallerApp } from '@/src/components/pwa/InstallerApp';
 import { HowItWorks } from '@/src/components/home/HowItWorks';
 import { PremierGroupage } from '@/src/components/home/PremierGroupage';
 import { SheinTeaser } from '@/src/components/home/SheinTeaser';
+import { WhatsAppCommunityCard } from '@/src/components/brand/WhatsAppCommunityCard';
 import { TrustRow } from '@/src/components/home/TrustRow';
 import { BRAND, SITE_URL } from '@/src/config/site';
 import { useProducts } from '@/src/hooks/useProducts';
@@ -42,6 +43,9 @@ export function HomePage() {
       <FeaturedProducts products={products} loading={loading} />
       <HowItWorks />
       <GroupingSection />
+      <section className="container-page mt-20">
+        <WhatsAppCommunityCard />
+      </section>
       <Reviews />
       <SheinTeaser />
       <InstallerApp />

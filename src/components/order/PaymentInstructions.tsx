@@ -117,13 +117,34 @@ export function PaymentInstructions({
                 {prettyPhone(number)}
               </span>
             </span>
-            <button
-              type="button"
-              onClick={() => copy(prettyPhone(number), 'Numéro')}
-              className="press inline-flex shrink-0 items-center gap-1.5 rounded-full border border-line px-3 py-2 text-[12px]"
-            >
-              <Copy className="size-3.5" /> Copier
-            </button>
+            <div className="flex items-center gap-1.5">
+              {method.id === 'orange_money' && (
+                <a
+                  href="tel:%23144%23"
+                  className="press inline-flex shrink-0 items-center gap-1 rounded-full bg-orange-500/10 px-3 py-1.5 text-[12px] font-medium text-orange-700 hover:bg-orange-500/20"
+                  title="Composer #144#"
+                >
+                  Code #144#
+                </a>
+              )}
+              {method.id === 'wave' && (
+                <a
+                  href="https://pay.wave.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="press inline-flex shrink-0 items-center gap-1 rounded-full bg-sky-500/10 px-3 py-1.5 text-[12px] font-medium text-sky-700 hover:bg-sky-500/20"
+                >
+                  App Wave
+                </a>
+              )}
+              <button
+                type="button"
+                onClick={() => copy(prettyPhone(number), 'Numéro')}
+                className="press inline-flex shrink-0 items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-[12px]"
+              >
+                <Copy className="size-3.5" /> Copier
+              </button>
+            </div>
           </div>
 
           <ol className="mt-3 list-decimal space-y-1 pl-4">
@@ -137,7 +158,7 @@ export function PaymentInstructions({
               ) : (
                 'le montant total'
               )}{' '}
-              à ce numéro.
+              à ce numéro (ou via le menu Orange Money #144# / application Wave).
             </li>
             <li>Faites une capture d'écran de la confirmation.</li>
             <li>Envoyez-la dans la conversation WhatsApp.</li>

@@ -92,11 +92,33 @@ export function buildOrderMessage(order: Order): string {
 }
 
 export function buildSheinMessage(request: SheinRequest): string {
+  const isAlibaba = request.platform === 'alibaba';
+  const isMixed = request.platform === 'mixed';
+  const platformLabel = isAlibaba ? 'ALIBABA' : isMixed ? 'SHEIN & ALIBABA' : 'SHEIN';
+
   const lines: string[] = [];
-  lines.push(`Bonjour, voici ma demande SHEIN ${request.requestNumber}.`);
+  lines.push(`Bonjour Espace AFAURA, voici ma demande de commande groupée ${platformLabel} (${request.requestNumber}).`);
   lines.push('');
   lines.push(`Nom : ${request.customerName}`);
   lines.push(`Téléphone : ${prettyPhone(request.phone)}`);
+  lines.push(`Plateforme : ${platformLabel}`);
+
+  if (isAlibaba || isMixed) {
+    const transit =
+      request.alibabaTransitMode === 'express_avion'
+        ? 'Fret Express Avion (15 à 20 jours)'
+        : 'Fret Maritime Bateau (2 à 3 mois max - idéal gros volumes)';
+    lines.push(`Acheminement Alibaba : ${transit}`);
+    lines.push(`Transit : Prise en charge intégrale par AFAURA (sans transitaire externe)`);
+  }
+
+  if (request.currencyAmount && request.currencyAmount > 0) {
+    const rate = request.usdRateApplied || 650;
+    lines.push(
+      `Montant panier estimé : ${request.currencyAmount} $ USD (taux indicatif 1$ = ${rate} FCFA)`,
+    );
+  }
+
   lines.push('');
   lines.push(`Articles (${request.items.length}) :`);
   request.items.forEach((item, index) => {
@@ -111,7 +133,7 @@ export function buildSheinMessage(request: SheinRequest): string {
       .filter(Boolean)
       .join(' · ');
     lines.push(`   ${details}`);
-    if (item.displayedPrice) lines.push(`   Prix affiché sur SHEIN : ${item.displayedPrice}`);
+    if (item.displayedPrice) lines.push(`   Prix affiché : ${item.displayedPrice}`);
     if (item.screenshotName) lines.push(`   Capture : ${item.screenshotName} (je l'envoie ici)`);
   });
   if (request.note) {
@@ -119,7 +141,7 @@ export function buildSheinMessage(request: SheinRequest): string {
     lines.push(`Commentaire : ${request.note}`);
   }
   lines.push('');
-  lines.push('Merci de me confirmer le montant total en FCFA.');
+  lines.push('Merci de me confirmer le montant exact en FCFA.');
   return lines.join('\n');
 }
 
